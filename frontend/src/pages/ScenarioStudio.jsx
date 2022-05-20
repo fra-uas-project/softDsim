@@ -2,18 +2,21 @@ import {
     Box,
     Breadcrumb,
     BreadcrumbItem,
-    BreadcrumbLink, Editable, EditableInput, EditablePreview,
-    Flex, FormControl, FormHelperText, FormLabel,
+    BreadcrumbLink,
+    Editable,
+    EditableInput,
+    EditablePreview,
+    Flex,
     Heading,
     HStack,
-    Icon, InputGroup, InputRightElement,
+    Icon,
     ListItem,
     Tab,
     TabList,
     TabPanel,
     TabPanels,
     Tabs,
-    Text, Textarea,
+    Text,
     UnorderedList,
     VStack
 } from "@chakra-ui/react";
@@ -37,6 +40,7 @@ import EditorBasicComponent from "../components/EditorBasicComponent";
 import EditorFragmentComponent from "../components/EditorFragmentComponent";
 import EditorQuestionsComponent from "../components/EditorQuestionsComponent";
 import InspectorItemSelector from "../components/InspectorItemSelector";
+import MarkdownTextfield from "../components/MarkdownTextfield";
 
 const Clone = styled(ListItem)`
   margin-bottom: 12px;
@@ -275,7 +279,7 @@ const ScenarioStudio = () => {
             const [reorderedQuestion] = sourceQuestionsComponentQuestions.splice(result.source.index, 1);
 
             // Change destination fragment action list
-            const destinationQuestionsComponent = editorListItems.find(compoonent => compoonent.id === result.destination.droppableId)
+            const destinationQuestionsComponent = editorListItems.find(component => component.id === result.destination.droppableId)
             const destinationQuestionsComponentQuestions = Array.from(destinationQuestionsComponent.questions);
             destinationQuestionsComponentQuestions.splice(result.destination.index, 0, reorderedQuestion);
 
@@ -300,9 +304,8 @@ const ScenarioStudio = () => {
     };
 
     const handleEditorBackgroundClick = (e) => {
-        if (e.target.tagName === "UL") {
-            //TODO not working correctly
-            // setTabIndex(tabIndexEnum.COMPONENTS)
+        if (e.target.getAttribute("role") === "list") {
+            setTabIndex(tabIndexEnum.COMPONENTS)
         }
 
     };
@@ -310,7 +313,7 @@ const ScenarioStudio = () => {
     // If item is selected, switch to inspector tab
     useEffect(() => {
         if (selectedItem) {
-            // setTabIndex(tabIndexEnum.INSPECTOR); // Deactivated for demonstration purposes
+            setTabIndex(tabIndexEnum.INSPECTOR); // Deactivated for demonstration purposes
         }
     }, [selectedItem, tabIndexEnum.INSPECTOR]);
 
@@ -467,10 +470,7 @@ const ScenarioStudio = () => {
                                                             <EditableInput/>
                                                         </Editable>
                                                         <Box h={3}/>
-                                                        <FormControl>
-                                                            <FormLabel htmlFor='text' color="gray.400" fontWeight="semibold">Story</FormLabel>
-                                                            <Textarea id="text" />
-                                                        </FormControl>
+                                                        <MarkdownTextfield />
                                                         <Box h={3}/>
                                                         <InspectorItemSelector
                                                             droppableId="questionList"
@@ -555,6 +555,9 @@ const ScenarioStudio = () => {
                     </DragDropContext>
                 </HStack>
             </Box>
+
+
+
         </Flex>
     )
 };
