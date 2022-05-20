@@ -1,7 +1,6 @@
 import {Box, HStack, Icon, ListItem, Text, UnorderedList, VStack} from "@chakra-ui/react";
 import {MdDragIndicator} from "react-icons/md";
 import {Draggable, Droppable} from "react-beautiful-dnd";
-import InnerFragmentList from "./InnerFragmentList";
 import EditorActionComponent from "./EditorActionComponent";
 
 const EditorFragmentComponent = (props) => {
