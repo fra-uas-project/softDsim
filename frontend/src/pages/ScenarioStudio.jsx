@@ -6,11 +6,11 @@ import {
     Editable,
     EditableInput,
     EditablePreview,
-    Flex,
+    Flex, FormControl, FormHelperText, FormLabel,
     Heading,
     HStack,
-    Icon,
-    ListItem,
+    Icon, Input,
+    ListItem, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper,
     Tab,
     TabList,
     TabPanel,
@@ -64,6 +64,11 @@ const ScenarioStudio = () => {
         "MODELSELECTION": "MODELSELECTION",
         "QUESTIONS": "QUESTIONS",
         "EVENT": "EVENT"
+    }
+
+    const questionEnum = {
+        "SINGLE": "SINGLE",
+        "MULTI": "MULTI",
     }
 
     const finalComponentList = [
@@ -295,6 +300,17 @@ const ScenarioStudio = () => {
         return (editorList.find(component => component.id === componentId))
     };
 
+    const findQuestion = (questionId) => {
+        const questionsList = editorList.filter(component => component.type === componentEnum.QUESTIONS)
+
+        let questions = []
+        for (const questionsListElement of questionsList) {
+            questions = [...questions, ...questionsListElement.questions]
+        }
+
+        return (questions.find(question => question.id === questionId))
+    };
+
     const handleSelect = (e) => {
         setSelectedItem(e.currentTarget.getAttribute("elementid"))
     }
@@ -313,13 +329,14 @@ const ScenarioStudio = () => {
     // If item is selected, switch to inspector tab
     useEffect(() => {
         if (selectedItem) {
-            setTabIndex(tabIndexEnum.INSPECTOR); // Deactivated for demonstration purposes
+            // TODO Not working when deselected and selected again
+            setTabIndex(tabIndexEnum.INSPECTOR);
         }
     }, [selectedItem, tabIndexEnum.INSPECTOR]);
 
     useEffect(() => {
-        console.log(editorList)
-    }, [editorList])
+        console.log(selectedItem)
+    }, [selectedItem])
 
     return (
         <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
@@ -488,6 +505,55 @@ const ScenarioStudio = () => {
                                                         type="action"
                                                         headline="Action Types"
                                                     />
+                                                }
+                                                {findQuestion(selectedItem)?.type === questionEnum.SINGLE &&
+                                                    <Box maxW="300px">
+                                                        <Editable defaultValue='Question 1' w="full" fontWeight="bold">
+                                                            <EditablePreview
+                                                                w="full"
+                                                                _hover={{
+                                                                    background: "gray.100",
+                                                                    cursor: "pointer",
+                                                                }}
+                                                            />
+                                                            <EditableInput/>
+                                                        </Editable>
+                                                        <Box h={3}/>
+                                                        <FormControl>
+                                                            <FormLabel htmlFor='question' color="gray.400" fontWeight="semibold">Question</FormLabel>
+                                                            <Input id='question' />
+                                                            <FormHelperText></FormHelperText>
+                                                        </FormControl>
+                                                        <Box h={3}/>
+                                                        <FormControl>
+                                                            <FormLabel htmlFor='answers' color="gray.400" fontWeight="semibold">Answers</FormLabel>
+                                                            <HStack>
+                                                            <Input id='question' />
+                                                            <NumberInput maxWidth={24}>
+                                                                <NumberInputField />
+                                                                <NumberInputStepper>
+                                                                    <NumberIncrementStepper />
+                                                                    <NumberDecrementStepper />
+                                                                </NumberInputStepper>
+                                                            </NumberInput>
+                                                            </HStack>
+                                                            <FormHelperText>
+                                                                <HStack justify="space-between">
+                                                                    <Text>Right Answer</Text>
+                                                                    <Text>Points</Text>
+                                                                </HStack>
+                                                            </FormHelperText>
+                                                            <Box h={7}/>
+                                                            <Input id='ss' />
+                                                            <FormHelperText>
+                                                                <HStack justify="space-between">
+                                                                    <Text>Wrong Answer</Text>
+                                                                    <Text>Points</Text>
+                                                                </HStack>
+                                                            </FormHelperText>
+                                                        </FormControl>
+                                                    </Box>
+
                                                 }
                                             </VStack>
                                             :
