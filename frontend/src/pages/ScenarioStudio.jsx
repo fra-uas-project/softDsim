@@ -48,7 +48,7 @@ const ScenarioStudio = () => {
         "BASE": "BASE",
         "FRAGMENT": "FRAGMENT",
         "MODELSELECTION": "MODELSELECTION",
-        "DECISIONS": "DECISIONS",
+        "QUESTIONS": "QUESTIONS",
         "EVENT": "EVENT"
     }
 
@@ -77,11 +77,11 @@ const ScenarioStudio = () => {
         },
         {
             id: uuidv4(),
-            type: "DECISIONS",
-            title: "Decisions",
+            type: "QUESTIONS",
+            title: "Questions",
             content: "Create questions which need to be answered.",
             icon: MdRule,
-            decisions: []
+            questions: []
         },
         {
             id: uuidv4(),
@@ -98,6 +98,20 @@ const ScenarioStudio = () => {
             type: "ACTION",
             title: "Action",
             icon: BsLightningCharge
+        },
+    ];
+
+    const finalQuestionList = [
+        {
+            id: uuidv4(),
+            type: "SINGLE",
+            text: "",
+            answers: [
+                {
+                    label: "",
+                    id: uuidv4()
+                }
+            ]
         },
     ];
 
@@ -155,13 +169,39 @@ const ScenarioStudio = () => {
             updateEditorList(editorListItems);
 
         // Reorder actions in same list
-        } else if (result.type === "action" && result.source.droppableId === result.destination.droppableId) { // TODO Add reordering
-            console.log("Same")
+        } else if (result.type === "action" && result.source.droppableId === result.destination.droppableId) {
+
+            // Get fragment which actions need to be changed
+            const editorListItems = Array.from(editorList);
+            const fragment = editorListItems.find(fragment => fragment.id === result.source.droppableId)
+
+            // Update actions
+            const fragmentActions = Array.from(fragment.actions);
+            const [reorderedAction] = fragmentActions.splice(result.source.index, 1);
+            fragmentActions.splice(result.destination.index, 0, reorderedAction);
+
+            fragment.actions = fragmentActions
+            updateEditorList(editorListItems);
 
 
         // Remove from one action list and add to another
         } else if (result.type === "action" && result.source.droppableId !== result.destination.droppableId) {
             console.log("Another")
+            const editorListItems = Array.from(editorList);
+
+            // Change source fragment action list
+            const sourceFragment = editorListItems.find(fragment => fragment.id === result.source.droppableId)
+            const sourceFragmentActions = Array.from(sourceFragment.actions);
+            const [reorderedAction] = sourceFragmentActions.splice(result.source.index, 1);
+
+            // Change destination fragment action list
+            const destinationFragment = editorListItems.find(fragment => fragment.id === result.destination.droppableId)
+            const destinationFragmentActions = Array.from(destinationFragment.actions);
+            destinationFragmentActions.splice(result.destination.index, 0, reorderedAction);
+
+            sourceFragment.actions = sourceFragmentActions
+            destinationFragment.actions = destinationFragmentActions
+            updateEditorList(editorListItems);
         }
 
         console.log(result)
