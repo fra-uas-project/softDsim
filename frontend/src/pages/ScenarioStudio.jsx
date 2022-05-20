@@ -21,13 +21,21 @@ import {HiChevronRight} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {Fragment, useEffect, useState} from "react";
-import {MdOutlineAttractions, MdOutlineInfo, MdRule, MdTimeline} from "react-icons/md";
+import {
+    MdOutlineAttractions,
+    MdOutlineCheckBox,
+    MdOutlineInfo,
+    MdOutlineRadioButtonChecked,
+    MdRule,
+    MdTimeline
+} from "react-icons/md";
 import {v4 as uuidv4} from 'uuid';
 import styled from "@emotion/styled";
 import {BsLightningCharge} from "react-icons/bs";
 import ComponentListElement from "../components/ComponentListElement";
 import EditorBasicComponent from "../components/EditorBasicComponent";
 import EditorFragmentComponent from "../components/EditorFragmentComponent";
+import EditorQuestionsComponent from "../components/EditorQuestionsComponent";
 
 const Clone = styled(ListItem)`
   margin-bottom: 12px;
@@ -105,6 +113,21 @@ const ScenarioStudio = () => {
         {
             id: uuidv4(),
             type: "SINGLE",
+            title: "Single Answer",
+            icon: MdOutlineRadioButtonChecked,
+            text: "",
+            answers: [
+                {
+                    label: "",
+                    id: uuidv4()
+                }
+            ]
+        },
+        {
+            id: uuidv4(),
+            type: "MULTI",
+            title: "Multiple Answers",
+            icon: MdOutlineCheckBox,
             text: "",
             answers: [
                 {
@@ -121,7 +144,6 @@ const ScenarioStudio = () => {
 
     const handleOnDragEnd = (result) => {
         // TODO deconstruct result
-        // TODO implement reordering logic for type
 
         // handle moving outside droppables
         if (!result.destination) return;
@@ -186,7 +208,6 @@ const ScenarioStudio = () => {
 
         // Remove from one action list and add to another
         } else if (result.type === "action" && result.source.droppableId !== result.destination.droppableId) {
-            console.log("Another")
             const editorListItems = Array.from(editorList);
 
             // Change source fragment action list
@@ -203,6 +224,63 @@ const ScenarioStudio = () => {
             destinationFragment.actions = destinationFragmentActions
             updateEditorList(editorListItems);
         }
+
+        // moving from action list to fragment in editor
+        else if (result.source.droppableId === "questionList") {
+            const questionsListItems = Array.from(finalQuestionList);
+            const [movedQuestion] = questionsListItems.splice(result.source.index, 1);
+
+            // copy because item needs to be unique
+            let movedQuestionCopy = {...movedQuestion};
+            movedQuestionCopy.id = uuidv4();
+
+            // get fragment which needs to be updated
+            const editorListItems = Array.from(editorList);
+            const questionsComponent = editorListItems.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
+            const questionsComponentQuestions = Array.from(questionsComponent.questions);
+
+            questionsComponentQuestions.splice(result.destination.index, 0, movedQuestionCopy);
+            questionsComponent.questions = questionsComponentQuestions
+
+            console.log(questionsComponent)
+
+            updateEditorList(editorListItems);
+        }
+
+        // Reorder questions in same list
+        else if (result.type === "question" && result.source.droppableId === result.destination.droppableId) {
+
+            // Get fragment which actions need to be changed
+            const editorListItems = Array.from(editorList);
+            const questionsComponent = editorListItems.find(questionsComponent => questionsComponent.id === result.source.droppableId)
+
+            // Update actions
+            const questionsComponentQuestions = Array.from(questionsComponent.questions);
+            const [reorderedQuestions] = questionsComponentQuestions.splice(result.source.index, 1);
+            questionsComponentQuestions.splice(result.destination.index, 0, reorderedQuestions);
+
+            questionsComponent.questions = questionsComponentQuestions
+            updateEditorList(editorListItems);
+
+
+        // Remove from one question list and add to another
+    } else if (result.type === "question" && result.source.droppableId !== result.destination.droppableId) {
+        const editorListItems = Array.from(editorList);
+
+        // Change source fragment action list
+        const sourceQuestionsComponent = editorListItems.find(component => component.id === result.source.droppableId)
+        const sourceQuestionsComponentQuestions = Array.from(sourceQuestionsComponent.questions);
+        const [reorderedQuestion] = sourceQuestionsComponentQuestions.splice(result.source.index, 1);
+
+        // Change destination fragment action list
+        const destinationQuestionsComponent = editorListItems.find(compoonent => compoonent.id === result.destination.droppableId)
+        const destinationQuestionsComponentQuestions = Array.from(destinationQuestionsComponent.questions);
+        destinationQuestionsComponentQuestions.splice(result.destination.index, 0, reorderedQuestion);
+
+        sourceQuestionsComponent.questions = sourceQuestionsComponentQuestions
+        destinationQuestionsComponent.questions = destinationQuestionsComponentQuestions
+        updateEditorList(editorListItems);
+    }
 
         console.log(result)
     };
@@ -299,8 +377,22 @@ const ScenarioStudio = () => {
                                                             actions={component.actions}
                                                         />
                                                         )
-                                                    }
-                                                    else {
+                                                    } else if(component.type === componentEnum.QUESTIONS) {
+                                                        return (
+                                                            <EditorQuestionsComponent
+                                                                key={component.id}
+                                                                backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
+                                                                elementid={component.id}
+                                                                onClick={((e) => handleSelect(e))}
+                                                                id={component.id}
+                                                                title={component.title}
+                                                                index={index}
+                                                                isSelected={selectedItem === component.id}
+                                                                selectedItem={selectedItem}
+                                                                actions={component.questions}
+                                                            />
+                                                        )
+                                                    } else {
                                                     // //    TODO Implement other types
                                                         return (
                                                             <EditorBasicComponent
@@ -326,9 +418,6 @@ const ScenarioStudio = () => {
                                                     <Text pointerEvents="none" fontSize="xl" mt="20px">(Create a complex
                                                         scenario by drag and dropping different components)</Text>
                                                 </VStack>
-                                        }
-                                        {/* ################################### TEST ########################################*/}
-                                        {/*<ComponentListDroppable id="lkjdfa" index={1} />*/}
                                         }
                                         {provided.placeholder}
                                     </UnorderedList>
@@ -366,6 +455,44 @@ const ScenarioStudio = () => {
                                                             ref={provided.innerRef}
                                                         >
                                                             {finalActionList.map(({id, title, content, icon}, index) => {
+                                                                    return (
+                                                                        <Draggable
+                                                                            key={id}
+                                                                            draggableId={id}
+                                                                            index={index}
+                                                                        >
+                                                                            {(provided, snapshot) => (
+                                                                                <Fragment>
+                                                                                    <ListItem
+                                                                                        ref={provided.innerRef}
+                                                                                        {...provided.draggableProps}
+                                                                                        {...provided.dragHandleProps}
+                                                                                        mb={3}
+                                                                                    >
+                                                                                        <ComponentListElement title={title} content={content} icon={icon}/>
+                                                                                    </ListItem>
+                                                                                    {snapshot.isDragging &&
+                                                                                        <Clone>
+                                                                                            <ComponentListElement title={title} content={content} icon={icon}/>
+                                                                                        </Clone>}
+                                                                                </Fragment>
+                                                                            )}
+                                                                        </Draggable>
+                                                                    )
+                                                                }
+                                                            )
+                                                            }
+                                                            {provided.placeholder}
+                                                        </UnorderedList>
+                                                    )}
+                                                </Droppable>
+                                                <Droppable droppableId="questionList" isDropDisabled={true} type="question">
+                                                    {(provided) => (
+                                                        <UnorderedList
+                                                            listStyleType="none"
+                                                            ref={provided.innerRef}
+                                                        >
+                                                            {finalQuestionList.map(({id, title, content, icon}, index) => {
                                                                     return (
                                                                         <Draggable
                                                                             key={id}
