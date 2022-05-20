@@ -34,6 +34,14 @@ const MDE = styled(SimpleMDE)`
     border: 1px solid #ddd !important;
     padding: 5px !important;
   }
+
+  .EasyMDEContainer .CodeMirror {
+    border-radius: 10px;
+  }
+  
+  .editor-toolbar {
+    border: none;
+  }
 `;
 
 const mdeOptionsLess = {
