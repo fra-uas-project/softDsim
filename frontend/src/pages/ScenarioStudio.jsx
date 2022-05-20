@@ -2,18 +2,18 @@ import {
     Box,
     Breadcrumb,
     BreadcrumbItem,
-    BreadcrumbLink,
-    Flex,
+    BreadcrumbLink, Editable, EditableInput, EditablePreview,
+    Flex, FormControl, FormHelperText, FormLabel,
     Heading,
     HStack,
-    Icon,
+    Icon, InputGroup, InputRightElement,
     ListItem,
     Tab,
     TabList,
     TabPanel,
     TabPanels,
     Tabs,
-    Text,
+    Text, Textarea,
     UnorderedList,
     VStack
 } from "@chakra-ui/react";
@@ -36,9 +36,11 @@ import ComponentListElement from "../components/ComponentListElement";
 import EditorBasicComponent from "../components/EditorBasicComponent";
 import EditorFragmentComponent from "../components/EditorFragmentComponent";
 import EditorQuestionsComponent from "../components/EditorQuestionsComponent";
+import InspectorItemSelector from "../components/InspectorItemSelector";
 
 const Clone = styled(ListItem)`
   margin-bottom: 12px;
+
   + li {
     display: none !important;
     background-color: blueviolet;
@@ -190,7 +192,7 @@ const ScenarioStudio = () => {
 
             updateEditorList(editorListItems);
 
-        // Reorder actions in same list
+            // Reorder actions in same list
         } else if (result.type === "action" && result.source.droppableId === result.destination.droppableId) {
 
             // Get fragment which actions need to be changed
@@ -206,7 +208,7 @@ const ScenarioStudio = () => {
             updateEditorList(editorListItems);
 
 
-        // Remove from one action list and add to another
+            // Remove from one action list and add to another
         } else if (result.type === "action" && result.source.droppableId !== result.destination.droppableId) {
             const editorListItems = Array.from(editorList);
 
@@ -263,30 +265,34 @@ const ScenarioStudio = () => {
             updateEditorList(editorListItems);
 
 
-        // Remove from one question list and add to another
-    } else if (result.type === "question" && result.source.droppableId !== result.destination.droppableId) {
-        const editorListItems = Array.from(editorList);
+            // Remove from one question list and add to another
+        } else if (result.type === "question" && result.source.droppableId !== result.destination.droppableId) {
+            const editorListItems = Array.from(editorList);
 
-        // Change source fragment action list
-        const sourceQuestionsComponent = editorListItems.find(component => component.id === result.source.droppableId)
-        const sourceQuestionsComponentQuestions = Array.from(sourceQuestionsComponent.questions);
-        const [reorderedQuestion] = sourceQuestionsComponentQuestions.splice(result.source.index, 1);
+            // Change source fragment action list
+            const sourceQuestionsComponent = editorListItems.find(component => component.id === result.source.droppableId)
+            const sourceQuestionsComponentQuestions = Array.from(sourceQuestionsComponent.questions);
+            const [reorderedQuestion] = sourceQuestionsComponentQuestions.splice(result.source.index, 1);
 
-        // Change destination fragment action list
-        const destinationQuestionsComponent = editorListItems.find(compoonent => compoonent.id === result.destination.droppableId)
-        const destinationQuestionsComponentQuestions = Array.from(destinationQuestionsComponent.questions);
-        destinationQuestionsComponentQuestions.splice(result.destination.index, 0, reorderedQuestion);
+            // Change destination fragment action list
+            const destinationQuestionsComponent = editorListItems.find(compoonent => compoonent.id === result.destination.droppableId)
+            const destinationQuestionsComponentQuestions = Array.from(destinationQuestionsComponent.questions);
+            destinationQuestionsComponentQuestions.splice(result.destination.index, 0, reorderedQuestion);
 
-        sourceQuestionsComponent.questions = sourceQuestionsComponentQuestions
-        destinationQuestionsComponent.questions = destinationQuestionsComponentQuestions
-        updateEditorList(editorListItems);
-    }
+            sourceQuestionsComponent.questions = sourceQuestionsComponentQuestions
+            destinationQuestionsComponent.questions = destinationQuestionsComponentQuestions
+            updateEditorList(editorListItems);
+        }
 
         console.log(result)
     };
 
+    const findComponent = (componentId) => {
+        return (editorList.find(component => component.id === componentId))
+    };
+
     const handleSelect = (e) => {
-            setSelectedItem(e.currentTarget.getAttribute("elementid"))
+        setSelectedItem(e.currentTarget.getAttribute("elementid"))
     }
 
     const handleTabsChange = (index) => {
@@ -294,7 +300,7 @@ const ScenarioStudio = () => {
     };
 
     const handleEditorBackgroundClick = (e) => {
-        if(e.target.tagName === "UL") {
+        if (e.target.tagName === "UL") {
             //TODO not working correctly
             // setTabIndex(tabIndexEnum.COMPONENTS)
         }
@@ -303,7 +309,7 @@ const ScenarioStudio = () => {
 
     // If item is selected, switch to inspector tab
     useEffect(() => {
-        if(selectedItem) {
+        if (selectedItem) {
             // setTabIndex(tabIndexEnum.INSPECTOR); // Deactivated for demonstration purposes
         }
     }, [selectedItem, tabIndexEnum.INSPECTOR]);
@@ -322,7 +328,8 @@ const ScenarioStudio = () => {
             <Heading>Scenario Studio</Heading>
             <Box h={5}></Box>
             <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="70vh">
-                <HStack w="full" h="full" overflow="hidden" pt={2} spacing={5} onClick={((e) => handleEditorBackgroundClick(e))}>
+                <HStack w="full" h="full" overflow="hidden" pt={2} spacing={5}
+                        onClick={((e) => handleEditorBackgroundClick(e))}>
                     <DragDropContext onDragEnd={handleOnDragEnd}>
                         {/*Editor*/}
                         <Flex w="full" h="full" justifyContent="center" alignItems="center" backgroundColor="white"
@@ -349,64 +356,64 @@ const ScenarioStudio = () => {
                                             editorList.length ?
                                                 editorList.map((component, index) => {
 
-                                                    if(component.type === componentEnum.BASE) {
-                                                        return (
-                                                            <EditorBasicComponent
-                                                                key={component.id}
-                                                                backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
-                                                                elementid={component.id}
-                                                                onClick={((e) => handleSelect(e))}
-                                                                id={component.id}
-                                                                title={component.title}
-                                                                index={index}
-                                                                isSelected={selectedItem === component.id}
-                                                            />
-                                                        )
-                                                    } else if (component.type === componentEnum.FRAGMENT) {
-                                                        return (
-                                                        <EditorFragmentComponent
-                                                            key={component.id}
-                                                            backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
-                                                            elementid={component.id}
-                                                            onClick={((e) => handleSelect(e))}
-                                                            id={component.id}
-                                                            title={component.title}
-                                                            index={index}
-                                                            isSelected={selectedItem === component.id}
-                                                            selectedItem={selectedItem}
-                                                            actions={component.actions}
-                                                        />
-                                                        )
-                                                    } else if(component.type === componentEnum.QUESTIONS) {
-                                                        return (
-                                                            <EditorQuestionsComponent
-                                                                key={component.id}
-                                                                backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
-                                                                elementid={component.id}
-                                                                onClick={((e) => handleSelect(e))}
-                                                                id={component.id}
-                                                                title={component.title}
-                                                                index={index}
-                                                                isSelected={selectedItem === component.id}
-                                                                selectedItem={selectedItem}
-                                                                actions={component.questions}
-                                                            />
-                                                        )
-                                                    } else {
-                                                    // //    TODO Implement other types
-                                                        return (
-                                                            <EditorBasicComponent
-                                                                key={component.id}
-                                                                backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
-                                                                elementid={component.id}
-                                                                onClick={((e) => handleSelect(e))}
-                                                                id={component.id}
-                                                                title={component.title}
-                                                                index={index}
-                                                                isSelected={selectedItem === component.id}
-                                                            />
-                                                        )
-                                                    }
+                                                        if (component.type === componentEnum.BASE) {
+                                                            return (
+                                                                <EditorBasicComponent
+                                                                    key={component.id}
+                                                                    backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
+                                                                    elementid={component.id}
+                                                                    onClick={((e) => handleSelect(e))}
+                                                                    id={component.id}
+                                                                    title={component.title}
+                                                                    index={index}
+                                                                    isSelected={selectedItem === component.id}
+                                                                />
+                                                            )
+                                                        } else if (component.type === componentEnum.FRAGMENT) {
+                                                            return (
+                                                                <EditorFragmentComponent
+                                                                    key={component.id}
+                                                                    backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
+                                                                    elementid={component.id}
+                                                                    onClick={((e) => handleSelect(e))}
+                                                                    id={component.id}
+                                                                    title={component.title}
+                                                                    index={index}
+                                                                    isSelected={selectedItem === component.id}
+                                                                    selectedItem={selectedItem}
+                                                                    actions={component.actions}
+                                                                />
+                                                            )
+                                                        } else if (component.type === componentEnum.QUESTIONS) {
+                                                            return (
+                                                                <EditorQuestionsComponent
+                                                                    key={component.id}
+                                                                    backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
+                                                                    elementid={component.id}
+                                                                    onClick={((e) => handleSelect(e))}
+                                                                    id={component.id}
+                                                                    title={component.title}
+                                                                    index={index}
+                                                                    isSelected={selectedItem === component.id}
+                                                                    selectedItem={selectedItem}
+                                                                    actions={component.questions}
+                                                                />
+                                                            )
+                                                        } else {
+                                                            // //    TODO Implement other types
+                                                            return (
+                                                                <EditorBasicComponent
+                                                                    key={component.id}
+                                                                    backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
+                                                                    elementid={component.id}
+                                                                    onClick={((e) => handleSelect(e))}
+                                                                    id={component.id}
+                                                                    title={component.title}
+                                                                    index={index}
+                                                                    isSelected={selectedItem === component.id}
+                                                                />
+                                                            )
+                                                        }
 
                                                     }
                                                 )
@@ -447,83 +454,41 @@ const ScenarioStudio = () => {
                                         {/* ########### Inspector Items ########### */}
                                         {selectedItem ?
                                             <VStack alignItems="flex-start" pt={2}>
-                                                <Text color="gray.400" fontWeight="bold">All Components</Text>
-                                                <Droppable droppableId="actionList" isDropDisabled={true} type="action">
-                                                    {(provided) => (
-                                                        <UnorderedList
-                                                            listStyleType="none"
-                                                            ref={provided.innerRef}
-                                                        >
-                                                            {finalActionList.map(({id, title, content, icon}, index) => {
-                                                                    return (
-                                                                        <Draggable
-                                                                            key={id}
-                                                                            draggableId={id}
-                                                                            index={index}
-                                                                        >
-                                                                            {(provided, snapshot) => (
-                                                                                <Fragment>
-                                                                                    <ListItem
-                                                                                        ref={provided.innerRef}
-                                                                                        {...provided.draggableProps}
-                                                                                        {...provided.dragHandleProps}
-                                                                                        mb={3}
-                                                                                    >
-                                                                                        <ComponentListElement title={title} content={content} icon={icon}/>
-                                                                                    </ListItem>
-                                                                                    {snapshot.isDragging &&
-                                                                                        <Clone>
-                                                                                            <ComponentListElement title={title} content={content} icon={icon}/>
-                                                                                        </Clone>}
-                                                                                </Fragment>
-                                                                            )}
-                                                                        </Draggable>
-                                                                    )
-                                                                }
-                                                            )
-                                                            }
-                                                            {provided.placeholder}
-                                                        </UnorderedList>
-                                                    )}
-                                                </Droppable>
-                                                <Droppable droppableId="questionList" isDropDisabled={true} type="question">
-                                                    {(provided) => (
-                                                        <UnorderedList
-                                                            listStyleType="none"
-                                                            ref={provided.innerRef}
-                                                        >
-                                                            {finalQuestionList.map(({id, title, content, icon}, index) => {
-                                                                    return (
-                                                                        <Draggable
-                                                                            key={id}
-                                                                            draggableId={id}
-                                                                            index={index}
-                                                                        >
-                                                                            {(provided, snapshot) => (
-                                                                                <Fragment>
-                                                                                    <ListItem
-                                                                                        ref={provided.innerRef}
-                                                                                        {...provided.draggableProps}
-                                                                                        {...provided.dragHandleProps}
-                                                                                        mb={3}
-                                                                                    >
-                                                                                        <ComponentListElement title={title} content={content} icon={icon}/>
-                                                                                    </ListItem>
-                                                                                    {snapshot.isDragging &&
-                                                                                        <Clone>
-                                                                                            <ComponentListElement title={title} content={content} icon={icon}/>
-                                                                                        </Clone>}
-                                                                                </Fragment>
-                                                                            )}
-                                                                        </Draggable>
-                                                                    )
-                                                                }
-                                                            )
-                                                            }
-                                                            {provided.placeholder}
-                                                        </UnorderedList>
-                                                    )}
-                                                </Droppable>
+                                                {findComponent(selectedItem)?.type === componentEnum.QUESTIONS &&
+                                                    <>
+                                                        <Editable defaultValue='Questions 1' w="full" fontWeight="bold">
+                                                            <EditablePreview
+                                                                w="full"
+                                                                _hover={{
+                                                                    background: "gray.100",
+                                                                    cursor: "pointer",
+                                                                }}
+                                                            />
+                                                            <EditableInput/>
+                                                        </Editable>
+                                                        <Box h={3}/>
+                                                        <FormControl>
+                                                            <FormLabel htmlFor='text' color="gray.400" fontWeight="semibold">Story</FormLabel>
+                                                            <Textarea id="text" />
+                                                        </FormControl>
+                                                        <Box h={3}/>
+                                                        <InspectorItemSelector
+                                                            droppableId="questionList"
+                                                            itemList={finalQuestionList}
+                                                            type="question"
+                                                            headline="Question Types"
+                                                        />
+                                                    </>
+                                                }
+
+                                                {findComponent(selectedItem)?.type === componentEnum.FRAGMENT &&
+                                                    <InspectorItemSelector
+                                                        droppableId="actionList"
+                                                        itemList={finalActionList}
+                                                        type="action"
+                                                        headline="Action Types"
+                                                    />
+                                                }
                                             </VStack>
                                             :
                                             <Box borderRadius="md" border="1px dashed" borderColor="gray.200" p={2}>
@@ -539,8 +504,9 @@ const ScenarioStudio = () => {
                                     <TabPanel>
                                         {/* ########### Component Items ########### */}
                                         <VStack alignItems="flex-start" pt={2}>
-                                            <Text color="gray.400" fontWeight="bold">All Components</Text>
-                                            <Droppable droppableId="componentList" isDropDisabled={true} type="component">
+                                            <Text color="gray.400" fontWeight="semibold">All Components</Text>
+                                            <Droppable droppableId="componentList" isDropDisabled={true}
+                                                       type="component">
                                                 {(provided) => (
                                                     <UnorderedList
                                                         listStyleType="none"
@@ -560,11 +526,15 @@ const ScenarioStudio = () => {
                                                                                     {...provided.dragHandleProps}
                                                                                     mb={3}
                                                                                 >
-                                                                                        <ComponentListElement title={title} content={content} icon={icon}/>
+                                                                                    <ComponentListElement title={title}
+                                                                                                          content={content}
+                                                                                                          icon={icon}/>
                                                                                 </ListItem>
                                                                                 {snapshot.isDragging &&
                                                                                     <Clone>
-                                                                                        <ComponentListElement title={title} content={content} icon={icon}/>
+                                                                                        <ComponentListElement title={title}
+                                                                                                              content={content}
+                                                                                                              icon={icon}/>
                                                                                     </Clone>}
                                                                             </Fragment>
                                                                         )}
