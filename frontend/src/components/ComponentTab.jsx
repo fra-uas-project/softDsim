@@ -16,6 +16,7 @@ const ComponentTab = (props) => {
                           {props.finalComponentList.map(({id, title, content, icon}, index) => {
                                   return (
                                       <ComponentTabItem
+                                          key={id}
                                           id={id}
                                           title={title}
                                           content={content}
