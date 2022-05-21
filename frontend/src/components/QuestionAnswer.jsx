@@ -40,7 +40,7 @@ const QuestionAnswer = (props) => {
     return (
         <>
             <HStack>
-                <Input id='question' value={label} onChange={handleLabelChange}/>
+                <Input value={label} onChange={handleLabelChange}/>
                 <NumberInput maxWidth={24} value={points} onChange={handlePointsChange} min={0}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -52,7 +52,7 @@ const QuestionAnswer = (props) => {
             </HStack>
             <FormHelperText>
                 <HStack justify="space-between">
-                    {props.multiRight ?
+                    {props.multiRight && !props.isNotRemovable ?
                         <Text
                             color={props.answer.right ? "green.400" : "red.400"}
                             cursor="pointer" onClick={toggleRightWrong}

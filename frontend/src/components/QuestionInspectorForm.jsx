@@ -99,12 +99,12 @@ const QuestionInspectorForm = (props) => {
             <FormControl>
                 <FormLabel htmlFor='question' color="gray.400" fontWeight="semibold">Question</FormLabel>
                 {/* TODO persist question and question name */}
-                <Input  />
+                <Input id="question"/>
                 <FormHelperText></FormHelperText>
             </FormControl>
             <Box h={3}/>
             <FormControl>
-                <FormLabel color="gray.400" fontWeight="semibold">Answers</FormLabel>
+                <FormLabel color="gray.400" fontWeight="semibold" htmlFor="">Answers</FormLabel>
                 {
                     answers.length ?
                         answers.map((answer, index) => {
