@@ -1,21 +1,14 @@
 import {
-    Box, Button,
+    Box,
+    Button,
     Divider,
     Editable,
     EditableInput,
     EditablePreview,
-    Flex,
     FormControl,
     FormHelperText,
     FormLabel,
-    HStack,
     Input,
-    NumberDecrementStepper,
-    NumberIncrementStepper,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    Text,
     VStack
 } from "@chakra-ui/react";
 import {useEffect, useState} from "react";
@@ -42,9 +35,14 @@ const QuestionInspectorForm = (props) => {
 
     const [answers, setAnswers] = useState(props.questionData?.answers);
     const [displayName, setDisplayName] = useState(props.questionData?.displayName);
+    const [questionText, setQuestionText] = useState(props.questionData?.text);
 
     const onChangeDisplayName =  (value) => {
         setDisplayName(value)
+    }
+
+    const onChangeQuestionText =  (event) => {
+        setQuestionText(event.target.value)
     }
 
     const addAnswer = () => {
@@ -80,7 +78,8 @@ const QuestionInspectorForm = (props) => {
 
     useEffect(() => {
         props.questionData.displayName = displayName
-    }, [displayName])
+        props.questionData.text = questionText
+    }, [displayName, questionText])
 
     return(
         <VStack maxW="300px">
@@ -99,7 +98,7 @@ const QuestionInspectorForm = (props) => {
             <FormControl>
                 <FormLabel htmlFor='question' color="gray.400" fontWeight="semibold">Question</FormLabel>
                 {/* TODO persist question and question name */}
-                <Input id="question"/>
+                <Input id="question" value={questionText} onChange={(value) => onChangeQuestionText(value)} />
                 <FormHelperText></FormHelperText>
             </FormControl>
             <Box h={3}/>
@@ -127,9 +126,6 @@ const QuestionInspectorForm = (props) => {
                         :
                         <FormHelperText color="red.400" textAlign="center">Maximum 6 answers allowed!</FormHelperText>
                 }
-
-
-
             </FormControl>
         </VStack>
     )
