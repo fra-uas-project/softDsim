@@ -3,14 +3,11 @@ import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
-    Editable,
-    EditableInput,
-    EditablePreview,
-    Flex, FormControl, FormHelperText, FormLabel,
+    Flex,
     Heading,
     HStack,
-    Icon, Input,
-    ListItem, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper,
+    Icon,
+    ListItem,
     Tab,
     TabList,
     TabPanel,
@@ -22,8 +19,8 @@ import {
 } from "@chakra-ui/react";
 import {HiChevronRight} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
-import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
-import {Fragment, useEffect, useState} from "react";
+import {DragDropContext, Droppable} from "react-beautiful-dnd";
+import {useEffect, useState} from "react";
 import {
     MdOutlineAttractions,
     MdOutlineCheckBox,
@@ -35,12 +32,14 @@ import {
 import {v4 as uuidv4} from 'uuid';
 import styled from "@emotion/styled";
 import {BsLightningCharge} from "react-icons/bs";
-import ComponentListElement from "../components/ComponentListElement";
 import EditorBasicComponent from "../components/EditorBasicComponent";
 import EditorFragmentComponent from "../components/EditorFragmentComponent";
 import EditorQuestionsComponent from "../components/EditorQuestionsComponent";
 import InspectorItemSelector from "../components/InspectorItemSelector";
-import MarkdownTextfield from "../components/MarkdownTextfield";
+import ComponentTab from "../components/ComponentTab";
+import QuestionInspectorForm from "../components/QuestionInspectorForm";
+import BaseInspectorForm from "../components/BaseInspectorForm";
+import QuestionsInspectorForm from "../components/QuestionsInspectorForm";
 
 const Clone = styled(ListItem)`
   margin-bottom: 12px;
@@ -78,6 +77,12 @@ const ScenarioStudio = () => {
             title: "Simulation Base Information",
             content: "Define the basisc stats for a new simulation.",
             icon: MdOutlineInfo,
+            displayName: "Base Information",
+            budget: "0",
+            duration: "0",
+            easy_tasks: "0",
+            medium_tasks:  "0",
+            hard_tasks: "0",
         },
         {
             id: uuidv4(),
@@ -85,6 +90,7 @@ const ScenarioStudio = () => {
             title: "Simulation Fragment",
             content: "Control the simulation by defining fragments.",
             icon: MdTimeline,
+            displayName: "() => { return `Simulation Fragment ${this.d.slice(0, 8)}`}",
             actions: []
         },
         {
@@ -93,6 +99,7 @@ const ScenarioStudio = () => {
             title: "Model Selection",
             content: "Trigger actions like teamevents or training sessions.",
             icon: BsLightningCharge,
+            displayName: "Model Selection",
         },
         {
             id: uuidv4(),
@@ -100,6 +107,8 @@ const ScenarioStudio = () => {
             title: "Questions",
             content: "Create questions which need to be answered.",
             icon: MdRule,
+            displayName: "() => { return `Simulation Fragment ${this.d.slice(0, 8)}`}",
+            text: "",
             questions: []
         },
         {
@@ -127,12 +136,7 @@ const ScenarioStudio = () => {
             title: "Single Answer",
             icon: MdOutlineRadioButtonChecked,
             text: "",
-            answers: [
-                {
-                    label: "",
-                    id: uuidv4()
-                }
-            ]
+            answers: []
         },
         {
             id: uuidv4(),
@@ -140,18 +144,14 @@ const ScenarioStudio = () => {
             title: "Multiple Answers",
             icon: MdOutlineCheckBox,
             text: "",
-            answers: [
-                {
-                    label: "",
-                    id: uuidv4()
-                }
-            ]
+            answers: []
         },
     ];
 
     const [tabIndex, setTabIndex] = useState(1);
     const [editorList, updateEditorList] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedObject, setSelectedObject] = useState(null);
 
     const handleOnDragEnd = (result) => {
         // TODO deconstruct result
@@ -180,6 +180,7 @@ const ScenarioStudio = () => {
             updateEditorList(editorListItems);
 
             setSelectedItem(movedItemCopy.id)
+            setSelectedObject(movedItemCopy)
             // setTabIndex(tabIndexEnum.INSPECTOR) // Deactivated for demonstration purposes
 
             // moving from action list to fragment in editor
@@ -253,8 +254,6 @@ const ScenarioStudio = () => {
             questionsComponentQuestions.splice(result.destination.index, 0, movedQuestionCopy);
             questionsComponent.questions = questionsComponentQuestions
 
-            console.log(questionsComponent)
-
             updateEditorList(editorListItems);
         }
 
@@ -313,6 +312,7 @@ const ScenarioStudio = () => {
 
     const handleSelect = (e) => {
         setSelectedItem(e.currentTarget.getAttribute("elementid"))
+        setSelectedObject(editorList.find(component => component.id === e.currentTarget.getAttribute("elementid")))
     }
 
     const handleTabsChange = (index) => {
@@ -323,7 +323,6 @@ const ScenarioStudio = () => {
         if (e.target.getAttribute("role") === "list") {
             setTabIndex(tabIndexEnum.COMPONENTS)
         }
-
     };
 
     // If item is selected, switch to inspector tab
@@ -335,7 +334,8 @@ const ScenarioStudio = () => {
     }, [selectedItem, tabIndexEnum.INSPECTOR]);
 
     useEffect(() => {
-        console.log(selectedItem)
+        console.log(editorList)
+        console.log("SO", selectedObject)
     }, [selectedItem])
 
     return (
@@ -474,85 +474,34 @@ const ScenarioStudio = () => {
                                         {/* ########### Inspector Items ########### */}
                                         {selectedItem ?
                                             <VStack alignItems="flex-start" pt={2}>
-                                                {findComponent(selectedItem)?.type === componentEnum.QUESTIONS &&
-                                                    <>
-                                                        <Editable defaultValue='Questions 1' w="full" fontWeight="bold">
-                                                            <EditablePreview
-                                                                w="full"
-                                                                _hover={{
-                                                                    background: "gray.100",
-                                                                    cursor: "pointer",
-                                                                }}
-                                                            />
-                                                            <EditableInput/>
-                                                        </Editable>
-                                                        <Box h={3}/>
-                                                        <MarkdownTextfield />
-                                                        <Box h={3}/>
-                                                        <InspectorItemSelector
-                                                            droppableId="questionList"
-                                                            itemList={finalQuestionList}
-                                                            type="question"
-                                                            headline="Question Types"
-                                                        />
-                                                    </>
+                                                {selectedObject?.type === componentEnum.BASE &&
+                                                    <BaseInspectorForm
+                                                        key={selectedObject.id}
+                                                        baseData={findComponent(selectedItem)}
+                                                    />
+                                                }
+                                                {selectedObject?.type === componentEnum.QUESTIONS &&
+                                                    <QuestionsInspectorForm
+                                                        key={selectedObject.id}
+                                                        finalQuestionList={finalQuestionList}
+                                                        questionsData={selectedObject}
+                                                    />
+
                                                 }
 
-                                                {findComponent(selectedItem)?.type === componentEnum.FRAGMENT &&
+                                                {selectedObject?.type === componentEnum.FRAGMENT &&
                                                     <InspectorItemSelector
+                                                        key={selectedObject.id}
                                                         droppableId="actionList"
                                                         itemList={finalActionList}
                                                         type="action"
                                                         headline="Action Types"
                                                     />
                                                 }
-                                                {findQuestion(selectedItem)?.type === questionEnum.SINGLE &&
-                                                    <Box maxW="300px">
-                                                        <Editable defaultValue='Question 1' w="full" fontWeight="bold">
-                                                            <EditablePreview
-                                                                w="full"
-                                                                _hover={{
-                                                                    background: "gray.100",
-                                                                    cursor: "pointer",
-                                                                }}
-                                                            />
-                                                            <EditableInput/>
-                                                        </Editable>
-                                                        <Box h={3}/>
-                                                        <FormControl>
-                                                            <FormLabel htmlFor='question' color="gray.400" fontWeight="semibold">Question</FormLabel>
-                                                            <Input id='question' />
-                                                            <FormHelperText></FormHelperText>
-                                                        </FormControl>
-                                                        <Box h={3}/>
-                                                        <FormControl>
-                                                            <FormLabel htmlFor='answers' color="gray.400" fontWeight="semibold">Answers</FormLabel>
-                                                            <HStack>
-                                                            <Input id='question' />
-                                                            <NumberInput maxWidth={24}>
-                                                                <NumberInputField />
-                                                                <NumberInputStepper>
-                                                                    <NumberIncrementStepper />
-                                                                    <NumberDecrementStepper />
-                                                                </NumberInputStepper>
-                                                            </NumberInput>
-                                                            </HStack>
-                                                            <FormHelperText>
-                                                                <HStack justify="space-between">
-                                                                    <Text>Right Answer</Text>
-                                                                    <Text>Points</Text>
-                                                                </HStack>
-                                                            </FormHelperText>
-                                                            <Box h={7}/>
-                                                            <Input id='ss' />
-                                                            <FormHelperText>
-                                                                <HStack justify="space-between">
-                                                                    <Text>Wrong Answer</Text>
-                                                                    <Text>Points</Text>
-                                                                </HStack>
-                                                            </FormHelperText>
-                                                        </FormControl>
-                                                    </Box>
+                                                {(findQuestion(selectedItem)?.type === questionEnum.SINGLE || findQuestion(selectedItem)?.type === questionEnum.MULTI) &&
+                                                    <QuestionInspectorForm
+                                                        questionData={findQuestion(selectedItem)}
+                                                    />
 
                                                 }
                                             </VStack>
@@ -568,53 +517,11 @@ const ScenarioStudio = () => {
 
                                     {/* Component Tab */}
                                     <TabPanel>
-                                        {/* ########### Component Items ########### */}
-                                        <VStack alignItems="flex-start" pt={2}>
-                                            <Text color="gray.400" fontWeight="semibold">All Components</Text>
-                                            <Droppable droppableId="componentList" isDropDisabled={true}
-                                                       type="component">
-                                                {(provided) => (
-                                                    <UnorderedList
-                                                        listStyleType="none"
-                                                        ref={provided.innerRef}
-                                                    >
-                                                        {finalComponentList.map(({id, title, content, icon}, index) => {
-                                                                return (
-                                                                    <Draggable
-                                                                        key={id}
-                                                                        draggableId={id}
-                                                                        index={index}>
-                                                                        {(provided, snapshot) => (
-                                                                            <Fragment>
-                                                                                <ListItem
-                                                                                    ref={provided.innerRef}
-                                                                                    {...provided.draggableProps}
-                                                                                    {...provided.dragHandleProps}
-                                                                                    mb={3}
-                                                                                >
-                                                                                    <ComponentListElement title={title}
-                                                                                                          content={content}
-                                                                                                          icon={icon}/>
-                                                                                </ListItem>
-                                                                                {snapshot.isDragging &&
-                                                                                    <Clone>
-                                                                                        <ComponentListElement title={title}
-                                                                                                              content={content}
-                                                                                                              icon={icon}/>
-                                                                                    </Clone>}
-                                                                            </Fragment>
-                                                                        )}
-                                                                    </Draggable>
-                                                                )
-                                                            }
-                                                        )
-                                                        }
-                                                        {provided.placeholder}
-                                                    </UnorderedList>
-                                                )}
-                                            </Droppable>
-                                        </VStack>
+                                        <ComponentTab
+                                            finalComponentList={finalComponentList}
+                                        />
                                     </TabPanel>
+
                                 </TabPanels>
                             </Tabs>
                         </Box>
