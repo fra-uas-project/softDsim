@@ -50,14 +50,8 @@ const BaseInspectorForm = (props) => {
 
     return (
         <>
-            <Editable defaultValue='Base Information' w="full" fontWeight="bold">
-                <EditablePreview
-                    w="full"
-                    _hover={{
-                        background: "gray.100",
-                        cursor: "pointer",
-                    }}
-                />
+            <Editable defaultValue='Base Information' w="full" fontWeight="bold" isDisabled>
+                <EditablePreview/>
                 <EditableInput/>
             </Editable>
             <Divider/>

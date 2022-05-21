@@ -41,6 +41,11 @@ const QuestionInspectorForm = (props) => {
     ]
 
     const [answers, setAnswers] = useState(props.questionData?.answers);
+    const [displayName, setDisplayName] = useState(props.questionData?.displayName);
+
+    const onChangeDisplayName =  (value) => {
+        setDisplayName(value)
+    }
 
     const addAnswer = () => {
         const newAnswer = {
@@ -73,9 +78,13 @@ const QuestionInspectorForm = (props) => {
         console.log(props.questionData)
     })
 
+    useEffect(() => {
+        props.questionData.displayName = displayName
+    }, [displayName])
+
     return(
         <VStack maxW="300px">
-            <Editable defaultValue={`Question ${props.questionData.id.slice(0, 8)}`} w="full" fontWeight="bold">
+            <Editable value={displayName} w="full" fontWeight="bold" onChange={(value) => onChangeDisplayName(value)}>
                 <EditablePreview
                     w="full"
                     _hover={{

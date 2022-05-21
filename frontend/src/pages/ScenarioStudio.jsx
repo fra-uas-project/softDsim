@@ -107,9 +107,10 @@ const ScenarioStudio = () => {
             title: "Questions",
             content: "Create questions which need to be answered.",
             icon: MdRule,
-            displayName: "() => { return `Simulation Fragment ${this.d.slice(0, 8)}`}",
+            displayName: `Questions ${uuidv4().slice(0, 8)}`,
             text: "",
-            questions: []
+            questions: [],
+
         },
         {
             id: uuidv4(),
@@ -135,6 +136,7 @@ const ScenarioStudio = () => {
             type: "SINGLE",
             title: "Single Answer",
             icon: MdOutlineRadioButtonChecked,
+            displayName: `Question ${uuidv4().slice(0, 8)}`,
             text: "",
             answers: []
         },
@@ -143,6 +145,7 @@ const ScenarioStudio = () => {
             type: "MULTI",
             title: "Multiple Answers",
             icon: MdOutlineCheckBox,
+            displayName: `Question ${uuidv4().slice(0, 8)}`,
             text: "",
             answers: []
         },
@@ -500,6 +503,7 @@ const ScenarioStudio = () => {
                                                 }
                                                 {(findQuestion(selectedItem)?.type === questionEnum.SINGLE || findQuestion(selectedItem)?.type === questionEnum.MULTI) &&
                                                     <QuestionInspectorForm
+                                                        key={findQuestion(selectedItem).id}
                                                         questionData={findQuestion(selectedItem)}
                                                     />
 
