@@ -1,17 +1,6 @@
-import {ListItem, TabPanel, Text, UnorderedList, VStack} from "@chakra-ui/react";
-import {Draggable, Droppable} from "react-beautiful-dnd";
-import {Fragment} from "react";
-import ComponentListElement from "./ComponentListElement";
-import styled from "@emotion/styled";
-
-const Clone = styled(ListItem)`
-  margin-bottom: 12px;
-
-  + li {
-    display: none !important;
-    background-color: blueviolet;
-  }
-`;
+import {Text, UnorderedList, VStack} from "@chakra-ui/react";
+import {Droppable} from "react-beautiful-dnd";
+import ComponentTabItem from "./ComponentTabItem";
 
 const ComponentTab = (props) => {
   return (
@@ -26,31 +15,13 @@ const ComponentTab = (props) => {
                       >
                           {props.finalComponentList.map(({id, title, content, icon}, index) => {
                                   return (
-                                      <Draggable
-                                          key={id}
-                                          draggableId={id}
-                                          index={index}>
-                                          {(provided, snapshot) => (
-                                              <Fragment>
-                                                  <ListItem
-                                                      ref={provided.innerRef}
-                                                      {...provided.draggableProps}
-                                                      {...provided.dragHandleProps}
-                                                      mb={3}
-                                                  >
-                                                      <ComponentListElement title={title}
-                                                                            content={content}
-                                                                            icon={icon}/>
-                                                  </ListItem>
-                                                  {snapshot.isDragging &&
-                                                      <Clone>
-                                                          <ComponentListElement title={title}
-                                                                                content={content}
-                                                                                icon={icon}/>
-                                                      </Clone>}
-                                              </Fragment>
-                                          )}
-                                      </Draggable>
+                                      <ComponentTabItem
+                                          id={id}
+                                          title={title}
+                                          content={content}
+                                          icon={icon}
+                                          index={index}
+                                      />
                                   )
                               }
                           )
