@@ -113,6 +113,7 @@ const QuestionInspectorForm = (props) => {
                                         answer={answer}
                                         removeAnswer={() => {removeAnswer(answer.id)}}
                                         multiRight={props.questionData.type === "MULTI"} //TODO Use Enum (make enum globally accessible)
+                                        isNotRemovable={index < 2} // Minimum one right and one wrong answer need to be present
                             />
                         })
                         :

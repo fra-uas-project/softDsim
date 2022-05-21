@@ -48,7 +48,7 @@ const QuestionAnswer = (props) => {
                         <NumberDecrementStepper/>
                     </NumberInputStepper>
                 </NumberInput>
-                <IconButton aria-label="Remove Answer" icon={<HiOutlineMinus />} size="xs" variant='ghost' onClick={props.removeAnswer}/>
+                <IconButton aria-label="Remove Answer" icon={<HiOutlineMinus />} size="xs" variant='ghost' onClick={props.removeAnswer} isDisabled={props.isNotRemovable}/>
             </HStack>
             <FormHelperText>
                 <HStack justify="space-between">
