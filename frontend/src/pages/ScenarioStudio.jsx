@@ -19,8 +19,8 @@ import {
 } from "@chakra-ui/react";
 import {HiChevronRight} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
-import {DragDropContext, Droppable} from "react-beautiful-dnd";
-import {useEffect, useState} from "react";
+import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
+import {Fragment, useEffect, useState} from "react";
 import {
     MdOutlineAttractions,
     MdOutlineCheckBox,
@@ -30,7 +30,6 @@ import {
     MdTimeline
 } from "react-icons/md";
 import {v4 as uuidv4} from 'uuid';
-import styled from "@emotion/styled";
 import {BsLightningCharge} from "react-icons/bs";
 import EditorBasicComponent from "../components/EditorBasicComponent";
 import EditorFragmentComponent from "../components/EditorFragmentComponent";
@@ -40,15 +39,7 @@ import ComponentTab from "../components/ComponentTab";
 import QuestionInspectorForm from "../components/QuestionInspectorForm";
 import BaseInspectorForm from "../components/BaseInspectorForm";
 import QuestionsInspectorForm from "../components/QuestionsInspectorForm";
-
-const Clone = styled(ListItem)`
-  margin-bottom: 12px;
-
-  + li {
-    display: none !important;
-    background-color: blueviolet;
-  }
-`;
+import ComponentListElement from "../components/ComponentListElement";
 
 const ScenarioStudio = () => {
 
@@ -90,7 +81,7 @@ const ScenarioStudio = () => {
             title: "Simulation Fragment",
             content: "Control the simulation by defining fragments.",
             icon: MdTimeline,
-            displayName: "() => { return `Simulation Fragment ${this.d.slice(0, 8)}`}",
+            displayName: "() => { return Simulation Fragment}",
             actions: []
         },
         {
@@ -168,6 +159,8 @@ const ScenarioStudio = () => {
             const [reorderedItem] = items.splice(result.source.index, 1);
             items.splice(result.destination.index, 0, reorderedItem);
 
+            // console.log("test", editorList[result.source.index])
+            // setSelectedItem(editorList[result.source.index].id)
             updateEditorList(items);
 
             // moving from component list to editor list
@@ -323,21 +316,23 @@ const ScenarioStudio = () => {
     };
 
     const handleEditorBackgroundClick = (e) => {
-        if (e.target.getAttribute("role") === "list") {
-            setTabIndex(tabIndexEnum.COMPONENTS)
-        }
+        // if (e.target.getAttribute("role") === "list") {
+        //     setTabIndex(tabIndexEnum.COMPONENTS)
+        //     setSelectedItem("")
+        //     setSelectedObject(null)
+        // }
     };
 
     // If item is selected, switch to inspector tab
     useEffect(() => {
         if (selectedItem) {
-            // TODO Not working when deselected and selected again
             setTabIndex(tabIndexEnum.INSPECTOR);
         }
     }, [selectedItem, tabIndexEnum.INSPECTOR]);
 
     useEffect(() => {
         console.log(editorList)
+        console.log("FC", finalComponentList)
         console.log("SO", selectedObject)
     }, [selectedItem])
 
@@ -417,10 +412,33 @@ const ScenarioStudio = () => {
                                                                     id={component.id}
                                                                     title={component.title}
                                                                     index={index}
+                                                                    component={component}
                                                                     isSelected={selectedItem === component.id}
                                                                     selectedItem={selectedItem}
                                                                     actions={component.questions}
                                                                 />
+                                                            )
+                                                        } else if (component.type === componentEnum.EVENT) {
+                                                            return (
+                                                                <Draggable
+                                                                    key={component.id}
+                                                                    draggableId={component.id}
+                                                                    index={index}>
+                                                                    {(provided, snapshot) => (
+                                                                        <Fragment>
+                                                                            <ListItem
+                                                                                ref={provided.innerRef}
+                                                                                {...provided.draggableProps}
+                                                                                {...provided.dragHandleProps}
+                                                                                mb={3}
+                                                                            >
+                                                                                <ComponentListElement title={component.title}
+                                                                                                      content={component.content}
+                                                                                                      icon={component.icon}/>
+                                                                            </ListItem>
+                                                                        </Fragment>
+                                                                    )}
+                                                                </Draggable>
                                                             )
                                                         } else {
                                                             // //    TODO Implement other types
@@ -462,7 +480,6 @@ const ScenarioStudio = () => {
                             <Tabs
                                 index={tabIndex}
                                 onChange={handleTabsChange}
-                                // defaultIndex={1}
                                 minH="900px"
                             >
                                 <TabList>
@@ -471,10 +488,8 @@ const ScenarioStudio = () => {
                                 </TabList>
 
                                 <TabPanels minW="350px">
-
-                                    {/* Inspector Tab */}
                                     <TabPanel>
-                                        {/* ########### Inspector Items ########### */}
+                                        {/* Inspector Items */}
                                         {selectedItem ?
                                             <VStack alignItems="flex-start" pt={2}>
                                                 {selectedObject?.type === componentEnum.BASE &&
@@ -532,9 +547,6 @@ const ScenarioStudio = () => {
                     </DragDropContext>
                 </HStack>
             </Box>
-
-
-
         </Flex>
     )
 };
