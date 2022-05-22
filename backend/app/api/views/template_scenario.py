@@ -56,8 +56,9 @@ class TemplateScenarioView(APIView):
                 )
         except Exception as e:
             logging.error(f"{e.__class__.__name__} occurred in POST template-scenario")
+            logging.error(f"{str(e)} occurred in POST template-scenario")
             return Response(
-                {"status": "something went wrong internally"},
+                {"status": "something went wrong internally", "data": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 

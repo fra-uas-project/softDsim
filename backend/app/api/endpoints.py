@@ -1,9 +1,10 @@
 from django.urls import path
 
+from app.api.views.question_collection import QuestionCollectionView
 from app.api.views.user_scenario import UserScenarioViews
 from app.api.views.team import SkillTypeView, TeamViews, MemberView
 from app.api.views.scenario_config import ScenarioConfigView
-from app.api.views.decision import DecisionView
+from app.api.views.question import QuestionView
 from app.api.views.management_goal import ManagementGoalView
 from app.api.security.security import (
     LoginView,
@@ -24,6 +25,7 @@ from app.api.views.simulation import (
     NextStepView,
 )
 
+
 urlpatterns = [
     # User stuff
     path("login", LoginView.as_view(), name="login"),
@@ -39,11 +41,16 @@ urlpatterns = [
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
     path("user-scenario/<int:id>", UserScenarioViews.as_view()),
-    # decision todo: remove maybe later
-    path("decision", DecisionView.as_view(), name="decision"),
-    path("decision/<str:decision_id>", DecisionView.as_view(), name="decision"),
+    # just for testing. todo: remove later
+    path("question", QuestionView.as_view(), name="question"),
+    path("question/<str:id>", QuestionView.as_view(), name="question"),
     path("management-goal/", ManagementGoalView.as_view()),
     path("management-goal/<str:id>", ManagementGoalView.as_view()),
+    path(
+        "question_collection",
+        QuestionCollectionView.as_view(),
+        name="question_collection",
+    ),
     # team and member
     path("team", TeamViews.as_view()),
     path("team/<int:id>", TeamViews.as_view()),

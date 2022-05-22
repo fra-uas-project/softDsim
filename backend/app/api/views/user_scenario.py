@@ -15,7 +15,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from app.models.user_scenario import ScenarioState, UserScenario
 from app.models.scenario import ScenarioConfig
 from app.models.team import Team
-
 from custom_user.models import User
 
 
