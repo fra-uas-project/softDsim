@@ -16,6 +16,26 @@ class MemberDTO(BaseModel):
     skill_type: SkillTypeDTO
 
 
+class AnswerDTO(BaseModel):
+    id: int
+    label: str
+    points: int
+
+
+class QuestionDTO(BaseModel):
+    id: int
+    index: int
+    text: str
+    multi: bool
+    answers: List[AnswerDTO]
+
+
+class QuestionCollectionDTO(BaseModel):
+    id: int
+    index: int
+    questions: List[QuestionDTO]
+
+
 class ScenarioStateDTO(BaseModel):
     counter: int
     day: int
@@ -39,19 +59,19 @@ class ScenarioResponse(BaseModel, ABC):
     """
 
     type: str
-    tasks: TasksStatusDTO
     state: ScenarioStateDTO
-    members: List[MemberDTO]
 
 
 class SimulationResponse(ScenarioResponse):
     type: str = "SIMULATION"
+    tasks: TasksStatusDTO
+    members: List[MemberDTO]
     # ToDo: Add list of actions (Issue #235)
 
 
 class QuestionResponse(ScenarioResponse):
     type: str = "QUESTION"
-    # ToDo: Add question (Issue #234)
+    question_collection: QuestionCollectionDTO
 
 
 class ModelResponse(ScenarioResponse):

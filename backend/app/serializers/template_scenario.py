@@ -6,6 +6,7 @@ from app.models.management_goal import ManagementGoal
 from app.models.question import Question
 from app.models.question_collection import QuestionCollection
 from app.models.score_card import ScoreCard
+from app.models.simulation_end import SimulationEnd
 from app.models.simulation_fragment import SimulationFragment
 from app.models.template_scenario import TemplateScenario
 from app.serializers.management_goal import ManagementGoalSerializer
@@ -71,24 +72,31 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
             # 2.2 create question
             for question in questions_data:
 
-                answer_data = question.pop("answer")
+                answers_data = question.pop("answers")
 
                 question_object = Question.objects.create(
                     question_collection=question_collection_object, **question
                 )
 
                 # 2.2.1 create answer (should only be one, maybe change to OneToOneField
-                for answer in answer_data:
+                for answer_data in answers_data:
 
-                    answer = Answer.objects.create(question=question_object, **answer)
+                    answer = Answer.objects.create(
+                        question=question_object, **answer_data
+                    )
 
         # 3 create simulation_fragments
         for simulation_fragment_data in simulation_fragments_data:
 
             action_data = simulation_fragment_data.pop("actions")
+            simulation_end_data = simulation_fragment_data.pop("simulation_end")
 
             simulation_fragment = SimulationFragment.objects.create(
                 template_scenario=template_scenario, **simulation_fragment_data
+            )
+
+            simulation_end = SimulationEnd.objects.create(
+                simulation_fragment=simulation_fragment, **simulation_end_data
             )
 
             # 3.1 create actions for simulation

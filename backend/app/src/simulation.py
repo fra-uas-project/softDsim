@@ -1,11 +1,17 @@
 import logging
-from app.dto.request import Workpack
-from app.dto.response import SimulationResponse
+
+from app.dto.response import SimulationResponse, QuestionResponse, ScenarioResponse
+from app.models.question_collection import QuestionCollection
 from app.models.user_scenario import UserScenario
 from app.models.task import Task
-from app.src.task_util import get_tasks_status
-from app.src.member_util import get_member_report
-from app.src.user_scenario_util import get_scenario_state_dto
+from app.serializers.user_scenario import UserScenarioSerializer
+from app.src.util.question_util import get_question_collection
+from app.src.util.task_util import get_tasks_status
+from app.src.util.member_util import get_member_report
+from app.src.util.user_scenario_util import (
+    get_scenario_state_dto,
+    find_next_scenario_component,
+)
 from app.dto.request import SimulationRequest
 from app.models.team import SkillType
 from app.models.team import Member
@@ -20,7 +26,7 @@ class SimulationException(BaseException):
 
 def continue_simulation(
     scenario: UserScenario, req: SimulationRequest
-) -> SimulationResponse:
+) -> ScenarioResponse:
     """ATTENTION: THIS FUNCTION IS NOT READY TO USE IN PRODUCTION
     The function currently can only be used as a dummy.
 
@@ -32,9 +38,26 @@ def continue_simulation(
     # Gather information of what to do
     days = wp.days
 
+    # todo philip: make this actually functional
+    state = scenario.state
+    if state.counter == 2:
+        state.counter = 0
+    else:
+        state.counter = state.counter + 1
+    state.save()
+
+    # find next component depending on current index of the scenario
+    next_component = find_next_scenario_component(scenario)
+
+    # if next component is a Question:
+    if isinstance(next_component, QuestionCollection):
+        return QuestionResponse(
+            question_collection=get_question_collection(scenario),
+            state=get_scenario_state_dto(scenario),
+        )
+
     member_change = req.members
     for m in member_change:
-        m.skill_type
         try:
             s = SkillType.objects.get(name=m.skill_type)
         except ObjectDoesNotExist:

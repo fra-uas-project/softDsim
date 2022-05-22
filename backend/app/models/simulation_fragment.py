@@ -8,6 +8,7 @@ class SimulationFragment(models.Model):
     index = models.PositiveIntegerField()
     text = models.TextField()
     points = models.PositiveIntegerField()
+    # simulation_end = SimulationEnd
     # actions: List[Action]
 
     template_scenario = models.ForeignKey(
@@ -17,7 +18,3 @@ class SimulationFragment(models.Model):
         blank=True,
         null=True,
     )
-
-    # template_scenario = models.OneToOneField(
-    #     TemplateScenario, on_delete=models.CASCADE, related_name="simulation"
-    # )
