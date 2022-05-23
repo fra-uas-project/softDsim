@@ -60,14 +60,14 @@ const mdeOptionsFull = {
 
 const MarkdownTextfield = (props) => {
     const {isOpen, onOpen, onClose} = useDisclosure();
-    const [value, setValue] = useState(props.questionsData.text);
+    const [value, setValue] = useState(props.data.text);
 
     const onChange = useCallback((value) => {
         setValue(value);
     }, []);
 
     useEffect(() => {
-        props.questionsData.text = value;
+        props.data.text = value;
     }, [value])
 
     return (

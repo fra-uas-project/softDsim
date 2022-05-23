@@ -30,7 +30,7 @@ const QuestionsInspectorForm = (props) => {
             <Box h={3}/>
             <MarkdownTextfield
                 key={props.questionsData.id}
-                questionsData={props.questionsData}
+                data={props.questionsData}
             />
             <Box h={3}/>
             <InspectorItemSelector
