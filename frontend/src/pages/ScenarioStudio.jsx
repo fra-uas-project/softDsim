@@ -69,6 +69,7 @@ const ScenarioStudio = () => {
             content: "Define the basisc stats for a new simulation.",
             icon: MdOutlineInfo,
             displayName: "Base Information",
+            text: "",
             budget: "0",
             duration: "0",
             easy_tasks: "0",
