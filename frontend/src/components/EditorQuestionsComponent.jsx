@@ -1,7 +1,8 @@
-import {Box, HStack, Icon, ListItem, Text, UnorderedList, VStack} from "@chakra-ui/react";
+import {Box, Flex, Heading, HStack, Icon, ListItem, Text, UnorderedList, VStack} from "@chakra-ui/react";
 import {MdDragIndicator} from "react-icons/md";
 import {Draggable, Droppable} from "react-beautiful-dnd";
 import EditorActionComponent from "./EditorActionComponent";
+import EditorQuestionComponent from "./EditorQuestionComponent";
 
 const EditorQuestionsComponent = (props) => {
 
@@ -9,18 +10,29 @@ const EditorQuestionsComponent = (props) => {
         <Draggable key={props.id} draggableId={props.id} index={props.index}>
             {(provided, snapshot) => (
                 <ListItem
-                    mb={3}
                     {...provided.draggableProps}
                     ref={provided.innerRef}
                 >
                     <VStack>
-                        <HStack w="200px" h="50px"
+                        <HStack
                                 justifyContent="space-around" onMouseDown={props.onClick}
                                 elementid={props.id}
-                                backgroundColor={props.backgroundColor}
+                                backgroundColor="white" p={3}
                                 boxShadow={props.isSelected ? "0 0 0 3px rgba(66, 153, 225, 0.6)" : ""}
+                                borderRadius="lg"
+
                         >
-                            <Text>{props.title}</Text>
+                            <Flex w={20} h={20} backgroundColor="gray.200" justifyContent="center" alignItems="center" borderRadius="xl">
+                                <Icon w={10} h={10} as={props.component.icon} color="gray.500" />
+                            </Flex>
+                            <VStack w="200px"
+                                    alignItems="flex-start"
+                                    spacing={1}
+                                    pl={3}
+                            >
+                                <Heading size="sm">{props.component.displayName}</Heading>
+                                <Text fontSize="sm" fontWeight="500" color="gray.400">{props.component.title}</Text>
+                            </VStack>
                             <Box {...provided.dragHandleProps}>
                                 <Icon as={MdDragIndicator}
                                       fontSize={20}/>
@@ -42,17 +54,17 @@ const EditorQuestionsComponent = (props) => {
                                     flexDir="column"
                                     alignItems="center"
                                     borderRadius="2xl">
-                                    >
                                     {
                                         props.actions &&
                                         props.actions.map((action, index) => {
                                             return (
-                                                <EditorActionComponent
+                                                <EditorQuestionComponent
                                                     key={action.id}
                                                     backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
                                                     elementid={action.id}
                                                     onClick={props.onClick}
                                                     id={action.id}
+                                                    question={action}
                                                     index={index}
                                                     isSelected={props.selectedItem === action.id}
                                                 />
@@ -63,7 +75,6 @@ const EditorQuestionsComponent = (props) => {
                                 </UnorderedList>
                             )}
                         </Droppable>
-
                     </VStack>
                 </ListItem>
             )
