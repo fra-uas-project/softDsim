@@ -3,6 +3,7 @@ import {Draggable, Droppable} from "react-beautiful-dnd";
 import {Fragment} from "react";
 import ComponentListElement from "./ComponentListElement";
 import styled from "@emotion/styled";
+import InspectorListElement from "./InspectorListElement";
 
 const Clone = styled(ListItem)`
   margin-bottom: 12px;
@@ -39,11 +40,11 @@ const InspectorItemSelector = (props) => {
                                                     {...provided.dragHandleProps}
                                                     mb={3}
                                                 >
-                                                    <ComponentListElement title={title} content={content} icon={icon}/>
+                                                    <InspectorListElement title={title} content={content} icon={icon}/>
                                                 </ListItem>
                                                 {snapshot.isDragging &&
                                                     <Clone>
-                                                        <ComponentListElement title={title} content={content} icon={icon}/>
+                                                        <InspectorListElement title={title} content={content} icon={icon}/>
                                                     </Clone>}
                                             </Fragment>
                                         )}

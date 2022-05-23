@@ -9,6 +9,7 @@ import {
     NumberInputField, NumberInputStepper
 } from "@chakra-ui/react";
 import {useEffect, useState} from "react";
+import MarkdownTextfield from "./MarkdownTextfield";
 
 const BaseInspectorForm = (props) => {
     const formatDays = (val) => val + ` days`
@@ -55,6 +56,13 @@ const BaseInspectorForm = (props) => {
                 <EditableInput/>
             </Editable>
             <Divider/>
+
+            <Box h={3}/>
+
+            <MarkdownTextfield
+                key={props.baseData.id}
+                data={props.baseData}
+            />
 
             <Box h={3}/>
 
