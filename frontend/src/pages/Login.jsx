@@ -1,12 +1,15 @@
-import { Heading, Flex, Stack, Input, Button, InputGroup, InputRightElement, Text } from "@chakra-ui/react"
-import { HiOutlineLogin, HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
-import React, { useState } from "react";
+import { Button, Flex, Heading, Input, InputGroup, InputRightElement, Stack, Text } from "@chakra-ui/react"
+import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin } from "react-icons/hi";
+import React, { useContext, useState } from "react";
 import { getCookie } from "../utils/utils"
+import { AuthContext } from "../AuthProvider";
 
 const Login = () => {
+    const { setCurrentUser } = useContext(AuthContext);
+
     // initialize states
     const [idInputValid, setIdInputValid] = useState(false)
-    const [passwortInputValid, setPasswortInputValird] = useState(false)
+    const [passwortInputValid, setPasswortInputValid] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [logInSuccess, setLogInSuccess] = useState('none')
     const [userID, setUserID] = useState('')
@@ -14,23 +17,27 @@ const Login = () => {
 
     // handle login click
     async function handleLogin() {
+        setLogInSuccess('attempting')
         const csrftoken = getCookie('csrftoken')
         if (csrftoken === undefined) {
             // get new unauthed token
             await getCRSF()
         }
         // attempt login
-        const loginAttempt = await login()
+        let loginAttempt = await login()
         if (loginAttempt.status === 403) {
             // wrong/invalid crsf token
             await getCRSF()
-            await login()
-        } else if (loginAttempt.status === 400) {
+            loginAttempt = await login()
+        }
+        if (loginAttempt.status === 400) {
             // wrong user credentials
             setLogInSuccess('wrongCredentials')
         } else if (loginAttempt.status === 200) {
             // login successful
             setLogInSuccess('success')
+            const resBody = await loginAttempt.json()
+            setCurrentUser(resBody.user)
         } else {
             // unknown/unhandled error
             console.log('unknown error - please try again')
@@ -41,7 +48,7 @@ const Login = () => {
     // Login API call
     async function login() {
         try {
-            const res = await fetch(`http://localhost:8000/api/login`, {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/login`, {
                 method: 'POST',
                 credentials: 'include',
                 body: JSON.stringify({ "username": userID, "password": userPassword }),
@@ -61,7 +68,7 @@ const Login = () => {
     async function getCRSF() {
         // get new unauthed token
         try {
-            await fetch(`http://localhost:8000/api/csrf-cookie`, {
+            await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/csrf-cookie`, {
                 method: 'GET',
                 credentials: 'include'
             })
@@ -84,9 +91,9 @@ const Login = () => {
     function userPasswordInput(event) {
         setUserPassword(event.target.value)
         if (event.target.value !== "") {
-            setPasswortInputValird(true)
+            setPasswortInputValid(true)
         } else {
-            setPasswortInputValird(false)
+            setPasswortInputValid(false)
         }
     }
 
@@ -98,13 +105,15 @@ const Login = () => {
     return (
         <>
             <Flex align="center" justify="center" flexGrow="1">
-                <Flex justify="center" p="10" w="40vw" maxW="400px" bg='white' rounded="2xl" flexFlow="column" shadow="xl">
+                <Flex justify="center" p="10" w="40vw" maxW="400px" bg='white' rounded="2xl" flexFlow="column"
+                    shadow="xl">
                     {/* input fields */}
                     <Stack spacing={5}>
                         <Heading as="h3" textAlign="center">SoftDSim</Heading>
                         <Input type="text" placeholder="User ID" size='lg' bg='#efefef' onChange={useridInput} />
                         <InputGroup>
-                            <Input type={showPassword ? "text" : "password"} placeholder="Password" size="lg" bg="#efefef" onChange={userPasswordInput} />
+                            <Input type={showPassword ? "text" : "password"} placeholder="Password" size="lg" onKeyPress={e => { if (e.key === 'Enter') { handleLogin() } }}
+                                bg="#efefef" onChange={userPasswordInput} />
                             {/* show password */}
                             <InputRightElement h="full">
                                 <Button size='xl' onClick={showPasswordClicked}>
@@ -115,11 +124,15 @@ const Login = () => {
                     </Stack>
                     {/* Failed login message */}
                     <Flex align="center" justify="center" h="40px">
-                        {logInSuccess === 'wrongCredentials' ? <Text textColor="red.500">Incorrect user credentials!</Text> : <></>}
-                        {logInSuccess === 'unknown' ? <Text textColor="red.500">Unknown Error - Please try again!</Text> : <></>}
+                        {logInSuccess === 'wrongCredentials' ?
+                            <Text textColor="red.500">Incorrect user credentials!</Text> : <></>}
+                        {logInSuccess === 'unknown' ?
+                            <Text textColor="red.500">Unknown Error - Please try again!</Text> : <></>}
                     </Flex>
                     {/* login button */}
-                    <Button rightIcon={<HiOutlineLogin />} colorScheme={idInputValid && passwortInputValid ? 'blue' : 'blackAlpha'} size='lg' onClick={handleLogin} isDisabled={idInputValid && passwortInputValid ? false : true}>
+                    <Button rightIcon={<HiOutlineLogin />} isLoading={logInSuccess === 'attempting' ? true : false}
+                        colorScheme={idInputValid && passwortInputValid ? 'blue' : 'blackAlpha'} size='lg'
+                        onClick={handleLogin} isDisabled={!(idInputValid && passwortInputValid)}>
                         Login
                     </Button>
                 </Flex>

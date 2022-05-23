@@ -1,0 +1,102 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+    - develop
+    - main
+    paths:
+    - 'backend/**'
+    - '.github/workflows/backend.yaml'
+    - 'deploy/*'
+  workflow_dispatch:
+
+jobs:
+
+  consecutiveness:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: mktcode/consecutive-workflow-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+  
+  BuildImage:
+    runs-on: ubuntu-latest
+    name: Build Base Image
+    needs:
+    - consecutiveness
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+    - name: Check for Changes
+      run: |
+            git diff HEAD~1 HEAD backend/requirements.txt > diff
+            if [ -s diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
+            echo ${{ env.DIFF }}
+    
+    - name: Copy Docker Build
+      if: ${{ env.DIFF == 'true' }}
+      run: |
+            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./backend/requirements.txt ./deploy/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_APP }}build
+    - name: Build Image
+      if: ${{ env.DIFF == 'true' }}
+      run: |
+            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
+            ssh docker-agent <<-'EOF2'
+                cd ${{ secrets.BASE_DIR_APP }}build/ \
+                && ${{ secrets.BASE_DIR_OPS }}iptables -t mangle -F PREROUTING \
+                && docker build . -t dj:latest \
+                && ${{ secrets.BASE_DIR_OPS }}iptables.sh \
+                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml down \
+                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml up -d
+            EOF2
+            EOF
+
+  Deploy:
+    runs-on: ubuntu-latest
+    name: Rollout backend
+    needs:
+    - consecutiveness
+    - BuildImage
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Check / set env Prod
+      if: ${{ github.ref == 'refs/heads/main' }}
+      run: |  
+            echo "DIR=PROD/" >> $GITHUB_ENV
+
+    - name: Check / set env Dev
+      if: ${{ github.ref == 'refs/heads/develop' }}
+      run: |
+            echo "DIR=DEV/" >> $GITHUB_ENV
+    
+    - name: Prepare Backend
+      run: |
+            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
+            mkdir -p ${{ secrets.BASE_DIR_APP }}${{ env.DIR }}swd
+            EOF
+
+    - name: Copy Files
+      run: |
+            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./backend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_APP }}${{ env.DIR }}swd
+
+    - name: Release Backend && Restart
+      run: |
+            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} <<-EOF
+            ssh docker-agent <<-'EOF2'
+              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml down
+            EOF2
+            cd ${{ secrets.BASE_DIR_APP }}${{ env.DIR }} \
+            && rm -rf bak || echo "bak not found" \
+            && mv prd bak || echo "prd not found" \
+            && mv swd prd || echo "swd not found" \
+            && cd prd \
+            && ln -s ../.env .env \
+            && ssh docker-agent <<-'EOF3'
+              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml up -d
+            EOF3
+            EOF
