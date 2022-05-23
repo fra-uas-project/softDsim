@@ -1,0 +1,28 @@
+name: Backend
+
+on:
+  push:
+    branches:
+    - develop
+    paths:
+    - 'backend/**'
+    - '.github/workflows/backend.yaml'
+    - 'deploy/*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Rollout backend
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Remove old files
+      run: |
+            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
+            rm -rf ${{ secrets.BASE_DIR_APP }}data/*
+            EOF
+    - name: Copy Files
+      run: |
+            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./backend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_APP }}data
+   
