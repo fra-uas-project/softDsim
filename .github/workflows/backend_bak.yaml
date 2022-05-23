@@ -1,13 +1,13 @@
 name: Backend
 
-on:
-  push:
-    branches:
-    - develop
-    paths:
-    - 'backend/**'
-    - '.github/workflows/backend.yaml'
-    - 'deploy/*'
+# on:
+#   push:
+#     branches:
+#     - develop
+#     paths:
+#     - 'backend/**'
+#     - '.github/workflows/backend.yaml'
+#     - 'deploy/*'
   workflow_dispatch:
 
 jobs:
