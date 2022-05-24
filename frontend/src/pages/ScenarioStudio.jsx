@@ -89,7 +89,8 @@ const ScenarioStudio = () => {
             content: "Control the simulation by defining fragments.",
             icon: MdTimeline,
             displayName: `Simulation ${uuidv4().slice(0, 8)}`,
-            actions: []
+            actions: [],
+            simulation_end: {}
         },
         {
             id: uuidv4(),
@@ -398,7 +399,6 @@ const ScenarioStudio = () => {
 
     useEffect(() => {
         console.log(editorList)
-        console.log("FC", finalComponentList)
         console.log("SO", selectedObject)
     }, [selectedItem])
 
