@@ -14,6 +14,7 @@ from app.serializers.question_collection import QuestionCollectionSerializer
 from app.serializers.score_card import ScoreCardSerializer
 
 from app.serializers.simulation_fragment import SimulationFragmentSerializer
+from app.src.util.scenario_util import check_indexes
 
 
 class TemplateScenarioSerializer(serializers.ModelSerializer):
@@ -39,6 +40,9 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
         The method will create a TemplateScenario and all elementes of it (management_goal, question (action, textblock),...) in the database
         """
         # todo philip: add try/catch
+
+        # check if indexes are correct
+        check_indexes(validated_data)
 
         management_goal_data = validated_data.pop("management_goal")
         question_collection_data = validated_data.pop("question_collections")
