@@ -22,10 +22,8 @@ import {
 import { HiChevronRight } from "react-icons/hi";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import RadioButton from "../components/RadioButton";
-import ActionSlider from "../components/ActionSlider";
-import ActionToggle from "../components/ActionToggle";
-import ActionSwitch from "../components/ActionSwitch";
+import Question from "../components/Question";
+import Action from "../components/Action"
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
@@ -46,6 +44,43 @@ const Simulation = () => {
         const newUrl = url.slice(0, url.lastIndexOf("/"));
         return newUrl;
     }
+
+    // test values for simulation
+    const [testSimValues, setTestSimValues] = useState(
+        {
+            "simulation_fragments": [
+                {
+                    "index": 2,
+                    "points": 300,
+                    "text": "Hier steht die Story",
+                    "actions": [
+                        {
+                            "title": "bugfix"
+                        },
+                        {
+                            "title": "unittest"
+                        },
+                        {
+                            "title": "integrationtest"
+                        },
+                        {
+                            "title": "meetings",
+                            "lower_limit": 0,
+                            "upper_limit": 25
+                        },
+                        {
+                            "title": "training",
+                            "lower_limit": 0,
+                            "upper_limit": 50
+                        },
+                        {
+                            "title": "teamevent"
+                        }
+                    ]
+                }
+            ]
+        }
+    )
 
     useEffect(() => {
         fetchUserScenario();
@@ -81,8 +116,8 @@ const Simulation = () => {
                 </Breadcrumb>
                 <Flex flexDir="column" flexGrow={1}>
                     <Heading p='5'>Active Scenario: {userScenario.scn_name}</Heading>
-                    <Container maxW='container.2xl'>
-                        <Flex>
+                    <Container maxW='container.2xl' h='full'>
+                        <Flex h='full'>
                             <Box w='60%'>
                                 <Grid
                                     h='100%'
@@ -100,114 +135,53 @@ const Simulation = () => {
                                 </Grid>
                             </Box>
                             <Spacer />
+                            {/* right side of simulation studio */}
                             <Box
                                 p='3'
                                 w='38%'
+                                h='full'
                                 boxShadow='md'
                                 rounded='md'
-                                bg='gray.400'
+                                bg='white'
                                 textAlign='center'
                             >
                                 <p>
-                                    <b>Actions</b>
+                                    {/* change heading depending on dataset */}
+                                    <b>
+                                        {
+                                            Object.keys(testSimValues)[0] === 'question_collections' ? 'Questions' :
+                                                Object.keys(testSimValues)[0] === 'simulation_fragments' ? 'Actions' : ''
+                                        }
+                                    </b>
                                 </p>
                                 <Grid
-                                    // templateRows='repeat(4, 1fr)'
-                                    // templateColumns='repeat(3, 1fr)'
                                     gap={4}
                                     p='5'
                                     justify="flex-end"
                                 >
-                                    <GridItem>
-                                        <RadioButton />
-                                    </GridItem>
-                                    <GridItem>
-                                        <ActionSlider />
-                                    </GridItem>
-                                    <GridItem>
-                                        <ActionToggle />
-                                    </GridItem>
-                                    <GridItem>
-                                        <ActionSwitch />
-                                    </GridItem>
-                                    {/* <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' m='2'>
-                                        <Grid>
-                                            <GridItem colSpan={3} rounded='md' bg='gray.100' p='2'> <b>Hier steht eine Frage</b> </GridItem>
-                                            <RadioGroup defaultValue='1'>
-                                                <Stack spacing={4} direction='row' p='2' justify='flex-end'>
-                                                    <Radio value='1'>
-                                                        Answer 1
-                                                    </Radio>
-                                                    <Radio value='2'>
-                                                        Answer 2
-                                                    </Radio>
-                                                    <Radio value='3'>
-                                                        Answer 3
-                                                    </Radio>
-                                                </Stack>
-                                            </RadioGroup>
-                                        </Grid>
-                                    </GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' m='2'>
-                                        <Grid>
-                                            <GridItem colSpan={3} rounded='md' bg='gray.100' p='2'> <b>Hier steht eine Frage</b> </GridItem>
-                                            <RadioGroup defaultValue='1'>
-                                                <Stack spacing={4} direction='row' p='2' justify='flex-end'>
-                                                    <Radio value='1'>
-                                                        Answer 1
-                                                    </Radio>
-                                                    <Radio value='2'>
-                                                        Answer 2
-                                                    </Radio>
-                                                    <Radio value='3'>
-                                                        Answer 3
-                                                    </Radio>
-                                                </Stack>
-                                            </RadioGroup>
-                                        </Grid>
-                                    </GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' m='2'>
-                                        <Grid>
-                                            <GridItem colSpan={3} rounded='md' bg='gray.100' p='2'> <b>Hier steht eine Frage</b> </GridItem>
-                                            <RadioGroup defaultValue='1'>
-                                                <Stack spacing={4} direction='row' p='2' justify='flex-end'>
-                                                    <Radio value='1'>
-                                                        Answer 1
-                                                    </Radio>
-                                                    <Radio value='2'>
-                                                        Answer 2
-                                                    </Radio>
-                                                    <Radio value='3'>
-                                                        Answer 3
-                                                    </Radio>
-                                                </Stack>
-                                            </RadioGroup>
-                                        </Grid>
-                                    </GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' m='2'>
-                                        <Grid>
-                                            <GridItem colSpan={3} rounded='md' bg='gray.100' p='2'> <b>Hier steht eine Frage</b> </GridItem>
-                                            <RadioGroup defaultValue='1'>
-                                                <Stack spacing={4} direction='row' p='2' justify='flex-end'>
-                                                    <Radio value='1'>
-                                                        Answer 1
-                                                    </Radio>
-                                                    <Radio value='2'>
-                                                        Answer 2
-                                                    </Radio>
-                                                    <Radio value='3'>
-                                                        Answer 3
-                                                    </Radio>
-                                                </Stack>
-                                            </RadioGroup>
-                                        </Grid>
-                                    </GridItem>
-
-                                    <GridItem colSpan={2} /> */}
-                                    <GridItem colSpan={1}  >
+                                    {/* Question Collection */}
+                                    {Object.keys(testSimValues)[0] === 'question_collections' ?
+                                        <>
+                                            {testSimValues.question_collections.map((question, index) => {
+                                                return <Question key={index} text={question.text} questions={question} />
+                                            })}
+                                        </>
+                                        : <></>
+                                    }
+                                    {/* Simulation Fragment */}
+                                    {Object.keys(testSimValues)[0] === 'simulation_fragments' ?
+                                        <>
+                                            {testSimValues.simulation_fragments.map((actions, index) => {
+                                                return <Action key={index} text={actions.text} actions={actions.actions} />
+                                            })}
+                                        </>
+                                        : <></>
+                                    }
+                                    <GridItem colSpan={1}>
                                         <Button colorScheme='blue' size='lg'>
                                             Next Week
-                                        </Button> </GridItem>
+                                        </Button>
+                                    </GridItem>
                                 </Grid>
                             </Box>
                         </Flex >
