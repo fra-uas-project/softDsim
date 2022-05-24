@@ -8,11 +8,11 @@ from app.serializers.answer import AnswerSerializer
 
 class QuestionSerializer(serializers.ModelSerializer):
 
-    answer = AnswerSerializer(many=True)
+    answers = AnswerSerializer(many=True)
 
     class Meta:
         model = Question
-        fields = ("id", "index", "text", "multi", "answer")
+        fields = ("id", "index", "text", "multi", "answers")
 
     def create(self, validated_data):
         answer_data = validated_data.pop("answer")

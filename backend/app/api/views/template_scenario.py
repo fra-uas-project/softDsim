@@ -30,9 +30,12 @@ class TemplateScenarioView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             logging.error(f"{e.__class__.__name__} occurred in GET template-scenario")
-            logging.debug(e)
+            logging.error(f"{str(e)} occurred in GET template-scenario")
             return Response(
-                {"error": "something went wrong on server side (except clause)"},
+                {
+                    "error": "something went wrong on server side (except clause)",
+                    "data": str(e),
+                },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 

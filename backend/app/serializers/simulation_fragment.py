@@ -1,17 +1,18 @@
 from rest_framework import serializers
 
 from app.models.action import Action
-from app.models.score_card import ScoreCard
 from app.models.simulation_fragment import SimulationFragment
+from app.serializers.SimulationEndSerializer import SimulationEndSerializer
 from app.serializers.action import ActionSerializer
 
 
 class SimulationFragmentSerializer(serializers.ModelSerializer):
     actions = ActionSerializer(many=True)
+    simulation_end = SimulationEndSerializer()
 
     class Meta:
         model = SimulationFragment
-        fields = ("points", "text", "actions", "index")
+        fields = ("points", "text", "actions", "index", "simulation_end")
 
     # todo philip: rework create method
     def create(self, validated_data):
