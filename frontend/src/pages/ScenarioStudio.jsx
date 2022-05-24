@@ -33,7 +33,7 @@ import {v4 as uuidv4} from 'uuid';
 import {BsLightningCharge} from "react-icons/bs";
 import EditorBasicComponent from "../components/EditorBasicComponent";
 import EditorFragmentComponent from "../components/EditorFragmentComponent";
-import EditorQuestionsComponent from "../components/EditorQuestionsComponent";
+import EditorListComponent from "../components/EditorQuestionsComponent";
 import InspectorItemSelector from "../components/InspectorItemSelector";
 import ComponentTab from "../components/ComponentTab";
 import QuestionInspectorForm from "../components/QuestionInspectorForm";
@@ -83,7 +83,7 @@ const ScenarioStudio = () => {
             title: "Simulation Fragment",
             content: "Control the simulation by defining fragments.",
             icon: MdTimeline,
-            displayName: "() => { return Simulation Fragment}",
+            displayName: "",
             actions: []
         },
         {
@@ -390,14 +390,15 @@ const ScenarioStudio = () => {
                                                             )
                                                         } else if (component.type === componentEnum.FRAGMENT) {
                                                             return (
-                                                                <EditorFragmentComponent
+                                                                <EditorListComponent
                                                                     key={component.id}
-                                                                    backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
                                                                     elementid={component.id}
                                                                     onClick={((e) => handleSelect(e))}
                                                                     id={component.id}
                                                                     title={component.title}
                                                                     index={index}
+                                                                    component={component}
+                                                                    droppableType="action"
                                                                     isSelected={selectedItem === component.id}
                                                                     selectedItem={selectedItem}
                                                                     actions={component.actions}
@@ -405,15 +406,15 @@ const ScenarioStudio = () => {
                                                             )
                                                         } else if (component.type === componentEnum.QUESTIONS) {
                                                             return (
-                                                                <EditorQuestionsComponent
+                                                                <EditorListComponent
                                                                     key={component.id}
-                                                                    backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
                                                                     elementid={component.id}
                                                                     onClick={((e) => handleSelect(e))}
                                                                     id={component.id}
                                                                     title={component.title}
                                                                     index={index}
                                                                     component={component}
+                                                                    droppableType="question"
                                                                     isSelected={selectedItem === component.id}
                                                                     selectedItem={selectedItem}
                                                                     actions={component.questions}

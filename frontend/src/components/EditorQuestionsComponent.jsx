@@ -38,7 +38,7 @@ const EditorQuestionsComponent = (props) => {
                                       fontSize={20}/>
                             </Box>
                         </HStack>
-                        <Droppable droppableId={props.id} type="question">
+                        <Droppable droppableId={props.id} type={props.droppableType}>
                             {(provided, snapshot) => (
                                 <UnorderedList
                                     listStyleType="none"
