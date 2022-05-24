@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app.decorators.decorators import allowed_roles
+from app.exceptions import IndexException
 from app.models.template_scenario import TemplateScenario
 from app.serializers.template_scenario import TemplateScenarioSerializer
 
@@ -45,7 +46,17 @@ class TemplateScenarioView(APIView):
         try:
             serializer = TemplateScenarioSerializer(data=request.data, many=False)
             if serializer.is_valid():
-                serializer.save()
+
+                # create method of TemplateScenarioSerializer checks if indexes of components are correct
+                # if they're not -> create method will throw IndexException -> notify client that their indexes are wrong
+                try:
+                    serializer.save()
+                except IndexException as e:
+                    return Response(
+                        {"message": str(e)},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
                 return Response(
                     {"status": "Template Scenario saved", "data": serializer.data},
                     status=status.HTTP_200_OK,

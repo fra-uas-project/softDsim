@@ -7,6 +7,7 @@ from app.dto.response import (
     ScenarioResponse,
     ResultResponse,
 )
+from app.exceptions import SimulationException
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
 from app.models.user_scenario import UserScenario
@@ -26,10 +27,6 @@ from app.models.team import Member
 
 
 from django.core.exceptions import ObjectDoesNotExist
-
-
-class SimulationException(BaseException):
-    """Raised when simulation cannot be executed because of wrong data in request."""
 
 
 def continue_simulation(

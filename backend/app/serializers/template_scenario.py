@@ -1,5 +1,8 @@
+import logging
+
 from rest_framework import serializers
 
+from app.exceptions import IndexException
 from app.models.action import Action
 from app.models.answer import Answer
 from app.models.management_goal import ManagementGoal
@@ -12,7 +15,6 @@ from app.models.template_scenario import TemplateScenario
 from app.serializers.management_goal import ManagementGoalSerializer
 from app.serializers.question_collection import QuestionCollectionSerializer
 from app.serializers.score_card import ScoreCardSerializer
-
 from app.serializers.simulation_fragment import SimulationFragmentSerializer
 from app.src.util.scenario_util import check_indexes
 
@@ -42,7 +44,9 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
         # todo philip: add try/catch
 
         # check if indexes are correct
-        check_indexes(validated_data)
+        if not check_indexes(validated_data):
+            logging.warning("Cannot create TemplateScenario - Indexes are not correct.")
+            raise IndexException()
 
         management_goal_data = validated_data.pop("management_goal")
         question_collection_data = validated_data.pop("question_collections")
