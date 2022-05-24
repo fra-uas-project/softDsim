@@ -24,7 +24,7 @@ class AnswerDTO(BaseModel):
 
 class QuestionDTO(BaseModel):
     id: int
-    index: int
+    index: int  # todo philip: delete index (currently here for developing)
     text: str
     multi: bool
     answers: List[AnswerDTO]
@@ -32,7 +32,7 @@ class QuestionDTO(BaseModel):
 
 class QuestionCollectionDTO(BaseModel):
     id: int
-    index: int
+    index: int  # todo philip: delete index (currently here for developing)
     questions: List[QuestionDTO]
 
 
@@ -60,12 +60,12 @@ class ScenarioResponse(BaseModel, ABC):
 
     type: str
     state: ScenarioStateDTO
+    tasks: TasksStatusDTO
+    members: List[MemberDTO]
 
 
 class SimulationResponse(ScenarioResponse):
     type: str = "SIMULATION"
-    tasks: TasksStatusDTO
-    members: List[MemberDTO]
     # ToDo: Add list of actions (Issue #235)
 
 
@@ -79,6 +79,7 @@ class ModelResponse(ScenarioResponse):
     # ToDo: Add list of models (Issue #243)
 
 
-class ResultResponse(ScenarioResponse):
+class ResultResponse(BaseModel):
     type: str = "RESULT"
+    state: ScenarioStateDTO
     # ToDo: Add result stats (Issue #237)

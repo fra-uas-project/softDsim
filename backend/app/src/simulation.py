@@ -62,6 +62,8 @@ def continue_simulation(
         question_response = QuestionResponse(
             question_collection=get_question_collection(scenario),
             state=get_scenario_state_dto(scenario),
+            tasks=get_tasks_status(scenario.id),
+            members=get_member_report(scenario.team.id),
         )
         increase_scenario_counter(scenario)
 
