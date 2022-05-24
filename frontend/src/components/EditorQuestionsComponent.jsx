@@ -42,11 +42,9 @@ const EditorQuestionsComponent = (props) => {
                             {(provided, snapshot) => (
                                 <UnorderedList
                                     listStyleType="none"
-                                    m={0}
-                                    p={0}
-                                    transition="background-color 0.2s ease"
+                                    transition="all 0.2s ease"
                                     minH="1px"
-                                    minW="200px"
+                                    minW="full"
                                     {...provided.droppableProps}
                                     ref={provided.innerRef}
                                     backgroundColor={snapshot.isDraggingOver ? "gray.200" : ""}
@@ -60,7 +58,6 @@ const EditorQuestionsComponent = (props) => {
                                             return (
                                                 <EditorQuestionComponent
                                                     key={action.id}
-                                                    backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
                                                     elementid={action.id}
                                                     onClick={props.onClick}
                                                     id={action.id}
