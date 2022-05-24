@@ -2,7 +2,7 @@ import {
     Box,
     Breadcrumb,
     BreadcrumbItem,
-    BreadcrumbLink,
+    BreadcrumbLink, calc,
     Flex,
     Heading,
     HStack,
@@ -17,16 +17,18 @@ import {
     UnorderedList,
     VStack
 } from "@chakra-ui/react";
-import {HiChevronRight} from "react-icons/hi";
+import {HiChevronRight, HiUserGroup} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {Fragment, useEffect, useState} from "react";
 import {
-    MdOutlineAttractions,
+    MdAlarm,
+    MdExtension, MdIntegrationInstructions, MdLocalBar, MdMiscellaneousServices, MdOutlineAttachMoney,
+    MdOutlineAttractions, MdOutlineBugReport,
     MdOutlineCheckBox,
     MdOutlineInfo,
-    MdOutlineRadioButtonChecked,
-    MdRule,
+    MdOutlineRadioButtonChecked, MdOutlineSchool,
+    MdRule, MdSchool,
     MdTimeline
 } from "react-icons/md";
 import {v4 as uuidv4} from 'uuid';
@@ -41,8 +43,11 @@ import BaseInspectorForm from "../components/BaseInspectorForm";
 import QuestionsInspectorForm from "../components/QuestionsInspectorForm";
 import ComponentListElement from "../components/ComponentListElement";
 import EditorBaseComponent from "../components/EditorBaseComponent";
+import FragmentInspectorForm from "../components/FragmentInspectorForm";
 
 const ScenarioStudio = () => {
+
+    const HEIGHT = "900px";
 
     const tabIndexEnum = {
         "INSPECTOR": 0,
@@ -83,7 +88,7 @@ const ScenarioStudio = () => {
             title: "Simulation Fragment",
             content: "Control the simulation by defining fragments.",
             icon: MdTimeline,
-            displayName: "",
+            displayName: `Simulation ${uuidv4().slice(0, 8)}`,
             actions: []
         },
         {
@@ -119,8 +124,66 @@ const ScenarioStudio = () => {
         {
             id: uuidv4(),
             type: "ACTION",
-            title: "Action",
-            icon: BsLightningCharge
+            title: "Bug Fixing",
+            icon: MdOutlineBugReport,
+            displayName: "Bug Fixing",
+            action: "bugfix",
+        },
+        {
+            id: uuidv4(),
+            type: "ACTION",
+            title: "Unit Testing",
+            icon: MdIntegrationInstructions,
+            displayName: "Unit Testing",
+            action: "unittest",
+        },
+        {
+            id: uuidv4(),
+            type: "ACTION",
+            title: "Integration Testing",
+            icon: MdMiscellaneousServices,
+            displayName: "Integration Testing",
+            action: "integrationtest",
+        },
+        {
+            id: uuidv4(),
+            type: "ACTION",
+            title: "Meetings",
+            icon: HiUserGroup,
+            displayName: "Meetings",
+            action: "integrationtest",
+        },
+        {
+            id: uuidv4(),
+            type: "ACTION",
+            title: "Team Event",
+            icon: MdLocalBar,
+            displayName: "Team Event",
+            action: "integrationtest",
+        },
+        {
+            id: uuidv4(),
+            type: "ACTION",
+            title: "Training",
+            icon: MdSchool,
+            displayName: "Training",
+            action: "integrationtest",
+        },
+        {
+            id: uuidv4(),
+            type: "ACTION",
+            title: "Salary",
+            icon: MdOutlineAttachMoney,
+            displayName: "Salary",
+            action: "integrationtest",
+        },
+        {
+            id: uuidv4(),
+            type: "ACTION",
+            title: "Overtime",
+            icon: MdAlarm,
+            displayName: "Overtime",
+            action: "integrationtest",
         },
     ];
 
@@ -349,21 +412,22 @@ const ScenarioStudio = () => {
             <Heading>Scenario Studio</Heading>
             <Box h={5}></Box>
             <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="70vh">
-                <HStack w="full" h="full" overflow="hidden" pt={2} spacing={5}
+                <HStack w="full" h={HEIGHT} overflow="hidden" pt={2} spacing={5}
                         onClick={((e) => handleEditorBackgroundClick(e))}>
                     <DragDropContext onDragEnd={handleOnDragEnd}>
                         {/*Editor*/}
                         <Flex w="full" h="full" justifyContent="center" alignItems="center" backgroundColor="white"
-                              borderRadius="2xl">
+                              borderRadius="2xl" overflowX="auto" p={10}>
                             <Droppable droppableId="editor"
-                                       type="component" // TODO
+                                       type="component"
                             >
                                 {(provided, snapshot) => (
                                     <UnorderedList listStyleType="none"
                                                    m={0}
-                                                   p={40}
+                                                   mt="auto"
                                                    transition="background-color 0.2s ease"
-                                                   minH="90%"
+                                                   minH="full"
+                                                   // h="full"
                                                    minW="90%"
                                                    {...provided.droppableProps}
                                                    ref={provided.innerRef}
@@ -372,7 +436,8 @@ const ScenarioStudio = () => {
                                                    flexDir="column"
                                                    justifyContent={editorList.length ? "flex-start" : "center"}
                                                    alignItems="center"
-                                                   borderRadius="2xl">
+                                                   borderRadius="2xl"
+                                    flexGrow="1">
                                         {
                                             editorList.length ?
                                                 editorList.map((component, index) => {
@@ -476,8 +541,9 @@ const ScenarioStudio = () => {
                                     <Tab fontWeight="bold" color="gray.400">Components</Tab>
                                 </TabList>
 
-                                <TabPanels minW="350px">
-                                    <TabPanel>
+                                {/* h = full height - tab header */}
+                                <TabPanels minW="350px" h="850px" overflow="auto">
+                                    <TabPanel height="full">
                                         {/* Inspector Items */}
                                         {selectedItem ?
                                             <VStack alignItems="flex-start" pt={2}>
@@ -497,12 +563,10 @@ const ScenarioStudio = () => {
                                                 }
 
                                                 {selectedObject?.type === componentEnum.FRAGMENT &&
-                                                    <InspectorItemSelector
+                                                    <FragmentInspectorForm
                                                         key={selectedObject.id}
-                                                        droppableId="actionList"
-                                                        itemList={finalActionList}
-                                                        type="action"
-                                                        headline="Action Types"
+                                                        finalActionList={finalActionList}
+                                                        fragmentData={findComponent(selectedItem)}
                                                     />
                                                 }
                                                 {(findQuestion(selectedItem)?.type === questionEnum.SINGLE || findQuestion(selectedItem)?.type === questionEnum.MULTI) &&
