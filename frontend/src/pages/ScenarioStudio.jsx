@@ -40,6 +40,7 @@ import QuestionInspectorForm from "../components/QuestionInspectorForm";
 import BaseInspectorForm from "../components/BaseInspectorForm";
 import QuestionsInspectorForm from "../components/QuestionsInspectorForm";
 import ComponentListElement from "../components/ComponentListElement";
+import EditorBaseComponent from "../components/EditorBaseComponent";
 
 const ScenarioStudio = () => {
 
@@ -108,6 +109,7 @@ const ScenarioStudio = () => {
             id: uuidv4(),
             type: "EVENT",
             title: "Event",
+            displayName: "Event",
             content: "Add events which can occur during the simulation like the illness of an employee.",
             icon: MdOutlineAttractions,
         },
@@ -377,15 +379,13 @@ const ScenarioStudio = () => {
 
                                                         if (component.type === componentEnum.BASE) {
                                                             return (
-                                                                <EditorBasicComponent
+                                                                <EditorBaseComponent
                                                                     key={component.id}
-                                                                    backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
-                                                                    elementid={component.id}
                                                                     onClick={((e) => handleSelect(e))}
-                                                                    id={component.id}
-                                                                    title={component.title}
                                                                     index={index}
+                                                                    component={component}
                                                                     isSelected={selectedItem === component.id}
+                                                                    selectedItem={selectedItem}
                                                                 />
                                                             )
                                                         } else if (component.type === componentEnum.FRAGMENT) {
@@ -421,38 +421,25 @@ const ScenarioStudio = () => {
                                                             )
                                                         } else if (component.type === componentEnum.EVENT) {
                                                             return (
-                                                                <Draggable
+                                                                <EditorBaseComponent
                                                                     key={component.id}
-                                                                    draggableId={component.id}
-                                                                    index={index}>
-                                                                    {(provided, snapshot) => (
-                                                                        <Fragment>
-                                                                            <ListItem
-                                                                                ref={provided.innerRef}
-                                                                                {...provided.draggableProps}
-                                                                                {...provided.dragHandleProps}
-                                                                                mb={3}
-                                                                            >
-                                                                                <ComponentListElement title={component.title}
-                                                                                                      content={component.content}
-                                                                                                      icon={component.icon}/>
-                                                                            </ListItem>
-                                                                        </Fragment>
-                                                                    )}
-                                                                </Draggable>
+                                                                    onClick={((e) => handleSelect(e))}
+                                                                    index={index}
+                                                                    component={component}
+                                                                    isSelected={selectedItem === component.id}
+                                                                    selectedItem={selectedItem}
+                                                                />
                                                             )
                                                         } else {
                                                             // //    TODO Implement other types
                                                             return (
-                                                                <EditorBasicComponent
+                                                                <EditorBaseComponent
                                                                     key={component.id}
-                                                                    backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
-                                                                    elementid={component.id}
                                                                     onClick={((e) => handleSelect(e))}
-                                                                    id={component.id}
-                                                                    title={component.title}
                                                                     index={index}
+                                                                    component={component}
                                                                     isSelected={selectedItem === component.id}
+                                                                    selectedItem={selectedItem}
                                                                 />
                                                             )
                                                         }
