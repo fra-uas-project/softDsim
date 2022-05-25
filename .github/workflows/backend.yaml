@@ -67,36 +67,36 @@ jobs:
     - name: Check / set env Prod
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |  
-            echo "DIR=PROD/" >> $GITHUB_ENV
+            echo "APP_ENV=PROD" >> $GITHUB_ENV
 
     - name: Check / set env Dev
       if: ${{ github.ref == 'refs/heads/develop' }}
       run: |
-            echo "DIR=DEV/" >> $GITHUB_ENV
+            echo "APP_ENV=DEV" >> $GITHUB_ENV
     
     - name: Prepare Backend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
-            mkdir -p ${{ secrets.BASE_DIR_APP }}${{ env.DIR }}swd
+            mkdir -p ${{ secrets.BASE_DIR_APP }}${{ env.APP_ENV }}/swd
             EOF
 
     - name: Copy Files
       run: |
-            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./backend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_APP }}${{ env.DIR }}swd
+            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./backend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_APP }}${{ env.APP_ENV }}/swd
 
     - name: Release Backend && Restart
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} <<-EOF
             ssh docker-agent <<-'EOF2'
-              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml down
+              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ../secrets/.env_app_${{ env.APP_ENV }} down
             EOF2
-            cd ${{ secrets.BASE_DIR_APP }}${{ env.DIR }} \
+            cd ${{ secrets.BASE_DIR_APP }}${{ env.APP_ENV }} \
             && rm -rf bak || echo "bak not found" \
             && mv prd bak || echo "prd not found" \
             && mv swd prd || echo "swd not found" \
             && cd prd \
             && ln -s ../.env .env \
             && ssh docker-agent <<-'EOF3'
-              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml up -d
+              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ../secrets/.env_app_${{ env.APP_ENV }} up -d
             EOF3
             EOF
