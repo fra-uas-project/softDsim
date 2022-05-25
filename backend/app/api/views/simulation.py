@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from app.decorators.decorators import allowed_roles
 from app.dto.request import Workpack
+from app.exceptions import SimulationException
 from app.models.scenario import ScenarioConfig
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import api_view
@@ -30,8 +31,6 @@ from app.src.simulation import continue_simulation
 from app.dto.request import SimulationRequest
 
 from rest_framework.views import APIView
-
-from app.src.simulation import SimulationException
 
 
 @method_decorator(csrf_protect, name="dispatch")
