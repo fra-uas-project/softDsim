@@ -61,6 +61,12 @@ const Simulation = () => {
                             "title": "unittest"
                         },
                         {
+                            "title": "salary"
+                        },
+                        {
+                            "title": "overtime"
+                        },
+                        {
                             "title": "integrationtest"
                         },
                         {

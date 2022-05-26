@@ -1,6 +1,7 @@
-import { Grid, Text, FormControl, Switch, Box, Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb, GridItem, Button } from '@chakra-ui/react'
+import { Grid, Text, FormControl, Switch, GridItem } from '@chakra-ui/react'
 import ActionSlider from './ActionSlider'
 import ActionToggle from './ActionToggle'
+import ActionSelect from './ActionSelect'
 
 const Action = (props) => {
     if (Object.keys(props).length > 0) {
@@ -74,7 +75,25 @@ const Action = (props) => {
                                                                 <ActionToggle />
                                                             </GridItem>
                                                             :
-                                                            <></>
+                                                            // Salary
+                                                            action.title === 'salary' ?
+                                                                <GridItem my={2}>
+                                                                    <Text size='lg' fontWeight='bold' mb='2'>
+                                                                        Salary
+                                                                    </Text>
+                                                                    <ActionSelect selectionText="Select salary for next sprint" selection={['Below Average', 'Average', 'Above Average']} />
+                                                                </GridItem>
+                                                                :
+                                                                // Overtime
+                                                                action.title === 'overtime' ?
+                                                                    <GridItem my={2}>
+                                                                        <Text size='lg' fontWeight='bold' mb='2'>
+                                                                            Overtime
+                                                                        </Text>
+                                                                        <ActionSelect selectionText="Select overtime for next sprint" selection={['Leave early', 'Normal hours', 'Encourage overtime', 'Enforce overtime']} />
+                                                                    </GridItem>
+                                                                    :
+                                                                    <></>
                                 }
                             </Grid>
                         })
