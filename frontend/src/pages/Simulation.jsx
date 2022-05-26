@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Question from "../components/Question";
 import Action from "../components/Action"
+import ModelSelection from '../components/ModelSelection'
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
@@ -48,43 +49,44 @@ const Simulation = () => {
     // test values for simulation
     const [testSimValues, setTestSimValues] = useState(
         {
-            "simulation_fragments": [
-                {
-                    "index": 2,
-                    "points": 300,
-                    "text": "Hier steht die Story",
-                    "actions": [
-                        {
-                            "title": "bugfix"
-                        },
-                        {
-                            "title": "unittest"
-                        },
-                        {
-                            "title": "salary"
-                        },
-                        {
-                            "title": "overtime"
-                        },
-                        {
-                            "title": "integrationtest"
-                        },
-                        {
-                            "title": "meetings",
-                            "lower_limit": 0,
-                            "upper_limit": 25
-                        },
-                        {
-                            "title": "training",
-                            "lower_limit": 0,
-                            "upper_limit": 50
-                        },
-                        {
-                            "title": "teamevent"
-                        }
-                    ]
-                }
-            ]
+            "model_selection": []
+            // "simulation_fragments": [
+            //     {
+            //         "index": 2,
+            //         "points": 300,
+            //         "text": "Hier steht die Story",
+            //         "actions": [
+            //             {
+            //                 "title": "bugfix"
+            //             },
+            //             {
+            //                 "title": "unittest"
+            //             },
+            //             {
+            //                 "title": "integrationtest"
+            //             },
+            //             {
+            //                 "title": "salary"
+            //             },
+            //             {
+            //                 "title": "overtime"
+            //             },
+            //             {
+            //                 "title": "meetings",
+            //                 "lower_limit": 0,
+            //                 "upper_limit": 25
+            //             },
+            //             {
+            //                 "title": "training",
+            //                 "lower_limit": 0,
+            //                 "upper_limit": 50
+            //             },
+            //             {
+            //                 "title": "teamevent"
+            //             }
+            //         ]
+            //     }
+            // ]
         }
     )
 
@@ -156,7 +158,8 @@ const Simulation = () => {
                                     <b>
                                         {
                                             Object.keys(testSimValues)[0] === 'question_collections' ? 'Questions' :
-                                                Object.keys(testSimValues)[0] === 'simulation_fragments' ? 'Actions' : ''
+                                                Object.keys(testSimValues)[0] === 'simulation_fragments' ? 'Actions' :
+                                                    Object.keys(testSimValues)[0] === 'model_selection' ? 'Model Selection' : ''
                                         }
                                     </b>
                                 </p>
@@ -180,6 +183,19 @@ const Simulation = () => {
                                             {testSimValues.simulation_fragments.map((actions, index) => {
                                                 return <Action key={index} text={actions.text} actions={actions.actions} />
                                             })}
+                                        </>
+                                        : <></>
+                                    }
+                                    {/* Model Selection */}
+                                    {Object.keys(testSimValues)[0] === 'model_selection' ?
+                                        <>
+                                            <ModelSelection />
+                                        </>
+                                        : <></>
+                                    }
+                                    {/* Event */}
+                                    {Object.keys(testSimValues)[0] === 'event' ?
+                                        <>
                                         </>
                                         : <></>
                                     }

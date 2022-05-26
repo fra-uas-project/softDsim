@@ -13,7 +13,7 @@ const Action = (props) => {
                     </Text>
                     {
                         props.actions.map((action, index) => {
-                            return <Grid>
+                            return <Grid key={index}>
                                 {
                                     // Bugfix
                                     action.title === 'bugfix' ?
