@@ -5,6 +5,7 @@ from rest_framework import serializers
 from app.exceptions import IndexException
 from app.models.action import Action
 from app.models.answer import Answer
+from app.models.model_selection import ModelSelection
 from app.models.management_goal import ManagementGoal
 from app.models.question import Question
 from app.models.question_collection import QuestionCollection
@@ -14,6 +15,7 @@ from app.models.simulation_fragment import SimulationFragment
 from app.models.template_scenario import TemplateScenario
 from app.serializers.management_goal import ManagementGoalSerializer
 from app.serializers.question_collection import QuestionCollectionSerializer
+from app.serializers.model_selection import ModelSelectionSerializer
 from app.serializers.score_card import ScoreCardSerializer
 from app.serializers.simulation_fragment import SimulationFragmentSerializer
 from app.src.util.scenario_util import check_indexes
@@ -23,6 +25,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
     management_goal = ManagementGoalSerializer()
     question_collections = QuestionCollectionSerializer(many=True)
     simulation_fragments = SimulationFragmentSerializer(many=True)
+    model_selections = ModelSelectionSerializer(many=True)
     score_card = ScoreCardSerializer()
 
     class Meta:
@@ -33,6 +36,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
             "management_goal",
             "question_collections",
             "simulation_fragments",
+            "model_selections",
             "score_card",
         )
 
@@ -51,6 +55,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
         management_goal_data = validated_data.pop("management_goal")
         question_collection_data = validated_data.pop("question_collections")
         simulation_fragments_data = validated_data.pop("simulation_fragments")
+        model_selections_data = validated_data.pop("model_selections")
         score_card_data = validated_data.pop("score_card")
 
         # 0. create template scenario
@@ -63,7 +68,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
             template_scenario = TemplateScenario.objects.create(**validated_data)
 
         # 1. create management_goal
-        management_goal = ManagementGoal.objects.create(
+        ManagementGoal.objects.create(
             template_scenario=template_scenario, **management_goal_data
         )
 
@@ -103,7 +108,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
                 template_scenario=template_scenario, **simulation_fragment_data
             )
 
-            simulation_end = SimulationEnd.objects.create(
+            SimulationEnd.objects.create(
                 simulation_fragment=simulation_fragment, **simulation_end_data
             )
 
@@ -115,9 +120,13 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
                 )
 
         # 4. create score card
-        score_card = ScoreCard.objects.create(
-            template_scenario=template_scenario, **score_card_data
-        )
+        ScoreCard.objects.create(template_scenario=template_scenario, **score_card_data)
+
+        # 5. create model selections
+        for model_selection in model_selections_data:
+            ModelSelection.objects.create(
+                **model_selection, template_scenario=template_scenario
+            )
 
         return template_scenario
 

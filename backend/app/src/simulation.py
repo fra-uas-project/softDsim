@@ -2,6 +2,7 @@ import logging
 
 
 from app.dto.response import (
+    ModelSelectionResponse,
     SimulationResponse,
     QuestionResponse,
     ScenarioResponse,
@@ -12,6 +13,7 @@ from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
 from app.models.user_scenario import UserScenario
 from app.models.task import Task
+from app.models.model_selection import ModelSelection
 from app.src.util.question_util import get_question_collection
 from app.src.util.task_util import get_tasks_status
 from app.src.util.member_util import get_member_report
@@ -120,4 +122,13 @@ def continue_simulation(
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
+        )
+    # Check if next component is a Model Selection
+    if isinstance(next_component, ModelSelection):
+        increase_scenario_counter(scenario)
+        return ModelSelectionResponse(
+            tasks=get_tasks_status(scenario.id),
+            state=get_scenario_state_dto(scenario),
+            members=get_member_report(scenario.team.id),
+            models=next_component.models(),
         )

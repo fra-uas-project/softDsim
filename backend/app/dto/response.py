@@ -83,3 +83,8 @@ class ResultResponse(BaseModel):
     type: str = "RESULT"
     state: ScenarioStateDTO
     # ToDo: Add result stats (Issue #237)
+
+
+class ModelSelectionResponse(ScenarioResponse):
+    type: str = "MODEL"
+    models: List[str]

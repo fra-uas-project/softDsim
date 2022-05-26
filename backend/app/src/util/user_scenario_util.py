@@ -1,6 +1,7 @@
 from app.dto.response import ScenarioStateDTO, ResultResponse
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
+from app.models.model_selection import ModelSelection
 from app.models.task import Task
 from app.models.user_scenario import UserScenario
 from app.serializers.user_scenario import ScenarioStateSerializer
@@ -19,16 +20,15 @@ def find_next_scenario_component(scenario):
     # todo: find better solution
 
     # add all components here
-    components = [QuestionCollection, SimulationFragment]
+    components = [QuestionCollection, SimulationFragment, ModelSelection]
+    query = dict(
+        index=scenario.state.counter, template_scenario_id=scenario.template_id
+    )
 
     for component in components:
-        if component.objects.filter(
-            index=scenario.state.counter, template_scenario_id=scenario.template_id
-        ).exists():
-            # return an instance of the component -> gets checked with isinstance() in continue_simulation function
-            return component()
-        else:
-            pass
+        if component.objects.filter(**query).exists():
+            # return the next component instance -> gets checked with isinstance() in continue_simulation function
+            return component.objects.get(**query)
 
     # send ResultResponse when scenario is finished
     return ResultResponse(state=get_scenario_state_dto(scenario))
