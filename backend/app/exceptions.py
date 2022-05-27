@@ -17,5 +17,15 @@ class RequestTypeException(BaseException):
         )
 
 
+class RequestActionException(BaseException):
+    def __init__(self):
+        super().__init__("Action was not specified.")
+
+
+class RequestMembersException(BaseException):
+    def __init__(self):
+        super().__init__("Members was not specified.")
+
+
 class SimulationException(BaseException):
     """Raised when simulation cannot be executed because of wrong data in request."""

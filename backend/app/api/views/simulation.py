@@ -7,8 +7,13 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from app.decorators.decorators import allowed_roles
-from app.dto.request import Workpack
-from app.exceptions import SimulationException, RequestTypeException
+from app.dto.request import Workpack, QuestionRequest, ModelRequest
+from app.exceptions import (
+    SimulationException,
+    RequestTypeException,
+    RequestActionException,
+    RequestMembersException,
+)
 from app.models.scenario import ScenarioConfig
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import api_view
@@ -31,6 +36,8 @@ from app.src.simulation import continue_simulation
 from app.dto.request import SimulationRequest
 
 from rest_framework.views import APIView
+
+from app.src.util.scenario_util import create_correct_request_model
 
 
 @method_decorator(csrf_protect, name="dispatch")
@@ -112,11 +119,27 @@ class NextStepView(APIView):
         scenario = auth_user_scenario(request)
         if isinstance(scenario, Response):
             return scenario
-        req = SimulationRequest(**request.data)
+
+        # Check if request type is specified
+        if request.data.get("type") is None:
+            return Response(
+                {
+                    "status": "error",
+                    "error-message": "Type of request was not specified. Type has to be one of the following: QUESTION, SIMULATION, MODEL",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        req = create_correct_request_model(request)
         try:
             response = continue_simulation(scenario, req)
             return Response(response.dict(), status=status.HTTP_200_OK)
-        except (SimulationException, RequestTypeException) as e:
+        except (
+            SimulationException,
+            RequestTypeException,
+            RequestActionException,
+            RequestMembersException,
+        ) as e:
             return Response(
                 {"status": "error", "error-message": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
