@@ -5,6 +5,8 @@ from app.models.model_selection import ModelSelection
 from app.models.task import Task
 from app.models.user_scenario import UserScenario
 from app.serializers.user_scenario import ScenarioStateSerializer
+from app.src.util.member_util import get_member_report
+from app.src.util.task_util import get_tasks_status
 
 
 def get_scenario_state_dto(scenario: UserScenario) -> ScenarioStateDTO:
@@ -31,7 +33,11 @@ def find_next_scenario_component(scenario):
             return component.objects.get(**query)
 
     # send ResultResponse when scenario is finished
-    return ResultResponse(state=get_scenario_state_dto(scenario))
+    return ResultResponse(
+        state=get_scenario_state_dto(scenario),
+        tasks=get_tasks_status(scenario.id),
+        members=get_member_report(scenario.team.id),
+    )
 
 
 def end_of_fragment(scenario) -> bool:
