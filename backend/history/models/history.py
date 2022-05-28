@@ -10,7 +10,7 @@ class History(models.Model):
 
     type = models.TextField(max_length=32)
 
-    # timestamp = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now=True)
 
     # State
     counter = models.PositiveIntegerField()

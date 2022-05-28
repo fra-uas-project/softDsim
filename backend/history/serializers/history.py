@@ -22,14 +22,32 @@ class HistorySerializer(serializers.ModelSerializer):
         fields = [
             "user_scenario",
             "type",
+            "timestamp",
+            "model",
+            # state
             "counter",
             "day",
             "cost",
+            # Task stuff
             "tasks_todo",
+            "task_done",
+            "tasks_unit_tested",
+            "tasks_integration_tested",
+            "tasks_bug_discovered",
+            "tasks_bug_undiscovered",
+            "tasks_done_wrong_specification",
+            # Question stuff
             "question_collection",
             "questions",
+            # Actions
             "bugfix",
+            "unittest",
+            "integrationtest",
             "meetings",
+            "salary",
+            "salary",
+            "overtime",
+            # Member Stuff
             "members",
             "member_changes",
         ]
