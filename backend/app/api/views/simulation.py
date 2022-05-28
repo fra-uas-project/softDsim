@@ -179,12 +179,27 @@ class AdjustMemberView(APIView):
         scenario = auth_user_scenario(request)
         if isinstance(scenario, Response):
             return scenario
-        member_objs = Member.objects.filter(team=scenario.team)
-        serializer = MemberSerializer(member_objs, many=True)
-        return Response(
-            data={"status": "success", "data": serializer.data},
-            status=status.HTTP_200_OK,
-        )
+        try:
+            member_objs = Member.objects.filter(team=scenario.team)
+            serializer = MemberSerializer(member_objs, many=True)
+            return Response(
+                data={"status": "success", "data": serializer.data},
+                status=status.HTTP_200_OK,
+            )
+        except ObjectDoesNotExist:
+            msg = f"History entry with id {id} does not exist"
+            logging.warn(msg)
+            return Response(
+                data={"status": "error", "data": msg},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            msg = f"{e.__class__.__name__} occurred when trying to access history entry {id}"
+            logging.warn(msg)
+            return Response(
+                data={"status": "error", "data": msg},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @allowed_roles(["student"])
     def delete(self, request, id=None):
