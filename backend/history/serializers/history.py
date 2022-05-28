@@ -12,7 +12,7 @@ from history.serializers.question import HistoryQuestionSerializer
 
 
 class HistorySerializer(serializers.ModelSerializer):
-    # user_scenario = UserScenarioSerializer(read_only=True)
+    user_scenario = UserScenarioSerializer(read_only=True)
     questions = HistoryQuestionSerializer(many=True)
     members = HistoryMemberStatusSerializer(many=True)
     member_changes = HistoryMemberChangesSerializer(many=True)

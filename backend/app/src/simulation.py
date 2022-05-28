@@ -37,7 +37,7 @@ from app.models.team import Member
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from history.write import write
+from history.write import write_history
 
 
 def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
@@ -50,7 +50,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     :param req: Object with request data
 
     """
-    write(scenario, req)
+    write_history(scenario, req)
     # 1. Process the request information
     # check if request type is specified. might not be needed here anymore,
     # since it is already checked in simulation view.

@@ -47,6 +47,6 @@ class History(models.Model):
     # memberChanges = List[HistoryMembersChange]
 
     # Model Selection
-    model = models.TextField(max_length=64)
+    model = models.TextField(max_length=64, null=True, blank=True)
 
     # Event (ToDo)
