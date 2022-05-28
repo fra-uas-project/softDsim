@@ -5,9 +5,14 @@ from pydantic import BaseModel
 
 class Workpack(BaseModel):
     days: int = 5
-    unit_test: bool = False
-    integration_test: bool = False
-    fix: bool = False
+    bugfix: bool = False
+    unittest: bool = False
+    integrationtest: bool = False
+    meetings: int = 0
+    training: int = 0
+    teamevent: bool = False
+    salary: int = 1  # default ?
+    overtime: int = 1
 
 
 class MemberDTO(BaseModel):
