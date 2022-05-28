@@ -40,7 +40,7 @@ class History(models.Model):
     teamevent = models.PositiveSmallIntegerField(blank=True, null=True)
     salary = models.PositiveSmallIntegerField(blank=True, null=True)
     overtime = models.PositiveSmallIntegerField(blank=True, null=True)
-    # Maybe more actions soon
+    days = models.PositiveSmallIntegerField(blank=True, null=True)
 
     # Members
     # members = List[HistoryMemberStatus]

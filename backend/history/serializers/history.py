@@ -47,6 +47,7 @@ class HistorySerializer(serializers.ModelSerializer):
             "salary",
             "salary",
             "overtime",
+            "days",
             # Member Stuff
             "members",
             "member_changes",
