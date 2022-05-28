@@ -71,6 +71,21 @@ class HistoryView(APIView):
 
     @allowed_roles(["student"])
     def get(self, request, id=None):
-        h = History.objects.get(id=id)
-        s = HistorySerializer(h)
-        return Response(data=s.data, status=status.HTTP_200_OK)
+        try:
+            h = History.objects.get(id=id)
+            s = HistorySerializer(h)
+            return Response(data=s.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            msg = f"History entry with id {id} does not exist"
+            logging.warn(msg)
+            return Response(
+                data={"status": "error", "data": msg},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            msg = f"{e.__class__.__name__} occurred when trying to access history entry {id}"
+            logging.warn(msg)
+            return Response(
+                data={"status": "error", "data": msg},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
