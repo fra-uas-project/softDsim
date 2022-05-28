@@ -25,6 +25,8 @@ from app.api.views.simulation import (
     NextStepView,
 )
 
+from history.view import HistoryView
+
 
 urlpatterns = [
     # User stuff
@@ -66,4 +68,7 @@ urlpatterns = [
     path("sim/next", NextStepView.as_view()),
     path("sim/team", AdjustMemberView.as_view()),
     path("sim/team/<int:id>", AdjustMemberView.as_view()),
+    # HISTORY Endpoints
+    path("history", HistoryView.as_view()),
+    path("history/<int:id>", HistoryView.as_view()),
 ]

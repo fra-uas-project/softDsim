@@ -34,3 +34,18 @@ def get_tasks_status(scenario_id: int) -> TasksStatusDTO:
         tasks_integration_tested=tasks_integration_tested,
         tasks_bug=tasks_bug,
     )
+
+
+def get_tasks_status_detailed(scenario_id: int):
+    # Todo remove dummy values with actual values
+    return {
+        "tasks_todo": Task.objects.filter(
+            user_scenario_id=scenario_id, done=False
+        ).count(),
+        "task_done": 0,
+        "tasks_unit_tested": 0,
+        "tasks_integration_tested": 0,
+        "tasks_bug_discovered": 0,
+        "tasks_bug_undiscovered": 0,
+        "tasks_done_wrong_specification": 0,
+    }
