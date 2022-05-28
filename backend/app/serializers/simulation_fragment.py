@@ -12,7 +12,7 @@ class SimulationFragmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SimulationFragment
-        fields = ("points", "text", "actions", "index", "simulation_end")
+        fields = ("text", "actions", "index", "simulation_end")
 
     # todo philip: rework create method
     def create(self, validated_data):

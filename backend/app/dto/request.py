@@ -16,5 +16,6 @@ class MemberDTO(BaseModel):
 
 class SimulationRequest(BaseModel):
     scenario_id: int
+    type: str = None
     actions: Workpack
     members: List[MemberDTO] = []

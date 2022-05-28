@@ -79,9 +79,8 @@ class ModelResponse(ScenarioResponse):
     # ToDo: Add list of models (Issue #243)
 
 
-class ResultResponse(BaseModel):
+class ResultResponse(ScenarioResponse):
     type: str = "RESULT"
-    state: ScenarioStateDTO
     # ToDo: Add result stats (Issue #237)
 
 

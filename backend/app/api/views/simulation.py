@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from app.decorators.decorators import allowed_roles
 from app.dto.request import Workpack
-from app.exceptions import SimulationException
+from app.exceptions import SimulationException, RequestTypeException
 from app.models.scenario import ScenarioConfig
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import api_view
@@ -107,7 +107,7 @@ class StartUserScenarioView(APIView):
 class NextStepView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["student"])
+    @allowed_roles(["all"])
     def post(self, request):
         scenario = auth_user_scenario(request)
         if isinstance(scenario, Response):
@@ -116,9 +116,10 @@ class NextStepView(APIView):
         try:
             response = continue_simulation(scenario, req)
             return Response(response.dict(), status=status.HTTP_200_OK)
-        except SimulationException as e:
+        except (SimulationException, RequestTypeException) as e:
             return Response(
-                {"status": "error", "data": str(e)}, status=status.HTTP_400_BAD_REQUEST
+                {"status": "error", "error-message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
             logging.error(str(e))

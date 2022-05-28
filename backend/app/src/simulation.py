@@ -1,5 +1,7 @@
 import logging
 
+from rest_framework import status
+from rest_framework.response import Response
 
 from app.dto.response import (
     ModelSelectionResponse,
@@ -8,7 +10,7 @@ from app.dto.response import (
     ScenarioResponse,
     ResultResponse,
 )
-from app.exceptions import SimulationException
+from app.exceptions import SimulationException, RequestTypeException
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
 from app.models.user_scenario import UserScenario
@@ -44,6 +46,11 @@ def continue_simulation(
     wp = req.actions
     # Gather information of what to do
     days = wp.days
+
+    # 1. Process request information
+    # check type of request data (Question, Simulation,...)
+    if req.type is None:
+        raise RequestTypeException()
 
     # find next component depending on current index of the scenario
     # this also checks if scenario is finished (will return response instead of component object)

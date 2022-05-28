@@ -7,7 +7,6 @@ class SimulationFragment(models.Model):
     id = models.AutoField(primary_key=True)
     index = models.PositiveIntegerField()
     text = models.TextField()
-    points = models.PositiveIntegerField()
     # simulation_end = SimulationEnd
     # actions: List[Action]
 
