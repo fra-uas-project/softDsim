@@ -46,13 +46,15 @@ def write_history(scenario, request: ScenarioRequest):
         # 3 Write specific fields for simulation requests
         if request.type == "SIMULATION":
             # Save member changes
-            request
             for member_change in request.members:
                 HistoryMemberChanges.objects.create(
                     history=h,
                     change=member_change.change,
                     skill_type_name=member_change.skill_type,
                 )
+            # Save user options for actions
+            for action_name, value in request.actions:
+                h.__setattr__(action_name, value)
     except Exception as e:
         logging.warning(
             f"{e.__class__.__name__} occurred when saving simulation fragment history"
