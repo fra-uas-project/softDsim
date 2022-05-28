@@ -24,7 +24,7 @@ class AnswerDTO(BaseModel):
 
 class QuestionDTO(BaseModel):
     id: int
-    index: int  # todo philip: delete index (currently here for developing)
+    question_index: int  # todo philip: delete index (currently here for developing)
     text: str
     multi: bool
     answers: List[AnswerDTO]

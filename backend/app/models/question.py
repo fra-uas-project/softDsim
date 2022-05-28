@@ -6,7 +6,7 @@ from app.models.question_collection import QuestionCollection
 class Question(models.Model):
     id = models.AutoField(primary_key=True)
     text = models.TextField()
-    index = models.PositiveIntegerField()
+    question_index = models.PositiveIntegerField()
     multi = models.BooleanField()
 
     question_collection = models.ForeignKey(
