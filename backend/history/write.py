@@ -2,7 +2,7 @@ import logging
 
 from app.serializers.team import TeamSerializer
 from app.src.util.task_util import get_tasks_status_detailed
-from backend.app.dto.request import ScenarioRequest
+from app.dto.request import ScenarioRequest
 
 from history.models.history import History
 from history.models.question import HistoryQuestion, HistoryAnswer
@@ -31,7 +31,14 @@ def write_history(scenario, request: ScenarioRequest):
                 )
 
     elif request.type == "SIMULATION":
-        pass
+        # Save member changes
+        request
+        for member_change in request.members:
+            HistoryMemberChanges.objects.create(
+                history=h,
+                change=member_change.change,
+                skill_type_name=member_change.skill_type,
+            )
 
     # Save Member Stats
     for member in TeamSerializer(scenario.team).data.get("member"):

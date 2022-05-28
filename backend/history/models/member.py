@@ -20,5 +20,5 @@ class HistoryMemberChanges(models.Model):
         History, on_delete=models.CASCADE, related_name="member_changes"
     )
     change = models.IntegerField()
-    skill_type = models.ForeignKey(SkillType, on_delete=models.SET_NULL, null=True)
+    # skill_type = models.ForeignKey(SkillType, on_delete=models.SET_NULL, null=True)
     skill_type_name = models.TextField(max_length=64)

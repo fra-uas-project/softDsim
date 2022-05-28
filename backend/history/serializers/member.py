@@ -5,13 +5,12 @@ from app.serializers.team import SkillTypeSerializer
 from history.models.member import HistoryMemberChanges, HistoryMemberStatus
 
 
-class HistoryMemberStatusSerializer(serializers.Serializer):
+class HistoryMemberStatusSerializer(serializers.ModelSerializer):
     skill_type = SkillTypeSerializer()
 
     class Meta:
         model = HistoryMemberStatus
         fields = (
-            "history",
             "member_id",
             "motivation",
             "stress",
@@ -21,7 +20,10 @@ class HistoryMemberStatusSerializer(serializers.Serializer):
         )
 
 
-class HistoryMemberChangesSerializer(serializers.Serializer):
+class HistoryMemberChangesSerializer(serializers.ModelSerializer):
     class Meta:
         model = HistoryMemberChanges
-        fields = "__all__"
+        fields = (
+            "skill_type_name",
+            "change",
+        )
