@@ -1,6 +1,10 @@
 import { Grid, Text, Stack, Checkbox, Radio, RadioGroup } from '@chakra-ui/react'
 
 const Question = (props) => {
+    function handleSelect(event) {
+        console.log(event.target.value, ':', event.target.checked)
+    }
+
     if (Object.keys(props).length > 0) {
         return (
             <>
@@ -17,13 +21,13 @@ const Question = (props) => {
                                 {question.multi ?
                                     <Stack placeContent='center' direction='row'>
                                         {question.answer.map((answer, index) => {
-                                            return <Checkbox key={index}>{answer.label}</Checkbox>
+                                            return <Checkbox onChange={(event) => handleSelect(event)} key={index} value={answer.label}>{answer.label}</Checkbox>
                                         })}
                                     </Stack> :
                                     <RadioGroup>
                                         <Stack placeContent='center' direction='row'>
                                             {question.answer.map((answer, index) => {
-                                                return <Radio key={index} value={answer.label}>{answer.label}</Radio>
+                                                return <Radio onChange={(event) => handleSelect(event)} key={index} value={answer.label}>{answer.label}</Radio>
                                             })}
                                         </Stack>
                                     </RadioGroup>

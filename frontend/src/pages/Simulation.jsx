@@ -47,9 +47,9 @@ const Simulation = () => {
     }
 
     // test values for simulation
-    const [testSimValues, setTestSimValues] = useState(
+    const [simValues, setSimValues] = useState(
         {
-            "model_selection": []
+            // "model_selection": []
             // "simulation_fragments": [
             //     {
             //         "index": 2,
@@ -87,8 +87,70 @@ const Simulation = () => {
             //         ]
             //     }
             // ]
+            "question_collections":
+            {
+                "index": 1,
+                "text": "Hier steht die Story",
+                "questions": [
+                    {
+                        "text": "Noch eine Frage?",
+                        "id": 1,
+                        "multi": false,
+                        "answer": [
+                            {
+                                "label": "A",
+                                "points": 30
+                            },
+                            {
+                                "label": "B",
+                                "points": 0
+                            },
+                            {
+                                "label": "C",
+                                "points": 0
+                            }
+                        ]
+                    },
+                    {
+                        "text": "Noch eine Frage2?",
+                        "id": 2,
+                        "multi": true,
+                        "answer": [
+                            {
+                                "label": "A",
+                                "points": 0
+                            },
+                            {
+                                "label": "B",
+                                "points": 50
+                            },
+                            {
+                                "label": "C",
+                                "points": 50
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     )
+
+    const [returnValues, setReturnValues] = useState()
+
+    async function handleSelection(event) {
+        if (Object.keys(simValues)[0] === 'model_selection') {
+            await setReturnValues({
+                simulationId: 0,
+                model: event
+            })
+        } else if (Object.keys(simValues)[0] === 'question_collections') {
+
+        }
+    }
+
+    function handleNext() {
+        console.log(returnValues)
+    }
 
     useEffect(() => {
         fetchUserScenario();
@@ -157,9 +219,9 @@ const Simulation = () => {
                                     {/* change heading depending on dataset */}
                                     <b>
                                         {
-                                            Object.keys(testSimValues)[0] === 'question_collections' ? 'Questions' :
-                                                Object.keys(testSimValues)[0] === 'simulation_fragments' ? 'Actions' :
-                                                    Object.keys(testSimValues)[0] === 'model_selection' ? 'Model Selection' : ''
+                                            Object.keys(simValues)[0] === 'question_collections' ? 'Questions' :
+                                                Object.keys(simValues)[0] === 'simulation_fragments' ? 'Actions' :
+                                                    Object.keys(simValues)[0] === 'model_selection' ? 'Model Selection' : ''
                                         }
                                     </b>
                                 </p>
@@ -169,38 +231,39 @@ const Simulation = () => {
                                     justify="flex-end"
                                 >
                                     {/* Question Collection */}
-                                    {Object.keys(testSimValues)[0] === 'question_collections' ?
+                                    {Object.keys(simValues)[0] === 'question_collections' ?
                                         <>
-                                            {testSimValues.question_collections.map((question, index) => {
-                                                return <Question key={index} text={question.text} questions={question} />
-                                            })}
+                                            <Question onSelectModel={(event) => handleSelection(event, simValues.question_collections)}
+                                                text={simValues.question_collections.text}
+                                                questions={simValues.question_collections}
+                                            />
                                         </>
                                         : <></>
                                     }
                                     {/* Simulation Fragment */}
-                                    {Object.keys(testSimValues)[0] === 'simulation_fragments' ?
+                                    {Object.keys(simValues)[0] === 'simulation_fragments' ?
                                         <>
-                                            {testSimValues.simulation_fragments.map((actions, index) => {
+                                            {simValues.simulation_fragments.map((actions, index) => {
                                                 return <Action key={index} text={actions.text} actions={actions.actions} />
                                             })}
                                         </>
                                         : <></>
                                     }
                                     {/* Model Selection */}
-                                    {Object.keys(testSimValues)[0] === 'model_selection' ?
+                                    {Object.keys(simValues)[0] === 'model_selection' ?
                                         <>
-                                            <ModelSelection />
+                                            <ModelSelection onSelectModel={(event) => handleSelection(event)} />
                                         </>
                                         : <></>
                                     }
                                     {/* Event */}
-                                    {Object.keys(testSimValues)[0] === 'event' ?
+                                    {Object.keys(simValues)[0] === 'event' ?
                                         <>
                                         </>
                                         : <></>
                                     }
                                     <GridItem colSpan={1}>
-                                        <Button colorScheme='blue' size='lg'>
+                                        <Button onClick={handleNext} colorScheme='blue' size='lg'>
                                             Next Week
                                         </Button>
                                     </GridItem>
