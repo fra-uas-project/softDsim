@@ -1,11 +1,9 @@
-FROM python:3.9.12
+FROM python:3.9
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 WORKDIR /home/app/webapp
 # Install requirements
-COPY ./ /home/app/webapp/
-# RUN apt-get update
-# RUN pip install --upgrade pip
+COPY ./backend/requirements.txt /home/app/webapp/
 RUN pip install -r /home/app/webapp/requirements.txt
 # Entrypoint
 COPY ./entrypoint.sh /

@@ -14,6 +14,7 @@ on:
 jobs:
 
   consecutiveness:
+    name: Check running Jobs
     runs-on: ubuntu-latest
     steps:
     - uses: mktcode/consecutive-workflow-action@v1
@@ -33,7 +34,10 @@ jobs:
         fetch-depth: 2
     - name: Check for Changes
       run: |
-            git diff HEAD~1 HEAD backend/requirements.txt > diff
+            > diff
+            git diff HEAD~1 HEAD backend/requirements.txt >> diff
+            git diff HEAD~1 HEAD deploy/Dockerfile >> diff
+            git diff HEAD~1 HEAD deploy/entrypoint.sh >> diff
             if [ -s diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
             echo ${{ env.DIFF }}
     
@@ -47,11 +51,11 @@ jobs:
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
             ssh docker-agent <<-'EOF2'
                 cd ${{ secrets.BASE_DIR_APP }}build/ \
-                && ${{ secrets.BASE_DIR_OPS }}iptables -t mangle -F PREROUTING \
+                && sudo iptables -t mangle -F PREROUTING \
                 && docker build . -t dj:latest \
-                && ${{ secrets.BASE_DIR_OPS }}iptables.sh \
-                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml down \
-                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml up -d
+                && sudo iptables-restore < /etc/iptables/rules.v4 \
+                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_app_${{ env.APP_ENV }} down \
+                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_app_${{ env.APP_ENV }} up -d
             EOF2
             EOF
 
@@ -88,7 +92,7 @@ jobs:
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} <<-EOF
             ssh docker-agent <<-'EOF2'
-              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}secrets/.env_app_${{ env.APP_ENV }} down
+              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_app_${{ env.APP_ENV }} down
             EOF2
             cd ${{ secrets.BASE_DIR_APP }}${{ env.APP_ENV }} \
             && rm -rf bak || echo "bak not found" \
@@ -97,6 +101,6 @@ jobs:
             && cd prd \
             && ln -s ../.env .env \
             && ssh docker-agent <<-'EOF3'
-              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}secrets/.env_app_${{ env.APP_ENV }} up -d
+              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_app_${{ env.APP_ENV }} up -d
             EOF3
             EOF
