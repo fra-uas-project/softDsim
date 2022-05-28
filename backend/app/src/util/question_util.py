@@ -12,7 +12,7 @@ def get_question_collection(scenario):
     # sort questions in question_collection by index of question
     data = serializer.data
     sorted_list = sorted(
-        data.get("questions"), key=lambda x: x.get("index"), reverse=False
+        data.get("questions"), key=lambda x: x.get("question_index"), reverse=False
     )
     data.update(questions=sorted_list)
 

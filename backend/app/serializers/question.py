@@ -12,7 +12,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ("id", "index", "text", "multi", "answers")
+        fields = ("id", "question_index", "text", "multi", "answers")
 
     def create(self, validated_data):
         answer_data = validated_data.pop("answer")
