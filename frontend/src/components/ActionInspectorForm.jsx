@@ -31,22 +31,28 @@ const ActionInspectorForm = (props) => {
 
     const handleChangeLowerLimit = (value) => {
         setLowerLimit(value)
+        value = parseInt(value)
         if (value >= upperLimit) {
-            setUpperLimit(parseInt(value) + 1)
+            setUpperLimit(value + 1)
         }
     };
 
     const handleChangeUpperLimit = (value) => {
         setUpperLimit(value)
+        value = parseInt(value)
         if (value <= lowerLimit) {
-            setLowerLimit(parseInt(value) - 1)
+            setLowerLimit(value - 1)
         }
     };
 
     useEffect(() => {
         props.actionData.lower_limit = lowerLimit;
+
+    }, [lowerLimit, props.actionData])
+
+    useEffect(() => {
         props.actionData.upper_limit = upperLimit;
-    }, [lowerLimit, upperLimit])
+    }, [upperLimit, props.actionData])
 
     return (
         <VStack maxW="300px" alignItems="flex-start" w="full">

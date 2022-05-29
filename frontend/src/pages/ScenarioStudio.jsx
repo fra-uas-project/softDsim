@@ -2,12 +2,11 @@ import {
     Box,
     Breadcrumb,
     BreadcrumbItem,
-    BreadcrumbLink, calc,
+    BreadcrumbLink,
     Flex,
     Heading,
     HStack,
     Icon,
-    ListItem,
     Tab,
     TabList,
     TabPanel,
@@ -19,31 +18,34 @@ import {
 } from "@chakra-ui/react";
 import {HiChevronRight, HiUserGroup} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
-import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
-import {Fragment, useEffect, useState} from "react";
+import {DragDropContext, Droppable} from "react-beautiful-dnd";
+import {useEffect, useState} from "react";
 import {
     MdAlarm,
-    MdExtension, MdIntegrationInstructions, MdLocalBar, MdMiscellaneousServices, MdOutlineAttachMoney,
-    MdOutlineAttractions, MdOutlineBugReport,
+    MdIntegrationInstructions,
+    MdLocalBar,
+    MdMiscellaneousServices,
+    MdOutlineAttachMoney,
+    MdOutlineAttractions,
+    MdOutlineBugReport,
     MdOutlineCheckBox,
     MdOutlineInfo,
-    MdOutlineRadioButtonChecked, MdOutlineSchool,
-    MdRule, MdSchool,
+    MdOutlineRadioButtonChecked,
+    MdRule,
+    MdSchool,
     MdTimeline
 } from "react-icons/md";
 import {v4 as uuidv4} from 'uuid';
 import {BsLightningCharge} from "react-icons/bs";
-import EditorBasicComponent from "../components/EditorBasicComponent";
-import EditorFragmentComponent from "../components/EditorFragmentComponent";
 import EditorListComponent from "../components/EditorQuestionsComponent";
-import InspectorItemSelector from "../components/InspectorItemSelector";
 import ComponentTab from "../components/ComponentTab";
 import QuestionInspectorForm from "../components/QuestionInspectorForm";
 import BaseInspectorForm from "../components/BaseInspectorForm";
 import QuestionsInspectorForm from "../components/QuestionsInspectorForm";
-import ComponentListElement from "../components/ComponentListElement";
 import EditorBaseComponent from "../components/EditorBaseComponent";
 import FragmentInspectorForm from "../components/FragmentInspectorForm";
+import ActionInspectorForm from "../components/ActionInspectorForm";
+import InspectorEmtpy from "../components/InspectorEmtpy";
 
 const ScenarioStudio = () => {
 
@@ -152,7 +154,9 @@ const ScenarioStudio = () => {
             title: "Meetings",
             icon: HiUserGroup,
             displayName: "Meetings",
-            action: "integrationtest",
+            action: "meetings",
+            lower_limit: "0",
+            upper_limit: "1",
         },
         {
             id: uuidv4(),
@@ -160,7 +164,7 @@ const ScenarioStudio = () => {
             title: "Team Event",
             icon: MdLocalBar,
             displayName: "Team Event",
-            action: "integrationtest",
+            action: "teamevent",
         },
         {
             id: uuidv4(),
@@ -168,7 +172,9 @@ const ScenarioStudio = () => {
             title: "Training",
             icon: MdSchool,
             displayName: "Training",
-            action: "integrationtest",
+            action: "training",
+            lower_limit: "0",
+            upper_limit: "1",
         },
         {
             id: uuidv4(),
@@ -176,7 +182,7 @@ const ScenarioStudio = () => {
             title: "Salary",
             icon: MdOutlineAttachMoney,
             displayName: "Salary",
-            action: "integrationtest",
+            action: "salary",
         },
         {
             id: uuidv4(),
@@ -184,7 +190,7 @@ const ScenarioStudio = () => {
             title: "Overtime",
             icon: MdAlarm,
             displayName: "Overtime",
-            action: "integrationtest",
+            action: "overtime",
         },
     ];
 
@@ -372,6 +378,17 @@ const ScenarioStudio = () => {
 
         return (questions.find(question => question.id === questionId))
     };
+
+    const findAction = (actionId) => {
+        const fragmentList = editorList.filter(component => component.type === componentEnum.FRAGMENT)
+
+        let actions = []
+        for (const fragment of fragmentList) {
+            actions = [...actions, ...fragment.actions]
+        }
+
+        return (actions.find(action => action.id === actionId))
+    }
 
     const handleSelect = (e) => {
         setSelectedItem(e.currentTarget.getAttribute("elementid"))
@@ -569,6 +586,13 @@ const ScenarioStudio = () => {
                                                         fragmentData={findComponent(selectedItem)}
                                                     />
                                                 }
+                                                {findAction(selectedItem)?.type === "ACTION" &&
+                                                    <ActionInspectorForm
+                                                        key={findAction(selectedItem).id}
+                                                        actionData={findAction(selectedItem)}
+                                                    />
+
+                                                }
                                                 {(findQuestion(selectedItem)?.type === questionEnum.SINGLE || findQuestion(selectedItem)?.type === questionEnum.MULTI) &&
                                                     <QuestionInspectorForm
                                                         key={findQuestion(selectedItem).id}
@@ -578,11 +602,9 @@ const ScenarioStudio = () => {
                                                 }
                                             </VStack>
                                             :
-                                            <Box borderRadius="md" border="1px dashed" borderColor="gray.200" p={2}>
-                                                <Text fontSize="sm" fontWeight="500" color="gray.400">
-                                                    No components selected. Click on a component to select it.
-                                                </Text>
-                                            </Box>
+                                            <InspectorEmtpy
+                                                content="No components selected. Click on a component to select it."
+                                                />
                                         }
 
                                     </TabPanel>
