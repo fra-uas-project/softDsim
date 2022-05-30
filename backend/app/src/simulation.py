@@ -22,7 +22,7 @@ from app.models.user_scenario import UserScenario
 from app.models.task import Task
 from app.models.model_selection import ModelSelection
 from app.src.util.question_util import get_question_collection
-from app.src.util.scenario_util import handle_question_answers
+from app.src.util.question_util import handle_question_answers
 from app.src.util.task_util import get_tasks_status
 from app.src.util.member_util import get_member_report
 from app.src.util.user_scenario_util import (
@@ -49,17 +49,28 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
 
     """
 
+    def a():
+        pass
+
+    mapper = {
+        "SIMULATION": a,
+        "QUESTION": handle_question_answers,
+        "MODEL": a,
+    }
+
     # 1. Process the request information
     # check if request type is specified. might not be needed here anymore,
     # since it is already checked in simulation view.
     if req.type is None:
         raise RequestTypeException()
 
-    # todo philip: clean this up
-    # this is development code and not final
-    if req.type == "QUESTION":
-        handle_question_answers(req.question_collection)
-        # save to history
+    mapper[req.type](req)
+
+    # # todo philip: clean this up
+    # # this is development code and not final
+    # if req.type == "QUESTION":
+    #     handle_question_answers(req.question_collection)
+    #     # save to history
 
     # 2. Find next component
     # find next component depending on current index of the scenario
@@ -134,6 +145,8 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
 
         # write updates to database
         Task.objects.bulk_update(done_tasks, fields=["done"])
+
+        #########
 
         # 4.2.1 Check if any events has occurred
 
