@@ -19,7 +19,7 @@ def get_question_collection(scenario):
     return QuestionCollectionDTO(**data)
 
 
-def handle_question_answers(req):
+def handle_question_answers(req, scenario):
     """This method is just for developing. It prints the answers of the user."""
     for q in req.question_collection.questions:
         print(f"Question #{q.id}")

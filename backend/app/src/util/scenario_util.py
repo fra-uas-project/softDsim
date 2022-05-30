@@ -39,3 +39,7 @@ def create_correct_request_model(request) -> ScenarioRequest:
         if request.data.get("type") == key:
             a = value(**request.data)
             return a
+
+
+def handle_model_request(req, scenario):
+    pass
