@@ -17,3 +17,11 @@ def get_question_collection(scenario):
     data.update(questions=sorted_list)
 
     return QuestionCollectionDTO(**data)
+
+
+def handle_question_answers(req, scenario):
+    """This method is just for developing. It prints the answers of the user."""
+    for q in req.question_collection.questions:
+        print(f"Question #{q.id}")
+        for a in q.answers:
+            print(f"For Answer-Option with ID:{a.id}, User selected: {a.answer}")

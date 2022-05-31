@@ -41,9 +41,5 @@ def create_correct_request_model(request) -> ScenarioRequest:
             return a
 
 
-def handle_question_answers(question_collection):
-    """This method is just for developing. It prints the answers of the user."""
-    for q in question_collection.questions:
-        print(f"Question #{q.id}")
-        for a in q.answers:
-            print(f"For Answer-Option with ID:{a.id}, User selected: {a.answer}")
+def handle_model_request(req, scenario):
+    pass

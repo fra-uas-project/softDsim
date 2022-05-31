@@ -1,36 +1,31 @@
-from app.models.task import Task
+from typing import Dict
+from app.models.task import Task, TaskStatus
 from app.dto.response import TasksStatusDTO
 
 
 def get_tasks_status(scenario_id: int) -> TasksStatusDTO:
-    """NOT FINAL"""
-    tasks_todo = Task.objects.filter(user_scenario_id=scenario_id, done=False).count()
-    tasks_done = Task.objects.filter(
-        user_scenario_id=scenario_id,
-        done=True,
-        unit_tested=False,
-        integration_tested=False,
-    ).count()
-    tasks_unit_tested = Task.objects.filter(
-        user_scenario_id=scenario_id,
-        done=True,
-        unit_tested=True,
-        integration_tested=False,
-    ).count()
-    tasks_integration_tested = Task.objects.filter(
-        user_scenario_id=scenario_id,
-        done=True,
-        unit_tested=True,
-        integration_tested=True,
-    ).count()
-    tasks_bug = Task.objects.filter(
-        user_scenario_id=scenario_id, done=True, unit_tested=True, bug=True
-    ).count()
-
+    """Returns a TaskStatusDTO for a current scenario with all data allowed to be seen
+    by team/user."""
     return TasksStatusDTO(
-        tasks_todo=tasks_todo,
-        task_done=tasks_done,
-        tasks_unit_tested=tasks_unit_tested,
-        tasks_integration_tested=tasks_integration_tested,
-        tasks_bug=tasks_bug,
+        tasks_todo=TaskStatus.todo(scenario_id).count(),
+        task_done=TaskStatus.done(scenario_id).count(),
+        tasks_unit_tested=TaskStatus.unit_tested(scenario_id).count(),
+        tasks_integration_tested=TaskStatus.integration_tested(scenario_id).count(),
+        tasks_bug=TaskStatus.bug(scenario_id).count(),
     )
+
+
+def get_tasks_status_detailed(scenario_id: int) -> Dict[str, int]:
+    """Returns json representation of a scenarios tasks status, including data that is
+    not allowed to be viewed by team/user."""
+    return {
+        "tasks_todo": TaskStatus.todo(scenario_id).count(),
+        "task_done": TaskStatus.done(scenario_id).count(),
+        "tasks_unit_tested": TaskStatus.unit_tested(scenario_id).count(),
+        "tasks_integration_tested": TaskStatus.integration_tested(scenario_id).count(),
+        "tasks_bug_discovered": TaskStatus.bug(scenario_id).count(),
+        "tasks_bug_undiscovered": TaskStatus.bug_undiscovered(scenario_id).count(),
+        "tasks_done_wrong_specification": TaskStatus.done_wrong_specification(
+            scenario_id
+        ).count(),
+    }
