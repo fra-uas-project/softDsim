@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 
@@ -50,6 +50,12 @@ class TasksStatusDTO(BaseModel):
     tasks_bug: int
 
 
+class ActionDTO(BaseModel):
+    action: str
+    lower_limit: Optional[int] = None
+    upper_limit: Optional[int] = None
+
+
 class ScenarioResponse(BaseModel, ABC):
     """
     This is the abstract response class that provides all data
@@ -66,7 +72,7 @@ class ScenarioResponse(BaseModel, ABC):
 
 class SimulationResponse(ScenarioResponse):
     type: str = "SIMULATION"
-    # ToDo: Add list of actions (Issue #235)
+    actions: List[ActionDTO] = []
 
 
 class QuestionResponse(ScenarioResponse):
