@@ -65,17 +65,6 @@ const ActionInspectorForm = (props) => {
                     <Divider/>
                     <Box h={3}/>
                     <FormControl>
-                        <NumberInput min={0} value={lowerLimit} onChange={(value) => handleChangeLowerLimit(value)}>
-                            <NumberInputField/>
-                            <NumberInputStepper>
-                                <NumberIncrementStepper/>
-                                <NumberDecrementStepper/>
-                            </NumberInputStepper>
-                        </NumberInput>
-                        <FormHelperText>Lower Limit</FormHelperText>
-
-                        <Box h={3}/>
-
                         <NumberInput min={1} value={upperLimit} onChange={(value) => handleChangeUpperLimit(value)}>
                             <NumberInputField/>
                             <NumberInputStepper>
@@ -84,6 +73,17 @@ const ActionInspectorForm = (props) => {
                             </NumberInputStepper>
                         </NumberInput>
                         <FormHelperText>Upper Limit</FormHelperText>
+
+                        <Box h={3}/>
+
+                        <NumberInput min={0} value={lowerLimit} onChange={(value) => handleChangeLowerLimit(value)}>
+                            <NumberInputField/>
+                            <NumberInputStepper>
+                                <NumberIncrementStepper/>
+                                <NumberDecrementStepper/>
+                            </NumberInputStepper>
+                        </NumberInput>
+                        <FormHelperText>Lower Limit</FormHelperText>
                     </FormControl>
                 </>
                 :
