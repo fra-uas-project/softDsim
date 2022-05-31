@@ -16,6 +16,26 @@ class MemberDTO(BaseModel):
     skill_type: SkillTypeDTO
 
 
+class AnswerDTO(BaseModel):
+    id: int
+    label: str
+    points: int
+
+
+class QuestionDTO(BaseModel):
+    id: int
+    question_index: int  # todo philip: delete index (currently here for developing)
+    text: str
+    multi: bool
+    answers: List[AnswerDTO]
+
+
+class QuestionCollectionDTO(BaseModel):
+    id: int
+    index: int  # todo philip: delete index (currently here for developing)
+    questions: List[QuestionDTO]
+
+
 class ScenarioStateDTO(BaseModel):
     counter: int
     day: int
@@ -39,8 +59,8 @@ class ScenarioResponse(BaseModel, ABC):
     """
 
     type: str
-    tasks: TasksStatusDTO
     state: ScenarioStateDTO
+    tasks: TasksStatusDTO
     members: List[MemberDTO]
 
 
@@ -51,7 +71,7 @@ class SimulationResponse(ScenarioResponse):
 
 class QuestionResponse(ScenarioResponse):
     type: str = "QUESTION"
-    # ToDo: Add question (Issue #234)
+    question_collection: QuestionCollectionDTO
 
 
 class ModelResponse(ScenarioResponse):
@@ -62,3 +82,8 @@ class ModelResponse(ScenarioResponse):
 class ResultResponse(ScenarioResponse):
     type: str = "RESULT"
     # ToDo: Add result stats (Issue #237)
+
+
+class ModelSelectionResponse(ScenarioResponse):
+    type: str = "MODEL"
+    models: List[str]
