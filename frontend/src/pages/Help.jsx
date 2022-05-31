@@ -30,8 +30,8 @@ const Help = () => {
   <TabList>
     <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Introduction</Tab>
     <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Registration/Login</Tab>
-    <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Szenarios</Tab>
-    <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Szenario Studio</Tab>
+    <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Scenarios</Tab>
+    <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Scenario Studio</Tab>
     <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Profile</Tab>
     <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Additional</Tab>
     <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Contact</Tab>
@@ -138,7 +138,7 @@ const Help = () => {
     <h2>
       <AccordionButton>
         <Box flex='1' textAlign='left'>
-          Szenarios
+          Scenarios
         </Box>
         <AccordionIcon />
       </AccordionButton>
@@ -173,7 +173,7 @@ const Help = () => {
     <h2>
       <AccordionButton>
         <Box flex='1' textAlign='left'>
-          Szenario Studio
+          Scenario Studio
         </Box>
         <AccordionIcon />
       </AccordionButton>

@@ -6,9 +6,10 @@ env
 /static/
 .vscode/settings.json
 .env
-app/migrations/*
-database/mongo*
-custom_user/migrations/*
+backend/app/migrations/*
+backend/database/mongo*
+backend/custom_user/migrations/*
+*/migrations/*
 
 .empty
 .vscode
