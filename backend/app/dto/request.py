@@ -49,7 +49,7 @@ class SimulationRequest(ScenarioRequest):
 
 
 class QuestionRequest(ScenarioRequest):
-    question_collection: QuestionCollectionRequestDTO
+    question_collection: QuestionCollectionRequestDTO = None
 
 
 class ModelRequest(ScenarioRequest):
