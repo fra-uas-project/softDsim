@@ -47,7 +47,7 @@ const UserOverview = () => {
     const cancelRef = useRef();
 
     const fetchUsers = async () => {
-        const res = await fetch('http://localhost:8000/api/user', {
+        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user`, {
             method: 'GET',
             credentials: 'include',
         })
@@ -61,7 +61,7 @@ const UserOverview = () => {
 
     const deleteUser = async (username) => {
         try {
-            const res = await fetch(`http://localhost:8000/api/user/${username}`, {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user/${username}`, {
                 method: 'DELETE',
                 credentials: 'include',
                 headers: {
@@ -87,7 +87,7 @@ const UserOverview = () => {
 
     const toggleRole = async (username) => {
         try {
-            const res = await fetch(`http://localhost:8000/api/user/${username}`, {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user/${username}`, {
                 method: 'PATCH',
                 credentials: 'include',
                 headers: {

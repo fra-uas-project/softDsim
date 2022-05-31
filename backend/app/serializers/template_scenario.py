@@ -1,37 +1,62 @@
+import logging
+
 from rest_framework import serializers
 
-from app.models.decision import Decision
+from app.exceptions import IndexException
 from app.models.action import Action
 from app.models.answer import Answer
+from app.models.model_selection import ModelSelection
 from app.models.management_goal import ManagementGoal
+from app.models.question import Question
+from app.models.question_collection import QuestionCollection
 from app.models.score_card import ScoreCard
-from app.models.simulation import Simulation
+from app.models.simulation_end import SimulationEnd
+from app.models.simulation_fragment import SimulationFragment
 from app.models.template_scenario import TemplateScenario
-from app.models.text_block import TextBlock
-from app.serializers.decision import DecisionSerializer
 from app.serializers.management_goal import ManagementGoalSerializer
-from app.serializers.simulation import SimulationSerializer
+from app.serializers.question_collection import QuestionCollectionSerializer
+from app.serializers.model_selection import ModelSelectionSerializer
+from app.serializers.score_card import ScoreCardSerializer
+from app.serializers.simulation_fragment import SimulationFragmentSerializer
+from app.src.util.scenario_util import check_indexes
 
 
 class TemplateScenarioSerializer(serializers.ModelSerializer):
     management_goal = ManagementGoalSerializer()
-    decisions = DecisionSerializer(many=True)
-    simulation = SimulationSerializer()
+    question_collections = QuestionCollectionSerializer(many=True)
+    simulation_fragments = SimulationFragmentSerializer(many=True)
+    model_selections = ModelSelectionSerializer(many=True)
+    score_card = ScoreCardSerializer()
 
     class Meta:
         model = TemplateScenario
-        fields = ("id", "name", "management_goal", "decisions", "simulation")
+        fields = (
+            "id",
+            "name",
+            "management_goal",
+            "question_collections",
+            "simulation_fragments",
+            "model_selections",
+            "score_card",
+        )
 
     def create(self, validated_data, _id=None):
         """
         This custom create method is needed to enable a nested json structure in the post request to create a TemplateScenario.
-        The method will create a TemplateScenario and all elementes of it (management_goal, decision (action, textblock),...) in the database
+        The method will create a TemplateScenario and all elementes of it (management_goal, question (action, textblock),...) in the database
         """
         # todo philip: add try/catch
 
+        # check if indexes are correct
+        if not check_indexes(validated_data):
+            logging.warning("Cannot create TemplateScenario - Indexes are not correct.")
+            raise IndexException()
+
         management_goal_data = validated_data.pop("management_goal")
-        decision_data = validated_data.pop("decisions")
-        simulation_data = validated_data.pop("simulation")
+        question_collection_data = validated_data.pop("question_collections")
+        simulation_fragments_data = validated_data.pop("simulation_fragments")
+        model_selections_data = validated_data.pop("model_selections")
+        score_card_data = validated_data.pop("score_card")
 
         # 0. create template scenario
         # this if is when the create method gets called by the update method
@@ -43,62 +68,65 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
             template_scenario = TemplateScenario.objects.create(**validated_data)
 
         # 1. create management_goal
-        management_goal = ManagementGoal.objects.create(
+        ManagementGoal.objects.create(
             template_scenario=template_scenario, **management_goal_data
         )
 
-        # 2. create decision
-        for data in decision_data:
+        # 2. questions
+        for question_collection in question_collection_data:
 
-            text_block_data = data.pop("text_block")
-            action_data = data.pop("actions")
+            questions_data = question_collection.pop("questions")
 
-            # 2.1 create decision
-            decision = Decision.objects.create(
-                template_scenario=template_scenario, **data
+            # 2.1 create question_collection
+            question_collection_object = QuestionCollection.objects.create(
+                template_scenario=template_scenario, **question_collection
             )
 
-            # 2.2 create actions for decision
+            # 2.2 create question
+            for question in questions_data:
+
+                answers_data = question.pop("answers")
+
+                question_object = Question.objects.create(
+                    question_collection=question_collection_object, **question
+                )
+
+                # 2.2.1 create answer (should only be one, maybe change to OneToOneField
+                for answer_data in answers_data:
+
+                    answer = Answer.objects.create(
+                        question=question_object, **answer_data
+                    )
+
+        # 3 create simulation_fragments
+        for simulation_fragment_data in simulation_fragments_data:
+
+            action_data = simulation_fragment_data.pop("actions")
+            simulation_end_data = simulation_fragment_data.pop("simulation_end")
+
+            simulation_fragment = SimulationFragment.objects.create(
+                template_scenario=template_scenario, **simulation_fragment_data
+            )
+
+            SimulationEnd.objects.create(
+                simulation_fragment=simulation_fragment, **simulation_end_data
+            )
+
+            # 3.1 create actions for simulation
             for action in action_data:
 
-                answers_data = action.pop("answers")
+                action = Action.objects.create(
+                    simulation_fragment=simulation_fragment, **action
+                )
 
-                action = Action.objects.create(decision=decision, **action)
+        # 4. create score card
+        ScoreCard.objects.create(template_scenario=template_scenario, **score_card_data)
 
-                # 2.2.1 create answers for action for decision
-                for answer in answers_data:
-                    Answer.objects.create(action=action, **answer)
-
-            # 2.3 create text_blocks for decision
-            for text_block in text_block_data:
-                TextBlock.objects.create(decision=decision, **text_block)
-
-        # 3. create simulation
-        text_block_data = simulation_data.pop("text_block")
-        action_data = simulation_data.pop("actions")
-        score_card_data = simulation_data.pop("score_card")
-
-        # 3.1 create simulation
-        simulation = Simulation.objects.create(
-            template_scenario=template_scenario, **simulation_data
-        )
-        # 3.2 create actions for simulation
-        for action in action_data:
-
-            answers_data = action.pop("answers")
-
-            action = Action.objects.create(simulation=simulation, **action)
-
-            # 3.2.1 create answers for action for simulation
-            for answer in answers_data:
-                Answer.objects.create(action=action, **answer)
-
-        # 3.3 create text_blocks for simulation
-        for text_block in text_block_data:
-            TextBlock.objects.create(simulation=simulation, **text_block)
-
-        # 3.4 create score_card for simulation
-        score_card = ScoreCard.objects.create(simulation=simulation, **score_card_data)
+        # 5. create model selections
+        for model_selection in model_selections_data:
+            ModelSelection.objects.create(
+                **model_selection, template_scenario=template_scenario
+            )
 
         return template_scenario
 

@@ -1,9 +1,10 @@
 from django.urls import path
 
+from app.api.views.question_collection import QuestionCollectionView
 from app.api.views.user_scenario import UserScenarioViews
 from app.api.views.team import SkillTypeView, TeamViews, MemberView
 from app.api.views.scenario_config import ScenarioConfigView
-from app.api.views.decision import DecisionView
+from app.api.views.question import QuestionView
 from app.api.views.management_goal import ManagementGoalView
 from app.api.security.security import (
     LoginView,
@@ -18,7 +19,14 @@ from app.api.security.security import (
 from app.api.views.template_scenario import TemplateScenarioView
 from app.api.views.user import UserView
 
-import app.api.simulation as sim
+from app.api.views.simulation import (
+    AdjustMemberView,
+    StartUserScenarioView,
+    NextStepView,
+)
+
+from history.view import HistoryView
+
 
 urlpatterns = [
     # User stuff
@@ -35,11 +43,16 @@ urlpatterns = [
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
     path("user-scenario/<int:id>", UserScenarioViews.as_view()),
-    # decision todo: remove maybe later
-    path("decision", DecisionView.as_view(), name="decision"),
-    path("decision/<str:decision_id>", DecisionView.as_view(), name="decision"),
+    # just for testing. todo: remove later
+    path("question", QuestionView.as_view(), name="question"),
+    path("question/<str:id>", QuestionView.as_view(), name="question"),
     path("management-goal/", ManagementGoalView.as_view()),
     path("management-goal/<str:id>", ManagementGoalView.as_view()),
+    path(
+        "question-collection",
+        QuestionCollectionView.as_view(),
+        name="question-collection",
+    ),
     # team and member
     path("team", TeamViews.as_view()),
     path("team/<int:id>", TeamViews.as_view()),
@@ -51,8 +64,11 @@ urlpatterns = [
     path("scenario-config", ScenarioConfigView.as_view()),
     path("scenario-config/<str:id>", ScenarioConfigView.as_view()),
     # SIMULATION Endpoints
-    path("sim/start", sim.start_new_simulation, name="start_new_scenario"),
-    path("sim/next", sim.next_step, name="next_scenario_step"),
-    path("sim/team", sim.adjust_team, name="adjust_team"),
-    path("sim/team/<int:id>", sim.adjust_team, name="adjust_team"),
+    path("sim/start", StartUserScenarioView.as_view()),
+    path("sim/next", NextStepView.as_view()),
+    path("sim/team", AdjustMemberView.as_view()),
+    path("sim/team/<int:id>", AdjustMemberView.as_view()),
+    # HISTORY Endpoints
+    path("history", HistoryView.as_view()),
+    path("history/<int:id>", HistoryView.as_view()),
 ]

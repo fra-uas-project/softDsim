@@ -1,28 +1,17 @@
 from django.db import models
 
-from app.models.decision import Decision
-from app.models.simulation import Simulation
+from app.models.simulation_fragment import SimulationFragment
 
 
 class Action(models.Model):
 
     id = models.AutoField(primary_key=True)
     title = models.TextField()
-    typ = models.TextField()
-    active = models.BooleanField()
-    # answers: List[Answer] -> ForeignKey Reference in Answer Model
-    required = models.BooleanField()
+    lower_limit = models.IntegerField(blank=True, null=True)
+    upper_limit = models.IntegerField(blank=True, null=True)
 
-    decision = models.ForeignKey(
-        Decision,
-        on_delete=models.CASCADE,
-        related_name="actions",
-        blank=True,
-        null=True,
-    )
-
-    simulation = models.ForeignKey(
-        Simulation,
+    simulation_fragment = models.ForeignKey(
+        SimulationFragment,
         on_delete=models.CASCADE,
         related_name="actions",
         blank=True,

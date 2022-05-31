@@ -9,8 +9,8 @@ class TemplateScenario(models.Model):
     :param management_goal: ManagementGoal with budget, duration, tasks
     :tpe management_goal: `ManagementGoal`
 
-    :param decisions: List of decisions
-    :type decisions: List[Descision]
+    :param questions: List of questions
+    :type questions: List[Questions]
 
     :param simulation:
     :type simulation: `Simulation`
@@ -18,5 +18,5 @@ class TemplateScenario(models.Model):
 
     id = models.AutoField(primary_key=True)
     name = models.TextField(default="default_scenario_name")
-    # decisions: List[Decision] -> ForeignKey Reference in Decision Model
+    # questions: List[Questions] -> ForeignKey Reference in Questions Model
     # simulation = Simulation -> ForeignKey Reference in Simulation Model

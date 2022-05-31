@@ -17,14 +17,15 @@ import {
     useDisclosure,
     Grid,
     GridItem,
-    Stack,
-    Radio,
-    RadioGroup,
     Spacer
 } from "@chakra-ui/react";
 import { HiChevronRight } from "react-icons/hi";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import RadioButton from "../components/RadioButton";
+import ActionSlider from "../components/ActionSlider";
+import ActionToggle from "../components/ActionToggle";
+import ActionSwitch from "../components/ActionSwitch";
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
@@ -111,13 +112,25 @@ const Simulation = () => {
                                     <b>Actions</b>
                                 </p>
                                 <Grid
-                                    templateRows='repeat(4, 1fr)'
-                                    templateColumns='repeat(3, 1fr)'
+                                    // templateRows='repeat(4, 1fr)'
+                                    // templateColumns='repeat(3, 1fr)'
                                     gap={4}
                                     p='5'
                                     justify="flex-end"
                                 >
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' m='2'>
+                                    <GridItem>
+                                        <RadioButton />
+                                    </GridItem>
+                                    <GridItem>
+                                        <ActionSlider />
+                                    </GridItem>
+                                    <GridItem>
+                                        <ActionToggle />
+                                    </GridItem>
+                                    <GridItem>
+                                        <ActionSwitch />
+                                    </GridItem>
+                                    {/* <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' m='2'>
                                         <Grid>
                                             <GridItem colSpan={3} rounded='md' bg='gray.100' p='2'> <b>Hier steht eine Frage</b> </GridItem>
                                             <RadioGroup defaultValue='1'>
@@ -190,7 +203,7 @@ const Simulation = () => {
                                         </Grid>
                                     </GridItem>
 
-                                    <GridItem colSpan={2} />
+                                    <GridItem colSpan={2} /> */}
                                     <GridItem colSpan={1}  >
                                         <Button colorScheme='blue' size='lg'>
                                             Next Week
