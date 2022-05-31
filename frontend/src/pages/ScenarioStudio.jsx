@@ -46,6 +46,8 @@ import EditorBaseComponent from "../components/EditorBaseComponent";
 import FragmentInspectorForm from "../components/FragmentInspectorForm";
 import ActionInspectorForm from "../components/ActionInspectorForm";
 import InspectorEmtpy from "../components/InspectorEmtpy";
+import EventInspectorForm from "../components/EventInspectorForm";
+import ModelSelectionInspectorForm from "../components/ModelSelectionInspectorForm";
 
 const ScenarioStudio = () => {
 
@@ -74,7 +76,7 @@ const ScenarioStudio = () => {
             id: uuidv4(),
             type: "BASE",
             title: "Simulation Base Information",
-            content: "Define the basisc stats for a new simulation.",
+            content: "Define the basic stats for a new simulation.",
             icon: MdOutlineInfo,
             displayName: "Base Information",
             text: "",
@@ -98,9 +100,11 @@ const ScenarioStudio = () => {
             id: uuidv4(),
             type: "MODELSELECTION",
             title: "Model Selection",
-            content: "Trigger actions like teamevents or training sessions.",
+            content: "Change between different project management methods.",
             icon: BsLightningCharge,
             displayName: "Model Selection",
+            text: "",
+            models: [],
         },
         {
             id: uuidv4(),
@@ -117,9 +121,18 @@ const ScenarioStudio = () => {
             id: uuidv4(),
             type: "EVENT",
             title: "Event",
-            displayName: "Event",
-            content: "Add events which can occur during the simulation like the illness of an employee.",
+            displayName: `Event ${uuidv4().slice(0, 8)}`,
+            content: "Add events that have an impact on the management objectives.",
+            text: "",
             icon: MdOutlineAttractions,
+            trigger: {},
+            budget: "0",
+            duration: "0",
+            easy_tasks: "0",
+            medium_tasks:  "0",
+            hard_tasks: "0",
+            stress: "0",
+            motivation: "0"
         },
     ]
 
@@ -570,13 +583,13 @@ const ScenarioStudio = () => {
                                                         baseData={findComponent(selectedItem)}
                                                     />
                                                 }
+
                                                 {selectedObject?.type === componentEnum.QUESTIONS &&
                                                     <QuestionsInspectorForm
                                                         key={selectedObject.id}
                                                         finalQuestionList={finalQuestionList}
                                                         questionsData={selectedObject}
                                                     />
-
                                                 }
 
                                                 {selectedObject?.type === componentEnum.FRAGMENT &&
@@ -586,19 +599,33 @@ const ScenarioStudio = () => {
                                                         fragmentData={findComponent(selectedItem)}
                                                     />
                                                 }
+
+                                                {selectedObject?.type === componentEnum.EVENT &&
+                                                    <EventInspectorForm
+                                                        key={selectedObject.id}
+                                                        eventData={findComponent(selectedItem)}
+                                                    />
+                                                }
+
+                                                {selectedObject?.type === componentEnum.MODELSELECTION &&
+                                                    <ModelSelectionInspectorForm
+                                                        key={selectedObject.id}
+                                                        modelSelectionData={selectedObject}
+                                                    />
+                                                }
+
                                                 {findAction(selectedItem)?.type === "ACTION" &&
                                                     <ActionInspectorForm
                                                         key={findAction(selectedItem).id}
                                                         actionData={findAction(selectedItem)}
                                                     />
-
                                                 }
+
                                                 {(findQuestion(selectedItem)?.type === questionEnum.SINGLE || findQuestion(selectedItem)?.type === questionEnum.MULTI) &&
                                                     <QuestionInspectorForm
                                                         key={findQuestion(selectedItem).id}
                                                         questionData={findQuestion(selectedItem)}
                                                     />
-
                                                 }
                                             </VStack>
                                             :
