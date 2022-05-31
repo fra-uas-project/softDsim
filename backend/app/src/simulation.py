@@ -21,8 +21,8 @@ from app.models.simulation_fragment import SimulationFragment
 from app.models.user_scenario import UserScenario
 from app.models.task import Task
 from app.models.model_selection import ModelSelection
-from app.src.util.question_util import get_question_collection
-from app.src.util.scenario_util import handle_question_answers
+from app.src.util.question_util import get_question_collection, handle_question_answers
+from app.src.util.scenario_util import handle_model_request
 from app.src.util.task_util import get_tasks_status
 from app.src.util.member_util import get_member_report
 from app.src.util.user_scenario_util import (
@@ -38,6 +38,53 @@ from app.models.team import Member
 from django.core.exceptions import ObjectDoesNotExist
 
 from history.write import write_history
+
+
+def simulate(req, scenario):
+    """This function does the actual simulation of a scenario fragment."""
+    if req.actions is None:
+        raise RequestActionException()
+
+    if not req.members:
+        raise RequestMembersException()
+
+    wp = req.actions
+    # Gather information of what to do
+    days = wp.days
+
+    member_change = req.members
+    for m in member_change:
+        try:
+            s = SkillType.objects.get(name=m.skill_type)
+        except ObjectDoesNotExist:
+            msg = f"SkillType {m.skill_type} does not exist."
+            logging.error(msg)
+            raise SimulationException(msg)
+        if m.change > 0:
+            for _ in range(m.change):
+                new_member = Member(skill_type=s, team=scenario.team)
+                new_member.save()
+        else:
+            list_of_members = Member.objects.filter(team=scenario.team, skill_type=s)
+            try:
+                for i in range(abs(m.change)):
+                    m_to_delete: Member = list_of_members[0]
+                    m_to_delete.delete()
+            except IndexError:
+                msg = f"Cannot remove {m.change} members of type {s.name}."
+                logging.error(msg)
+                raise SimulationException(msg)
+
+    # Simulate what happens
+    tasks = Task.objects.filter(user_scenario=scenario, done=False)
+    done_tasks = []
+    for i in range(min(days, len(tasks))):
+        t = tasks[i]
+        t.done = True
+        done_tasks.append(t)
+
+    # write updates to database
+    Task.objects.bulk_update(done_tasks, fields=["done"])
 
 
 def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
@@ -57,11 +104,13 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     if req.type is None:
         raise RequestTypeException()
 
-    # todo philip: clean this up
-    # this is development code and not final
-    if req.type == "QUESTION":
-        handle_question_answers(req.question_collection)
-        # save to history
+    # handle the request data
+    request_handling_mapper = {
+        "SIMULATION": simulate,
+        "QUESTION": handle_question_answers,
+        "MODEL": handle_model_request,
+    }
+    request_handling_mapper[req.type](req, scenario)
 
     # 2. Find next component
     # find next component depending on current index of the scenario
@@ -90,52 +139,6 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
 
     # 4.2 Check if next component is a Simulation Component
     if isinstance(next_component, SimulationFragment):
-
-        if req.actions is None:
-            raise RequestActionException()
-
-        if not req.members:
-            raise RequestMembersException()
-
-        wp = req.actions
-        # Gather information of what to do
-        days = wp.days
-
-        member_change = req.members
-        for m in member_change:
-            try:
-                s = SkillType.objects.get(name=m.skill_type)
-            except ObjectDoesNotExist:
-                msg = f"SkillType {m.skill_type} does not exist."
-                logging.error(msg)
-                raise SimulationException(msg)
-            if m.change > 0:
-                for _ in range(m.change):
-                    new_member = Member(skill_type=s, team=scenario.team)
-                    new_member.save()
-            else:
-                list_of_members = Member.objects.filter(
-                    team=scenario.team, skill_type=s
-                )
-                try:
-                    for i in range(abs(m.change)):
-                        m_to_delete: Member = list_of_members[0]
-                        m_to_delete.delete()
-                except IndexError:
-                    msg = f"Cannot remove {m.change} members of type {s.name}."
-                    logging.error(msg)
-                    raise SimulationException(msg)
-
-        # Simulate what happens
-        tasks = Task.objects.filter(user_scenario=scenario, done=False)
-        done_tasks = []
-        for i in range(min(days, len(tasks))):
-            t = tasks[i]
-            t.done = True
-            done_tasks.append(t)
-
-        # write updates to database
-        Task.objects.bulk_update(done_tasks, fields=["done"])
 
         # 4.2.1 Check if any events has occurred
 
