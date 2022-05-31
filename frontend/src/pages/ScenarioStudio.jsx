@@ -61,7 +61,8 @@ const ScenarioStudio = () => {
                 credentials: 'include',
                 headers: {
                     "X-CSRFToken": getCookie("csrftoken")
-                }
+                },
+                body: JSON.stringify(editorList)
             })
             await res.json();
             toast({
