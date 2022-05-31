@@ -25,6 +25,7 @@ import { Link, useLocation } from "react-router-dom";
 import Question from "../components/Question";
 import Action from "../components/Action"
 import ModelSelection from '../components/ModelSelection'
+import { getCookie } from "../utils/utils"
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
@@ -46,101 +47,19 @@ const Simulation = () => {
         return newUrl;
     }
 
+    const [currentSimID, setCurrentSimID] = useState()
+
+    const [currentType, setCurrentType] = useState()
+
     // test values for simulation
-    const [simValues, setSimValues] = useState(
-        {
-            // "model_selection": []
-            // "simulation_fragments": [
-            //     {
-            //         "index": 2,
-            //         "points": 300,
-            //         "text": "Hier steht die Story",
-            //         "actions": [
-            //             {
-            //                 "title": "bugfix"
-            //             },
-            //             {
-            //                 "title": "unittest"
-            //             },
-            //             {
-            //                 "title": "integrationtest"
-            //             },
-            //             {
-            //                 "title": "salary"
-            //             },
-            //             {
-            //                 "title": "overtime"
-            //             },
-            //             {
-            //                 "title": "meetings",
-            //                 "lower_limit": 0,
-            //                 "upper_limit": 25
-            //             },
-            //             {
-            //                 "title": "training",
-            //                 "lower_limit": 0,
-            //                 "upper_limit": 50
-            //             },
-            //             {
-            //                 "title": "teamevent"
-            //             }
-            //         ]
-            //     }
-            // ]
-            "question_collections":
-            {
-                "index": 1,
-                "text": "Hier steht die Story",
-                "questions": [
-                    {
-                        "text": "Noch eine Frage?",
-                        "id": 1,
-                        "multi": false,
-                        "answer": [
-                            {
-                                "label": "A",
-                                "points": 30
-                            },
-                            {
-                                "label": "B",
-                                "points": 0
-                            },
-                            {
-                                "label": "C",
-                                "points": 0
-                            }
-                        ]
-                    },
-                    {
-                        "text": "Noch eine Frage2?",
-                        "id": 2,
-                        "multi": true,
-                        "answer": [
-                            {
-                                "label": "A",
-                                "points": 0
-                            },
-                            {
-                                "label": "B",
-                                "points": 50
-                            },
-                            {
-                                "label": "C",
-                                "points": 50
-                            }
-                        ]
-                    }
-                ]
-            }
-        }
-    )
+    const [simValues, setSimValues] = useState({})
 
     const [returnValues, setReturnValues] = useState()
 
     async function handleSelection(event) {
         if (Object.keys(simValues)[0] === 'model_selection') {
             await setReturnValues({
-                simulationId: 0,
+                simulationId: currentSimID,
                 model: event
             })
         } else if (Object.keys(simValues)[0] === 'question_collections') {
@@ -148,14 +67,61 @@ const Simulation = () => {
         }
     }
 
-    function handleNext() {
-        console.log(returnValues)
+    async function startScenario() {
+        console.log('ES STARTET')
+        try {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/sim/start`, {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify({ "template-id": 1, "config-id": 1 }),
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+            })
+
+            const scenario = await res.json()
+            setCurrentSimID(scenario.data.id)
+        } catch (err) {
+            console.log(err)
+        } finally {
+            handleNext()
+        }
+    }
+
+    async function handleNext() {
+        console.log(currentSimID)
+        try {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/sim/next`, {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify({ "scenario_id": currentSimID, "type": "MODEL" }),
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+            })
+
+            const nextData = await res.json()
+            console.log(nextData)
+            // set type
+            setCurrentType(nextData.type)
+            // set data
+            if (nextData.type === 'QUESTION') {
+                setSimValues(nextData.question_collection)
+            }
+
+            // setSimValues(scenario.data.id)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     useEffect(() => {
         fetchUserScenario();
         onOpen();
     }, [onOpen]);
+
 
     return (
         <>
@@ -169,7 +135,7 @@ const Simulation = () => {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button colorScheme='blue' mr={3} onClick={onClose}>
+                        <Button colorScheme='blue' mr={3} onClick={() => { onClose(); startScenario() }}>
                             Start
                         </Button>
                     </ModalFooter>
@@ -231,11 +197,10 @@ const Simulation = () => {
                                     justify="flex-end"
                                 >
                                     {/* Question Collection */}
-                                    {Object.keys(simValues)[0] === 'question_collections' ?
+                                    {currentType === 'QUESTION' ?
                                         <>
                                             <Question onSelectModel={(event) => handleSelection(event, simValues.question_collections)}
-                                                text={simValues.question_collections.text}
-                                                questions={simValues.question_collections}
+                                                question_collection={simValues}
                                             />
                                         </>
                                         : <></>
