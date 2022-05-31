@@ -3,6 +3,7 @@ import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
+    Button,
     Flex,
     Heading,
     HStack,
@@ -14,224 +15,69 @@ import {
     Tabs,
     Text,
     UnorderedList,
+    useToast,
     VStack
 } from "@chakra-ui/react";
-import {HiChevronRight, HiUserGroup} from "react-icons/hi";
+import {HiChevronRight} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import {useEffect, useState} from "react";
-import {
-    MdAlarm,
-    MdIntegrationInstructions,
-    MdLocalBar,
-    MdMiscellaneousServices,
-    MdOutlineAttachMoney,
-    MdOutlineAttractions,
-    MdOutlineBugReport,
-    MdOutlineCheckBox,
-    MdOutlineInfo,
-    MdOutlineRadioButtonChecked,
-    MdRule,
-    MdSchool,
-    MdTimeline
-} from "react-icons/md";
 import {v4 as uuidv4} from 'uuid';
-import {BsLightningCharge} from "react-icons/bs";
-import EditorListComponent from "../components/EditorQuestionsComponent";
-import ComponentTab from "../components/ComponentTab";
-import QuestionInspectorForm from "../components/QuestionInspectorForm";
-import BaseInspectorForm from "../components/BaseInspectorForm";
-import QuestionsInspectorForm from "../components/QuestionsInspectorForm";
-import EditorBaseComponent from "../components/EditorBaseComponent";
-import FragmentInspectorForm from "../components/FragmentInspectorForm";
-import ActionInspectorForm from "../components/ActionInspectorForm";
-import InspectorEmtpy from "../components/InspectorEmtpy";
-import EventInspectorForm from "../components/EventInspectorForm";
-import ModelSelectionInspectorForm from "../components/ModelSelectionInspectorForm";
+import EditorListComponent from "../components/ScenarionStudio/Editor/EditorQuestionsComponent";
+import ComponentTab from "../components/ScenarionStudio/ComponentTab/ComponentTab";
+import QuestionInspectorForm from "../components/ScenarionStudio/InspectorTab/QuestionInspectorForm";
+import BaseInspectorForm from "../components/ScenarionStudio/InspectorTab/BaseInspectorForm";
+import QuestionsInspectorForm from "../components/ScenarionStudio/InspectorTab/QuestionsInspectorForm";
+import EditorBaseComponent from "../components/ScenarionStudio/Editor/EditorBaseComponent";
+import FragmentInspectorForm from "../components/ScenarionStudio/InspectorTab/FragmentInspectorForm";
+import ActionInspectorForm from "../components/ScenarionStudio/InspectorTab/ActionInspectorForm";
+import InspectorEmtpy from "../components/ScenarionStudio/InspectorTab/InspectorEmtpy";
+import EventInspectorForm from "../components/ScenarionStudio/InspectorTab/EventInspectorForm";
+import ModelSelectionInspectorForm from "../components/ScenarionStudio/InspectorTab/ModelSelectionInspectorForm";
+import {getCookie} from "../utils/utils";
+import {
+    componentEnum,
+    finalActionList,
+    finalComponentList,
+    finalQuestionList,
+    questionEnum,
+    tabIndexEnum
+} from "../components/ScenarionStudio/scenarioStudioData";
 
 const ScenarioStudio = () => {
 
     const HEIGHT = "900px";
-
-    const tabIndexEnum = {
-        "INSPECTOR": 0,
-        "COMPONENTS": 1
-    };
-
-    const componentEnum = {
-        "BASE": "BASE",
-        "FRAGMENT": "FRAGMENT",
-        "MODELSELECTION": "MODELSELECTION",
-        "QUESTIONS": "QUESTIONS",
-        "EVENT": "EVENT"
-    }
-
-    const questionEnum = {
-        "SINGLE": "SINGLE",
-        "MULTI": "MULTI",
-    }
-
-    const finalComponentList = [
-        {
-            id: uuidv4(),
-            type: "BASE",
-            title: "Simulation Base Information",
-            content: "Define the basic stats for a new simulation.",
-            icon: MdOutlineInfo,
-            displayName: "Base Information",
-            text: "",
-            budget: "0",
-            duration: "0",
-            easy_tasks: "0",
-            medium_tasks:  "0",
-            hard_tasks: "0",
-        },
-        {
-            id: uuidv4(),
-            type: "FRAGMENT",
-            title: "Simulation Fragment",
-            content: "Control the simulation by defining fragments.",
-            icon: MdTimeline,
-            displayName: `Simulation ${uuidv4().slice(0, 8)}`,
-            actions: [],
-            simulation_end: {}
-        },
-        {
-            id: uuidv4(),
-            type: "MODELSELECTION",
-            title: "Model Selection",
-            content: "Change between different project management methods.",
-            icon: BsLightningCharge,
-            displayName: "Model Selection",
-            text: "",
-            models: [],
-        },
-        {
-            id: uuidv4(),
-            type: "QUESTIONS",
-            title: "Questions",
-            content: "Create questions which need to be answered.",
-            icon: MdRule,
-            displayName: `Questions ${uuidv4().slice(0, 8)}`,
-            text: "",
-            questions: [],
-
-        },
-        {
-            id: uuidv4(),
-            type: "EVENT",
-            title: "Event",
-            displayName: `Event ${uuidv4().slice(0, 8)}`,
-            content: "Add events that have an impact on the management objectives.",
-            text: "",
-            icon: MdOutlineAttractions,
-            trigger: {},
-            budget: "0",
-            duration: "0",
-            easy_tasks: "0",
-            medium_tasks:  "0",
-            hard_tasks: "0",
-            stress: "0",
-            motivation: "0"
-        },
-    ]
-
-    const finalActionList = [
-        {
-            id: uuidv4(),
-            type: "ACTION",
-            title: "Bug Fixing",
-            icon: MdOutlineBugReport,
-            displayName: "Bug Fixing",
-            action: "bugfix",
-        },
-        {
-            id: uuidv4(),
-            type: "ACTION",
-            title: "Unit Testing",
-            icon: MdIntegrationInstructions,
-            displayName: "Unit Testing",
-            action: "unittest",
-        },
-        {
-            id: uuidv4(),
-            type: "ACTION",
-            title: "Integration Testing",
-            icon: MdMiscellaneousServices,
-            displayName: "Integration Testing",
-            action: "integrationtest",
-        },
-        {
-            id: uuidv4(),
-            type: "ACTION",
-            title: "Meetings",
-            icon: HiUserGroup,
-            displayName: "Meetings",
-            action: "meetings",
-            lower_limit: "0",
-            upper_limit: "1",
-        },
-        {
-            id: uuidv4(),
-            type: "ACTION",
-            title: "Team Event",
-            icon: MdLocalBar,
-            displayName: "Team Event",
-            action: "teamevent",
-        },
-        {
-            id: uuidv4(),
-            type: "ACTION",
-            title: "Training",
-            icon: MdSchool,
-            displayName: "Training",
-            action: "training",
-            lower_limit: "0",
-            upper_limit: "1",
-        },
-        {
-            id: uuidv4(),
-            type: "ACTION",
-            title: "Salary",
-            icon: MdOutlineAttachMoney,
-            displayName: "Salary",
-            action: "salary",
-        },
-        {
-            id: uuidv4(),
-            type: "ACTION",
-            title: "Overtime",
-            icon: MdAlarm,
-            displayName: "Overtime",
-            action: "overtime",
-        },
-    ];
-
-    const finalQuestionList = [
-        {
-            id: uuidv4(),
-            type: "SINGLE",
-            title: "Single Answer",
-            icon: MdOutlineRadioButtonChecked,
-            displayName: `Question ${uuidv4().slice(0, 8)}`,
-            text: "",
-            answers: []
-        },
-        {
-            id: uuidv4(),
-            type: "MULTI",
-            title: "Multiple Answers",
-            icon: MdOutlineCheckBox,
-            displayName: `Question ${uuidv4().slice(0, 8)}`,
-            text: "",
-            answers: []
-        },
-    ];
+    const toast = useToast();
 
     const [tabIndex, setTabIndex] = useState(1);
     const [editorList, updateEditorList] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedObject, setSelectedObject] = useState(null);
+
+    const saveScenarioTemplate = async () => {
+        try {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                }
+            })
+            await res.json();
+            toast({
+                title: `Scenario Template has been saved`,
+                status: 'success',
+                duration: 5000,
+            });
+        } catch (e) {
+            toast({
+                title: `Could not save Scenario Template`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+        }
+    };
 
     const handleOnDragEnd = (result) => {
         // TODO deconstruct result
@@ -425,12 +271,12 @@ const ScenarioStudio = () => {
         if (selectedItem) {
             setTabIndex(tabIndexEnum.INSPECTOR);
         }
-    }, [selectedItem, tabIndexEnum.INSPECTOR]);
+    }, [selectedItem]);
 
     useEffect(() => {
         console.log(editorList)
         console.log("SO", selectedObject)
-    }, [selectedItem])
+    }, [selectedItem, editorList, selectedObject])
 
     return (
         <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
@@ -439,7 +285,10 @@ const ScenarioStudio = () => {
                     <BreadcrumbLink href=''>Scenarios Studio</BreadcrumbLink>
                 </BreadcrumbItem>
             </Breadcrumb>
-            <Heading>Scenario Studio</Heading>
+            <HStack justifyContent="space-between" mr={3}>
+                <Heading>Scenario Studio</Heading>
+                <Button variant="solid" colorScheme="blue" onClick={saveScenarioTemplate}>Save Template</Button>
+            </HStack>
             <Box h={5}></Box>
             <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="70vh">
                 <HStack w="full" h={HEIGHT} overflow="hidden" pt={2} spacing={5}
@@ -457,7 +306,6 @@ const ScenarioStudio = () => {
                                                    mt="auto"
                                                    transition="background-color 0.2s ease"
                                                    minH="full"
-                                                   // h="full"
                                                    minW="90%"
                                                    {...provided.droppableProps}
                                                    ref={provided.innerRef}
@@ -467,7 +315,7 @@ const ScenarioStudio = () => {
                                                    justifyContent={editorList.length ? "flex-start" : "center"}
                                                    alignItems="center"
                                                    borderRadius="2xl"
-                                    flexGrow="1">
+                                                   flexGrow="1">
                                         {
                                             editorList.length ?
                                                 editorList.map((component, index) => {
@@ -555,7 +403,6 @@ const ScenarioStudio = () => {
                                     </UnorderedList>
                                 )}
                             </Droppable>
-
                         </Flex>
 
 
@@ -631,7 +478,7 @@ const ScenarioStudio = () => {
                                             :
                                             <InspectorEmtpy
                                                 content="No components selected. Click on a component to select it."
-                                                />
+                                            />
                                         }
 
                                     </TabPanel>

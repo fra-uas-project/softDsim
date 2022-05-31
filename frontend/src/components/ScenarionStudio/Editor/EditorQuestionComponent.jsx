@@ -1,13 +1,12 @@
 import {Box, Flex, Heading, HStack, Icon, ListItem, Text, VStack} from "@chakra-ui/react";
 import {MdDragIndicator} from "react-icons/md";
 import {Draggable} from "react-beautiful-dnd";
-import {v4 as uuidv4} from 'uuid';
 
 const EditorQuestionComponent = (props) => {
 
     return (
         <Draggable key={props.id} draggableId={props.id} index={props.index}>
-            {(provided, snapshot) => (
+            {(provided) => (
                 <ListItem
                     mb={3}
                     {...provided.draggableProps}

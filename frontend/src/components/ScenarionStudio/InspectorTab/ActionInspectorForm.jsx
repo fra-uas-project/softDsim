@@ -1,5 +1,5 @@
 import InspectorEmtpy from "./InspectorEmtpy";
-import {action} from "../utils/utils";
+import {action} from "../../../utils/utils";
 import {
     Box,
     Divider,

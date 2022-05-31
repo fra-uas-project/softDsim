@@ -1,7 +1,6 @@
 import {ListItem, Text, UnorderedList} from "@chakra-ui/react";
 import {Draggable, Droppable} from "react-beautiful-dnd";
 import {Fragment} from "react";
-import ComponentListElement from "./ComponentListElement";
 import styled from "@emotion/styled";
 import InspectorListElement from "./InspectorListElement";
 

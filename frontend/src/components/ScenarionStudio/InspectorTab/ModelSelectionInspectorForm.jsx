@@ -15,8 +15,17 @@ import {useEffect, useState} from "react";
 const ModelSelectionInspectorForm = (props) => {
 
     const [displayName, setDisplayName] = useState(props.modelSelectionData?.displayName);
+    const [models, setModels] = useState([]);
 
-    const [models, setModels] = useState(["Kanban", "Scrum", "Waterfall"])
+    const allModels = ["Kanban", "Scrum", "Waterfall"];
+
+    const onChangeModels = (event) => {
+        if(models.includes(event.target.value)) {
+            setModels(models.filter((element) => {return element !== event.target.value}))
+        }else {
+            setModels(prevState => [...prevState, event.target.value])
+        }
+    }
 
     const onChangeDisplayName = (value) => {
         setDisplayName(value)
@@ -24,7 +33,8 @@ const ModelSelectionInspectorForm = (props) => {
 
     useEffect(() => {
         props.modelSelectionData.displayName = displayName;
-    }, [displayName, props.modelSelectionData])
+        props.modelSelectionData.models = models;
+    }, [displayName, models, props.modelSelectionData])
 
     return (
         <VStack maxW="300px" alignItems="flex-start">
@@ -46,8 +56,8 @@ const ModelSelectionInspectorForm = (props) => {
             <Box h={3}/>
             <FormControl flexDir="column" display="flex">
                 <FormLabel color="gray.400" htmlFor="">Available Management Models</FormLabel>
-                {models.map((value, index) => {
-                    return <Checkbox key={index} spacing='1rem' mb="0.5rem">{value}</Checkbox>
+                {allModels.map((value, index) => {
+                    return <Checkbox key={index} spacing='1rem' mb="0.5rem" value={value} onChange={(event) => onChangeModels(event)}>{value}</Checkbox>
                 })}
             </FormControl>
         </VStack>

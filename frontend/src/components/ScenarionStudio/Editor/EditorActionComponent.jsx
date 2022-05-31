@@ -5,7 +5,7 @@ import {MdDragIndicator} from "react-icons/md";
 const EditorActionComponent = (props) => {
   return (
       <Draggable key={props.id} draggableId={props.id} index={props.index}>
-          {(provided, snapshot) => (
+          {(provided) => (
               <ListItem
                   mb={3}
                   {...provided.draggableProps}

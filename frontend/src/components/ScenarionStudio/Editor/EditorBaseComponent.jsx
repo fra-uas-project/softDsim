@@ -6,7 +6,7 @@ const EditorBaseComponent = (props) => {
 
     return (
         <Draggable key={props.component.id} draggableId={props.component.id} index={props.index}>
-            {(provided, snapshot) => (
+            {(provided) => (
                 <ListItem
                     {...provided.draggableProps}
                     ref={provided.innerRef}
