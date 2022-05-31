@@ -98,7 +98,6 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     :param req: Object with request data
 
     """
-    write_history(scenario, req)
     # 1. Process the request information
     # check if request type is specified. might not be needed here anymore,
     # since it is already checked in simulation view.
@@ -112,6 +111,8 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
         "MODEL": handle_model_request,
     }
     request_handling_mapper[req.type](req, scenario)
+
+    write_history(scenario, req)
 
     # 2. Find next component
     # find next component depending on current index of the scenario
