@@ -3,10 +3,16 @@ import {
     Divider,
     Editable,
     EditableInput,
-    EditablePreview, FormControl, FormHelperText,
-    FormLabel, NumberDecrementStepper, NumberIncrementStepper,
+    EditablePreview,
+    FormControl,
+    FormHelperText,
+    FormLabel,
+    Input,
+    NumberDecrementStepper,
+    NumberIncrementStepper,
     NumberInput,
-    NumberInputField, NumberInputStepper
+    NumberInputField,
+    NumberInputStepper
 } from "@chakra-ui/react";
 import {useEffect, useState} from "react";
 import MarkdownTextfield from "./MarkdownTextfield";
@@ -15,11 +21,16 @@ const BaseInspectorForm = (props) => {
     const formatDays = (val) => val + ` days`
     const parseDays = (val) => val.replace(/^\days/, '')
 
+    const [templateName, setTemplateName] = useState(props.baseData.template_name);
     const [duration, setDuration] = useState(props.baseData.duration);
     const [budget, setBudget] = useState(props.baseData.budget);
     const [easyTasks, setEasyTasks] = useState(props.baseData.easy_tasks);
     const [mediumTasks, setMediumTasks] = useState(props.baseData.medium_tasks);
     const [hardTasks, setHardTasks] = useState(props.baseData.hard_tasks);
+
+    const handleTemplateName = (event) => {
+        setTemplateName(event.target.value)
+    };
 
     const handleChangeDuration = (valueString) => {
         setDuration(parseDays(valueString))
@@ -42,12 +53,13 @@ const BaseInspectorForm = (props) => {
     };
 
     useEffect(() => {
+        props.baseData.template_name = templateName;
         props.baseData.duration = duration;
         props.baseData.budget = budget;
         props.baseData.easy_tasks = easyTasks;
         props.baseData.medium_tasks = mediumTasks;
         props.baseData.hard_tasks = hardTasks;
-    }, [duration, budget, easyTasks, mediumTasks, hardTasks])
+    }, [templateName, duration, budget, easyTasks, mediumTasks, hardTasks, props.baseData])
 
     return (
         <>
@@ -56,6 +68,13 @@ const BaseInspectorForm = (props) => {
                 <EditableInput/>
             </Editable>
             <Divider/>
+
+            <Box h={3} />
+
+            <FormControl>
+                <FormLabel color="gray.400" htmlFor="templateName">Scenario Name</FormLabel>
+                <Input id="templateName" value={templateName} onChange={(event) => {handleTemplateName(event)}}/>
+                <FormHelperText></FormHelperText>
 
             <Box h={3}/>
 
@@ -66,7 +85,7 @@ const BaseInspectorForm = (props) => {
 
             <Box h={3}/>
 
-            <FormControl>
+
                 <FormLabel color="gray.400" htmlFor="budget">Budget</FormLabel>
                 <NumberInput min={0} id="budget" value={budget} onChange={(value) => handleChangeBudget(value)}>
                     <NumberInputField />
