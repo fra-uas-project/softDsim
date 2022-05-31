@@ -60,11 +60,19 @@ const ScenarioStudio = () => {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    "X-CSRFToken": getCookie("csrftoken")
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(editorList)
             })
-            await res.json();
+
+            if(!res.ok) {
+                console.error(await res.json())
+                throw new Error()
+
+            }
+
             toast({
                 title: `Scenario Template has been saved`,
                 status: 'success',
