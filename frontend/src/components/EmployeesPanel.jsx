@@ -1,10 +1,13 @@
 import { 
-    StatLabel,
-    StatNumber,
-    StatHelpText,
-    StatArrow,
-    StatGroup,
-Box,Stat,Text, Heading, } from "@chakra-ui/react"
+    Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,Text, Heading, } from "@chakra-ui/react"
 import React, { useState } from "react";
 
 const EmployeesPanel = () => {
@@ -18,41 +21,37 @@ const EmployeesPanel = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold'>Tasks</Heading>
-            <Box m="2">
-            <Stat>
-            <StatLabel>Easy Tasks</StatLabel>
-            <StatNumber>950</StatNumber> 
-            {/* set api calls here*/}
-            
-            <StatHelpText>
-             <StatArrow type='increase' />
-             100%
-            </StatHelpText>
-            </Stat>
-            </Box>
-            <Box m="2">
-            <Stat>
-            <StatLabel>Medium Tasks</StatLabel>
-            <StatNumber>950</StatNumber>
-            
-            <StatHelpText>
-             <StatArrow type='increase' />
-             75%
-            </StatHelpText>
-            </Stat>
-            </Box>
-            <Box m="2">
-            <Stat>
-            <StatLabel>Hard Tasks</StatLabel>
-            <StatNumber>950</StatNumber>
-            
-            <StatHelpText>
-             <StatArrow type='increase' />
-             50%
-            </StatHelpText>
-            </Stat>
-            </Box>
+                <Heading size='md' fontWeight='bold'>Employees</Heading>
+                <TableContainer>
+  <Table variant='striped' colorScheme='blue'>
+    <TableCaption>Employees Overview</TableCaption>
+    <Thead>
+      <Tr>
+        <Th>Position</Th>
+        <Th>Salary</Th>
+        <Th>Tasks done</Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      <Tr>
+        <Td>Senior</Td>
+        <Td>55k</Td>
+        <Td>45</Td>
+      </Tr>
+      <Tr>
+        <Td>Junior</Td>
+        <Td>35k</Td>
+        <Td>30</Td>
+      </Tr>
+      <Tr>
+        <Td>Chuck Norris</Td>
+        <Td>200k</Td>
+        <Td>All!</Td>
+      </Tr>
+    </Tbody>
+    
+  </Table>
+</TableContainer>
             </Text>
         </>
     )

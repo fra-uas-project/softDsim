@@ -30,6 +30,7 @@ import TasksPanel from "../components/TasksPanel";
 import StressPanel from "../components/StressPanel";
 import EmployeesPanel from "../components/EmployeesPanel";
 import ProgressPanel from "../components/ProgressPanel";
+import MilestonesPanel from "../components/MilestonesPanel";
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
@@ -93,17 +94,18 @@ const Simulation = () => {
                             <Box w='60%'>
                                 <Grid
                                     h='100%'
-                                    templateRows='repeat(2, 1fr)'
+                                    templateRows='repeat(3, 1fr)'
                                     templateColumns='repeat(5, 1fr)'
                                     gap={4}
                                     textAlign='center'
                                     fontWeight='bold'
                                     color='white'
                                 >
-                                    <GridItem rowSpan={2} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='grey.300'><TasksPanel /></GridItem>
+                                    <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='grey.300'><TasksPanel /></GridItem>
                                     <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><ProgressPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><EmployeesPanel /></GridItem>
-                                    <GridItem colSpan={4} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><StressPanel /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><MilestonesPanel /></GridItem>
+                                    <GridItem colSpan={5} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><EmployeesPanel /></GridItem>
+                                    <GridItem colSpan={5} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><StressPanel /></GridItem>
                                 </Grid>
                             </Box>
                             <Spacer />

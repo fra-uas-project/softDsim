@@ -36,13 +36,13 @@ const StressPanel = () => {
             </CircularProgress></GridItem>
             <GridItem w="100%" h="10">
                 Some Developer
-            <CircularProgress value={75} color='green.400' size='75'>
-            <CircularProgressLabel>75%</CircularProgressLabel>
+            <CircularProgress value={60} color='green.400' size='75'>
+            <CircularProgressLabel>60%</CircularProgressLabel>
             </CircularProgress></GridItem>
             <GridItem w="100%" h="10">
-                Some Guy for something
-            <CircularProgress value={75} color='green.400' size='75'>
-            <CircularProgressLabel>75%</CircularProgressLabel>
+                Backend Developer
+            <CircularProgress value={15} color='green.400' size='75'>
+            <CircularProgressLabel>15%</CircularProgressLabel>
             </CircularProgress></GridItem>
             
             </Grid>
