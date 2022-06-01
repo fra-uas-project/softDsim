@@ -1,10 +1,5 @@
 import { 
-    StatLabel,
-    StatNumber,
-    StatHelpText,
-    StatArrow,
-    StatGroup,
-Box,Stat,Text, Heading, } from "@chakra-ui/react"
+    Box,Text, Heading,CircularProgress, CircularProgressLabel,Grid,GridItem, } from "@chakra-ui/react"
 import React, { useState } from "react";
 
 const StressPanel = () => {
@@ -18,41 +13,39 @@ const StressPanel = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold'>Tasks</Heading>
-            <Box m="2">
-            <Stat>
-            <StatLabel>Easy Tasks</StatLabel>
-            <StatNumber>950</StatNumber> 
-            {/* set api calls here*/}
+                <Heading size='md' fontWeight='bold'>Stress Overview</Heading>
+                <Grid templateColumns='repeat(5, 1fr)' gap={5} m="2">
+                    <GridItem w="100%" h="10">
             
-            <StatHelpText>
-             <StatArrow type='increase' />
-             100%
-            </StatHelpText>
-            </Stat>
-            </Box>
-            <Box m="2">
-            <Stat>
-            <StatLabel>Medium Tasks</StatLabel>
-            <StatNumber>950</StatNumber>
+                Senior Developer
+            <CircularProgress value={40} color='green.400' size='75'>
+            <CircularProgressLabel>40%</CircularProgressLabel>
+            </CircularProgress>
             
-            <StatHelpText>
-             <StatArrow type='increase' />
-             75%
-            </StatHelpText>
-            </Stat>
-            </Box>
-            <Box m="2">
-            <Stat>
-            <StatLabel>Hard Tasks</StatLabel>
-            <StatNumber>950</StatNumber>
+            </GridItem>
+            <GridItem w="100%" h="10">
+                Senior Frontend
+            <CircularProgress value={30} color='green.400' size='75'>
+            <CircularProgressLabel>30%</CircularProgressLabel>
+            </CircularProgress></GridItem>
             
-            <StatHelpText>
-             <StatArrow type='increase' />
-             50%
-            </StatHelpText>
-            </Stat>
-            </Box>
+            <GridItem w="100%" h="10">
+                Junior Developer
+            <CircularProgress value={75} color='green.400' size='75'>
+            <CircularProgressLabel>75%</CircularProgressLabel>
+            </CircularProgress></GridItem>
+            <GridItem w="100%" h="10">
+                Some Developer
+            <CircularProgress value={75} color='green.400' size='75'>
+            <CircularProgressLabel>75%</CircularProgressLabel>
+            </CircularProgress></GridItem>
+            <GridItem w="100%" h="10">
+                Some Guy for something
+            <CircularProgress value={75} color='green.400' size='75'>
+            <CircularProgressLabel>75%</CircularProgressLabel>
+            </CircularProgress></GridItem>
+            
+            </Grid>
             </Text>
         </>
     )
