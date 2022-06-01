@@ -118,16 +118,16 @@ const Simulation = () => {
                             </Box>
                             <Spacer />
                             <Box
-                                p='3'
+                                
                                 w='38%'
                                 boxShadow='md'
                                 rounded='md'
                                 bg='white'
                                 textAlign='center'
                             >
-                                <p>
-                                    <b>Actions</b>
-                                </p>
+                                
+                                <Heading size='md' fontWeight='bold' m='3'>Actions<hr></hr></Heading>
+                                
                                 <Grid
                                     // templateRows='repeat(4, 1fr)'
                                     // templateColumns='repeat(3, 1fr)'
