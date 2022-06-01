@@ -23,14 +23,14 @@ const SideDrawerLeft = () => {
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
                 <Heading size='md' fontWeight='bold'  p="5">Additional Information</Heading>
                 <Text>
-                It is possible to get all information about the scenario with a click on the button below. The information will open on the left.</Text>
+                It is possible to get all information about the scenario with a click on the button below. The information will open on the right.</Text>
                 <Box h={3}></Box>
                 <Button ref={btnRef} colorScheme='teal' onClick={onOpen}>
         Open
       </Button>
       <Drawer
         isOpen={isOpen}
-        placement='left'
+        placement='right'
         onClose={onClose}
         finalFocusRef={btnRef}
       >
