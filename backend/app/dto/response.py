@@ -11,6 +11,7 @@ class SkillTypeDTO(BaseModel):
 class MemberDTO(BaseModel):
     id: int
     motivation: float
+    familiarity: float
     stress: float
     xp: float
     skill_type: SkillTypeDTO

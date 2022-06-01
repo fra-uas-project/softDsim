@@ -23,6 +23,9 @@ class Member(models.Model):
     motivation = models.FloatField(
         default=0.75, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
+    familiarity = models.FloatField(
+        default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+    )
     stress = models.FloatField(
         default=0.1, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
