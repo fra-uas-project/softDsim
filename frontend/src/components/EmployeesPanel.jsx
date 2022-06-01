@@ -21,7 +21,7 @@ const EmployeesPanel = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold' m='3'>Employees</Heading>
+                <Heading size='md' fontWeight='bold' m='3'>Employees<hr></hr></Heading>
                 <TableContainer p='2'>
   <Table variant='striped' colorScheme='blue'>
     <TableCaption>Employees Overview</TableCaption>

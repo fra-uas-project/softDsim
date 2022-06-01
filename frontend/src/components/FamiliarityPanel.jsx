@@ -13,7 +13,7 @@ const FamiliarityPanel = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold'  p="5">Familiarity Overview</Heading>
+                <Heading size='md' fontWeight='bold'  p="5">Familiarity Overview<hr></hr></Heading>
                 <Grid templateColumns='repeat(5, 1fr)' gap={2} m="3">
                     <GridItem w="100%" h="10">
             

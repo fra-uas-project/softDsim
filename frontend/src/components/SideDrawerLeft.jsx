@@ -21,7 +21,7 @@ const SideDrawerLeft = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold'  p="5">Additional Information</Heading>
+                <Heading size='md' fontWeight='bold'  p="5">Additional Information<hr></hr></Heading>
                 <Text>
                 It is possible to get all information about the scenario with a click on the button below. The information will open on the right.</Text>
                 <Box h={3}></Box>

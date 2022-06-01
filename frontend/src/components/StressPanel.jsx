@@ -13,7 +13,7 @@ const StressPanel = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold'  p="5">Stress Overview</Heading>
+                <Heading size='md' fontWeight='bold'  p="5">Stress Overview<hr></hr></Heading>
                 
                 <Grid  templateColumns='repeat(5, 1fr)' gap={2} m="2" >
                     <GridItem w="100%" h="10" >

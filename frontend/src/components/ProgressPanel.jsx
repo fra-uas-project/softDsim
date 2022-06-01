@@ -14,7 +14,7 @@ const ProgressPanel = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold'>Progress</Heading>
+                <Heading size='md' fontWeight='bold' m='3'>Progress<hr></hr></Heading>
             <Box m="2">
             
             </Box>
