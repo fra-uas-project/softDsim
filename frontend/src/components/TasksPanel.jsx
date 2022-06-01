@@ -19,7 +19,7 @@ const TasksPanel = () => {
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
                 <Heading size='md' fontWeight='bold' m='3'>Tasks<hr></hr></Heading>
-            <Box m="2" bg='blue.100' borderRadius='2xl'>
+            <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Todo</StatLabel>
             <StatNumber>426</StatNumber> 
@@ -31,7 +31,7 @@ const TasksPanel = () => {
             </StatHelpText>
             </Stat>
             </Box>
-            <Box m="2" bg='blue.100' borderRadius='2xl'>
+            <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Done</StatLabel>
             <StatNumber>189</StatNumber>
@@ -42,7 +42,7 @@ const TasksPanel = () => {
             </StatHelpText>
             </Stat>
             </Box>
-            <Box m="2" bg='blue.100' borderRadius='2xl'>
+            <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Unittested</StatLabel>
             <StatNumber>42</StatNumber>
@@ -54,7 +54,7 @@ const TasksPanel = () => {
             </Stat>
             
             </Box>
-            <Box m="2" bg='blue.100' borderRadius='2xl'>
+            <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Integrationtested</StatLabel>
             <StatNumber>42</StatNumber>
@@ -66,7 +66,7 @@ const TasksPanel = () => {
             </Stat>
             
             </Box>
-            <Box m="2" bg='blue.100' borderRadius='2xl'>
+            <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Bug</StatLabel>
             <StatNumber>42</StatNumber>

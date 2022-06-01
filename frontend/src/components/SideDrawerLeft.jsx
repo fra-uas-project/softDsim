@@ -5,7 +5,7 @@ import {
     DrawerHeader,
     DrawerOverlay,
     DrawerContent,
-    DrawerCloseButton,useDisclosure, Button, Input,} from "@chakra-ui/react"
+    DrawerCloseButton,useDisclosure, Button, SkeletonCircle, SkeletonText,Divider,} from "@chakra-ui/react"
 import React, { useState } from "react";
 
 const SideDrawerLeft = () => {
@@ -20,13 +20,13 @@ const SideDrawerLeft = () => {
 
     return (
         <>
-            <Text size='lg' fontWeight='bold' mb='2' color='black'>
+            <Text size='lg' fontWeight='bold' mb='2' color='black' align='center'>
                 <Heading size='md' fontWeight='bold'  p="5">Additional Information<hr></hr></Heading>
                 <Text>
-                It is possible to get all information about the scenario with a click on the button below. The information will open on the right.</Text>
+                It is possible to get all information about the scenario with a click on the button below.</Text>
                 <Box h={3}></Box>
-                <Button ref={btnRef} colorScheme='teal' onClick={onOpen}>
-        Open
+                <Button ref={btnRef} colorScheme='blue' onClick={onOpen}>
+        Open Information
       </Button>
       <Drawer
         isOpen={isOpen}
@@ -37,22 +37,24 @@ const SideDrawerLeft = () => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Scenario Story</DrawerHeader>
+          <DrawerHeader>Scenario Information</DrawerHeader>
 
           <DrawerBody>
-          <Text size='lg' as='i' m='2' color='black'>
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, 
-          sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-          no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, 
-          sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. 
-          At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</Text>
-          <Box h={5}></Box>
-          <Text size='lg' as='i' m='2' color='black'>
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, 
-          sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-          no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, 
-          sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. 
-          At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</Text>
+            <Heading size='md' fontWeight='bold' p="2">Story<Divider /></Heading>
+          <Box padding='6' boxShadow='lg' bg='white'>
+          <SkeletonCircle size='10' />
+          <SkeletonText mt='4' noOfLines={4} spacing='4' />
+          </Box>
+          <Heading size='md' fontWeight='bold' p="2">Goals<Divider /></Heading>
+          <Box padding='6' boxShadow='lg' bg='white'>
+          <SkeletonCircle size='10' />
+          <SkeletonText mt='4' noOfLines={8} spacing='4' />
+          </Box>
+          <Heading size='md' fontWeight='bold' p="2">More...<Divider /></Heading>
+          <Box padding='6' boxShadow='lg' bg='white'>
+          <SkeletonCircle size='10' />
+          <SkeletonText mt='4' noOfLines={20} spacing='4' />
+          </Box>
           </DrawerBody>
 
           <DrawerFooter>

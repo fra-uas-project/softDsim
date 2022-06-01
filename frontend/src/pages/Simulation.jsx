@@ -79,7 +79,7 @@ const Simulation = () => {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-            <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
+            <Flex px={10} pt={2} flexDir="column" flexGrow={0}>
                 <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500' />}>
                     <BreadcrumbItem>
                         <BreadcrumbLink as={Link} to={scenarioPath()}>Scenarios</BreadcrumbLink>
@@ -92,33 +92,36 @@ const Simulation = () => {
             
                 <Flex flexDir="column" flexGrow={1}>
                     <Heading p='5'>Active Scenario: {userScenario.scn_name}</Heading>
-                    <Box backgroundColor="white" borderRadius="2xl" minH="70vh" p="2">
+                    <Box backgroundColor="white" borderRadius="2xl"  p="2">
                     <Container maxW='container.2xl'>
                         <Flex>
                             <Box w='60%'>
+                                <Box boxShadow='md' rounded='md' p='3' mb='5'><SideDrawerLeft /></Box>
                                 <Grid
                                     
                                     templateRows='repeat(4, 1fr)'
                                     templateColumns='repeat(6, 1fr)'
-                                    gap={4}
+                                    gap={5}
                                     textAlign='center'
                                     fontWeight='bold'
                                     color='white'
-                                >
+                                >   
                                     <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='grey.300'><TasksPanel /></GridItem>
                                     <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><ProgressPanel /></GridItem>
                                     <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><MilestonesPanel /></GridItem>
                                     <GridItem colSpan={6} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><EmployeesPanel /></GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><StressPanel /></GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' ><MotivationPanel /></GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' ><FamiliarityPanel /></GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' ><SideDrawerLeft /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' p='2'><StressPanel /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' p='2'><MotivationPanel /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' p='2'><FamiliarityPanel /></GridItem>
+                                    
 
                                 </Grid>
+                                
                             </Box>
                             <Spacer />
+                            
                             <Box
-                                
+                                h='100%'
                                 w='38%'
                                 boxShadow='md'
                                 rounded='md'
