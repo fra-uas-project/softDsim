@@ -67,7 +67,11 @@ const MarkdownTextfield = (props) => {
     }, []);
 
     useEffect(() => {
-        props.data.text = value;
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.data.id)
+                component.text = value;
+            })
     }, [value])
 
     return (

@@ -43,6 +43,7 @@ import {
     questionEnum,
     tabIndexEnum
 } from "../components/ScenarionStudio/scenarioStudioData";
+import {useImmer} from "use-immer";
 
 const ScenarioStudio = () => {
 
@@ -50,7 +51,7 @@ const ScenarioStudio = () => {
     const toast = useToast();
 
     const [tabIndex, setTabIndex] = useState(1);
-    const [editorList, updateEditorList] = useState([]);
+    const [editorList, updateEditorList] = useImmer([]);
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedObject, setSelectedObject] = useState(null);
 
@@ -437,6 +438,7 @@ const ScenarioStudio = () => {
                                                     <BaseInspectorForm
                                                         key={selectedObject.id}
                                                         baseData={findComponent(selectedItem)}
+                                                        updateEditorList={updateEditorList}
                                                     />
                                                 }
 
@@ -467,6 +469,7 @@ const ScenarioStudio = () => {
                                                     <ModelSelectionInspectorForm
                                                         key={selectedObject.id}
                                                         modelSelectionData={selectedObject}
+                                                        updateEditorList={updateEditorList}
                                                     />
                                                 }
 
