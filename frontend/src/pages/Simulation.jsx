@@ -122,7 +122,7 @@ const Simulation = () => {
                                 w='38%'
                                 boxShadow='md'
                                 rounded='md'
-                                bg='gray.400'
+                                bg='white'
                                 textAlign='center'
                             >
                                 <p>

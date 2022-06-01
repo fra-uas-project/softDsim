@@ -21,8 +21,8 @@ const EmployeesPanel = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold'>Employees</Heading>
-                <TableContainer>
+                <Heading size='md' fontWeight='bold' m='3'>Employees</Heading>
+                <TableContainer p='2'>
   <Table variant='striped' colorScheme='blue'>
     <TableCaption>Employees Overview</TableCaption>
     <Thead>

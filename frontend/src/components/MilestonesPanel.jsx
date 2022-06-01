@@ -20,8 +20,8 @@ const MilestonesPanel = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold'>Milestones</Heading>
-                <TableContainer>
+                <Heading size='md' fontWeight='bold' m='3'>Milestones</Heading>
+                <TableContainer p='2'>
   <Table variant='striped' colorScheme='blue'>
     <TableCaption>Employees Overview</TableCaption>
     <Thead>

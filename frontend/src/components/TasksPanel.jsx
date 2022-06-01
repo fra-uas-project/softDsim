@@ -18,7 +18,7 @@ const TasksPanel = () => {
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
-                <Heading size='md' fontWeight='bold'>Tasks</Heading>
+                <Heading size='md' fontWeight='bold' m='3'>Tasks</Heading>
             <Box m="2" bg='blue.100' borderRadius='2xl'>
             <Stat>
             <StatLabel>Todo</StatLabel>
