@@ -121,7 +121,8 @@ const Simulation = () => {
                             <Spacer />
                             
                             <Box
-                                h='100%'
+                                p='3'
+                                
                                 w='38%'
                                 boxShadow='md'
                                 rounded='md'
