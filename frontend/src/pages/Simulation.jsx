@@ -26,6 +26,10 @@ import RadioButton from "../components/RadioButton";
 import ActionSlider from "../components/ActionSlider";
 import ActionToggle from "../components/ActionToggle";
 import ActionSwitch from "../components/ActionSwitch";
+import TasksPanel from "../components/TasksPanel";
+import StressPanel from "../components/StressPanel";
+import EmployeesPanel from "../components/EmployeesPanel";
+import ProgressPanel from "../components/ProgressPanel";
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
@@ -79,8 +83,11 @@ const Simulation = () => {
                         <BreadcrumbLink href=''>{userScenario.scn_name}</BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
+                
+            
                 <Flex flexDir="column" flexGrow={1}>
                     <Heading p='5'>Active Scenario: {userScenario.scn_name}</Heading>
+                    <Box backgroundColor="white" borderRadius="2xl" minH="70vh" p="2">
                     <Container maxW='container.2xl'>
                         <Flex>
                             <Box w='60%'>
@@ -93,10 +100,10 @@ const Simulation = () => {
                                     fontWeight='bold'
                                     color='white'
                                 >
-                                    <GridItem rowSpan={2} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='blue.300'> Tasks</GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='blue.800'>Progress Graph</GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='blue.100'>Employees</GridItem>
-                                    <GridItem colSpan={4} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='blue.700'>Stress Level</GridItem>
+                                    <GridItem rowSpan={2} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='grey.300'><TasksPanel /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><ProgressPanel /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><EmployeesPanel /></GridItem>
+                                    <GridItem colSpan={4} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><StressPanel /></GridItem>
                                 </Grid>
                             </Box>
                             <Spacer />
@@ -211,8 +218,11 @@ const Simulation = () => {
                                 </Grid>
                             </Box>
                         </Flex >
+                       
                     </Container >
+                    </Box>
                 </Flex>
+                
             </Flex>
         </>
     )
