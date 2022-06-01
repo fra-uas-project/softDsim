@@ -19,10 +19,10 @@ const TasksPanel = () => {
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
                 <Heading size='md' fontWeight='bold'>Tasks</Heading>
-            <Box m="2">
+            <Box m="2" bg='blue.100' borderRadius='2xl'>
             <Stat>
-            <StatLabel>Easy Tasks</StatLabel>
-            <StatNumber>950</StatNumber> 
+            <StatLabel>Todo</StatLabel>
+            <StatNumber>426</StatNumber> 
             {/* set api calls here*/}
             
             <StatHelpText>
@@ -31,10 +31,10 @@ const TasksPanel = () => {
             </StatHelpText>
             </Stat>
             </Box>
-            <Box m="2">
+            <Box m="2" bg='blue.100' borderRadius='2xl'>
             <Stat>
-            <StatLabel>Medium Tasks</StatLabel>
-            <StatNumber>950</StatNumber>
+            <StatLabel>Done</StatLabel>
+            <StatNumber>189</StatNumber>
             
             <StatHelpText>
              <StatArrow type='increase' />
@@ -42,16 +42,41 @@ const TasksPanel = () => {
             </StatHelpText>
             </Stat>
             </Box>
-            <Box m="2">
+            <Box m="2" bg='blue.100' borderRadius='2xl'>
             <Stat>
-            <StatLabel>Hard Tasks</StatLabel>
-            <StatNumber>950</StatNumber>
+            <StatLabel>Unittested</StatLabel>
+            <StatNumber>42</StatNumber>
             
             <StatHelpText>
              <StatArrow type='increase' />
              50%
             </StatHelpText>
             </Stat>
+            
+            </Box>
+            <Box m="2" bg='blue.100' borderRadius='2xl'>
+            <Stat>
+            <StatLabel>Integrationtested</StatLabel>
+            <StatNumber>42</StatNumber>
+            
+            <StatHelpText>
+             <StatArrow type='increase' />
+             50%
+            </StatHelpText>
+            </Stat>
+            
+            </Box>
+            <Box m="2" bg='blue.100' borderRadius='2xl'>
+            <Stat>
+            <StatLabel>Bug</StatLabel>
+            <StatNumber>42</StatNumber>
+            
+            <StatHelpText>
+             <StatArrow type='increase' />
+             50%
+            </StatHelpText>
+            </Stat>
+            
             </Box>
             </Text>
         </>

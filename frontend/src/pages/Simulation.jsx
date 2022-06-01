@@ -17,7 +17,8 @@ import {
     useDisclosure,
     Grid,
     GridItem,
-    Spacer
+    Spacer,
+    
 } from "@chakra-ui/react";
 import { HiChevronRight } from "react-icons/hi";
 import { useEffect, useState } from "react";
@@ -31,6 +32,9 @@ import StressPanel from "../components/StressPanel";
 import EmployeesPanel from "../components/EmployeesPanel";
 import ProgressPanel from "../components/ProgressPanel";
 import MilestonesPanel from "../components/MilestonesPanel";
+import MotivationPanel from "../components/MotivationPanel";
+import FamiliarityPanel from "../components/FamiliarityPanel";
+import SideDrawerLeft from "../components/SideDrawerLeft";
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
@@ -93,19 +97,23 @@ const Simulation = () => {
                         <Flex>
                             <Box w='60%'>
                                 <Grid
-                                    h='100%'
-                                    templateRows='repeat(3, 1fr)'
-                                    templateColumns='repeat(5, 1fr)'
+                                    
+                                    templateRows='repeat(4, 1fr)'
+                                    templateColumns='repeat(6, 1fr)'
                                     gap={4}
                                     textAlign='center'
                                     fontWeight='bold'
                                     color='white'
                                 >
                                     <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='grey.300'><TasksPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><ProgressPanel /></GridItem>
+                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><ProgressPanel /></GridItem>
                                     <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><MilestonesPanel /></GridItem>
-                                    <GridItem colSpan={5} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><EmployeesPanel /></GridItem>
-                                    <GridItem colSpan={5} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><StressPanel /></GridItem>
+                                    <GridItem colSpan={6} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><EmployeesPanel /></GridItem>
+                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><StressPanel /></GridItem>
+                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' ><MotivationPanel /></GridItem>
+                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' ><FamiliarityPanel /></GridItem>
+                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' ><SideDrawerLeft /></GridItem>
+
                                 </Grid>
                             </Box>
                             <Spacer />
