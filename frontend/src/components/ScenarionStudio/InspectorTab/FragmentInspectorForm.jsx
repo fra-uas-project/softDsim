@@ -3,10 +3,17 @@ import {
     Divider,
     Editable,
     EditableInput,
-    EditablePreview, FormControl, FormHelperText,
-    FormLabel, HStack, NumberDecrementStepper, NumberIncrementStepper,
+    EditablePreview,
+    FormControl,
+    FormHelperText,
+    FormLabel,
+    HStack,
+    NumberDecrementStepper,
+    NumberIncrementStepper,
     NumberInput,
-    NumberInputField, NumberInputStepper, Select,
+    NumberInputField,
+    NumberInputStepper,
+    Select,
     VStack
 } from "@chakra-ui/react";
 import {useEffect, useState} from "react";
@@ -19,6 +26,7 @@ const FragmentInspectorForm = (props) => {
     const [endConditionType, setEndConditionType] = useState(props.fragmentData?.simulation_end?.type);
     const [endConditionLimit, setEndConditionLimit] = useState(props.fragmentData?.simulation_end?.limit);
     const [limitType, setLimitType] = useState(props.fragmentData?.simulation_end?.limit_type);
+    const [actions, setActions] = useState(props.fragmentData?.actions);
 
     const onChangeDisplayName =  (value) => {
         setDisplayName(value)
@@ -36,12 +44,17 @@ const FragmentInspectorForm = (props) => {
         setLimitType(event.target.value)
     }
 
+    const addActions =  (value) => {
+        setActions(value)
+    }
+
     useEffect(() => {
         props.fragmentData.displayName = displayName;
         props.fragmentData.simulation_end.type = endConditionType;
         props.fragmentData.simulation_end.limit = endConditionLimit;
         props.fragmentData.simulation_end.limit_type = limitType;
-    }, [displayName, endConditionType, endConditionLimit, limitType])
+        props.fragmentData.actions = actions;
+    }, [displayName, endConditionType, endConditionLimit, limitType, actions])
 
     return (
         <VStack maxW="300px" alignItems="flex-start">
@@ -103,7 +116,8 @@ const FragmentInspectorForm = (props) => {
                 droppableId="actionList"
                 itemList={props.finalActionList}
                 type="action"
-                headline="Action Types"
+                headline="Actions"
+                addActions={addActions}
             />
         </VStack>
     )
