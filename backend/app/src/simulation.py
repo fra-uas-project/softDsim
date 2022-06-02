@@ -36,6 +36,7 @@ from app.models.team import Member
 
 
 from django.core.exceptions import ObjectDoesNotExist
+from app.src.util.scenario_util import get_actions_from_fragment
 
 from history.write import write_history
 
@@ -97,7 +98,6 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     :param req: Object with request data
 
     """
-    write_history(scenario, req)
     # 1. Process the request information
     # check if request type is specified. might not be needed here anymore,
     # since it is already checked in simulation view.
@@ -111,6 +111,8 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
         "MODEL": handle_model_request,
     }
     request_handling_mapper[req.type](req, scenario)
+
+    write_history(scenario, req)
 
     # 2. Find next component
     # find next component depending on current index of the scenario
@@ -139,7 +141,6 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
 
     # 4.2 Check if next component is a Simulation Component
     if isinstance(next_component, SimulationFragment):
-
         # 4.2.1 Check if any events has occurred
 
         # 4.2.2 Check if Simulation Fragment ended
@@ -150,9 +151,9 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             # return next component
             # don't know yet if recursive is the best solution
             return continue_simulation(scenario, req)
-
         # 4.2.3 Build response
         return SimulationResponse(
+            actions=get_actions_from_fragment(next_component),
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),

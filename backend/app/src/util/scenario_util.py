@@ -1,9 +1,11 @@
+from typing import List
 from app.dto.request import (
     ScenarioRequest,
     SimulationRequest,
     QuestionRequest,
     ModelRequest,
 )
+from app.dto.response import ActionDTO
 
 
 def check_indexes(data) -> bool:
@@ -43,3 +45,16 @@ def create_correct_request_model(request) -> ScenarioRequest:
 
 def handle_model_request(req, scenario):
     pass
+
+
+def get_actions_from_fragment(next_component) -> List[ActionDTO]:
+    """Extracts and returns all actions from a component and returns it as a
+    list of ActionDTOs."""
+    return [
+        ActionDTO(
+            action=a.get("title"),
+            lower_limit=a.get("lower_limit"),
+            upper_limit=a.get("upper_limit"),
+        )
+        for a in next_component.actions.values()
+    ]

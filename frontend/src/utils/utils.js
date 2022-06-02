@@ -10,3 +10,14 @@ export const role = {
     CREATOR: "creator",
     STUDENT: "student"
 }
+
+export const action = {
+    BUGFIX: "bugfix",
+    UNITTEST: "unittest",
+    INTEGRATIONTEST: "integrationtest",
+    TEAMEVENT: "teamevent",
+    MEETINGS: "meetings",
+    TRAINING: "training",
+    SALARY: "salary",
+    OVERTIME: "overtime"
+}

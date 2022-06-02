@@ -13,7 +13,15 @@ class MemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Member
-        fields = ["id", "xp", "motivation", "stress", "skill_type", "team"]
+        fields = [
+            "id",
+            "xp",
+            "motivation",
+            "familiarity",
+            "stress",
+            "skill_type",
+            "team",
+        ]
 
 
 class TeamSerializer(serializers.ModelSerializer):
