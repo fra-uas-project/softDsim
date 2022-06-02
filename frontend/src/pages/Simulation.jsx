@@ -163,11 +163,11 @@ const Simulation = () => {
 
                 <Flex flexDir="column" flexGrow={1}>
                     <Heading p='5'>Active Scenario: {userScenario.scn_name}</Heading>
-                    <Box backgroundColor="white" borderRadius="2xl"  p="2">
+                    
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                <Box boxShadow='md' rounded='md' p='3' mb='5'><SideDrawerLeft /></Box>
+                                <Box boxShadow='md' rounded='md' p='3' mb='5' bg='white' _hover={{ boxShadow: '2xl' }}><SideDrawerLeft /></Box>
                                 <Grid
                                     templateRows='repeat(4, 1fr)'
                                     templateColumns='repeat(6, 1fr)'
@@ -176,13 +176,13 @@ const Simulation = () => {
                                     fontWeight='bold'
                                     color='white'
                                 >
-                                    <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='grey.300'><TasksPanel /></GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><ProgressPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><MilestonesPanel /></GridItem>
-                                    <GridItem colSpan={6} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300'><EmployeesPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' p='2'><StressPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' p='2'><MotivationPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='grey.300' p='2'><FamiliarityPanel /></GridItem>
+                                    <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='white'><TasksPanel /></GridItem>
+                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><ProgressPanel /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><MilestonesPanel /></GridItem>
+                                    <GridItem colSpan={6} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><EmployeesPanel /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white' p='2'><StressPanel /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white' p='2'><MotivationPanel /></GridItem>
+                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white' p='2'><FamiliarityPanel /></GridItem>
                                 </Grid>
                             </Box>
                             <Spacer />
@@ -252,7 +252,7 @@ const Simulation = () => {
                             </Box>
                         </Flex >
                     </Container >
-                    </Box>
+                   
                 </Flex>
             </Flex>
         </>
