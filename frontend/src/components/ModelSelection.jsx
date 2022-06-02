@@ -5,10 +5,8 @@ import { DiScrum } from "react-icons/di"
 import { BsKanbanFill } from "react-icons/bs"
 
 const ModelSelection = (props) => {
+    // selected option will be highlighted
     const [selectedOption, setSelectedOption] = useState('')
-    const [options, setOptions] = useState([
-        'Waterfall', 'Agile', 'Kanban'
-    ])
 
     function handleSelect(option) {
         setSelectedOption(option)
@@ -17,12 +15,15 @@ const ModelSelection = (props) => {
 
     return (
         <Stack>
-            {options.map((option, index) => {
+            {props.models.map((model, index) => {
                 return <Button h={40} leftIcon={
-                    option === 'Waterfall' ? <GiWaterfall size={100} /> :
-                        option === 'Agile' ? <DiScrum size={140} /> :
-                            option === 'Kanban' ? <BsKanbanFill size={80} /> : <></>}
-                    onClick={() => handleSelect(option)} key={index} fontSize="4xl" colorScheme={selectedOption === option ? 'blue' : 'gray'}>{option}</Button >
+                    // get icon for type, if type is not found, no icon will be shown
+                    model === 'waterfall' ? <GiWaterfall size={100} /> :
+                        model === 'scrum' ? <DiScrum size={140} /> :
+                            model === 'kanban' ? <BsKanbanFill size={80} /> : <></>}
+                    onClick={() => handleSelect(model)} key={index} fontSize="4xl" colorScheme={selectedOption === model ? 'blue' : 'gray'}>{
+                        model.charAt(0).toUpperCase() + model.slice(1)
+                    }</Button >
             })}
         </Stack>
     )

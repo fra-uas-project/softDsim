@@ -112,12 +112,14 @@ const Simulation = () => {
             })
 
             const nextData = await res.json()
-            console.log(nextData)
+            console.log('NextData:', nextData)
             // set type
             setCurrentType(nextData.type)
             // set data
             if (nextData.type === 'QUESTION') {
                 setSimValues(nextData.question_collection)
+            } else if (nextData.type === 'MODEL') {
+                setSimValues(nextData.models)
             }
 
             // setSimValues(scenario.data.id)
@@ -163,7 +165,7 @@ const Simulation = () => {
 
                 <Flex flexDir="column" flexGrow={1}>
                     <Heading p='5'>Active Scenario: {userScenario.scn_name}</Heading>
-                    
+
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
@@ -231,9 +233,9 @@ const Simulation = () => {
                                         : <></>
                                     }
                                     {/* Model Selection */}
-                                    {Object.keys(simValues)[0] === 'model_selection' ?
+                                    {currentType === 'MODEL' ?
                                         <>
-                                            <ModelSelection onSelectModel={(event) => handleSelection(event)} />
+                                            <ModelSelection onSelectModel={(event) => handleSelection(event)} models={simValues} />
                                         </>
                                         : <></>
                                     }
@@ -252,7 +254,7 @@ const Simulation = () => {
                             </Box>
                         </Flex >
                     </Container >
-                   
+
                 </Flex>
             </Flex>
         </>
