@@ -163,6 +163,7 @@ const Simulation = () => {
 
                 <Flex flexDir="column" flexGrow={1}>
                     <Heading p='5'>Active Scenario: {userScenario.scn_name}</Heading>
+                    <Box backgroundColor="white" borderRadius="2xl"  p="2">
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
@@ -251,6 +252,7 @@ const Simulation = () => {
                             </Box>
                         </Flex >
                     </Container >
+                    </Box>
                 </Flex>
             </Flex>
         </>
