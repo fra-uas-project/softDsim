@@ -11,6 +11,14 @@ from app.exceptions import IndexException
 from app.models.template_scenario import TemplateScenario
 from app.serializers.template_scenario import TemplateScenarioSerializer
 
+from app.models.question_collection import QuestionCollection
+from app.models.question import Question
+from app.models.answer import Answer
+from app.models.simulation_end import SimulationEnd
+from app.models.simulation_fragment import SimulationFragment
+from app.models.action import Action
+from app.models.model_selection import ModelSelection
+
 
 class TemplateScenarioView(APIView):
 
@@ -124,3 +132,81 @@ class TemplateScenarioView(APIView):
                 {"status": "something went wrong internally"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class TemplateScenarioFromStudioView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    @allowed_roles(["all"])
+    def post(self, request):
+        scenario = TemplateScenario()
+        scenario.save()
+
+        caller = {
+            "BASE": handle_base,
+            "QUESTIONS": handle_question,
+            "SIMULATION": handle_simulation,
+            "MODELSELECTION": handle_model,
+            "EVENT": handle_event,
+            # "not-found": raise AttributeError
+        }
+
+        i = 0
+        for component in request.data:
+            i = caller[component.get("type", "not-found")](component, scenario, i)
+
+        scenario.save()
+
+
+def handle_base(data, scenario: TemplateScenario, i):
+    scenario.name = data.get("template_name")
+    scenario.story = data.get("text")
+    return i
+
+
+def handle_question(data, scenario: TemplateScenario, i):
+    qc = QuestionCollection(index=i, template_scenario=scenario)
+    qc.save()
+    qi = 0
+    for question_data in data.get("questions", []):
+
+        q = Question(
+            question_index=qi,
+            question_collection=qc,
+            text=question_data.get("text"),
+            multi=question_data.get("type") == "MULTI",
+        )
+        q.save()
+
+        for answer_data in question_data.get("answers"):
+            a = Answer(
+                label=answer_data.get("label"),
+                points=int(answer_data.get("points")),
+                question=q,
+            )
+            a.save()
+        qi += 1
+
+    return i + 1
+
+
+def handle_simulation(data, scenario: TemplateScenario, i):
+    pass
+
+
+def handle_model(data, scenario: TemplateScenario, i):
+    m = ModelSelection(
+        index=i,
+        text=data.get("text"),
+        waterfall="waterfall" in data.get("models"),
+        kanban="kanban" in data.get("models"),
+        scrum="scrum" in data.get("models"),
+        template_scenario=scenario,
+    )
+    m.save()
+    return i + 1
+
+
+def handle_event(data, scenario: TemplateScenario, i):
+    pass
