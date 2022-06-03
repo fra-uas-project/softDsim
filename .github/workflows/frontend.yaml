@@ -2,9 +2,9 @@ name: Deploy Frontend
 
 on:
   push:
-    # branches:
-    #   - main
-    #   - develop
+    branches:
+      - main
+      - develop
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend.yaml'
@@ -27,8 +27,6 @@ jobs:
     name: Build and Deploy
     needs:
     - consecutiveness
-    env:
-      DIR: DEV
 
     steps:
     - uses: actions/checkout@v3
@@ -44,26 +42,19 @@ jobs:
             echo "REACT_APP_DJANGO_HOST=${{ secrets.DOMAIN_DEV }}" >> $GITHUB_ENV
             echo "CI=false" >> $GITHUB_ENV
 
-    # - name: Setup Node
-    #   uses: actions/setup-node@v3
-    #   with:
-    #     node-version: '16'
-    # - name: Compile Frontend
-    #   run: |
-    #         node -v
-    #         npm -v
-    #         cd frontend
-    #         npm ci
-    #         npm run build
-    #         echo "chmod for js"
-    #         chmod -R 755 ./build/static/js
-    # - name: Prepare Frontend
-    #   run: |
-    #         sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
-    #         cd ${{ secrets.BASE_DIR_WEB }}${{ env.DIR }} \
-    #         && mkdir -p swd
-            # sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./frontend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
-    #         EOF
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+    - name: Compile Frontend
+      run: |
+            node -v
+            npm -v
+            cd frontend
+            npm ci
+            npm run build
+            echo "chmod for js"
+            chmod -R 755 ./build/static/js
     - name: Copy Frontend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" rsync -a --rsh="ssh -o StrictHostKeyChecking=no" ./frontend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
@@ -71,6 +62,5 @@ jobs:
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
             cd ${{ secrets.BASE_DIR_WEB }}${{ env.DIR }} \
-            && ln -sfn ${GITHUB_SHA} prd \
-            && ls -lA
+            && ln -sfn ${GITHUB_SHA} prd
             EOF
