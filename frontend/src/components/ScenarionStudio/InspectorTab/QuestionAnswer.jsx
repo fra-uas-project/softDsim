@@ -54,7 +54,7 @@ const QuestionAnswer = (props) => {
         <>
             <HStack>
                 <Input value={label} onChange={handleLabelChange}/>
-                <NumberInput maxWidth={24} value={points} onChange={handlePointsChange} min={0}>
+                <NumberInput maxWidth={24} value={points} onChange={handlePointsChange}>
                     <NumberInputField />
                     <NumberInputStepper>
                         <NumberIncrementStepper/>
