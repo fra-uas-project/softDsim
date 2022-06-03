@@ -34,3 +34,14 @@ export const findQuestion = (questionId, editorList) => {
 
     return (questions.find(question => question.id === questionId))
 };
+
+export const findAction = (actionId, editorList) => {
+    const fragmentList = editorList.filter(component => component.type === componentEnum.FRAGMENT)
+
+    let actions = []
+    for (const fragment of fragmentList) {
+        actions = [...actions, ...fragment.actions]
+    }
+
+    return (actions.find(action => action.id === actionId))
+}

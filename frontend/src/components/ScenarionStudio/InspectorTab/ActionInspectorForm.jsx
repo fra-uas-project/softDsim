@@ -1,5 +1,5 @@
 import InspectorEmtpy from "./InspectorEmtpy";
-import {action} from "../../../utils/utils";
+import {action, findAction} from "../../../utils/utils";
 import {
     Box,
     Divider,
@@ -15,7 +15,7 @@ import {
     NumberInputStepper,
     VStack
 } from "@chakra-ui/react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
 const ActionInspectorForm = (props) => {
 
@@ -29,30 +29,42 @@ const ActionInspectorForm = (props) => {
     const [lowerLimit, setLowerLimit] = useState(props.actionData.lower_limit)
     const [upperLimit, setUpperLimit] = useState(props.actionData.upper_limit)
 
+    // TODO: Refactor functions
     const handleChangeLowerLimit = (value) => {
-        setLowerLimit(value)
         value = parseInt(value)
+        setLowerLimit(value)
+        props.updateEditorList(
+            (draft) => {
+                const action = findAction(props.actionData.id, draft)
+                action.lower_limit = value;
+            })
         if (value >= upperLimit) {
             setUpperLimit(value + 1)
+            props.updateEditorList(
+                (draft) => {
+                    const action = findAction(props.actionData.id, draft)
+                    action.upper_limit = value + 1;
+                })
         }
     };
 
     const handleChangeUpperLimit = (value) => {
-        setUpperLimit(value)
         value = parseInt(value)
+        setUpperLimit(value)
+        props.updateEditorList(
+            (draft) => {
+                const action = findAction(props.actionData.id, draft)
+                action.upper_limit = value;
+            })
         if (value <= lowerLimit) {
             setLowerLimit(value - 1)
+            props.updateEditorList(
+                (draft) => {
+                    const action = findAction(props.actionData.id, draft)
+                    action.lower_limit = value - 1;
+                })
         }
     };
-
-    useEffect(() => {
-        props.actionData.lower_limit = lowerLimit;
-
-    }, [lowerLimit, props.actionData])
-
-    useEffect(() => {
-        props.actionData.upper_limit = upperLimit;
-    }, [upperLimit, props.actionData])
 
     return (
         <VStack maxW="300px" alignItems="flex-start" w="full">

@@ -466,6 +466,7 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         finalActionList={finalActionList}
                                                         fragmentData={findComponent(selectedItem)}
+                                                        updateEditorList={updateEditorList}
                                                     />
                                                 }
 
@@ -489,6 +490,7 @@ const ScenarioStudio = () => {
                                                     <ActionInspectorForm
                                                         key={findAction(selectedItem).id}
                                                         actionData={findAction(selectedItem)}
+                                                        updateEditorList={updateEditorList}
                                                     />
                                                 }
 
