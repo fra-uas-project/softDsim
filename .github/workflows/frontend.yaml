@@ -53,11 +53,11 @@ jobs:
             cd frontend
             npm ci
             npm run build
-            echo "chmod for js"
-            chmod -R 755 ./build/static/js
+
     - name: Copy Frontend
       run: |
-            sshpass -p "${{ secrets.SSH_PAS }}" rsync -a --rsh="ssh -o StrictHostKeyChecking=no" ./frontend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
+            sshpass -p "${{ secrets.SSH_PAS }}" rsync -a --rsh="ssh -o StrictHostKeyChecking=no" ./frontend/build/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
+   
     - name: Release Frontend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
