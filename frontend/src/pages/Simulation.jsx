@@ -60,18 +60,22 @@ const Simulation = () => {
 
     const [currentType, setCurrentType] = useState()
 
+    const [dataValidationStatus, setDataValidationStatus] = useState(false)
+
     // test values for simulation
     const [simValues, setSimValues] = useState({})
 
     const [returnValues, setReturnValues] = useState()
 
     async function handleSelection(event) {
-        if (Object.keys(simValues)[0] === 'model_selection') {
+        if (currentType === 'MODEL') {
             await setReturnValues({
-                simulationId: currentSimID,
+                scenario_id: currentSimID,
+                type: currentType,
                 model: event
             })
-        } else if (Object.keys(simValues)[0] === 'question_collections') {
+            setDataValidationStatus(true)
+        } else if (currentType === 'question_collections') {
 
         }
     }
@@ -91,20 +95,26 @@ const Simulation = () => {
 
             const scenario = await res.json()
             setCurrentSimID(scenario.data.id)
+            handleNext(scenario.data.id)
         } catch (err) {
             console.log(err)
-        } finally {
-            handleNext()
         }
     }
 
-    async function handleNext() {
-        console.log(currentSimID)
+    async function handleNext(simID) {
+        console.log('next: ', simID)
+        setDataValidationStatus(false)
+        var nextValues = {}
+        if (returnValues === undefined) {
+            nextValues = { "scenario_id": simID, "type": "MODEL" }
+        } else {
+            nextValues = returnValues
+        }
         try {
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/sim/next`, {
                 method: 'POST',
                 credentials: 'include',
-                body: JSON.stringify({ "scenario_id": currentSimID, "type": "MODEL" }),
+                body: JSON.stringify(nextValues),
                 headers: {
                     "X-CSRFToken": getCookie("csrftoken"),
                     "Content-Type": "application/json"
@@ -132,6 +142,10 @@ const Simulation = () => {
         fetchUserScenario();
         onOpen();
     }, [onOpen]);
+
+    useEffect(() => {
+        console.log('currentSimID', currentSimID)
+    }, [currentSimID]);
 
 
     return (
@@ -246,7 +260,7 @@ const Simulation = () => {
                                         : <></>
                                     }
                                     <GridItem colSpan={1}>
-                                        <Button onClick={handleNext} colorScheme='blue' size='lg'>
+                                        <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg'>
                                             Next Week
                                         </Button>
                                     </GridItem>
