@@ -114,7 +114,9 @@ const ScenarioStudio = () => {
             // copy because item needs to be unique
             let movedItemCopy = {...movedItem};
             movedItemCopy.id = uuidv4();
-            if(movedItemCopy.type !== componentEnum.BASE) {
+            if(movedItemCopy.type === componentEnum.BASE) {
+                movedItemCopy.template_name += ` ${uuidv4().slice(0, 8)}`
+            } else {
                 movedItemCopy.displayName += ` ${uuidv4().slice(0, 8)}`
             }
             editorListItems.splice(result.destination.index, 0, movedItemCopy);
