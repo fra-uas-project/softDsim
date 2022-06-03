@@ -26,7 +26,7 @@ const FragmentInspectorForm = (props) => {
     const [endConditionType, setEndConditionType] = useState(props.fragmentData?.simulation_end?.type);
     const [endConditionLimit, setEndConditionLimit] = useState(props.fragmentData?.simulation_end?.limit);
     const [limitType, setLimitType] = useState(props.fragmentData?.simulation_end?.limit_type);
-    const [setActions] = useState(props.fragmentData?.actions);
+    const [actions, setActions] = useState(props.fragmentData?.actions);
 
     const onChangeDisplayName =  (value) => {
         setDisplayName(value)
