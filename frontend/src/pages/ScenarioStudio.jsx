@@ -473,6 +473,7 @@ const ScenarioStudio = () => {
                                                     <EventInspectorForm
                                                         key={selectedObject.id}
                                                         eventData={findComponent(selectedItem)}
+                                                        updateEditorList={updateEditorList}
                                                     />
                                                 }
 
