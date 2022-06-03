@@ -19,11 +19,12 @@ const Clone = styled(ListItem)`
 const InspectorItemSelector = (props) => {
 
     const copyAllActions = () => {
-        // Creating a deep copy
+        // Creating a deep copy (deep copy does not copy functions (icon)
         const actionListItems = JSON.parse(JSON.stringify(finalActionList));
 
-        for (const actionListItem of actionListItems) {
-            actionListItem.id = uuidv4();
+        for (let i = 0; i < finalActionList.length; i++) {
+            actionListItems[i].id = uuidv4();
+            actionListItems[i].icon = finalActionList[i].icon
         }
         return actionListItems
     }
