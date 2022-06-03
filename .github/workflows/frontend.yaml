@@ -64,10 +64,10 @@ jobs:
     - name: Copy Frontend
       run: |
             # sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./frontend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
-            sshpass -p "${{ secrets.SSH_PAS }}" rsync -r --rsh=ssh ./frontend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
+            sshpass -p "${{ secrets.SSH_PAS }}" rsync -r --rsh="ssh -o StrictHostKeyChecking=no" ./frontend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
     - name: Release Frontend
       run: |
-            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
             cd ${{ secrets.BASE_DIR_WEB }}${{ env.DIR }} \
             ln -sfn ${GITHUB_SHA} prd
             ls -lA
