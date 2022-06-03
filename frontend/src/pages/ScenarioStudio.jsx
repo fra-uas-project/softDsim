@@ -23,7 +23,7 @@ import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import {useEffect, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
-import EditorListComponent from "../components/ScenarionStudio/Editor/EditorQuestionsComponent";
+import EditorListComponent from "../components/ScenarionStudio/Editor/EditorListComponent";
 import ComponentTab from "../components/ScenarionStudio/ComponentTab/ComponentTab";
 import QuestionInspectorForm from "../components/ScenarionStudio/InspectorTab/QuestionInspectorForm";
 import BaseInspectorForm from "../components/ScenarionStudio/InspectorTab/BaseInspectorForm";
@@ -114,6 +114,9 @@ const ScenarioStudio = () => {
             // copy because item needs to be unique
             let movedItemCopy = {...movedItem};
             movedItemCopy.id = uuidv4();
+            if(movedItemCopy.type !== componentEnum.BASE) {
+                movedItemCopy.displayName += ` ${uuidv4().slice(0, 8)}`
+            }
             editorListItems.splice(result.destination.index, 0, movedItemCopy);
             updateEditorList(editorListItems);
 
@@ -179,6 +182,7 @@ const ScenarioStudio = () => {
             const [movedQuestion] = questionsListItems.splice(result.source.index, 1);
             let movedQuestionCopy = {...movedQuestion};
             movedQuestionCopy.id = uuidv4();
+            movedQuestionCopy.displayName += ` ${uuidv4().slice(0, 8)}`;
 
             updateEditorList((draft) => {
                 const questionsComponent = draft.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
