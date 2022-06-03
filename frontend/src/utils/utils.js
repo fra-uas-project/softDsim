@@ -1,3 +1,5 @@
+import {componentEnum} from "../components/ScenarionStudio/scenarioStudioData";
+
 export function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -21,3 +23,14 @@ export const action = {
     SALARY: "salary",
     OVERTIME: "overtime"
 }
+
+export const findQuestion = (questionId, editorList) => {
+    const questionsList = editorList.filter(component => component.type === componentEnum.QUESTIONS)
+
+    let questions = []
+    for (const questionsListElement of questionsList) {
+        questions = [...questions, ...questionsListElement.questions]
+    }
+
+    return (questions.find(question => question.id === questionId))
+};

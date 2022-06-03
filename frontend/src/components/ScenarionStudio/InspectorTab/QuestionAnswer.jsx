@@ -1,15 +1,19 @@
 import {
     Box,
     FormHelperText,
-    HStack, IconButton,
-    Input, NumberDecrementStepper,
+    HStack,
+    IconButton,
+    Input,
+    NumberDecrementStepper,
     NumberIncrementStepper,
     NumberInput,
     NumberInputField,
-    NumberInputStepper, Text
+    NumberInputStepper,
+    Text
 } from "@chakra-ui/react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {HiOutlineMinus} from "react-icons/hi";
+import {findQuestion} from "../../../utils/utils";
 
 const QuestionAnswer = (props) => {
     const [label, setLabel] = useState(props.answer.label);
@@ -18,24 +22,33 @@ const QuestionAnswer = (props) => {
 
     const handleLabelChange = (event) => {
         setLabel(event.target.value)
+        props.updateEditorList(
+            (draft) => {
+                const question = findQuestion(props.questionId, draft);
+                const answer = question.answers.find((answer) => answer.id === props.answer.id);
+                answer.label = event.target.value;
+            })
     };
 
     const handlePointsChange = (event) => {
         setPoints(event)
+        props.updateEditorList(
+            (draft) => {
+                const question = findQuestion(props.questionId, draft);
+                const answer = question.answers.find((answer) => answer.id === props.answer.id);
+                answer.points = event;
+            })
     };
 
     const toggleRightWrong = () => {
         setIsRight(!isRight)
-        props.answer.right = ! props.answer.right
+        props.updateEditorList(
+            (draft) => {
+                const question = findQuestion(props.questionId, draft);
+                const answer = question.answers.find((answer) => answer.id === props.answer.id);
+                answer.right = !isRight;
+            })
     };
-
-    useEffect(() => {
-        props.answer.label = label
-    }, [label])
-
-    useEffect(() => {
-        props.answer.points = points
-    }, [points])
 
     return (
         <>
@@ -54,11 +67,11 @@ const QuestionAnswer = (props) => {
                 <HStack justify="space-between">
                     {props.multiRight && !props.isNotRemovable ?
                         <Text
-                            color={props.answer.right ? "green.400" : "red.400"}
+                            color={isRight ? "green.400" : "red.400"}
                             cursor="pointer" onClick={toggleRightWrong}
-                        >{props.answer.right ? "Right Answer" : "Wrong Answer"}</Text>
+                        >{isRight ? "Right Answer" : "Wrong Answer"}</Text>
                         :
-                        <Text color={props.answer.right ? "green.400" : "red.400"}>{props.answer.right ? "Right Answer" : "Wrong Answer"}</Text>
+                        <Text color={isRight ? "green.400" : "red.400"}>{isRight ? "Right Answer" : "Wrong Answer"}</Text>
                     }
                     <Text pr={10}>Points</Text>
                 </HStack>

@@ -1,7 +1,7 @@
 import {Box, Divider, Editable, EditableInput, EditablePreview} from "@chakra-ui/react";
 import MarkdownTextfield from "./MarkdownTextfield";
 import InspectorItemSelector from "./InspectorItemSelector";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
 const QuestionsInspectorForm = (props) => {
     const [displayName, setDisplayName] = useState(props.questionsData.displayName);
@@ -10,13 +10,19 @@ const QuestionsInspectorForm = (props) => {
         setDisplayName(value)
     }
 
-    useEffect(() => {
-        props.questionsData.displayName = displayName
-    }, [displayName])
+    const onSubmitDisplayName = () => {
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.questionsData.id)
+                component.displayName = displayName;
+            })
+    }
 
     return (
         <>
-            <Editable value={displayName} w="full" fontWeight="bold" onChange={(value) => onChangeDisplayName(value)}>
+            <Editable value={displayName} w="full" fontWeight="bold"
+                      onChange={(value) => onChangeDisplayName(value)}
+                      onSubmit={onSubmitDisplayName}>
                 <EditablePreview
                     w="full"
                     _hover={{
@@ -31,6 +37,7 @@ const QuestionsInspectorForm = (props) => {
             <MarkdownTextfield
                 key={props.questionsData.id}
                 data={props.questionsData}
+                updateEditorList={props.updateEditorList}
             />
             <Box h={3}/>
             <InspectorItemSelector

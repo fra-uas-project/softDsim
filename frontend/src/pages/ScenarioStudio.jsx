@@ -175,24 +175,34 @@ const ScenarioStudio = () => {
             updateEditorList(editorListItems);
         }
 
-        // moving from action list to fragment in editor
+        // moving from question list to questions component in editor
         else if (result.source.droppableId === "questionList") {
-            const questionsListItems = Array.from(finalQuestionList);
-            const [movedQuestion] = questionsListItems.splice(result.source.index, 1);
+
 
             // copy because item needs to be unique
+            const questionsListItems = Array.from(finalQuestionList);
+            const [movedQuestion] = questionsListItems.splice(result.source.index, 1);
             let movedQuestionCopy = {...movedQuestion};
             movedQuestionCopy.id = uuidv4();
 
-            // get fragment which needs to be updated
-            const editorListItems = Array.from(editorList);
-            const questionsComponent = editorListItems.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
-            const questionsComponentQuestions = Array.from(questionsComponent.questions);
+            // // get questions component which needs to be updated
+            // const editorListItems = Array.from(editorList);
+            // const questionsComponent = editorListItems.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
+            // const questionsComponentQuestions = Array.from(questionsComponent.questions);
+            //
+            // questionsComponentQuestions.splice(result.destination.index, 0, movedQuestionCopy);
+            // questionsComponent.questions = questionsComponentQuestions
+            //
+            // updateEditorList(editorListItems);
 
-            questionsComponentQuestions.splice(result.destination.index, 0, movedQuestionCopy);
-            questionsComponent.questions = questionsComponentQuestions
 
-            updateEditorList(editorListItems);
+            updateEditorList((draft) => {
+                const questionsComponent = draft.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
+                questionsComponent.questions.splice(result.destination.index, 0, movedQuestionCopy)
+            })
+
+
+
         }
 
         // Reorder questions in same list
@@ -447,6 +457,7 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         finalQuestionList={finalQuestionList}
                                                         questionsData={selectedObject}
+                                                        updateEditorList={updateEditorList}
                                                     />
                                                 }
 
@@ -484,6 +495,7 @@ const ScenarioStudio = () => {
                                                     <QuestionInspectorForm
                                                         key={findQuestion(selectedItem).id}
                                                         questionData={findQuestion(selectedItem)}
+                                                        updateEditorList={updateEditorList}
                                                     />
                                                 }
                                             </VStack>

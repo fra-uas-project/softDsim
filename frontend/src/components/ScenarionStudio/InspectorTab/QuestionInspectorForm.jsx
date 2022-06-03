@@ -15,6 +15,8 @@ import {useEffect, useState} from "react";
 import QuestionAnswer from "./QuestionAnswer";
 import {v4 as uuidv4} from 'uuid';
 import {HiOutlinePlus} from "react-icons/hi";
+import {questionEnum} from "../scenarioStudioData";
+import {findQuestion} from "../../../utils/utils";
 
 const QuestionInspectorForm = (props) => {
     const basicAnswers = [
@@ -45,6 +47,22 @@ const QuestionInspectorForm = (props) => {
         setQuestionText(event.target.value)
     }
 
+    const onSubmitDisplayName = () => {
+        props.updateEditorList(
+            (draft) => {
+                const question = findQuestion(props.questionData.id, draft)
+                question.displayName = displayName;
+            })
+    }
+
+    const onSubmitQuestionText = () => {
+        props.updateEditorList(
+            (draft) => {
+                const question = findQuestion(props.questionData.id, draft)
+                question.text = questionText;
+            })
+    }
+
     const addAnswer = () => {
         const newAnswer = {
             id: uuidv4(),
@@ -62,10 +80,13 @@ const QuestionInspectorForm = (props) => {
         setAnswers(copyAnswers)
     };
 
-
     // Update answers (not react way. should update answers in parent component with setEditorList
     const updateAnswers = () => {
-        props.questionData.answers = answers
+        props.updateEditorList(
+            (draft) => {
+                const question = findQuestion(props.questionData.id, draft)
+                question.answers = answers;
+            })
     };
 
     useEffect(() => {
@@ -76,14 +97,12 @@ const QuestionInspectorForm = (props) => {
         console.log(props.questionData)
     })
 
-    useEffect(() => {
-        props.questionData.displayName = displayName
-        props.questionData.text = questionText
-    }, [displayName, questionText])
-
     return(
         <VStack maxW="300px">
-            <Editable value={displayName} w="full" fontWeight="bold" onChange={(value) => onChangeDisplayName(value)}>
+            <Editable value={displayName} w="full" fontWeight="bold"
+                      onChange={(value) => onChangeDisplayName(value)}
+                      onSubmit={onSubmitDisplayName}
+            >
                 <EditablePreview
                     w="full"
                     _hover={{
@@ -98,7 +117,10 @@ const QuestionInspectorForm = (props) => {
             <FormControl>
                 <FormLabel htmlFor='question' color="gray.400" fontWeight="semibold">Question</FormLabel>
                 {/* TODO persist question and question name */}
-                <Input id="question" value={questionText} onChange={(value) => onChangeQuestionText(value)} />
+                <Input id="question" value={questionText}
+                       onChange={(value) => onChangeQuestionText(value)}
+                       onBlur={onSubmitQuestionText}
+                />
                 <FormHelperText></FormHelperText>
             </FormControl>
             <Box h={3}/>
@@ -107,16 +129,19 @@ const QuestionInspectorForm = (props) => {
                 {
                     answers.length ?
                         answers.map((answer, index) => {
-                            return <QuestionAnswer // TODO make first element not removable
+                            return <QuestionAnswer
                                         key={answer.id}
+                                        questionId={props.questionData.id}
+                                        updateEditorList={props.updateEditorList}
                                         answer={answer}
                                         removeAnswer={() => {removeAnswer(answer.id)}}
-                                        multiRight={props.questionData.type === "MULTI"} //TODO Use Enum (make enum globally accessible)
+                                        multiRight={props.questionData.type === questionEnum.MULTI}
                                         isNotRemovable={index < 1} // Minimum one
                             />
                         })
                         :
                         setAnswers(basicAnswers)
+
                 }
                 {
                     answers.length < 6 ?
