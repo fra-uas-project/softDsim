@@ -18,26 +18,26 @@ import {HiOutlinePlus} from "react-icons/hi";
 import {questionEnum} from "../scenarioStudioData";
 import {findQuestion} from "../../../utils/utils";
 
-const QuestionInspectorForm = (props) => {
-    const basicAnswers = [
-        {
-            id: uuidv4(),
-            label: "",
-            points: "0",
-            right: true
-        },
-        {
-            id: uuidv4(),
-            label: "",
-            points: "0",
-            right: false
-        },
+const basicAnswers = [
+    {
+        id: uuidv4(),
+        label: "",
+        points: "0",
+        right: true
+    },
+    {
+        id: uuidv4(),
+        label: "",
+        points: "0",
+        right: false
+    },
+]
 
-    ]
+const QuestionInspectorForm = ({updateEditorList, questionData}) => {
 
-    const [answers, setAnswers] = useState(props.questionData?.answers);
-    const [displayName, setDisplayName] = useState(props.questionData?.displayName);
-    const [questionText, setQuestionText] = useState(props.questionData?.text);
+    const [answers, setAnswers] = useState(questionData?.answers);
+    const [displayName, setDisplayName] = useState(questionData?.displayName);
+    const [questionText, setQuestionText] = useState(questionData?.text);
 
     const onChangeDisplayName =  (value) => {
         setDisplayName(value)
@@ -48,17 +48,17 @@ const QuestionInspectorForm = (props) => {
     }
 
     const onSubmitDisplayName = () => {
-        props.updateEditorList(
+        updateEditorList(
             (draft) => {
-                const question = findQuestion(props.questionData.id, draft)
+                const question = findQuestion(questionData.id, draft)
                 question.displayName = displayName;
             })
     }
 
     const onSubmitQuestionText = () => {
-        props.updateEditorList(
+        updateEditorList(
             (draft) => {
-                const question = findQuestion(props.questionData.id, draft)
+                const question = findQuestion(questionData.id, draft)
                 question.text = questionText;
             })
     }
@@ -80,22 +80,19 @@ const QuestionInspectorForm = (props) => {
         setAnswers(copyAnswers)
     };
 
-    // Update answers (not react way. should update answers in parent component with setEditorList
-    const updateAnswers = () => {
-        props.updateEditorList(
+    useEffect(() => {
+        updateEditorList(
             (draft) => {
-                const question = findQuestion(props.questionData.id, draft)
+                const question = findQuestion(questionData.id, draft)
                 question.answers = answers;
             })
-    };
+    }, [answers, updateEditorList, questionData.id])
 
     useEffect(() => {
-        updateAnswers()
-    }, [answers])
-
-    useEffect(() => {
-        console.log(props.questionData)
-    })
+        if (answers.length === 0) {
+            setAnswers(basicAnswers)
+        }
+    }, [answers.length])
 
     return(
         <VStack maxW="300px">
@@ -116,7 +113,6 @@ const QuestionInspectorForm = (props) => {
             <Box h={3}/>
             <FormControl>
                 <FormLabel htmlFor='question' color="gray.400" fontWeight="semibold">Question</FormLabel>
-                {/* TODO persist question and question name */}
                 <Input id="question" value={questionText}
                        onChange={(value) => onChangeQuestionText(value)}
                        onBlur={onSubmitQuestionText}
@@ -127,21 +123,17 @@ const QuestionInspectorForm = (props) => {
             <FormControl>
                 <FormLabel color="gray.400" fontWeight="semibold" htmlFor="">Answers</FormLabel>
                 {
-                    answers.length ?
                         answers.map((answer, index) => {
                             return <QuestionAnswer
                                         key={answer.id}
-                                        questionId={props.questionData.id}
-                                        updateEditorList={props.updateEditorList}
+                                        questionId={questionData.id}
+                                        updateEditorList={updateEditorList}
                                         answer={answer}
                                         removeAnswer={() => {removeAnswer(answer.id)}}
-                                        multiRight={props.questionData.type === questionEnum.MULTI}
+                                        multiRight={questionData.type === questionEnum.MULTI}
                                         isNotRemovable={index < 1} // Minimum one
                             />
                         })
-                        :
-                        setAnswers(basicAnswers)
-
                 }
                 {
                     answers.length < 6 ?
