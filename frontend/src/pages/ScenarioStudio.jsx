@@ -130,15 +130,10 @@ const ScenarioStudio = () => {
             let movedActionCopy = {...movedAction};
             movedActionCopy.id = uuidv4();
 
-            // get fragment which needs to be updated
-            const editorListItems = Array.from(editorList);
-            const fragment = editorListItems.find(fragment => fragment.id === result.destination.droppableId)
-            const fragmentActions = Array.from(fragment.actions);
-
-            fragmentActions.splice(result.destination.index, 0, movedActionCopy);
-            fragment.actions = fragmentActions
-
-            updateEditorList(editorListItems);
+            updateEditorList((draft) => {
+                const fragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
+                fragmentComponent.actions.splice(result.destination.index, 0, movedActionCopy)
+            })
 
             // Reorder actions in same list
         } else if (result.type === "action" && result.source.droppableId === result.destination.droppableId) {
@@ -185,23 +180,10 @@ const ScenarioStudio = () => {
             let movedQuestionCopy = {...movedQuestion};
             movedQuestionCopy.id = uuidv4();
 
-            // // get questions component which needs to be updated
-            // const editorListItems = Array.from(editorList);
-            // const questionsComponent = editorListItems.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
-            // const questionsComponentQuestions = Array.from(questionsComponent.questions);
-            //
-            // questionsComponentQuestions.splice(result.destination.index, 0, movedQuestionCopy);
-            // questionsComponent.questions = questionsComponentQuestions
-            //
-            // updateEditorList(editorListItems);
-
-
             updateEditorList((draft) => {
                 const questionsComponent = draft.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
                 questionsComponent.questions.splice(result.destination.index, 0, movedQuestionCopy)
             })
-
-
 
         }
 
