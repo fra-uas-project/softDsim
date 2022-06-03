@@ -42,19 +42,19 @@ jobs:
             echo "REACT_APP_DJANGO_HOST=${{ secrets.DOMAIN_DEV }}" >> $GITHUB_ENV
             echo "CI=false" >> $GITHUB_ENV
 
-    - name: Setup Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-    - name: Compile Frontend
-      run: |
-            node -v
-            npm -v
-            cd frontend
-            npm ci
-            npm run build
-            echo "chmod for js"
-            chmod -R 755 ./build/static/js
+    # - name: Setup Node
+    #   uses: actions/setup-node@v3
+    #   with:
+    #     node-version: '16'
+    # - name: Compile Frontend
+    #   run: |
+    #         node -v
+    #         npm -v
+    #         cd frontend
+    #         npm ci
+    #         npm run build
+    #         echo "chmod for js"
+    #         chmod -R 755 ./build/static/js
     # - name: Prepare Frontend
     #   run: |
     #         sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
@@ -63,7 +63,7 @@ jobs:
     #         EOF
     - name: Copy Frontend
       run: |
-            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./frontend/build/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
+            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./frontend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
     - name: Release Frontend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
