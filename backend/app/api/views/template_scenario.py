@@ -139,7 +139,7 @@ class TemplateScenarioFromStudioView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["all"])
+    @allowed_roles(["creator"])
     def post(self, request):
         try:
             logging.info("Creating template scenario from studio")
