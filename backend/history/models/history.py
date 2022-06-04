@@ -8,12 +8,14 @@ class History(models.Model):
         UserScenario, on_delete=models.CASCADE, related_name="history"
     )
 
-    type = models.TextField(max_length=32)
+    request_type = models.TextField(max_length=32)
+    response_type = models.TextField(max_length=32)
 
     timestamp = models.DateTimeField(auto_now=True)
 
     # State
-    counter = models.PositiveIntegerField()
+    component_counter = models.PositiveIntegerField()
+    step_counter = models.PositiveIntegerField()
     day = models.PositiveIntegerField()
     cost = models.FloatField()
 

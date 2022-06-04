@@ -13,6 +13,7 @@ from app.exceptions import (
     RequestTypeException,
     RequestActionException,
     RequestMembersException,
+    RequestTypeMismatchException,
 )
 from app.models.scenario import ScenarioConfig
 from django.core.exceptions import ObjectDoesNotExist
@@ -139,6 +140,7 @@ class NextStepView(APIView):
             RequestTypeException,
             RequestActionException,
             RequestMembersException,
+            RequestTypeMismatchException,
         ) as e:
             return Response(
                 {"status": "error", "error-message": str(e)},

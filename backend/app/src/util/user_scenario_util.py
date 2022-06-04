@@ -24,7 +24,8 @@ def find_next_scenario_component(scenario):
     # add all components here
     components = [QuestionCollection, SimulationFragment, ModelSelection]
     query = dict(
-        index=scenario.state.counter, template_scenario_id=scenario.template_id
+        index=scenario.state.component_counter,
+        template_scenario_id=scenario.template_id,
     )
 
     for component in components:
@@ -47,10 +48,12 @@ def end_of_fragment(scenario) -> bool:
     returns: boolean
     """
     # todo philip: clean this up
-
-    fragment = SimulationFragment.objects.get(
-        template_scenario=scenario.template, index=scenario.state.counter
-    )
+    try:
+        fragment = SimulationFragment.objects.get(
+            template_scenario=scenario.template, index=scenario.state.component_counter
+        )
+    except:
+        return False
 
     tasks_done = Task.objects.filter(user_scenario=scenario, done=True)
 
@@ -65,6 +68,11 @@ def end_of_fragment(scenario) -> bool:
                     return False
 
 
-def increase_scenario_counter(scenario, increase_by=1):
-    scenario.state.counter = scenario.state.counter + increase_by
+def increase_scenario_component_counter(scenario, increase_by=1):
+    scenario.state.component_counter = scenario.state.component_counter + increase_by
+    scenario.state.save()
+
+
+def increase_scenario_step_counter(scenario, increase_by=1):
+    scenario.state.step_counter = scenario.state.step_counter + increase_by
     scenario.state.save()

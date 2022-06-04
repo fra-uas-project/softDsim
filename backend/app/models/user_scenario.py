@@ -8,7 +8,13 @@ from custom_user.models import User
 
 
 class ScenarioState(models.Model):
-    counter = models.IntegerField(default=0)
+
+    # counter for the components of the scenario
+    component_counter = models.IntegerField(default=0)
+
+    # counter for each step of the scenario simulation
+    step_counter = models.IntegerField(default=0)
+
     cost = models.FloatField(default=0)
     day = models.IntegerField(default=0)
 

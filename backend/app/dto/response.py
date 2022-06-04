@@ -38,7 +38,8 @@ class QuestionCollectionDTO(BaseModel):
 
 
 class ScenarioStateDTO(BaseModel):
-    counter: int
+    component_counter: int
+    step_counter: int
     day: int
     cost: float
 
