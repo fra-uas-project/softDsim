@@ -30,7 +30,7 @@ const TasksPanel = (props) => {
             <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Done</StatLabel>
-            <StatNumber>{props.simTasks.tasks_done}</StatNumber>
+            <StatNumber>{props.simTasks.task_done}</StatNumber>
             
             <StatHelpText>
              <StatArrow type='increase' />
