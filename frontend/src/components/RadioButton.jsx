@@ -28,7 +28,7 @@ const RadioButton = () => {
                 <RadioGroup defaultValue='1'>
                     <Stack direction='row' justify='stretch'>
                         {testValues.questions.map((question, index) => {
-                            return <Radio w='full' justifyItems='center' colorScheme='blue' value={index} isChecked={question.value}>
+                            return <Radio key={index} w='full' justifyItems='center' colorScheme='blue' value={index} isChecked={question.value}>
                                 {question.text}
                             </Radio>
                         })}

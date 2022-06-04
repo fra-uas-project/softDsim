@@ -25,6 +25,8 @@ from app.api.views.simulation import (
     NextStepView,
 )
 
+from history.view import HistoryView
+
 
 urlpatterns = [
     # User stuff
@@ -47,9 +49,9 @@ urlpatterns = [
     path("management-goal/", ManagementGoalView.as_view()),
     path("management-goal/<str:id>", ManagementGoalView.as_view()),
     path(
-        "question_collection",
+        "question-collection",
         QuestionCollectionView.as_view(),
-        name="question_collection",
+        name="question-collection",
     ),
     # team and member
     path("team", TeamViews.as_view()),
@@ -66,4 +68,7 @@ urlpatterns = [
     path("sim/next", NextStepView.as_view()),
     path("sim/team", AdjustMemberView.as_view()),
     path("sim/team/<int:id>", AdjustMemberView.as_view()),
+    # HISTORY Endpoints
+    path("history", HistoryView.as_view()),
+    path("history/<int:id>", HistoryView.as_view()),
 ]

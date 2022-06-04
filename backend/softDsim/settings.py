@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "custom_user",
+    "history",
 ]
 
 
@@ -201,4 +202,10 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Needed for post requests
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "https://dev.uas.bspace.xyz",
+    "http://dev.uas.bspace.xyz",
+    "https://uas.bspace.xyz",
+    "http://uas.bspace.xyz",
+]

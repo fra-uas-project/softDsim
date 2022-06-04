@@ -11,6 +11,7 @@ import GDPR from "./pages/GDPR";
 import Imprint from "./pages/Imprint";
 import { getCookie } from "./utils/utils";
 import NotFoundPage from "./components/NotFoundPage";
+import ScenarioStudio from "./pages/ScenarioStudio";
 
 const Routing = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext)
@@ -83,6 +84,7 @@ const Routing = () => {
                 currentUser?.creator &&
                 <>
                     {/* adding routes which are accessible for every logged-in user with role creator */}
+                    <Route path="/scenario-studio" element={<ScenarioStudio />} />
                 </>
             }
             {

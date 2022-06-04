@@ -1,4 +1,4 @@
-name: Frontend
+name: Deploy Frontend
 
 on:
   push:
@@ -7,27 +7,38 @@ on:
       - develop
     paths:
       - 'frontend/**'
-      - '!**.md'
       - '.github/workflows/frontend.yaml'
+      - '!**.md'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
+
+  consecutiveness:
+    name: Check running Jobs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: mktcode/consecutive-workflow-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     runs-on: ubuntu-latest
     name: Build and Deploy
+    needs:
+    - consecutiveness
 
     steps:
     - uses: actions/checkout@v3
     - name: Check / set env Prod
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |  
-            echo "DIR=prod/" >> $GITHUB_ENV
+            echo "DIR=PROD" >> $GITHUB_ENV
             echo "REACT_APP_DJANGO_HOST=${{ secrets.DOMAIN_PROD }}" >> $GITHUB_ENV
     - name: Check / set env Dev
       if: ${{ github.ref == 'refs/heads/develop' }}
       run: |
-            echo "DIR=dev/" >> $GITHUB_ENV
+            echo "DIR=DEV" >> $GITHUB_ENV
             echo "REACT_APP_DJANGO_HOST=${{ secrets.DOMAIN_DEV }}" >> $GITHUB_ENV
             echo "CI=false" >> $GITHUB_ENV
 
@@ -42,22 +53,14 @@ jobs:
             cd frontend
             npm ci
             npm run build
-            echo "chmod for js"
-            chmod -R 755 ./build/static/js
-    - name: Prepare Backend
+
+    - name: Copy Frontend
       run: |
-            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
-            cd ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} \
-            && mkdir -p swd
-            EOF
-    - name: Deploy Frontend
-      run: |
-            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./frontend/build/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{env.DIR}}swd/
+            sshpass -p "${{ secrets.SSH_PAS }}" rsync -a --rsh="ssh -o StrictHostKeyChecking=no" ./frontend/build/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{ env.DIR }}/${GITHUB_SHA}/
+   
     - name: Release Frontend
       run: |
-            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
-            cd ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} \
-            && rm -rf bak || echo "bak not found" \
-            && mv prd bak || echo "prd not found" \
-            && mv swd prd || echo "swd not found"
+            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+            cd ${{ secrets.BASE_DIR_WEB }}${{ env.DIR }} \
+            && ln -sfn ${GITHUB_SHA} prd
             EOF

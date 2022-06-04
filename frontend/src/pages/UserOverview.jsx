@@ -100,7 +100,7 @@ const UserOverview = () => {
             fetchUsers();
         } catch (e) {
             toast({
-                title: `Could not change role ${role}`,
+                title: `Could not change role ${roleToChange.role}`,
                 status: 'error',
                 duration: 5000,
             });
@@ -243,11 +243,11 @@ const UserOverview = () => {
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                            Delete user {selectedUser}
+                            Delete user
                         </AlertDialogHeader>
 
                         <AlertDialogBody>
-                            Are you sure? You can't undo this action afterwards.
+                            Are you sure that you want to delete {selectedUser}? You can't undo this action afterwards.
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
@@ -280,7 +280,7 @@ const UserOverview = () => {
                         </AlertDialogHeader>
 
                         <AlertDialogBody>
-                            Are you sure that you want to change a role?
+                            Are you sure that you want to change role {roleToChange.role} of {selectedUser}?
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
