@@ -22,27 +22,6 @@ https://github.com/docker/compose -> manually (version 2.4.1) -> add to PATH (in
 [nginx-digital ocean](https://www.digitalocean.com/community/tools/nginx?domains.0.php.php=false&domains.0.reverseProxy.reverseProxy=true&domains.0.routing.root=false&global.app.lang=de)
 ```
 ├── conf.d
-├── fastcgi.conf
-├── fastcgi_params
-├── koi-utf
-├── koi-win
-├── mime.types
-├── modules-available
-├── modules-enabled
-├── nginx.conf
-├── nginxconfig.io
-├── proxy_params
-├── scgi_params
-├── sites-available
-├── sites-enabled
-├── snippets
-├── uwsgi_params
-└── win-utf
-
-7 directories, 10 files
-deployadm@fb2-sim-pm:/deploydata/operations/nginx$ tree -L 2
-.
-├── conf.d
 ├── backup
 ├── conf.d
 ├── mime.types
