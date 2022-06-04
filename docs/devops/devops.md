@@ -18,6 +18,31 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io curl iptables-pers
 ```
 https://github.com/docker/compose -> manually (version 2.4.1) -> add to PATH (in section User)
 
+## nginx
+[nginx-digital ocean](https://www.digitalocean.com/community/tools/nginx?domains.0.php.php=false&domains.0.reverseProxy.reverseProxy=true&domains.0.routing.root=false&global.app.lang=de)
+```
+├── conf.d
+├── fastcgi.conf
+├── fastcgi_params
+├── koi-utf
+├── koi-win
+├── mime.types
+├── modules-available
+├── modules-enabled
+├── nginx.conf
+├── proxy_params
+├── scgi_params
+├── sites-available
+│   └── default
+├── sites-enabled
+│   └── default -> /etc/nginx/sites-available/default
+├── snippets
+│   ├── fastcgi-php.conf
+│   └── snakeoil.conf
+├── uwsgi_params
+└── win-utf
+
+```
 ## Docker
 ```bash
 IMAGE                   COMMAND                  PORTS            NAMES
@@ -41,14 +66,14 @@ https://grafana.com/docs/grafana/latest/administration/configure-docker/
 |kompsim|complexy Team User|
 |connect|restricted connect User|
 ## cronjobs
-## deployadm
+### deployadm
 ```bash
 30 0 * * * . $HOME/.profile && getGithubActionIP.sh >> $BASE_DIR_OPS/logs/crontab_run.log 2>&1 
 
 35 0 * * 0 . $HOME/.profile && docker system prune -f >> $BASE_DIR_OPS/logs/crontab_run.log 2>&1
 ```
 
-## deploydata
+### deploydata
 ```bash
 30 0 * * * . $HOME/.profile && cd ${BASE_DIR_WEB}/DEV/ && while [[ $(ls -l | grep -v prd | wc -l) -gt 10 ]];do rm -rf $(ls -t | tail -n1); done
 ```
@@ -131,10 +156,10 @@ https://www.digitalocean.com/community/tutorials/docker-explained-how-to-contain
 
 # Ideen
 ### Testing
-https://fakerjs.dev/guide/
+- https://fakerjs.dev/guide/
+- [Gatling](https://gatling.io/open-source/)
 
 
 
-
-069 1533  3685
-          3333
+<!-- 069 1533   3685
+                3333 -->
