@@ -16,7 +16,10 @@ from app.api.security.security import (
 
 
 # all request with /api/ land here (see softDsim/urls.py)
-from app.api.views.template_scenario import TemplateScenarioView
+from app.api.views.template_scenario import (
+    TemplateScenarioView,
+    TemplateScenarioFromStudioView,
+)
 from app.api.views.user import UserView
 
 from app.api.views.simulation import (
@@ -39,6 +42,9 @@ urlpatterns = [
     path("user/<str:username>", UserView.as_view()),
     # template scenario
     path("template-scenario", TemplateScenarioView.as_view()),
+    path(
+        "template-scenario/create-from-studio", TemplateScenarioFromStudioView.as_view()
+    ),
     path("template-scenario/<str:scenario_id>", TemplateScenarioView.as_view()),
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
