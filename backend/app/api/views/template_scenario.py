@@ -140,25 +140,42 @@ class TemplateScenarioFromStudioView(APIView):
 
     @allowed_roles(["all"])
     def post(self, request):
-        logging.info("Creating template scenario from studio")
-        scenario = TemplateScenario()
-        scenario.save()
+        try:
+            logging.info("Creating template scenario from studio")
+            scenario = TemplateScenario()
+            scenario.save()
 
-        caller = {
-            "BASE": handle_base,
-            "QUESTIONS": handle_question,
-            "FRAGMENT": handle_simulation,
-            "MODELSELECTION": handle_model,
-            "EVENT": handle_event,
-            # "not-found": raise AttributeError
-        }
+            caller = {
+                "BASE": handle_base,
+                "QUESTIONS": handle_question,
+                "FRAGMENT": handle_simulation,
+                "MODELSELECTION": handle_model,
+                "EVENT": handle_event,
+            }
+            print(request.data)
+            i = 0
+            for component in request.data:
+                try:
+                    i = caller[component.get("type", "not-found")](
+                        component, scenario, i
+                    )
+                except KeyError:
+                    msg = f"Invalid component type {component.get('type')}"
+                    logging.warning(msg)
+                    return Response(
+                        dict(status="error", data=msg,),
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
 
-        i = 0
-        for component in request.data:
-            i = caller[component.get("type", "not-found")](component, scenario, i)
-
-        scenario.save()
-        logging.info("Template scenario created with id: " + str(scenario.id))
+            scenario.save()
+            logging.info("Template scenario created with id: " + str(scenario.id))
+        except Exception as e:
+            msg = f"{e.__class__.__name__} occured while creating template scenario from studio"
+            logging.error(msg)
+            return Response(
+                dict(status="error", data=msg),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         # Create Scorecard
         scorecard = ScoreCard(template_scenario=scenario)
