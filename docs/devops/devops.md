@@ -1,19 +1,102 @@
-### Zertifikate
+### Zertifikate (if own Domain)
+```
 certbot run -n -d uas.bspace.xyz,uas.dev.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de
 certbot certonly --standalone -n -d uas.bspace.xyz,dev.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de --dry-run 
+```
+```
 certbot renew \
  && cp -L /etc/letsencrypt/live/uas.bspace.xyz/* /deploydata/nginx/cert/ \
  && docker restart webserver
  5 5 */7 * * certbot renew --nginx --renew-hook "systemctl reload nginx" && date >> /home/pi/log.txt
+```
 
-### Hardening
+
+# Software
+```bash
+sudo apt-get update && apt-get upgrade -y
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io curl iptables-persistent rsync git nginx certbot
+```
+https://github.com/docker/compose -> manually (version 2.4.1) -> add to PATH (in section User)
+
+## Docker
+```bash
+IMAGE                   COMMAND                  PORTS            NAMES
+dj:latest               "/bin/sh -c /entrypo…"   8002->8000/tcp   APP_DEV
+mariadb:10.7.3          "docker-entrypoint.s…"   3322->3306/tcp   APP_DB_DEV
+grafana/grafana:8.5.2   "/run.sh"                3000->3000/tcp   grafana
+mariadb:10.7.3          "docker-entrypoint.s…"   3320->3306/tcp   grafanaDB
+```
+### App (SoftDsim)
+
+### Grafana
+https://grafana.com/tutorials/run-grafana-behind-a-proxy/
+https://grafana.com/docs/grafana/latest/administration/configure-docker/
+
+# Ops
+## User
+| User |Function|
+|--|--|
+|deployadm|Docker, Operations|
+|deploydata|copy Data|
+|kompsim|complexy Team User|
+|connect|restricted connect User|
+## cronjobs
+## deployadm
+```bash
+30 0 * * * . $HOME/.profile && getGithubActionIP.sh >> $BASE_DIR_OPS/logs/crontab_run.log 2>&1 
+
+35 0 * * 0 . $HOME/.profile && docker system prune -f >> $BASE_DIR_OPS/logs/crontab_run.log 2>&1
+```
+
+## deploydata
+```bash
+30 0 * * * . $HOME/.profile && cd ${BASE_DIR_WEB}/DEV/ && while [[ $(ls -l | grep -v prd | wc -l) -gt 10 ]];do rm -rf $(ls -t | tail -n1); done
+```
+### Folder Struture
+**BASE_DIR_OPS**
+```bash
+├── bin
+│   ├── docker-compose
+│   ├── getGithubActionIP.sh
+│   └── iptables.sh
+├── compose
+│   ├── app_compose.yaml
+│   └── grafana_compose.yaml
+├── config
+├── iptables
+│   ├── ghIPList.txt
+│   ├── oldIP
+│   │   ├── ghIPList_20220531_193401.txt
+│   │   └── ghIPList_20220531_193701.txt
+└── logs
+    └── crontab_run.log
+```
+**BASE_DIR_WEB**
+```bash
+├── DEV
+│   ├── 52350a...
+│   ├── 5b41ca...
+│   ├── 60880a...
+│   ├── cb0f46...
+│   └── prd -> 60880a...
+└── PROD
+```
+**BASE_DIR_APP**
+```bash
+├── build
+│   ├── Dockerfile
+│   ├── entrypoint.sh
+│   └── requirements.txt
+├── DEV
+│   ├── bak
+│   └── prd
+└── PROD
+    └── prd
+```
+
+# Hardening
  https://www.digitalocean.com/community/tutorials/how-to-harden-openssh-on-ubuntu-20-04
-
-### Installed Software
-docker, curl, iptables-persistent
-https://github.com/docker/compose -> manually version 2.4.1
-
-### IPtables GeoIP
+## IPtables GeoIP
 https://docs.rackspace.com/support/how-to/block-ip-range-from-countries-with-geoip-and-iptables/
 https://www.eigener-server.ch/web-server/ubuntu/ubuntu-geoip-iptables/
 libtext-csv-xs-perl libmoosex-types-netaddr-ip-perl
@@ -24,14 +107,20 @@ lsmod | grep ^xt_geoip
 git clone https://git.code.sf.net/p/xtables-addons/xtables-addons xtables-addons-xtables-addons
 sudo ./xt_geoip_dl
 sudo ./xt_geoip_build -D /usr/share/xt_geoip *.csv
-- vllt Cron
- 30 23 * * * wget -q https://legacy-geoip-csv.ufficyo.com/Legacy-MaxMind-GeoIP-database.tar.gz -O - | tar -xvzf - -C /usr/share/xt_geoip
 
+**vllt Cron**
+```bash
+30 23 * * * wget -q https://legacy-geoip-csv.ufficyo.com/Legacy-MaxMind-GeoIP-database.tar.gz -O - | tar -xvzf - -C /usr/share/xt_geoip
+```
+
+#### Rules
+```bash
 iptables -t mangle -I PREROUTING -p tcp --dport 22 -m geoip ! --src-cc DE,US -j DROP
 iptables -t mangle -I PREROUTING -p tcp --dport 80 -m geoip ! --src-cc DE -j DROP
 iptables -t mangle -I PREROUTING -p tcp --dport 443 -m geoip ! --src-cc DE -j DROP
-
 iptables -t mangle -I PREROUTING -s 10.0.0.0/8 -j ACCEPT
+```
+
 https://superuser.com/questions/1234693/permanently-ban-after-n-connections-in-a-minute-with-iptables
 
 iptables without root
@@ -40,522 +129,12 @@ https://unix.stackexchange.com/questions/385109/can-you-list-iptables-as-a-non-r
 ### Backend Python Container
 https://www.digitalocean.com/community/tutorials/docker-explained-how-to-containerize-python-web-applications
 
-
-### Ideen
+# Ideen
+### Testing
 https://fakerjs.dev/guide/
 
 
-### Grafana
-https://grafana.com/tutorials/run-grafana-behind-a-proxy/
-https://grafana.com/docs/grafana/latest/administration/configure-docker/
 
-# Software
-https://github.com/docker/compose
-dj
 
 069 1533  3685
           3333
-
-581910 entries total
-   57 IPv4 ranges for AD
-   32 IPv6 ranges for AD
-  546 IPv4 ranges for AE
-  200 IPv6 ranges for AE
-  188 IPv4 ranges for AF
-   61 IPv6 ranges for AF
-   72 IPv4 ranges for AG
-   32 IPv6 ranges for AG
-   22 IPv4 ranges for AI
-   17 IPv6 ranges for AI
-  223 IPv4 ranges for AL
-   99 IPv6 ranges for AL
-  170 IPv4 ranges for AM
-   78 IPv6 ranges for AM
-  172 IPv4 ranges for AO
-   57 IPv6 ranges for AO
-    5 IPv4 ranges for AQ
-   24 IPv6 ranges for AQ
- 1834 IPv4 ranges for AR
- 1253 IPv6 ranges for AR
-   25 IPv4 ranges for AS
-   20 IPv6 ranges for AS
- 2223 IPv4 ranges for AT
-37947 IPv6 ranges for AT
- 9515 IPv4 ranges for AU
-11597 IPv6 ranges for AU
-   35 IPv4 ranges for AW
-   19 IPv6 ranges for AW
-   18 IPv4 ranges for AX
-   18 IPv6 ranges for AX
-  170 IPv4 ranges for AZ
-   83 IPv6 ranges for AZ
-  210 IPv4 ranges for BA
-   73 IPv6 ranges for BA
-   83 IPv4 ranges for BB
-   27 IPv6 ranges for BB
- 1553 IPv4 ranges for BD
- 1168 IPv6 ranges for BD
- 2338 IPv4 ranges for BE
- 1143 IPv6 ranges for BE
-   60 IPv4 ranges for BF
-   41 IPv6 ranges for BF
- 1225 IPv4 ranges for BG
-  333 IPv6 ranges for BG
-  113 IPv4 ranges for BH
-   72 IPv6 ranges for BH
-   23 IPv4 ranges for BI
-   30 IPv6 ranges for BI
-   36 IPv4 ranges for BJ
-   38 IPv6 ranges for BJ
-   10 IPv4 ranges for BL
-   22 IPv6 ranges for BL
-   70 IPv4 ranges for BM
-   24 IPv6 ranges for BM
-   48 IPv4 ranges for BN
-   37 IPv6 ranges for BN
-  132 IPv4 ranges for BO
-   76 IPv6 ranges for BO
-   17 IPv4 ranges for BQ
-   15 IPv6 ranges for BQ
- 4875 IPv4 ranges for BR
- 9223 IPv6 ranges for BR
-  115 IPv4 ranges for BS
-   33 IPv6 ranges for BS
-   36 IPv4 ranges for BT
-   40 IPv6 ranges for BT
-    0 IPv4 ranges for BV
-    5 IPv6 ranges for BV
-   74 IPv4 ranges for BW
-   39 IPv6 ranges for BW
-  201 IPv4 ranges for BY
-   68 IPv6 ranges for BY
-   83 IPv4 ranges for BZ
-   64 IPv6 ranges for BZ
-32034 IPv4 ranges for CA
-10697 IPv6 ranges for CA
-    1 IPv4 ranges for CC
-    6 IPv6 ranges for CC
-  121 IPv4 ranges for CD
-   46 IPv6 ranges for CD
-   13 IPv4 ranges for CF
-   22 IPv6 ranges for CF
-   40 IPv4 ranges for CG
-   34 IPv6 ranges for CG
- 3406 IPv4 ranges for CH
-13603 IPv6 ranges for CH
-  224 IPv4 ranges for CI
-   42 IPv6 ranges for CI
-    3 IPv4 ranges for CK
-   17 IPv6 ranges for CK
-  959 IPv4 ranges for CL
-  401 IPv6 ranges for CL
-   84 IPv4 ranges for CM
-   50 IPv6 ranges for CM
- 4979 IPv4 ranges for CN
- 2349 IPv6 ranges for CN
-  999 IPv4 ranges for CO
- 1015 IPv6 ranges for CO
-  330 IPv4 ranges for CR
-  151 IPv6 ranges for CR
-   26 IPv4 ranges for CU
-   30 IPv6 ranges for CU
-   17 IPv4 ranges for CV
-   28 IPv6 ranges for CV
-   62 IPv4 ranges for CW
-   34 IPv6 ranges for CW
-    0 IPv4 ranges for CX
-    6 IPv6 ranges for CX
-  398 IPv4 ranges for CY
-  138 IPv6 ranges for CY
- 1879 IPv4 ranges for CZ
-  907 IPv6 ranges for CZ
-15540 IPv4 ranges for DE
-13869 IPv6 ranges for DE
-   20 IPv4 ranges for DJ
-   32 IPv6 ranges for DJ
- 1717 IPv4 ranges for DK
-  600 IPv6 ranges for DK
-   35 IPv4 ranges for DM
-   30 IPv6 ranges for DM
-  198 IPv4 ranges for DO
-  133 IPv6 ranges for DO
-   76 IPv4 ranges for DZ
-   38 IPv6 ranges for DZ
-  393 IPv4 ranges for EC
-  247 IPv6 ranges for EC
-  455 IPv4 ranges for EE
-  228 IPv6 ranges for EE
-  270 IPv4 ranges for EG
-   56 IPv6 ranges for EG
-    0 IPv4 ranges for EH
-    5 IPv6 ranges for EH
-    5 IPv4 ranges for ER
-   24 IPv6 ranges for ER
- 5954 IPv4 ranges for ES
- 1311 IPv6 ranges for ES
-   21 IPv4 ranges for ET
-   27 IPv6 ranges for ET
- 1917 IPv4 ranges for FI
-  492 IPv6 ranges for FI
-   44 IPv4 ranges for FJ
-   45 IPv6 ranges for FJ
-   10 IPv4 ranges for FK
-   15 IPv6 ranges for FK
-   15 IPv4 ranges for FM
-   27 IPv6 ranges for FM
-   21 IPv4 ranges for FO
-   21 IPv6 ranges for FO
-12509 IPv4 ranges for FR
- 4298 IPv6 ranges for FR
-   46 IPv4 ranges for GA
-   34 IPv6 ranges for GA
-19682 IPv4 ranges for GB
-56149 IPv6 ranges for GB
-   44 IPv4 ranges for GD
-   34 IPv6 ranges for GD
-  263 IPv4 ranges for GE
-   93 IPv6 ranges for GE
-   47 IPv4 ranges for GF
-   21 IPv6 ranges for GF
-   93 IPv4 ranges for GG
-   22 IPv6 ranges for GG
-  176 IPv4 ranges for GH
-   68 IPv6 ranges for GH
-   73 IPv4 ranges for GI
-   42 IPv6 ranges for GI
-   29 IPv4 ranges for GL
-   24 IPv6 ranges for GL
-   27 IPv4 ranges for GM
-   29 IPv6 ranges for GM
-   34 IPv4 ranges for GN
-   36 IPv6 ranges for GN
-  103 IPv4 ranges for GP
-   34 IPv6 ranges for GP
-   20 IPv4 ranges for GQ
-   26 IPv6 ranges for GQ
-  608 IPv4 ranges for GR
-  169 IPv6 ranges for GR
-    3 IPv4 ranges for GS
-    5 IPv6 ranges for GS
-  202 IPv4 ranges for GT
-   90 IPv6 ranges for GT
-   47 IPv4 ranges for GU
-   22 IPv6 ranges for GU
-    8 IPv4 ranges for GW
-   28 IPv6 ranges for GW
-   26 IPv4 ranges for GY
-   33 IPv6 ranges for GY
- 5288 IPv4 ranges for HK
- 1375 IPv6 ranges for HK
-    0 IPv4 ranges for HM
-    2 IPv6 ranges for HM
-  234 IPv4 ranges for HN
-  115 IPv6 ranges for HN
-  369 IPv4 ranges for HR
-  149 IPv6 ranges for HR
-   36 IPv4 ranges for HT
-   35 IPv6 ranges for HT
-  853 IPv4 ranges for HU
-  307 IPv6 ranges for HU
- 2993 IPv4 ranges for ID
- 1875 IPv6 ranges for ID
- 2419 IPv4 ranges for IE
- 4319 IPv6 ranges for IE
-  985 IPv4 ranges for IL
-  272 IPv6 ranges for IL
-  137 IPv4 ranges for IM
-   34 IPv6 ranges for IM
- 6672 IPv4 ranges for IN
- 2125 IPv6 ranges for IN
-    4 IPv4 ranges for IO
-   16 IPv6 ranges for IO
-  355 IPv4 ranges for IQ
-  158 IPv6 ranges for IQ
- 1466 IPv4 ranges for IR
-  430 IPv6 ranges for IR
-  175 IPv4 ranges for IS
-  131 IPv6 ranges for IS
- 4621 IPv4 ranges for IT
- 1418 IPv6 ranges for IT
-  107 IPv4 ranges for JE
-   29 IPv6 ranges for JE
-   83 IPv4 ranges for JM
-   34 IPv6 ranges for JM
-  168 IPv4 ranges for JO
-   75 IPv6 ranges for JO
- 6398 IPv4 ranges for JP
- 1401 IPv6 ranges for JP
-  539 IPv4 ranges for KE
-  128 IPv6 ranges for KE
-  139 IPv4 ranges for KG
-   52 IPv6 ranges for KG
-  303 IPv4 ranges for KH
-  124 IPv6 ranges for KH
-   13 IPv4 ranges for KI
-   27 IPv6 ranges for KI
-   10 IPv4 ranges for KM
-   23 IPv6 ranges for KM
-   39 IPv4 ranges for KN
-   28 IPv6 ranges for KN
-    7 IPv4 ranges for KP
-   33 IPv6 ranges for KP
- 1678 IPv4 ranges for KR
- 1300 IPv6 ranges for KR
-  327 IPv4 ranges for KW
-   81 IPv6 ranges for KW
-   50 IPv4 ranges for KY
-   19 IPv6 ranges for KY
-  632 IPv4 ranges for KZ
-  104 IPv6 ranges for KZ
-   81 IPv4 ranges for LA
-   45 IPv6 ranges for LA
-  292 IPv4 ranges for LB
-  132 IPv6 ranges for LB
-   44 IPv4 ranges for LC
-   26 IPv6 ranges for LC
-   94 IPv4 ranges for LI
-   63 IPv6 ranges for LI
-  103 IPv4 ranges for LK
-   64 IPv6 ranges for LK
-   33 IPv4 ranges for LR
-   29 IPv6 ranges for LR
-  283 IPv4 ranges for LS
-   27 IPv6 ranges for LS
-  635 IPv4 ranges for LT
-  270 IPv6 ranges for LT
-  524 IPv4 ranges for LU
-  753 IPv6 ranges for LU
-  511 IPv4 ranges for LV
-  154 IPv6 ranges for LV
-   53 IPv4 ranges for LY
-   30 IPv6 ranges for LY
-  126 IPv4 ranges for MA
-   50 IPv6 ranges for MA
-   44 IPv4 ranges for MC
-   26 IPv6 ranges for MC
-  489 IPv4 ranges for MD
-  161 IPv6 ranges for MD
-   70 IPv4 ranges for ME
-   40 IPv6 ranges for ME
-    4 IPv4 ranges for MF
-    5 IPv6 ranges for MF
-   34 IPv4 ranges for MG
-   30 IPv6 ranges for MG
-    9 IPv4 ranges for MH
-   25 IPv6 ranges for MH
-  145 IPv4 ranges for MK
-   67 IPv6 ranges for MK
-   30 IPv4 ranges for ML
-   30 IPv6 ranges for ML
-  196 IPv4 ranges for MM
-  112 IPv6 ranges for MM
-  133 IPv4 ranges for MN
-   60 IPv6 ranges for MN
-   57 IPv4 ranges for MO
-   37 IPv6 ranges for MO
-    8 IPv4 ranges for MP
-   15 IPv6 ranges for MP
-   70 IPv4 ranges for MQ
-   15 IPv6 ranges for MQ
-   20 IPv4 ranges for MR
-   25 IPv6 ranges for MR
-   13 IPv4 ranges for MS
-   15 IPv6 ranges for MS
-  158 IPv4 ranges for MT
-   66 IPv6 ranges for MT
-  739 IPv4 ranges for MU
- 1107 IPv6 ranges for MU
-   46 IPv4 ranges for MV
-   37 IPv6 ranges for MV
-   51 IPv4 ranges for MW
-   47 IPv6 ranges for MW
- 1499 IPv4 ranges for MX
-  188 IPv6 ranges for MX
-  955 IPv4 ranges for MY
-  377 IPv6 ranges for MY
-   74 IPv4 ranges for MZ
-   44 IPv6 ranges for MZ
-   90 IPv4 ranges for NA
-   32 IPv6 ranges for NA
-   46 IPv4 ranges for NC
-   34 IPv6 ranges for NC
-   37 IPv4 ranges for NE
-   27 IPv6 ranges for NE
-    7 IPv4 ranges for NF
-   16 IPv6 ranges for NF
-  550 IPv4 ranges for NG
-  135 IPv6 ranges for NG
-   91 IPv4 ranges for NI
-   48 IPv6 ranges for NI
-10614 IPv4 ranges for NL
-24027 IPv6 ranges for NL
- 1690 IPv4 ranges for NO
-  657 IPv6 ranges for NO
-  242 IPv4 ranges for NP
-  165 IPv6 ranges for NP
-    7 IPv4 ranges for NR
-   23 IPv6 ranges for NR
-    2 IPv4 ranges for NU
-   17 IPv6 ranges for NU
- 1359 IPv4 ranges for NZ
-  573 IPv6 ranges for NZ
-  106 IPv4 ranges for OM
-   43 IPv6 ranges for OM
-  314 IPv4 ranges for PA
-  132 IPv6 ranges for PA
-  430 IPv4 ranges for PE
-  191 IPv6 ranges for PE
-   29 IPv4 ranges for PF
-   26 IPv6 ranges for PF
-  104 IPv4 ranges for PG
-   54 IPv6 ranges for PG
-  977 IPv4 ranges for PH
-  266 IPv6 ranges for PH
-  678 IPv4 ranges for PK
-  246 IPv6 ranges for PK
- 4517 IPv4 ranges for PL
- 1194 IPv6 ranges for PL
-    7 IPv4 ranges for PM
-   18 IPv6 ranges for PM
-    2 IPv4 ranges for PN
-    5 IPv6 ranges for PN
-  694 IPv4 ranges for PR
-  128 IPv6 ranges for PR
-  267 IPv4 ranges for PS
-   51 IPv6 ranges for PS
-  871 IPv4 ranges for PT
-  267 IPv6 ranges for PT
-    8 IPv4 ranges for PW
-   24 IPv6 ranges for PW
-  179 IPv4 ranges for PY
-  116 IPv6 ranges for PY
-   86 IPv4 ranges for QA
-   46 IPv6 ranges for QA
-  132 IPv4 ranges for RE
-   20 IPv6 ranges for RE
- 2467 IPv4 ranges for RO
-  575 IPv6 ranges for RO
-  462 IPv4 ranges for RS
-  146 IPv6 ranges for RS
- 9257 IPv4 ranges for RU
- 3452 IPv6 ranges for RU
-   50 IPv4 ranges for RW
-   41 IPv6 ranges for RW
-  742 IPv4 ranges for SA
-  164 IPv6 ranges for SA
-   16 IPv4 ranges for SB
-   37 IPv6 ranges for SB
-  235 IPv4 ranges for SC
-  150 IPv6 ranges for SC
-   36 IPv4 ranges for SD
-   32 IPv6 ranges for SD
- 4311 IPv4 ranges for SE
- 1367 IPv6 ranges for SE
- 4981 IPv4 ranges for SG
- 2952 IPv6 ranges for SG
-    0 IPv4 ranges for SH
-    6 IPv6 ranges for SH
-  562 IPv4 ranges for SI
-  204 IPv6 ranges for SI
-    1 IPv4 ranges for SJ
-    6 IPv6 ranges for SJ
-  560 IPv4 ranges for SK
-  413 IPv6 ranges for SK
-   78 IPv4 ranges for SL
-   31 IPv6 ranges for SL
-   25 IPv4 ranges for SM
-   33 IPv6 ranges for SM
-   58 IPv4 ranges for SN
-   32 IPv6 ranges for SN
-   38 IPv4 ranges for SO
-   38 IPv6 ranges for SO
-   15 IPv4 ranges for SR
-   29 IPv6 ranges for SR
-   39 IPv4 ranges for SS
-   30 IPv6 ranges for SS
-    8 IPv4 ranges for ST
-   27 IPv6 ranges for ST
-  145 IPv4 ranges for SV
-   73 IPv6 ranges for SV
-   14 IPv4 ranges for SX
-   23 IPv6 ranges for SX
-  196 IPv4 ranges for SY
-   50 IPv6 ranges for SY
-   30 IPv4 ranges for SZ
-   27 IPv6 ranges for SZ
-   17 IPv4 ranges for TC
-   19 IPv6 ranges for TC
-   25 IPv4 ranges for TD
-   28 IPv6 ranges for TD
-    1 IPv4 ranges for TF
-    2 IPv6 ranges for TF
-   25 IPv4 ranges for TG
-   28 IPv6 ranges for TG
-  930 IPv4 ranges for TH
-  264 IPv6 ranges for TH
-   47 IPv4 ranges for TJ
-   35 IPv6 ranges for TJ
-    7 IPv4 ranges for TK
-   21 IPv6 ranges for TK
-   23 IPv4 ranges for TL
-   31 IPv6 ranges for TL
-   20 IPv4 ranges for TM
-   26 IPv6 ranges for TM
-   73 IPv4 ranges for TN
-   28 IPv6 ranges for TN
-   14 IPv4 ranges for TO
-   28 IPv6 ranges for TO
- 2291 IPv4 ranges for TR
-19375 IPv6 ranges for TR
-  110 IPv4 ranges for TT
-   41 IPv6 ranges for TT
-    4 IPv4 ranges for TV
-   26 IPv6 ranges for TV
- 1311 IPv4 ranges for TW
-  536 IPv6 ranges for TW
-  208 IPv4 ranges for TZ
-   82 IPv6 ranges for TZ
- 3226 IPv4 ranges for UA
-  781 IPv6 ranges for UA
-  149 IPv4 ranges for UG
-   60 IPv6 ranges for UG
-    0 IPv4 ranges for UM
-   19 IPv6 ranges for UM
-65525 IPv4 ranges for US
-22447 IPv6 ranges for US
-  131 IPv4 ranges for UY
-   48 IPv6 ranges for UY
-  201 IPv4 ranges for UZ
-   57 IPv6 ranges for UZ
-   19 IPv4 ranges for VA
-   35 IPv6 ranges for VA
-   32 IPv4 ranges for VC
-   33 IPv6 ranges for VC
-  358 IPv4 ranges for VE
-  159 IPv6 ranges for VE
-  110 IPv4 ranges for VG
-   36 IPv6 ranges for VG
-   53 IPv4 ranges for VI
-   31 IPv6 ranges for VI
-  768 IPv4 ranges for VN
-  420 IPv6 ranges for VN
-   30 IPv4 ranges for VU
-   38 IPv6 ranges for VU
-    5 IPv4 ranges for WF
-   17 IPv6 ranges for WF
-   20 IPv4 ranges for WS
-   32 IPv6 ranges for WS
-  108 IPv4 ranges for XK
-   14 IPv6 ranges for XK
-   37 IPv4 ranges for YE
-   31 IPv6 ranges for YE
-   26 IPv4 ranges for YT
-   13 IPv6 ranges for YT
- 2799 IPv4 ranges for ZA
-  581 IPv6 ranges for ZA
-   89 IPv4 ranges for ZM
-   39 IPv6 ranges for ZM
-  119 IPv4 ranges for ZW
-  401 IPv6 ranges for ZW
-   14 IPv4 ranges for ZZ
-    3 IPv6 ranges for ZZ
