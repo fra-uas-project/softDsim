@@ -19,6 +19,7 @@ from app.models.simulation_fragment import SimulationFragment
 from app.models.action import Action
 from app.models.model_selection import ModelSelection
 from app.models.score_card import ScoreCard
+from app.models.management_goal import ManagementGoal
 
 
 class TemplateScenarioView(APIView):
@@ -152,7 +153,6 @@ class TemplateScenarioFromStudioView(APIView):
                 "MODELSELECTION": handle_model,
                 "EVENT": handle_event,
             }
-            print(request.data)
             i = 0
             for component in request.data:
                 try:
@@ -169,6 +169,16 @@ class TemplateScenarioFromStudioView(APIView):
 
             scenario.save()
             logging.info("Template scenario created with id: " + str(scenario.id))
+
+            # Create Scorecard
+            scorecard = ScoreCard(template_scenario=scenario)
+            scorecard.save()  # TODO: this should be set by the creator in studio
+
+            return Response(
+                dict(status="success", data={"id": scenario.id}),
+                status=status.HTTP_200_OK,
+            )
+
         except Exception as e:
             msg = f"{e.__class__.__name__} occured while creating template scenario from studio"
             logging.error(msg)
@@ -177,18 +187,22 @@ class TemplateScenarioFromStudioView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        # Create Scorecard
-        scorecard = ScoreCard(template_scenario=scenario)
-        scorecard.save()  # TODO: this should be set by the creator in studio
-
-        return Response(
-            dict(status="success", data={"id": scenario.id}), status=status.HTTP_200_OK,
-        )
-
 
 def handle_base(data, scenario: TemplateScenario, i):
     scenario.name = data.get("template_name")
     scenario.story = data.get("text")
+    # Create Management Goal
+    mgoal = ManagementGoal(
+        budget=data.get("budget"),
+        duration=data.get("duration"),
+        easy_tasks=int(data.get("easy_tasks")),
+        medium_tasks=int(data.get("medium_tasks")),
+        hard_tasks=int(data.get("hard_tasks")),
+        tasks_predecessor_p=0.3,  # TODO: this should be set by the creator in studio
+        template_scenario=scenario,
+    )
+
+    mgoal.save()
     return i
 
 
