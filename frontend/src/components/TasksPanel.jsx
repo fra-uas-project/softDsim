@@ -7,14 +7,10 @@ import {
 Box,Stat,Text, Heading, } from "@chakra-ui/react"
 import React, { useState } from "react";
 
-const TasksPanel = () => {
+const TasksPanel = (props) => {
 
-    const [testValues, setTestValues] = useState(
-        {
-            text: "Tasks Overview"
-        }
-    )
-
+   
+    console.log('tasks',props)
     return (
         <>
             <Text size='lg' fontWeight='bold' mb='2' color='black'>
@@ -22,7 +18,7 @@ const TasksPanel = () => {
             <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Todo</StatLabel>
-            <StatNumber>426</StatNumber> 
+            <StatNumber>{props.simTasks.tasks_todo}</StatNumber> 
             {/* set api calls here*/}
             
             <StatHelpText>
@@ -34,7 +30,7 @@ const TasksPanel = () => {
             <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Done</StatLabel>
-            <StatNumber>189</StatNumber>
+            <StatNumber>{props.simTasks.task_done}</StatNumber>
             
             <StatHelpText>
              <StatArrow type='increase' />
@@ -45,7 +41,7 @@ const TasksPanel = () => {
             <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Unittested</StatLabel>
-            <StatNumber>42</StatNumber>
+            <StatNumber>{props.simTasks.tasks_unit_tested}</StatNumber>
             
             <StatHelpText>
              <StatArrow type='increase' />
@@ -57,7 +53,7 @@ const TasksPanel = () => {
             <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Integrationtested</StatLabel>
-            <StatNumber>42</StatNumber>
+            <StatNumber>{props.simTasks.tasks_integration_tested}</StatNumber>
             
             <StatHelpText>
              <StatArrow type='increase' />
@@ -69,7 +65,7 @@ const TasksPanel = () => {
             <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
             <Stat>
             <StatLabel>Bug</StatLabel>
-            <StatNumber>42</StatNumber>
+            <StatNumber>{props.simTasks.tasks_bug}</StatNumber>
             
             <StatHelpText>
              <StatArrow type='increase' />
