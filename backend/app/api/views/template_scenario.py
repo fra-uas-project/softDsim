@@ -18,6 +18,7 @@ from app.models.simulation_end import SimulationEnd
 from app.models.simulation_fragment import SimulationFragment
 from app.models.action import Action
 from app.models.model_selection import ModelSelection
+from app.models.score_card import ScoreCard
 
 
 class TemplateScenarioView(APIView):
@@ -61,8 +62,7 @@ class TemplateScenarioView(APIView):
                     serializer.save()
                 except IndexException as e:
                     return Response(
-                        {"message": str(e)},
-                        status=status.HTTP_400_BAD_REQUEST,
+                        {"message": str(e)}, status=status.HTTP_400_BAD_REQUEST,
                     )
 
                 return Response(
@@ -140,13 +140,14 @@ class TemplateScenarioFromStudioView(APIView):
 
     @allowed_roles(["all"])
     def post(self, request):
+        logging.info("Creating template scenario from studio")
         scenario = TemplateScenario()
         scenario.save()
 
         caller = {
             "BASE": handle_base,
             "QUESTIONS": handle_question,
-            "SIMULATION": handle_simulation,
+            "FRAGMENT": handle_simulation,
             "MODELSELECTION": handle_model,
             "EVENT": handle_event,
             # "not-found": raise AttributeError
@@ -157,6 +158,15 @@ class TemplateScenarioFromStudioView(APIView):
             i = caller[component.get("type", "not-found")](component, scenario, i)
 
         scenario.save()
+        logging.info("Template scenario created with id: " + str(scenario.id))
+
+        # Create Scorecard
+        scorecard = ScoreCard(template_scenario=scenario)
+        scorecard.save()  # TODO: this should be set by the creator in studio
+
+        return Response(
+            dict(status="success", data={"id": scenario.id}), status=status.HTTP_200_OK,
+        )
 
 
 def handle_base(data, scenario: TemplateScenario, i):
@@ -192,7 +202,33 @@ def handle_question(data, scenario: TemplateScenario, i):
 
 
 def handle_simulation(data, scenario: TemplateScenario, i):
-    pass
+    # Initialize Fragment
+    simfragment = SimulationFragment(
+        index=i, text=data.get("text"), template_scenario=scenario
+    )
+    simfragment.save()
+
+    # Create Simulation End
+    simend_data = data.get("simulation_end")
+    simend = SimulationEnd(
+        limit=simend_data.get("limit"),
+        type=simend_data.get("type"),
+        limit_type=simend_data.get("limit_type"),
+        simulation_fragment=simfragment,
+    )
+    simend.save()
+
+    # Create Actions
+    for action_data in data.get("actions"):
+        action = Action(
+            title=action_data.get("action"),
+            lower_limit=action_data.get("lower_limit"),
+            upper_limit=action_data.get("upper_limit"),
+            simulation_fragment=simfragment,
+        )
+        action.save()
+
+    return i + 1
 
 
 def handle_model(data, scenario: TemplateScenario, i):
@@ -204,9 +240,17 @@ def handle_model(data, scenario: TemplateScenario, i):
         scrum="scrum" in data.get("models"),
         template_scenario=scenario,
     )
+
+    if not m.waterfall and not m.kanban and not m.scrum:
+        # If no model is selected, select all models
+        m.waterfall = True
+        m.scrum = True
+        m.kanban = True
+
     m.save()
     return i + 1
 
 
 def handle_event(data, scenario: TemplateScenario, i):
-    pass
+    # Events are not yet implemented
+    return i
