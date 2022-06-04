@@ -55,9 +55,14 @@ def simulate(req, scenario):
     if not req.members:
         raise RequestMembersException()
 
-    wp = req.actions
+    workpack = req.actions
     # Gather information of what to do
-    days = wp.days
+    days = workpack.days
+
+    # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
+    ## scenario.team.work(workpack) (ein tag simuliert)
+
+    # team.team_event()
 
     member_change = req.members
     for m in member_change:
