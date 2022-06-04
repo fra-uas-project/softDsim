@@ -61,7 +61,9 @@ https://grafana.com/docs/grafana/latest/administration/configure-docker/
 |deployadm|Docker, Operations|
 |deploydata|copy Data|
 |kompsim|complexy Team User|
-|connect|restricted connect User|
+|connect|restricted connect User (chsh -s /bin/rbash)|
+
+https://stackoverflow.com/questions/21498667/how-to-limit-user-commands-in-linux
 ## cronjobs
 ### deployadm
 ```bash
