@@ -64,6 +64,11 @@ const Simulation = () => {
 
     // test values for simulation
     const [simValues, setSimValues] = useState({})
+    const [simTasks, setSimTasks] = useState({tasks_todo: 0,
+        task_done: 0,
+        tasks_unit_tested: 0,
+        tasks_integration_tested: 0,
+        tasks_bug: 0})
 
     const [returnValues, setReturnValues] = useState()
 
@@ -131,6 +136,8 @@ const Simulation = () => {
             } else if (nextData.type === 'MODEL') {
                 setSimValues(nextData.models)
             }
+            // set taskValues
+            setSimTasks(nextData.tasks)
 
             // setSimValues(scenario.data.id)
         } catch (err) {
@@ -192,7 +199,7 @@ const Simulation = () => {
                                     fontWeight='bold'
                                     color='white'
                                 >
-                                    <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='white'><TasksPanel /></GridItem>
+                                    <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='white' ><TasksPanel simTasks={simTasks}/></GridItem>
                                     <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><ProgressPanel /></GridItem>
                                     <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><MilestonesPanel /></GridItem>
                                     <GridItem colSpan={6} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><EmployeesPanel /></GridItem>
