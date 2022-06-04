@@ -30,17 +30,35 @@ https://github.com/docker/compose -> manually (version 2.4.1) -> add to PATH (in
 ├── modules-available
 ├── modules-enabled
 ├── nginx.conf
+├── nginxconfig.io
 ├── proxy_params
 ├── scgi_params
 ├── sites-available
-│   └── default
 ├── sites-enabled
-│   └── default -> /etc/nginx/sites-available/default
 ├── snippets
-│   ├── fastcgi-php.conf
-│   └── snakeoil.conf
 ├── uwsgi_params
 └── win-utf
+
+7 directories, 10 files
+deployadm@fb2-sim-pm:/deploydata/operations/nginx$ tree -L 2
+.
+├── conf.d
+├── backup
+├── conf.d
+├── mime.types
+├── modules-available
+├── modules-enabled
+├── nginx.conf
+├── nginxconfig.io
+│   ├── general.conf
+│   ├── proxy.conf
+│   └── security.conf
+├── sites-available
+│   ├── default
+│   └── uas.bspace.xyz.conf
+└── sites-enabled
+    ├── default -> /etc/nginx/sites-available/default
+    └── uas.bspace.xyz.conf -> ../sites-available/uas.bspace.xyz.conf
 
 ```
 ## Docker
