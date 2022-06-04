@@ -56,15 +56,22 @@ const Simulation = () => {
         return newUrl;
     }
 
+    // current simulation play id
     const [currentSimID, setCurrentSimID] = useState()
 
+    // current simulation type (eg. model, question, segment, event)
     const [currentType, setCurrentType] = useState()
 
+    // validation status of user selected data
     const [dataValidationStatus, setDataValidationStatus] = useState(false)
 
-    // test values for simulation
+    // values for simulation
     const [simValues, setSimValues] = useState({})
 
+    // contains all values from next endpoint
+    const [scenarioValues, setScenarioValues] = useState({})
+
+    // contains the values that should be sent to the next endpoint
     const [returnValues, setReturnValues] = useState()
 
     async function handleSelection(event) {
@@ -75,8 +82,15 @@ const Simulation = () => {
                 model: event
             })
             setDataValidationStatus(true)
-        } else if (currentType === 'question_collections') {
-
+        } else if (currentType === 'QUESTION') {
+            await setReturnValues({
+                scenario_id: currentSimID,
+                type: currentType,
+                id: scenarioValues.id,
+                question_index: scenarioValues.question_index,
+                answers: []
+            })
+            setDataValidationStatus(true)
         }
     }
 
@@ -132,7 +146,8 @@ const Simulation = () => {
                 setSimValues(nextData.models)
             }
 
-            // setSimValues(scenario.data.id)
+            // set overall scenario values
+            setScenarioValues(nextData)
         } catch (err) {
             console.log(err)
         }
