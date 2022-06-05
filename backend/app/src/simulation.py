@@ -71,7 +71,9 @@ def simulate(req, scenario):
                 new_member = Member(skill_type=s, team=scenario.team)
                 new_member.save()
         else:
-            list_of_members = Member.objects.filter(team=scenario.team, skill_type=s)
+            list_of_members = Member.objects.filter(
+                team_id=scenario.team.instance.id, skill_type=s
+            )
             try:
                 for i in range(abs(m.change)):
                     m_to_delete: Member = list_of_members[0]
@@ -161,7 +163,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             actions=get_actions_from_fragment(next_component),
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
-            members=get_member_report(scenario.team.id),
+            members=get_member_report(scenario.team.instance.id),
         )
     # 5.2 Check if next component is a Question Component
     elif isinstance(next_component, QuestionCollection):

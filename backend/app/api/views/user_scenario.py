@@ -13,7 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from app.models.user_scenario import ScenarioState, UserScenario
 from app.models.scenario import ScenarioConfig
-from app.models.team import Team
 from custom_user.models import User
 
 
@@ -53,7 +52,8 @@ class UserScenarioViews(APIView):
             logging.error("Could not create user scenario. Attributes missing")
             logging.debug(errors)
             return Response(
-                {"status": "error", "data": errors}, status=status.HTTP_400_BAD_REQUEST,
+                {"status": "error", "data": errors},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         if serializer.is_valid():
             obj = serializer.save()
@@ -116,7 +116,8 @@ class UserScenarioViews(APIView):
                 errors["team"] = f"No team with id {team} does exist in Database."
         if errors:
             return Response(
-                {"status": "error", "data": errors}, status=status.HTTP_400_BAD_REQUEST,
+                {"status": "error", "data": errors},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         serializer = UserScenarioSerializer(item, data=request.data, partial=True)
         if serializer.is_valid():

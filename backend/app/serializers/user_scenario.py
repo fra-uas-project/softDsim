@@ -15,7 +15,7 @@ class ScenarioStateSerializer(serializers.ModelSerializer):
 
 class UserScenarioSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    team = TeamSerializer(read_only=True)
+    team = TeamSerializer(many=True)
     config = ScenarioConfigSerializer(read_only=True)
     template = TemplateScenarioSerializer(read_only=True)
     state = ScenarioStateSerializer()

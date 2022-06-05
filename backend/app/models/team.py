@@ -1,9 +1,19 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+# from app.models.task import TaskStatus
+from app.models.user_scenario import UserScenario
+
 
 class Team(models.Model):
     name = models.CharField(max_length=32, default="team")
+    user_scenario = models.ForeignKey(
+        UserScenario,
+        related_name="team",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     # def meeting(workpack)
     # for m in self.members:
@@ -14,11 +24,9 @@ class Team(models.Model):
     def meeting(self, workpack, scenario):
         for member in self.members.values():
             tasks_in_meeting = scenario.config.done_tasks_per_meeting
-            total_tasks_done = None
-            tasks = scenario.tasks.values()
+            # total_tasks_done = scenario.tasks.values().objects.filter(done=True)
             member.familiar_tasks = min(member.familiar_tasks + tasks_in_meeting, 5)
-            print(tasks_in_meeting)
-            pass
+            print(member.familiar_tasks)
             # increase familiarity of m
 
     # ein tag

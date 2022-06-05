@@ -64,18 +64,20 @@ class StartUserScenarioView(APIView):
             )
 
         try:
-            team = Team()
-            team.save()
             state = ScenarioState()
             state.save()
             user_scenario = UserScenario(
                 user=request.user,
                 template=template,
                 config=config,
-                team=team,
                 state=state,
             )
             user_scenario.save()
+
+            # Create team with FK to user_scenario
+            team = Team(user_scenario=user_scenario)
+            team.save()
+
             serializer = UserScenarioSerializer(user_scenario)
             # create tasks
             tasks = [  # easy
@@ -92,6 +94,7 @@ class StartUserScenarioView(APIView):
             ]
             # Add all tasks to database in a single insert
             Task.objects.bulk_create(tasks)
+
         except Exception as e:
             msg = f"'{e.__class__.__name__}' occurred when creating user scenario"
             logging.error(msg)
@@ -194,7 +197,8 @@ class AdjustMemberView(APIView):
                 msg = f"Member with id {id} deleted."
                 logging.info(msg)
                 return Response(
-                    data={"status": "success", "data": msg}, status=status.HTTP_200_OK,
+                    data={"status": "success", "data": msg},
+                    status=status.HTTP_200_OK,
                 )
             else:
                 msg = f"Member {id} does not belong to a team in user-scenario {scenario.id}"

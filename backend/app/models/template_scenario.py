@@ -19,5 +19,5 @@ class TemplateScenario(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField(default="default_scenario_name")
     story = models.TextField(default="", max_length=65536)
-    # questions: List[Questions] -> ForeignKey Reference in Questions Model
+    # question_collections: List[QuestionCollection] -> ForeignKey Reference in QuestionCollection Model
     # simulation = Simulation -> ForeignKey Reference in Simulation Model
