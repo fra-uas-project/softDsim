@@ -45,14 +45,14 @@ def find_next_scenario_component(scenario: UserScenario):
             user_scenario=scenario,
             total_score=200,  # todo: get total score
             total_steps=scenario.state.step_counter,
-            total_days=scenario.state.days,
+            total_days=scenario.state.day,
             total_cost=scenario.state.cost,
             **get_tasks_status_detailed(scenario_id=scenario.id),
             quality_score=100,  # todo: get quality score
             time_score=50,  # todo: get time score
             budget_score=25,  # todo: get budget score
             question_score=25,  # todo: get question score
-            model=scenario.model,
+            model=scenario.model or "",
         )
     return ResultResponse(
         state=get_scenario_state_dto(scenario),
@@ -63,8 +63,8 @@ def find_next_scenario_component(scenario: UserScenario):
         question_score=result.question_score,
         budget_score=result.budget_score,
         time_score=result.time_score,
-        tasks_accepted=TaskStatus.accepted(scenario_id=scenario.id),
-        tasks_rejected=TaskStatus.rejected(scenario_id=scenario.id),
+        tasks_accepted=TaskStatus.accepted(scenario_id=scenario.id).count(),
+        tasks_rejected=TaskStatus.rejected(scenario_id=scenario.id).count(),
         total_days=result.total_days,
         total_cost=result.total_cost,
     )
