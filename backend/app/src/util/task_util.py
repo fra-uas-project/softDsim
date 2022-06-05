@@ -29,3 +29,11 @@ def get_tasks_status_detailed(scenario_id: int) -> Dict[str, int]:
             scenario_id
         ).count(),
     }
+
+
+def get_tasks_customer_view(scenario_id: int) -> Dict[str, int]:
+    """Returns json representation of a scenarios tasks status, as seen from customer"""
+    return {
+        "tasks_accepted": TaskStatus.accepted(scenario_id).count(),
+        "tasks_rejected": TaskStatus.rejected(scenario_id).count(),
+    }

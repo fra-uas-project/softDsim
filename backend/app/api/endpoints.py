@@ -8,7 +8,6 @@ from app.api.views.question import QuestionView
 from app.api.views.management_goal import ManagementGoalView
 from app.api.security.security import (
     LoginView,
-    GetCSRFToken,
     LogoutView,
     CheckAuthenticatedView,
     RegisterView,
@@ -28,14 +27,13 @@ from app.api.views.simulation import (
     NextStepView,
 )
 
-from history.view import HistoryView
+from history.view import HistoryView, ResultView
 
 
 urlpatterns = [
     # User stuff
     path("login", LoginView.as_view(), name="login"),
     path("logout", LogoutView.as_view(), name="logout"),
-    path("csrf-cookie", GetCSRFToken.as_view(), name="csrf-cookie"),
     path("authenticated", CheckAuthenticatedView.as_view(), name="authenticated"),
     path("register", RegisterView.as_view(), name="register"),
     path("user", UserView.as_view()),
@@ -77,4 +75,5 @@ urlpatterns = [
     # HISTORY Endpoints
     path("history", HistoryView.as_view()),
     path("history/<int:id>", HistoryView.as_view()),
+    path("result/<int:id>", ResultView.as_view()),
 ]

@@ -51,8 +51,7 @@ class TaskStatus:
     def integration_tested(scenario_id) -> QuerySet:
         """Returns all tasks that are successfully integration tested."""
         return Task.objects.filter(
-            user_scenario_id=scenario_id,
-            integration_tested=True,
+            user_scenario_id=scenario_id, integration_tested=True,
         )
 
     def bug(scenario_id) -> QuerySet:
@@ -72,3 +71,19 @@ class TaskStatus:
         return Task.objects.filter(
             user_scenario_id=scenario_id, done=True, correct_specification=False
         )
+
+    def accepted(scenario_id) -> QuerySet:
+        """Returns all tasks that are accepted by customer."""
+        return Task.objects.filter(
+            user_scenario_id=scenario_id,
+            done=True,
+            bug=False,
+            correct_specification=True,
+        )
+
+    def rejected(scenario_id) -> QuerySet:
+        """Returns all tasks that are rejected by customer."""
+        all = Task.objects.filter(user_scenario_id=scenario_id)
+        acc = TaskStatus.accepted(scenario_id)
+        rej = all.exclude(id__in=acc)
+        return rej
