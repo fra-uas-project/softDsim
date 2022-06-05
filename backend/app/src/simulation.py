@@ -32,11 +32,11 @@ from app.src.util.task_util import get_tasks_status
 from app.src.util.member_util import get_member_report
 from app.src.util.user_scenario_util import (
     get_scenario_state_dto,
-    find_next_scenario_component,
-    end_of_fragment,
     increase_scenario_component_counter,
     increase_scenario_step_counter,
 )
+
+from app.src.util.simulation_util import end_of_fragment, find_next_scenario_component
 from app.models.team import SkillType
 from app.models.team import Member
 

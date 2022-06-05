@@ -89,7 +89,15 @@ class ModelResponse(ScenarioResponse):
 
 class ResultResponse(ScenarioResponse):
     type: str = "RESULT"
-    # ToDo: Add result stats (Issue #237)
+    total_score: int
+    question_score: int
+    quality_score: int
+    budget_score: int
+    time_score: int
+    tasks_accepted: int
+    tasks_rejected: int
+    total_days: int
+    total_cost: int
 
 
 class ModelSelectionResponse(ScenarioResponse):
