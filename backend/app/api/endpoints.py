@@ -8,7 +8,6 @@ from app.api.views.question import QuestionView
 from app.api.views.management_goal import ManagementGoalView
 from app.api.security.security import (
     LoginView,
-    GetCSRFToken,
     LogoutView,
     CheckAuthenticatedView,
     RegisterView,
@@ -35,7 +34,6 @@ urlpatterns = [
     # User stuff
     path("login", LoginView.as_view(), name="login"),
     path("logout", LogoutView.as_view(), name="logout"),
-    path("csrf-cookie", GetCSRFToken.as_view(), name="csrf-cookie"),
     path("authenticated", CheckAuthenticatedView.as_view(), name="authenticated"),
     path("register", RegisterView.as_view(), name="register"),
     path("user", UserView.as_view()),
