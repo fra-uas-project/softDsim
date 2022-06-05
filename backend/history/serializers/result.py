@@ -15,6 +15,8 @@ class ResultSerializer(serializers.ModelSerializer):
             "total_steps",
             "total_days",
             "total_cost",
+            "tasks_accepted",
+            "tasks_rejected",
             "tasks_todo",
             "task_done",
             "tasks_unit_tested",

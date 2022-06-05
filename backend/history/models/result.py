@@ -26,6 +26,10 @@ class Result(models.Model):
     tasks_bug_undiscovered = models.PositiveIntegerField(default=0)
     tasks_done_wrong_specification = models.PositiveIntegerField(default=0)
 
+    # Tasks as seen by customer
+    tasks_accepted = models.PositiveIntegerField(default=0)
+    tasks_rejected = models.PositiveIntegerField(default=0)
+
     # Total Score for category tasks (simulation fragments)
     quality_score = models.PositiveSmallIntegerField(default=0)
 
