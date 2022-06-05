@@ -5,7 +5,28 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 class Team(models.Model):
     name = models.CharField(max_length=32, default="team")
 
-    # hier ein tag
+    # def meeting(workpack)
+    # for m in self.members:
+    # workpack.meeting -
+    # in scenario config ist definiert wie viele tasks pro meeting besprochen werden können => X
+    # m.familiar_tasks = min(total_tasks_done, m.familiar_tasks + X) => rohwert von tasks
+    # m.familiarity = proznet wert (HIER NICHT BERECHNEN, wird später automatisch berechnet
+    def meeting(self, workpack, scenario):
+        for member in self.members.values():
+            tasks_in_meeting = scenario.config.done_tasks_per_meeting
+            total_tasks_done = None
+            tasks = scenario.tasks.values()
+            member.familiar_tasks = min(member.familiar_tasks + tasks_in_meeting, 5)
+            print(tasks_in_meeting)
+            pass
+            # increase familiarity of m
+
+    # ein tag
+    def work(self, workpack, scenario):
+
+        self.meeting(workpack, scenario)
+
+        pass
 
     # def work(workpack)
     ## 1. meeting
@@ -61,13 +82,14 @@ class Member(models.Model):
     motivation = models.FloatField(
         default=0.75, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
+    familiar_tasks = models.PositiveIntegerField(default=0)
     familiarity = models.FloatField(
         default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
     stress = models.FloatField(
         default=0.1, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="member")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="members")
     skill_type = models.ForeignKey(
         SkillType,
         on_delete=models.CASCADE,
