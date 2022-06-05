@@ -1,7 +1,5 @@
 import logging
 
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework import status
@@ -17,7 +15,6 @@ from history.models.history import History
 from history.serializers.result import ResultSerializer
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class HistoryView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -64,7 +61,6 @@ class HistoryView(APIView):
             )
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class ResultView(APIView):
     permission_classes = (IsAuthenticated,)
 

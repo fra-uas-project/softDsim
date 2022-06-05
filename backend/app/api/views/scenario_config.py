@@ -1,5 +1,3 @@
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -12,7 +10,6 @@ from app.serializers.scenario_config import ScenarioConfig, ScenarioConfigSerial
 from app.models.scenario import ScenarioConfig
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class ScenarioConfigView(APIView):
     permission_classes = (IsAuthenticated,)
 

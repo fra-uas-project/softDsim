@@ -1,13 +1,10 @@
 import logging
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
+
 from rest_framework import status
-from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from app.decorators.decorators import allowed_roles
-from app.dto.request import Workpack, QuestionRequest, ModelRequest
 from app.exceptions import (
     SimulationException,
     RequestTypeException,
@@ -41,7 +38,6 @@ from rest_framework.views import APIView
 from app.src.util.scenario_util import create_correct_request_model
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class StartUserScenarioView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -111,7 +107,6 @@ class StartUserScenarioView(APIView):
         )
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class NextStepView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -154,7 +149,6 @@ class NextStepView(APIView):
             )
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class AdjustMemberView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -200,8 +194,7 @@ class AdjustMemberView(APIView):
                 msg = f"Member with id {id} deleted."
                 logging.info(msg)
                 return Response(
-                    data={"status": "success", "data": msg},
-                    status=status.HTTP_200_OK,
+                    data={"status": "success", "data": msg}, status=status.HTTP_200_OK,
                 )
             else:
                 msg = f"Member {id} does not belong to a team in user-scenario {scenario.id}"
