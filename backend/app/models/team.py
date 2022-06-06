@@ -1,9 +1,18 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from app.models.user_scenario import UserScenario
+
 
 class Team(models.Model):
     name = models.CharField(max_length=32, default="team")
+    user_scenario = models.OneToOneField(
+        UserScenario,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="team",
+    )
 
     # def meeting(workpack)
     # for m in self.members:
