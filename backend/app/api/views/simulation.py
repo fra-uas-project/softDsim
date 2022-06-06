@@ -64,18 +64,15 @@ class StartUserScenarioView(APIView):
             )
 
         try:
-            team = Team()
-            team.save()
+
             state = ScenarioState()
             state.save()
             user_scenario = UserScenario(
-                user=request.user,
-                template=template,
-                config=config,
-                team=team,
-                state=state,
+                user=request.user, template=template, config=config, state=state,
             )
             user_scenario.save()
+            team = Team(user_scenario=user_scenario)
+            team.save()
             serializer = UserScenarioSerializer(user_scenario)
             # create tasks
             tasks = [  # easy
