@@ -111,7 +111,7 @@ const Simulation = () => {
         setDataValidationStatus(false)
         var nextValues = {}
         if (returnValues === undefined) {
-            nextValues = { "scenario_id": simID, "type": "MODEL" }
+            nextValues = { "scenario_id": simID, "type": "START" }
         } else {
             nextValues = returnValues
         }
