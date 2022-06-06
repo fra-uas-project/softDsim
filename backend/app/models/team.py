@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from app.models.task import TaskStatus
 from app.models.user_scenario import UserScenario
 
 
@@ -14,28 +15,25 @@ class Team(models.Model):
         related_name="team",
     )
 
-    # def meeting(workpack)
-    # for m in self.members:
-    # workpack.meeting -
-    # in scenario config ist definiert wie viele tasks pro meeting besprochen werden können => X
-    # m.familiar_tasks = min(total_tasks_done, m.familiar_tasks + X) => rohwert von tasks
-    # m.familiarity = proznet wert (HIER NICHT BERECHNEN, wird später automatisch berechnet
-    def meeting(self, workpack, scenario):
-        for member in self.members.values():
+    # increases familiarity with the project for each member
+    def meeting(self, scenario, members):
+        solved_tasks = TaskStatus.solved(scenario.id)
+        for member in members:
             tasks_in_meeting = scenario.config.done_tasks_per_meeting
-            total_tasks_done = None
-            tasks = scenario.tasks.values()
-            member.familiar_tasks = min(member.familiar_tasks + tasks_in_meeting, 5)
-            print(tasks_in_meeting)
-            pass
-            # increase familiarity of m
+
+            member.familiar_tasks = min(
+                member.familiar_tasks + tasks_in_meeting, len(solved_tasks)
+            )
+            # increase familiarity of member
+            member.calculate_familiarity(len(solved_tasks))
+        # save members
+        # todo: wir können überlegen ob man member auch in der work methode in einem bulk update mit anderen Sachen speichern kann
+        Member.objects.bulk_update(members, fields=["familiar_tasks", "familiarity"])
 
     # ein tag
     def work(self, workpack, scenario):
-
-        self.meeting(workpack, scenario)
-
-        pass
+        members = Member.objects.filter(team_id=scenario.team.id)
+        self.meeting(scenario, members)
 
     # def work(workpack)
     ## 1. meeting
@@ -109,3 +107,6 @@ class Member(models.Model):
 
     def __str__(self):
         return f"{self.skill_type.name} Member"
+
+    def calculate_familiarity(self, solved_tasks):
+        self.familiarity = self.familiar_tasks / solved_tasks
