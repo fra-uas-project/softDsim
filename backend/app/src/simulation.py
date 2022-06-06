@@ -56,13 +56,7 @@ def simulate(req, scenario):
         raise RequestMembersException()
 
     workpack = req.actions
-    # Gather information of what to do
     days = workpack.days
-
-    # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
-    ## scenario.team.work(workpack) (ein tag simuliert)
-
-    # team.team_event()
 
     member_change = req.members
     for m in member_change:
@@ -97,6 +91,18 @@ def simulate(req, scenario):
 
     # write updates to database
     Task.objects.bulk_update(done_tasks, fields=["done"])
+
+    # new
+
+    # team event
+    if req.actions.teamevent:
+        days = days - 1
+        # do some team even logic here
+
+    # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
+    ## scenario.team.work(workpack) (ein tag simuliert)
+    for day in range(0, days):
+        scenario.team.work(workpack, scenario)
 
 
 def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
