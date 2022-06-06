@@ -20,7 +20,7 @@ class Configuration(BaseSettings):
     database_port: Optional[str]
     database_user: str
     database_pass: str
-    cloud_db: Optional[bool]
+    server: Optional[int] = 0
     logging_level: Optional[str] = "INFO"
 
     @property

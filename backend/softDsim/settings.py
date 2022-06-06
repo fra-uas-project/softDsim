@@ -183,9 +183,23 @@ REST_FRAMEWORK = {
 }
 logging.config.dictConfig(LOGGING)
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "https://uas.bspace.xyz",
+#     "https://pp.uas.bspace.xyz",
+#     "https://dev.uas.bspace.xyz"
+#     ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
+
+
+if configuration.server:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SAMESITE = 'None'
 
 # Needed for post requests
 
