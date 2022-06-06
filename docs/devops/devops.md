@@ -16,7 +16,16 @@ certbot renew \
 sudo apt-get update && apt-get upgrade -y
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io curl iptables-persistent rsync git nginx certbot
 ```
-https://github.com/docker/compose -> manually (version 2.4.1) -> add to PATH (in section User)
+https://github.com/docker/compose -> manually (version 2.4.1) -> add to PATH
+include Userbased e.g.: in ".profile"
+```bash
+...
+export BASE_DIR_OPS="***"
+if [ -d "$BASE_DIR_OPS/bin" ] ; then
+    PATH="$BASE_DIR_OPS/bin:$PATH"
+fi
+...
+```
 
 ## nginx
 [nginx-digital ocean](https://www.digitalocean.com/community/tools/nginx?domains.0.php.php=false&domains.0.reverseProxy.reverseProxy=true&domains.0.routing.root=false&global.app.lang=de)
@@ -154,6 +163,9 @@ https://unix.stackexchange.com/questions/385109/can-you-list-iptables-as-a-non-r
 https://www.digitalocean.com/community/tutorials/docker-explained-how-to-containerize-python-web-applications
 
 # Ideen
+
+### Versioning
+https://github.com/marketplace/actions/git-semantic-version
 ### Testing
 - https://fakerjs.dev/guide/
 - [Gatling](https://gatling.io/open-source/)
