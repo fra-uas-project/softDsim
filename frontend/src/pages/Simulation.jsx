@@ -56,32 +56,47 @@ const Simulation = () => {
         return newUrl;
     }
 
+    // current simulation play id
     const [currentSimID, setCurrentSimID] = useState()
 
+    // current simulation type (eg. model, question, segment, event)
     const [currentType, setCurrentType] = useState()
 
+    // validation status of user selected data
     const [dataValidationStatus, setDataValidationStatus] = useState(false)
 
-    // test values for simulation
+    // values for simulation
     const [simValues, setSimValues] = useState({})
-    const [simTasks, setSimTasks] = useState({tasks_todo: 0,
+    const [simTasks, setSimTasks] = useState({
+        tasks_todo: 0,
         task_done: 0,
         tasks_unit_tested: 0,
         tasks_integration_tested: 0,
-        tasks_bug: 0})
+        tasks_bug: 0
+    })
 
+    // contains all values from next endpoint
+    const [scenarioValues, setScenarioValues] = useState({})
+
+    // contains the values that should be sent to the next endpoint
     const [returnValues, setReturnValues] = useState()
 
     async function handleSelection(event) {
         if (currentType === 'MODEL') {
-            await setReturnValues({
+            setReturnValues({
                 scenario_id: currentSimID,
                 type: currentType,
                 model: event
             })
             setDataValidationStatus(true)
-        } else if (currentType === 'question_collections') {
-
+        } else if (currentType === 'QUESTION') {
+            const tempReturnValues = {
+                scenario_id: currentSimID,
+                type: currentType,
+                question_collection: event
+            }
+            setReturnValues(tempReturnValues)
+            setDataValidationStatus(true)
         }
     }
 
@@ -107,7 +122,6 @@ const Simulation = () => {
     }
 
     async function handleNext(simID) {
-        console.log('next: ', simID)
         setDataValidationStatus(false)
         var nextValues = {}
         if (returnValues === undefined) {
@@ -133,13 +147,21 @@ const Simulation = () => {
             // set data
             if (nextData.type === 'QUESTION') {
                 setSimValues(nextData.question_collection)
+                setDataValidationStatus(true)
             } else if (nextData.type === 'MODEL') {
                 setSimValues(nextData.models)
+            } else if (nextData.type === 'SIMULATION') {
+                setSimValues(nextData)
+                setDataValidationStatus(true)
+            } else if (nextData.type === 'EVENT') {
+                setDataValidationStatus(true)
+                setSimValues(nextData)
             }
             // set taskValues
             setSimTasks(nextData.tasks)
 
-            // setSimValues(scenario.data.id)
+            // set overall scenario values
+            setScenarioValues(nextData)
         } catch (err) {
             console.log(err)
         }
@@ -154,6 +176,9 @@ const Simulation = () => {
         console.log('currentSimID', currentSimID)
     }, [currentSimID]);
 
+    useEffect(() => {
+        console.log('dataValidationStatus', dataValidationStatus)
+    }, [dataValidationStatus]);
 
     return (
         <>
@@ -199,7 +224,7 @@ const Simulation = () => {
                                     fontWeight='bold'
                                     color='white'
                                 >
-                                    <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='white' ><TasksPanel simTasks={simTasks}/></GridItem>
+                                    <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='white' ><TasksPanel simTasks={simTasks} /></GridItem>
                                     <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><ProgressPanel /></GridItem>
                                     <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><MilestonesPanel /></GridItem>
                                     <GridItem colSpan={6} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><EmployeesPanel /></GridItem>
@@ -238,7 +263,7 @@ const Simulation = () => {
                                     {/* Question Collection */}
                                     {currentType === 'QUESTION' ?
                                         <>
-                                            <Question onSelectModel={(event) => handleSelection(event, simValues.question_collections)}
+                                            <Question onSelect={(event) => handleSelection(event)}
                                                 question_collection={simValues}
                                             />
                                         </>
