@@ -8,23 +8,25 @@ class History(models.Model):
         UserScenario, on_delete=models.CASCADE, related_name="history"
     )
 
-    type = models.TextField(max_length=32)
+    request_type = models.TextField(max_length=32, default="", null=True)
+    response_type = models.TextField(max_length=32, default="", null=True)
 
     timestamp = models.DateTimeField(auto_now=True)
 
     # State
-    counter = models.PositiveIntegerField()
-    day = models.PositiveIntegerField()
-    cost = models.FloatField()
+    component_counter = models.PositiveIntegerField(null=True)
+    step_counter = models.PositiveIntegerField(null=True)
+    day = models.PositiveIntegerField(null=True)
+    cost = models.FloatField(null=True)
 
     # Tasks
-    tasks_todo = models.PositiveIntegerField()
-    task_done = models.PositiveIntegerField()
-    tasks_unit_tested = models.PositiveIntegerField()
-    tasks_integration_tested = models.PositiveIntegerField()
-    tasks_bug_discovered = models.PositiveIntegerField()
-    tasks_bug_undiscovered = models.PositiveIntegerField()
-    tasks_done_wrong_specification = models.PositiveIntegerField()
+    tasks_todo = models.PositiveIntegerField(null=True)
+    task_done = models.PositiveIntegerField(null=True)
+    tasks_unit_tested = models.PositiveIntegerField(null=True)
+    tasks_integration_tested = models.PositiveIntegerField(null=True)
+    tasks_bug_discovered = models.PositiveIntegerField(null=True)
+    tasks_bug_undiscovered = models.PositiveIntegerField(null=True)
+    tasks_done_wrong_specification = models.PositiveIntegerField(null=True)
 
     # Question
     question_collection = models.ForeignKey(

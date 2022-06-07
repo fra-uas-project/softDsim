@@ -1,6 +1,5 @@
 import logging
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
+
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -12,13 +11,12 @@ from app.models.template_scenario import TemplateScenario
 from app.serializers.user_scenario import UserScenarioSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
-from app.models.user_scenario import ScenarioState, UserScenario
+from app.models.user_scenario import UserScenario
 from app.models.scenario import ScenarioConfig
 from app.models.team import Team
 from custom_user.models import User
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class UserScenarioViews(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -55,8 +53,7 @@ class UserScenarioViews(APIView):
             logging.error("Could not create user scenario. Attributes missing")
             logging.debug(errors)
             return Response(
-                {"status": "error", "data": errors},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"status": "error", "data": errors}, status=status.HTTP_400_BAD_REQUEST,
             )
         if serializer.is_valid():
             obj = serializer.save()
@@ -119,8 +116,7 @@ class UserScenarioViews(APIView):
                 errors["team"] = f"No team with id {team} does exist in Database."
         if errors:
             return Response(
-                {"status": "error", "data": errors},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"status": "error", "data": errors}, status=status.HTTP_400_BAD_REQUEST,
             )
         serializer = UserScenarioSerializer(item, data=request.data, partial=True)
         if serializer.is_valid():

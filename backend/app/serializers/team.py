@@ -17,6 +17,7 @@ class MemberSerializer(serializers.ModelSerializer):
             "id",
             "xp",
             "motivation",
+            "familiar_tasks",
             "familiarity",
             "stress",
             "skill_type",
@@ -25,8 +26,8 @@ class MemberSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    member = MemberSerializer(many=True, read_only=True)
+    members = MemberSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team
-        fields = ("id", "name", "member")
+        fields = ("id", "name", "members")

@@ -65,7 +65,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -88,6 +87,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 AUTH_USER_MODEL = "custom_user.User"
 
@@ -116,15 +116,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
 
@@ -166,7 +160,7 @@ LOGGING = {
         "stdlog": {
             "()": "colorlog.ColoredFormatter",
             "format": "%(log_color)s%(levelname)-8s %(asctime)s --- "
-            "%(message)s (in %(filename)s:%(lineno)s)",
+            "%(message)s (in %(pathname)s:%(lineno)d)",
             "log_colors": {
                 "DEBUG": "cyan",
                 "INFO": "bold_green",
@@ -177,35 +171,35 @@ LOGGING = {
             "datefmt": "%d.%m %H:%M:%S",
         },
     },
-    "handlers": {
-        "console": {"class": "logging.StreamHandler", "formatter": "stdlog"},
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": configuration.logging_level,
-    },
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "stdlog"},},
+    "root": {"handlers": ["console"], "level": configuration.logging_level,},
 }
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
+        "app.api.security.authentication.CsrfExemptSessionAuthentication"
     ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated",],
 }
 logging.config.dictConfig(LOGGING)
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "https://uas.bspace.xyz",
+#     "https://pp.uas.bspace.xyz",
+#     "https://dev.uas.bspace.xyz"
+#     ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
 
+
+if configuration.server:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SAMESITE = 'None'
+
 # Needed for post requests
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "https://dev.uas.bspace.xyz",
-    "http://dev.uas.bspace.xyz",
-    "https://uas.bspace.xyz",
-    "http://uas.bspace.xyz",
-]

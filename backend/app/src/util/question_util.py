@@ -5,7 +5,8 @@ from app.serializers.question_collection import QuestionCollectionSerializer
 
 def get_question_collection(scenario):
     question_collections = QuestionCollection.objects.get(
-        template_scenario_id=scenario.template_id, index=scenario.state.counter
+        template_scenario_id=scenario.template_id,
+        index=scenario.state.component_counter,
     )
     serializer = QuestionCollectionSerializer(question_collections)
 
