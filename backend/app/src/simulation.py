@@ -4,6 +4,7 @@ from typing import List
 from rest_framework import status
 from rest_framework.response import Response
 
+from app.dto.request import WorkpackStatus
 from app.dto.response import (
     ModelSelectionResponse,
     SimulationResponse,
@@ -94,7 +95,6 @@ def simulate(req, scenario: UserScenario):
     Task.objects.bulk_update(done_tasks, fields=["done"])
 
     # new
-
     # team event
     if req.actions.teamevent:
         days = days - 1
@@ -102,9 +102,9 @@ def simulate(req, scenario: UserScenario):
 
     # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
     ## scenario.team.work(workpack) (ein tag simuliert)
+    workpack_status = WorkpackStatus()
     for day in range(0, days):
-        scenario.team.work(workpack, scenario)
-
+        workpack_status = scenario.team.work(workpack, scenario, workpack_status)
     # team event
     if req.actions.teamevent:
         members: List[Member] = Member.objects.filter(team_id=scenario.team.id)
