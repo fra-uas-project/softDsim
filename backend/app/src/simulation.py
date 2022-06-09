@@ -4,7 +4,7 @@ from typing import List
 from rest_framework import status
 from rest_framework.response import Response
 
-from app.dto.request import WorkpackStatus
+
 from app.dto.response import (
     ModelSelectionResponse,
     SimulationResponse,
@@ -18,6 +18,7 @@ from app.exceptions import (
     RequestActionException,
     RequestMembersException,
     RequestTypeMismatchException,
+    TooManyMeetingsException,
 )
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
@@ -38,7 +39,11 @@ from app.src.util.user_scenario_util import (
     increase_scenario_step_counter,
 )
 
-from app.src.util.simulation_util import end_of_fragment, find_next_scenario_component
+from app.src.util.simulation_util import (
+    end_of_fragment,
+    find_next_scenario_component,
+    WorkpackStatus,
+)
 from app.models.team import SkillType
 from app.models.team import Member
 
@@ -57,8 +62,16 @@ def simulate(req, scenario: UserScenario):
     if not req.members:
         raise RequestMembersException()
 
+    normal_work_hour_day: int = 8
+
     workpack = req.actions
     days = workpack.days
+
+    # you can not do more meetings than hours per day
+    if (workpack.meetings / days) > (normal_work_hour_day + workpack.overtime):
+        raise TooManyMeetingsException(
+            (workpack.meetings / days), (normal_work_hour_day + workpack.overtime)
+        )
 
     member_change = req.members
     for m in member_change:
@@ -100,11 +113,13 @@ def simulate(req, scenario: UserScenario):
         days = days - 1
         # team event will be at the end of the week
 
+    workpack_status = WorkpackStatus(days, workpack)
+
     # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
     ## scenario.team.work(workpack) (ein tag simuliert)
-    workpack_status = WorkpackStatus()
     for day in range(0, days):
-        workpack_status = scenario.team.work(workpack, scenario, workpack_status)
+        scenario.team.work(workpack, scenario, workpack_status, day)
+
     # team event
     if req.actions.teamevent:
         members: List[Member] = Member.objects.filter(team_id=scenario.team.id)

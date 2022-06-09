@@ -11,6 +11,7 @@ from app.exceptions import (
     RequestActionException,
     RequestMembersException,
     RequestTypeMismatchException,
+    TooManyMeetingsException,
 )
 from app.models.scenario import ScenarioConfig
 from django.core.exceptions import ObjectDoesNotExist
@@ -66,7 +67,9 @@ class StartUserScenarioView(APIView):
         try:
             # Craete UserScenario
             user_scenario = UserScenario(
-                user=request.user, template=template, config=config,
+                user=request.user,
+                template=template,
+                config=config,
             )
             user_scenario.save()
 
@@ -138,6 +141,7 @@ class NextStepView(APIView):
             RequestActionException,
             RequestMembersException,
             RequestTypeMismatchException,
+            TooManyMeetingsException,
         ) as e:
             return Response(
                 {"status": "error", "error-message": str(e)},
@@ -196,7 +200,8 @@ class AdjustMemberView(APIView):
                 msg = f"Member with id {id} deleted."
                 logging.info(msg)
                 return Response(
-                    data={"status": "success", "data": msg}, status=status.HTTP_200_OK,
+                    data={"status": "success", "data": msg},
+                    status=status.HTTP_200_OK,
                 )
             else:
                 msg = f"Member {id} does not belong to a team in user-scenario {scenario.id}"

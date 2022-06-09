@@ -3,7 +3,7 @@ import logging
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-from app.dto.request import WorkpackStatus
+
 from app.models.task import TaskStatus
 from app.models.user_scenario import UserScenario
 
@@ -40,28 +40,24 @@ class Team(models.Model):
         return work_hours - 1
 
     # ein tag
-    def work(self, workpack, scenario, workpack_status) -> WorkpackStatus:
+    def work(self, workpack, scenario, workpack_status, current_day):
 
         # work hours
-        work_hours = 8 + workpack.overtime
+        NORMAL_WORK_HOUR_DAY: int = 8
+        work_hours = NORMAL_WORK_HOUR_DAY + workpack.overtime
 
         members = Member.objects.filter(team_id=scenario.team.id)
 
         # 1. meeting
-        if workpack_status.meetings < workpack.meetings:
+        for _ in range(workpack_status.meetings_per_day[current_day]):
             work_hours = self.meeting(scenario, members, work_hours)
-            workpack_status.meeting_completed()
 
         # 2. training
-        if workpack_status.trainings < workpack.training:
-            work_hours = self.training(scenario, work_hours)
-            workpack_status.training_completed()
-        # work_hours = self.training()
+        for _ in range(workpack_status.trainings_per_day[current_day]):
+            work_hours = self.training(scenario, members, work_hours)
 
         # 3. task work
         # self.task_work()
-
-        return workpack_status
 
     # def work(workpack)
     ## 1. meeting (done)
