@@ -4,6 +4,10 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from app.models.task import TaskStatus
 from app.models.user_scenario import UserScenario
 
+import numpy as np
+
+import logging
+
 
 class Team(models.Model):
     name = models.CharField(max_length=32, default="team")
@@ -14,6 +18,18 @@ class Team(models.Model):
         blank=True,
         related_name="team",
     )
+
+    @property
+    def num_communication_channels(self):
+        """Returns the number of communication channels of the team."""
+        n = Member.objects.filter(team_id=self.id).count()
+        return (n * (n - 1)) / 2
+
+    @property
+    def efficiency(self):
+        """Returns the team's efficiency."""
+        c = self.num_communication_channels
+        return 1 / (1 + (c / 20 - 0.05))
 
     # increases familiarity with the project for each member
     def meeting(self, scenario, members):
@@ -108,5 +124,19 @@ class Member(models.Model):
     def __str__(self):
         return f"{self.skill_type.name} Member"
 
+    @property
+    def efficiency(self) -> float:
+        """Returns the efficiency of the member"""
+        return sum([self.familiarity, self.motivation, self.stress]) / 3
+
     def calculate_familiarity(self, solved_tasks):
         self.familiarity = self.familiar_tasks / solved_tasks
+
+    def n_tasks(self, hours) -> int:
+        """Returns the number of tasks that the member can do in the given hours"""
+        mu = (
+            hours
+            * ((self.efficiency + self.team.efficiency) / 2)
+            * (self.skill_type.throughput + self.xp)
+        )
+        return np.random.poisson(mu)
