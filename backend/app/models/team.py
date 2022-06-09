@@ -37,6 +37,15 @@ class Team(models.Model):
 
     def training(self, scenario, members, work_hours) -> int:
 
+        for member in members:
+            member.xp = member.xp * 1.1
+
+            self.xp_factor += (hours * delta * TRAIN_SKILL_INCREASE_AMOUNT) / (
+                (1 + self.xp_factor) ** 2
+            )  # Divide by xp_factor^2 to make it grow less with increasing xp factor
+            self.motivation = min(1, self.motivation + 0.1 * hours)
+            return self.xp_factor
+
         return work_hours - 1
 
     # ein tag
