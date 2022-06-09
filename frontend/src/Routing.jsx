@@ -6,6 +6,7 @@ import ScenarioOverview from "./pages/ScenarioOverview";
 import UserOverview from "./pages/UserOverview";
 import Simulation from "./pages/Simulation";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Help from "./pages/Help";
 import GDPR from "./pages/GDPR";
 import Imprint from "./pages/Imprint";
@@ -64,6 +65,7 @@ const Routing = () => {
                     <Route path="/scenarios" element={<ScenarioOverview />} />
                     <Route path="/scenarios/:scn_id" element={<Simulation />} />
                     <Route path="/help" element={<Help />} />
+                    <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Navigate to="/" replace />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </>
@@ -74,6 +76,7 @@ const Routing = () => {
                         !isAuthenticating &&
                         <>
                             <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Register />} />
                             <Route path="*" element={<Navigate to="/login" replace />} />
                         </>
                     }
