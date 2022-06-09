@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -47,7 +48,7 @@ from app.src.util.scenario_util import get_actions_from_fragment
 from history.write import write_history
 
 
-def simulate(req, scenario):
+def simulate(req, scenario: UserScenario):
     """This function does the actual simulation of a scenario fragment."""
     if req.actions is None:
         raise RequestActionException()
@@ -97,12 +98,25 @@ def simulate(req, scenario):
     # team event
     if req.actions.teamevent:
         days = days - 1
-        # do some team even logic here
+        # team event will be at the end of the week
 
     # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
     ## scenario.team.work(workpack) (ein tag simuliert)
     for day in range(0, days):
         scenario.team.work(workpack, scenario)
+
+    # team event
+    if req.actions.teamevent:
+        members: List[Member] = Member.objects.filter(team_id=scenario.team.id)
+        cost = len(members) * scenario.config.cost_member_team_event
+        scenario.state.cost += cost
+        for member in members:
+            # Stress is reduced by 50% ?
+            member.stress = member.stress * 0.5
+            # Motivation is increased by 20% ?
+            member.motivation = min([member.motivation * 1.2, 1])
+            member.save()
+    scenario.save()
 
 
 def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
