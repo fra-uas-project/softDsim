@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 
 from app.decorators.decorators import allowed_roles
 from app.serializers.user import UserSerializer
@@ -58,7 +58,10 @@ class RegisterView(APIView):
         serializer = UserSerializer(user)
 
         return Response(
-            {"success": "User created successfully", "user": serializer.data,},
+            {
+                "success": "User created successfully",
+                "user": serializer.data,
+            },
             status=status.HTTP_201_CREATED,
         )
 
@@ -93,7 +96,8 @@ class LoginView(APIView):
         password = data["password"]
 
         try:
-            user = User.objects.get(username=username)
+            # user = User.objects.get(username=username)
+            user = authenticate(username=username, password=password)
 
             if user is not None:
                 login(request, user)
@@ -179,4 +183,3 @@ class CheckAuthenticatedView(APIView):
             {"authentication-status": "user is not authenticated"},
             status=status.HTTP_403_FORBIDDEN,
         )
-
