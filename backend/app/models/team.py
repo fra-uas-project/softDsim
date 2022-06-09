@@ -1,5 +1,8 @@
+import logging
+
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 from app.models.task import TaskStatus
 from app.models.user_scenario import UserScenario
@@ -16,7 +19,7 @@ class Team(models.Model):
     )
 
     # increases familiarity with the project for each member
-    def meeting(self, scenario, members):
+    def meeting(self, scenario, members, work_hours) -> int:
         solved_tasks = TaskStatus.solved(scenario.id)
         for member in members:
             tasks_in_meeting = scenario.config.done_tasks_per_meeting
@@ -30,13 +33,34 @@ class Team(models.Model):
         # todo: wir können überlegen ob man member auch in der work methode in einem bulk update mit anderen Sachen speichern kann
         Member.objects.bulk_update(members, fields=["familiar_tasks", "familiarity"])
 
+        return work_hours - 1
+
+    def training(self, scenario, members, work_hours) -> int:
+
+        return work_hours - 1
+
     # ein tag
-    def work(self, workpack, scenario):
+    def work(self, workpack, scenario, workpack_status, current_day):
+
+        # work hours
+        NORMAL_WORK_HOUR_DAY: int = 8
+        work_hours = NORMAL_WORK_HOUR_DAY + workpack.overtime
+
         members = Member.objects.filter(team_id=scenario.team.id)
-        self.meeting(scenario, members)
+
+        # 1. meeting
+        for _ in range(workpack_status.meetings_per_day[current_day]):
+            work_hours = self.meeting(scenario, members, work_hours)
+
+        # 2. training
+        for _ in range(workpack_status.trainings_per_day[current_day]):
+            work_hours = self.training(scenario, members, work_hours)
+
+        # 3. task work
+        # self.task_work()
 
     # def work(workpack)
-    ## 1. meeting
+    ## 1. meeting (done)
     ## self.meeting(workpack) (zieht Zeit vom tag ab)
     ## 2. training
     ## self.training(workpack) (zieht Zeit vom tag ab)

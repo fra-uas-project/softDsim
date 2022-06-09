@@ -36,3 +36,12 @@ class RequestTypeMismatchException(BaseException):
 
     def __init__(self, type):
         super().__init__(f"Request type {type} does not match previous response type.")
+
+
+class TooManyMeetingsException(BaseException):
+    """Raised when user requests more meetings per day than available work hours"""
+
+    def __init__(self, meetings, hours):
+        super().__init__(
+            f"Requested {meetings} hours of meetings per day, but only {hours} hours are available per day."
+        )

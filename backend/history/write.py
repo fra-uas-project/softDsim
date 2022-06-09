@@ -64,7 +64,7 @@ def write_history(scenario, request: ScenarioRequest, response_type):
 
     try:
         # 4 Save Member Stats
-        for member in TeamSerializer(scenario.team).data.get("member"):
+        for member in TeamSerializer(scenario.team).data.get("members"):
             HistoryMemberStatus.objects.create(
                 history=h,
                 member_id=member.get("id"),
