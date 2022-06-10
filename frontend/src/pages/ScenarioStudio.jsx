@@ -52,7 +52,6 @@ const ScenarioStudio = () => {
 
     const [tabIndex, setTabIndex] = useState(1);
     const [editorList, updateEditorList] = useImmer([]);
-    const [selectedItem, setSelectedItem] = useState(null);
     const [selectedObject, setSelectedObject] = useState(null);
 
     const saveScenarioTemplate = async () => {
@@ -120,7 +119,6 @@ const ScenarioStudio = () => {
             editorListItems.splice(result.destination.index, 0, movedItemCopy);
             updateEditorList(editorListItems);
 
-            setSelectedItem(movedItemCopy.id)
             setSelectedObject(movedItemCopy)
 
             // moving from action list to fragment in editor
@@ -197,36 +195,30 @@ const ScenarioStudio = () => {
         console.log(result)
     };
 
-    // TODO use functions from util.js
-    const findComponent = (componentId) => {
-        return (editorList.find(component => component.id === componentId))
-    };
+    const handleSelect = (e) => {
+        const component = editorList.find(component => component.id === e.currentTarget.getAttribute("elementid"))
 
-    const findQuestion = (questionId) => {
-        const questionsList = editorList.filter(component => component.type === componentEnum.QUESTIONS)
-
-        let questions = []
-        for (const questionsListElement of questionsList) {
-            questions = [...questions, ...questionsListElement.questions]
-        }
-
-        return (questions.find(question => question.id === questionId))
-    };
-
-    const findAction = (actionId) => {
         const fragmentList = editorList.filter(component => component.type === componentEnum.FRAGMENT)
-
         let actions = []
         for (const fragment of fragmentList) {
             actions = [...actions, ...fragment.actions]
         }
+        const action = actions.find(action => action.id === e.currentTarget.getAttribute("elementid"))
 
-        return (actions.find(action => action.id === actionId))
-    }
+        const questionsList = editorList.filter(component => component.type === componentEnum.QUESTIONS)
+        let questions = []
+        for (const questionsListElement of questionsList) {
+            questions = [...questions, ...questionsListElement.questions]
+        }
+        const question = questions.find(question => question.id === e.currentTarget.getAttribute("elementid"))
 
-    const handleSelect = (e) => {
-        setSelectedItem(e.currentTarget.getAttribute("elementid"))
-        setSelectedObject(editorList.find(component => component.id === e.currentTarget.getAttribute("elementid")))
+        if(component) {
+            setSelectedObject(component)
+        } else if(action) {
+            setSelectedObject(action)
+        } else if(question) {
+            setSelectedObject(question)
+        }
     }
 
     const handleTabsChange = (index) => {
@@ -234,24 +226,31 @@ const ScenarioStudio = () => {
     };
 
     const handleEditorBackgroundClick = (e) => {
-        // if (e.target.getAttribute("role") === "list") {
+        // if (e.target.getAttribute("elementid") === "backgroundList") {
         //     setTabIndex(tabIndexEnum.COMPONENTS)
-        //     setSelectedItem("")
         //     setSelectedObject(null)
         // }
     };
 
     // If item is selected, switch to inspector tab
     useEffect(() => {
-        if (selectedItem) {
+        if (selectedObject) {
             setTabIndex(tabIndexEnum.INSPECTOR);
         }
-    }, [selectedItem]);
+    }, [selectedObject]);
+
+    useEffect(() => {
+        if (selectedObject) {
+            setTabIndex(tabIndexEnum.INSPECTOR);
+        } else {
+            setTabIndex(tabIndexEnum.COMPONENTS);
+        }
+    }, [selectedObject]);
 
     useEffect(() => {
         console.log(editorList)
         console.log("SO", selectedObject)
-    }, [selectedItem, editorList, selectedObject])
+    }, [editorList, selectedObject])
 
     return (
         <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
@@ -290,7 +289,9 @@ const ScenarioStudio = () => {
                                                    justifyContent={editorList.length ? "flex-start" : "center"}
                                                    alignItems="center"
                                                    borderRadius="2xl"
-                                                   flexGrow="1">
+                                                   flexGrow="1"
+                                                   elementid="backgroundList"
+                                    >
                                         {
                                             editorList.length ?
                                                 editorList.map((component, index) => {
@@ -301,8 +302,7 @@ const ScenarioStudio = () => {
                                                                     onClick={((e) => handleSelect(e))}
                                                                     index={index}
                                                                     component={component}
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject.id === component.id}
                                                                 />
                                                             )
                                                         } else if (component.type === componentEnum.FRAGMENT) {
@@ -316,8 +316,8 @@ const ScenarioStudio = () => {
                                                                     index={index}
                                                                     component={component}
                                                                     droppableType="action"
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject.id === component.id}
+                                                                    selectedItem={selectedObject.id}
                                                                     actions={component.actions}
                                                                 />
                                                             )
@@ -332,8 +332,8 @@ const ScenarioStudio = () => {
                                                                     index={index}
                                                                     component={component}
                                                                     droppableType="question"
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject.id === component.id}
+                                                                    selectedItem={selectedObject.id}
                                                                     actions={component.questions}
                                                                 />
                                                             )
@@ -344,8 +344,8 @@ const ScenarioStudio = () => {
                                                                     onClick={((e) => handleSelect(e))}
                                                                     index={index}
                                                                     component={component}
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject.id === component.id}
+                                                                    selectedItem={selectedObject.id}
                                                                 />
                                                             )
                                                         } else {
@@ -355,8 +355,8 @@ const ScenarioStudio = () => {
                                                                     onClick={((e) => handleSelect(e))}
                                                                     index={index}
                                                                     component={component}
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject.id === component.id}
+                                                                    selectedItem={selectedObject.id} // TODO maybe not needed due to component?
                                                                 />
                                                             )
                                                         }
@@ -394,13 +394,14 @@ const ScenarioStudio = () => {
                                 <TabPanels minW="350px" h="850px" overflow="auto">
                                     <TabPanel height="full">
                                         {/* Inspector Items */}
-                                        {selectedItem ?
+                                        {selectedObject ?
                                             <VStack alignItems="flex-start" pt={2}>
                                                 {selectedObject?.type === componentEnum.BASE &&
                                                     <BaseInspectorForm
                                                         key={selectedObject.id}
-                                                        baseData={findComponent(selectedItem)}
+                                                        baseData={selectedObject}
                                                         updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
@@ -417,7 +418,7 @@ const ScenarioStudio = () => {
                                                     <FragmentInspectorForm
                                                         key={selectedObject.id}
                                                         finalActionList={finalActionList}
-                                                        fragmentData={findComponent(selectedItem)}
+                                                        fragmentData={selectedObject}
                                                         updateEditorList={updateEditorList}
                                                     />
                                                 }
@@ -425,7 +426,7 @@ const ScenarioStudio = () => {
                                                 {selectedObject?.type === componentEnum.EVENT &&
                                                     <EventInspectorForm
                                                         key={selectedObject.id}
-                                                        eventData={findComponent(selectedItem)}
+                                                        eventData={selectedObject}
                                                         updateEditorList={updateEditorList}
                                                     />
                                                 }
@@ -438,18 +439,18 @@ const ScenarioStudio = () => {
                                                     />
                                                 }
 
-                                                {findAction(selectedItem)?.type === "ACTION" &&
+                                                {selectedObject?.type === "ACTION" &&
                                                     <ActionInspectorForm
-                                                        key={findAction(selectedItem).id}
-                                                        actionData={findAction(selectedItem)}
+                                                        key={selectedObject.id}
+                                                        actionData={selectedObject}
                                                         updateEditorList={updateEditorList}
                                                     />
                                                 }
 
-                                                {(findQuestion(selectedItem)?.type === questionEnum.SINGLE || findQuestion(selectedItem)?.type === questionEnum.MULTI) &&
+                                                {(selectedObject?.type === questionEnum.SINGLE || selectedObject?.type === questionEnum.MULTI) &&
                                                     <QuestionInspectorForm
-                                                        key={findQuestion(selectedItem).id}
-                                                        questionData={findQuestion(selectedItem)}
+                                                        key={selectedObject.id}
+                                                        questionData={selectedObject}
                                                         updateEditorList={updateEditorList}
                                                     />
                                                 }
