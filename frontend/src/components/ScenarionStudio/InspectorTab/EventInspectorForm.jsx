@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import MarkdownTextfield from "./MarkdownTextfield";
 import {useState} from "react";
+import DeleteButton from "./DeleteButton";
 
 const EventInspectorForm = (props) => {
 
@@ -287,6 +288,11 @@ const EventInspectorForm = (props) => {
                 <FormHelperText>Motivation</FormHelperText>
 
             </FormControl>
+            <DeleteButton
+                component={props.eventData}
+                updateEditorList={props.updateEditorList}
+                setSelectedObject={props.setSelectedObject}
+            />
         </VStack>
     )
 }

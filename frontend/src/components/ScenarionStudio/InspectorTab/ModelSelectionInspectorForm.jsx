@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import MarkdownTextfield from "./MarkdownTextfield";
 import {useEffect, useState} from "react";
+import DeleteButton from "./DeleteButton";
 
 const ModelSelectionInspectorForm = (props) => {
 
@@ -45,7 +46,7 @@ const ModelSelectionInspectorForm = (props) => {
                 const component = draft.find((component) => component.id === props.modelSelectionData.id)
                 component.models = models;
             })
-    }, [models])
+    }, [models, props])
 
     return (
         <VStack maxW="300px" alignItems="flex-start">
@@ -72,6 +73,11 @@ const ModelSelectionInspectorForm = (props) => {
                     return <Checkbox key={index} spacing='1rem' mb="0.5rem" value={value} onChange={(event) => onChangeModels(event)}>{value}</Checkbox>
                 })}
             </FormControl>
+            <DeleteButton
+                component={props.modelSelectionData}
+                updateEditorList={props.updateEditorList}
+                setSelectedObject={props.setSelectedObject}
+            />
         </VStack>
     )
 }

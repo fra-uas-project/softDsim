@@ -419,6 +419,7 @@ const ScenarioStudio = () => {
                                                         finalActionList={finalActionList}
                                                         fragmentData={selectedObject}
                                                         updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
@@ -427,6 +428,7 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         eventData={selectedObject}
                                                         updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
@@ -435,6 +437,7 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         modelSelectionData={selectedObject}
                                                         updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
@@ -443,6 +446,7 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         actionData={selectedObject}
                                                         updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
@@ -451,6 +455,7 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         questionData={selectedObject}
                                                         updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
                                             </VStack>

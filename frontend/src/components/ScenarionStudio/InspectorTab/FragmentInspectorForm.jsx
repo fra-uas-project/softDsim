@@ -19,6 +19,7 @@ import {
 import {useState} from "react";
 import InspectorItemSelector from "./InspectorItemSelector";
 import MarkdownTextfield from "./MarkdownTextfield";
+import DeleteButton from "./DeleteButton";
 
 const FragmentInspectorForm = (props) => {
 
@@ -77,7 +78,7 @@ const FragmentInspectorForm = (props) => {
     }
 
     return (
-        <VStack maxW="300px" alignItems="flex-start">
+        <VStack maxW="300px" alignItems="flex-start" mb={3}>
             <Editable value={displayName} w="full" fontWeight="bold"
                       onChange={(value) => onChangeDisplayName(value)}
                       onSubmit={onSubmitDisplayName}
@@ -142,6 +143,11 @@ const FragmentInspectorForm = (props) => {
                 type="action"
                 headline="Actions"
                 addActions={addActions}
+            />
+            <DeleteButton
+                component={props.fragmentData}
+                updateEditorList={props.updateEditorList}
+                setSelectedObject={props.setSelectedObject}
             />
         </VStack>
     )
