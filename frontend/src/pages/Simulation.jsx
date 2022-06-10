@@ -8,7 +8,6 @@ import {
     Heading,
     Modal,
     ModalBody,
-    ModalCloseButton,
     ModalContent,
     ModalFooter,
     ModalHeader,
@@ -182,11 +181,10 @@ const Simulation = () => {
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+            <Modal isOpen={isOpen} closeOnOverlayClick={false} isCentered>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Modal Title</ModalHeader>
-                    <ModalCloseButton />
                     <ModalBody>
                         <Text>Scenario Description Here</Text>
                     </ModalBody>
