@@ -61,7 +61,7 @@ const Routing = () => {
             {currentUser ?
                 <>
                     {/* routes which are accessible for every logged-in user */}
-                    <Route path="/" element={<Landing />} />
+                    <Route path="/" element={<Navigate to="/scenarios" replace />} />
                     <Route path="/scenarios" element={<ScenarioOverview />} />
                     <Route path="/scenarios/:scn_id" element={<Simulation />} />
                     <Route path="/help" element={<Help />} />
@@ -75,6 +75,7 @@ const Routing = () => {
                     {
                         !isAuthenticating &&
                         <>
+                            <Route path="/" element={<Landing />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
                             <Route path="*" element={<Navigate to="/login" replace />} />

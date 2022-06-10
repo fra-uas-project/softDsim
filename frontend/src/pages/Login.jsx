@@ -4,6 +4,7 @@ import React, { useContext, useState } from "react";
 import { getCookie } from "../utils/utils"
 import { AuthContext } from "../AuthProvider";
 import { Link } from 'react-router-dom'
+import landing_bg from "../images/landing_bg.svg"
 
 const Login = () => {
     const { setCurrentUser } = useContext(AuthContext);
@@ -105,7 +106,7 @@ const Login = () => {
 
     return (
         <>
-            <Flex align="center" justify="center" flexGrow="1">
+            <Flex align="center" justify="center" flexGrow="1" backgroundImage={landing_bg} backgroundPosition="center" backgroundSize="cover" backgroundRepeat="no-repeat">
                 <Flex justify="center" p="10" w="40vw" maxW="400px" bg='white' rounded="2xl" flexFlow="column"
                     shadow="xl">
                     {/* input fields */}

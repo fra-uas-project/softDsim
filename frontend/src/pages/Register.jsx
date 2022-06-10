@@ -1,6 +1,7 @@
 import { Flex, Stack, Heading, Input, InputGroup, InputRightElement, Button, Text, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody } from "@chakra-ui/react";
 import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin, HiOutlineInformationCircle } from "react-icons/hi";
 import React, { useState } from "react";
+import landing_bg from "../images/landing_bg.svg"
 
 const Register = () => {
     // initialize states
@@ -11,7 +12,6 @@ const Register = () => {
     const [passwortRepeatInputValid, setPasswortRepeatInputValid] = useState(false)
     const [userID, setUserID] = useState('')
     const [userPassword, setUserPassword] = useState('')
-    const [userRepeatPassword, setUserRepeatPassword] = useState('')
     const [registerSuccess, setRegisterSuccess] = useState('none')
 
     // validate user ID input
@@ -45,7 +45,6 @@ const Register = () => {
 
     // validate user repeated password input
     function userRepeatPasswordInput(event) {
-        setUserRepeatPassword(event.target.value)
         if (event.target.value === userPassword) {
             setPasswortRepeatInputValid(true)
         } else {
@@ -67,7 +66,6 @@ const Register = () => {
                     body: JSON.stringify({ "username": userID, "password": userPassword, "admin": false }),
                 })
                 const registerAttempt = await res
-                console.log('registerAttempt', registerAttempt)
                 if (registerAttempt.status === 201) {
                     setRegisterSuccess('none')
                     window.location.href = "/login"
@@ -96,7 +94,7 @@ const Register = () => {
 
     return (
         <>
-            <Flex align="center" justify="center" flexGrow="1">
+            <Flex align="center" justify="center" flexGrow="1" backgroundImage={landing_bg} backgroundPosition="center" backgroundSize="cover" backgroundRepeat="no-repeat">
                 <Flex justify="center" p="10" w="40vw" maxW="400px" bg='white' rounded="2xl" flexFlow="column"
                     shadow="xl">
                     {/* input fields */}
