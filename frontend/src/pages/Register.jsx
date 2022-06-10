@@ -11,7 +11,6 @@ const Register = () => {
     const [passwortRepeatInputValid, setPasswortRepeatInputValid] = useState(false)
     const [userID, setUserID] = useState('')
     const [userPassword, setUserPassword] = useState('')
-    const [userRepeatPassword, setUserRepeatPassword] = useState('')
     const [registerSuccess, setRegisterSuccess] = useState('none')
 
     // validate user ID input
@@ -45,7 +44,6 @@ const Register = () => {
 
     // validate user repeated password input
     function userRepeatPasswordInput(event) {
-        setUserRepeatPassword(event.target.value)
         if (event.target.value === userPassword) {
             setPasswortRepeatInputValid(true)
         } else {
@@ -67,7 +65,6 @@ const Register = () => {
                     body: JSON.stringify({ "username": userID, "password": userPassword, "admin": false }),
                 })
                 const registerAttempt = await res
-                console.log('registerAttempt', registerAttempt)
                 if (registerAttempt.status === 201) {
                     setRegisterSuccess('none')
                     window.location.href = "/login"
