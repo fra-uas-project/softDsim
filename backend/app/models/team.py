@@ -38,13 +38,31 @@ class Team(models.Model):
     def training(self, scenario, members, work_hours) -> int:
 
         for member in members:
-            member.xp = member.xp * 1.1
+            # todo philip: implement real delta
+            delta = 1
+            xp = (delta * scenario.config.train_skill_increase_rate) / (
+                1 + member.xp
+            ) ** 2
+            member.xp = xp
 
-            self.xp_factor += (hours * delta * TRAIN_SKILL_INCREASE_AMOUNT) / (
-                (1 + self.xp_factor) ** 2
-            )  # Divide by xp_factor^2 to make it grow less with increasing xp factor
-            self.motivation = min(1, self.motivation + 0.1 * hours)
-            return self.xp_factor
+            member.motivation = min(1, member.motivation + 0.1)
+
+        Member.objects.bulk_update(members, fields=["xp", "motivation"])
+        # training aus alter train methode
+        # self.xp_factor += (hours * delta * TRAIN_SKILL_INCREASE_AMOUNT) / (
+        #     (1 + self.xp_factor) ** 2
+        # )  # Divide by xp_factor^2 to make it grow less with increasing xp factor
+        # self.motivation = min(1, self.motivation + 0.1 * hours)
+        # return self.xp_factor
+
+        # delta aus alter train methode
+        # m = mean(
+        #     [member.skill_type.throughput for member in self.staff if not member.halted]
+        # )
+        # for member in self.staff:
+        #     delta = m - member.skill_type.throughput
+        #     if delta > 0:
+        #         member.train(total_training_h, delta)
 
         return work_hours - 1
 
@@ -53,17 +71,30 @@ class Team(models.Model):
 
         # work hours
         NORMAL_WORK_HOUR_DAY: int = 8
-        work_hours = NORMAL_WORK_HOUR_DAY + workpack.overtime
+        remaining_work_hours = NORMAL_WORK_HOUR_DAY + workpack.overtime
 
         members = Member.objects.filter(team_id=scenario.team.id)
 
         # 1. meeting
         for _ in range(workpack_status.meetings_per_day[current_day]):
-            work_hours = self.meeting(scenario, members, work_hours)
+            remaining_work_hours = self.meeting(scenario, members, remaining_work_hours)
 
         # 2. training
-        for _ in range(workpack_status.trainings_per_day[current_day]):
-            work_hours = self.training(scenario, members, work_hours)
+        remaining_trainings = workpack_status.remaining_trainings
+        if remaining_trainings > 0:
+            if remaining_trainings > remaining_work_hours:
+                workpack_status.remaining_trainings = (
+                    remaining_trainings - remaining_work_hours
+                )
+                remaining_trainings = remaining_work_hours
+            else:
+                workpack_status.remaining_trainings = 0
+            # training wird so oft aufgerufen wie Stunden an Training geplant sind
+            # jedes Aufrufen der training methode ist eine Stunde
+            for _ in range(remaining_trainings):
+                remaining_work_hours = self.training(
+                    scenario, members, remaining_work_hours
+                )
 
         # 3. task work
         # self.task_work()
