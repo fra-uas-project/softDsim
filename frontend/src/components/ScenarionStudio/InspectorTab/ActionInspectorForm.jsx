@@ -16,6 +16,7 @@ import {
     VStack
 } from "@chakra-ui/react";
 import {useState} from "react";
+import DeleteButton from "./DeleteButton";
 
 const ActionInspectorForm = (props) => {
 
@@ -101,6 +102,11 @@ const ActionInspectorForm = (props) => {
                 :
                 <InspectorEmtpy content={`${props.actionData.title} was added. No further configuration needed. `}/>
             }
+            <DeleteButton
+                component={props.actionData}
+                updateEditorList={props.updateEditorList}
+                setSelectedObject={props.setSelectedObject}
+            />
         </VStack>
     )
 }

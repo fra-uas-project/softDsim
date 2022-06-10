@@ -17,6 +17,7 @@ import {v4 as uuidv4} from 'uuid';
 import {HiOutlinePlus} from "react-icons/hi";
 import {questionEnum} from "../scenarioStudioData";
 import {findQuestion} from "../../../utils/utils";
+import DeleteButton from "./DeleteButton";
 
 const basicAnswers = [
     {
@@ -33,7 +34,7 @@ const basicAnswers = [
     },
 ]
 
-const QuestionInspectorForm = ({updateEditorList, questionData}) => {
+const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObject}) => {
 
     const [answers, setAnswers] = useState(questionData?.answers);
     const [displayName, setDisplayName] = useState(questionData?.displayName);
@@ -95,7 +96,7 @@ const QuestionInspectorForm = ({updateEditorList, questionData}) => {
     }, [answers.length])
 
     return(
-        <VStack maxW="300px">
+        <VStack maxW="300px" mb={3}>
             <Editable value={displayName} w="full" fontWeight="bold"
                       onChange={(value) => onChangeDisplayName(value)}
                       onSubmit={onSubmitDisplayName}
@@ -144,6 +145,11 @@ const QuestionInspectorForm = ({updateEditorList, questionData}) => {
                         <FormHelperText color="red.400" textAlign="center">Maximum 6 answers allowed!</FormHelperText>
                 }
             </FormControl>
+            <DeleteButton
+                component={questionData}
+                updateEditorList={updateEditorList}
+                setSelectedObject={setSelectedObject}
+            />
         </VStack>
     )
 }
