@@ -302,7 +302,7 @@ const ScenarioStudio = () => {
                                                                     onClick={((e) => handleSelect(e))}
                                                                     index={index}
                                                                     component={component}
-                                                                    isSelected={selectedObject.id === component.id}
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
                                                                 />
                                                             )
                                                         } else if (component.type === componentEnum.FRAGMENT) {
@@ -316,8 +316,8 @@ const ScenarioStudio = () => {
                                                                     index={index}
                                                                     component={component}
                                                                     droppableType="action"
-                                                                    isSelected={selectedObject.id === component.id}
-                                                                    selectedItem={selectedObject.id}
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
+                                                                    selectedItem={selectedObject?.id}
                                                                     actions={component.actions}
                                                                 />
                                                             )
@@ -332,8 +332,8 @@ const ScenarioStudio = () => {
                                                                     index={index}
                                                                     component={component}
                                                                     droppableType="question"
-                                                                    isSelected={selectedObject.id === component.id}
-                                                                    selectedItem={selectedObject.id}
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
+                                                                    selectedItem={selectedObject?.id}
                                                                     actions={component.questions}
                                                                 />
                                                             )
@@ -344,8 +344,7 @@ const ScenarioStudio = () => {
                                                                     onClick={((e) => handleSelect(e))}
                                                                     index={index}
                                                                     component={component}
-                                                                    isSelected={selectedObject.id === component.id}
-                                                                    selectedItem={selectedObject.id}
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
                                                                 />
                                                             )
                                                         } else {
@@ -355,8 +354,7 @@ const ScenarioStudio = () => {
                                                                     onClick={((e) => handleSelect(e))}
                                                                     index={index}
                                                                     component={component}
-                                                                    isSelected={selectedObject.id === component.id}
-                                                                    selectedItem={selectedObject.id} // TODO maybe not needed due to component?
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
                                                                 />
                                                             )
                                                         }
@@ -411,6 +409,7 @@ const ScenarioStudio = () => {
                                                         finalQuestionList={finalQuestionList}
                                                         questionsData={selectedObject}
                                                         updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 

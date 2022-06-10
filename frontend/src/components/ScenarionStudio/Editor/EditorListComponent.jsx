@@ -1,7 +1,7 @@
 import {Box, Flex, Heading, HStack, Icon, IconButton, ListItem, Text, UnorderedList, VStack} from "@chakra-ui/react";
 import {MdDragIndicator} from "react-icons/md";
 import {Draggable, Droppable} from "react-beautiful-dnd";
-import EditorQuestionComponent from "./EditorQuestionComponent";
+import EditorSubListComponent from "./EditorSubListComponent";
 import {HiOutlineChevronDown, HiOutlineChevronLeft} from "react-icons/hi";
 import {useState} from "react";
 
@@ -71,14 +71,14 @@ const EditorListComponent = (props) => {
                                         (props.actions && actionListExpanded) &&
                                         props.actions.map((action, index) => {
                                             return (
-                                                <EditorQuestionComponent
+                                                <EditorSubListComponent
                                                     key={action.id}
                                                     elementid={action.id}
                                                     onClick={props.onClick}
                                                     id={action.id}
                                                     question={action}
                                                     index={index}
-                                                    isSelected={props.selectedItem === action.id}
+                                                    isSelected={props.selectedItem ? props.selectedItem === action.id : false}
                                                 />
                                             )
                                         })}
