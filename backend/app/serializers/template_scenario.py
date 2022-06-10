@@ -33,6 +33,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
+            "story",
             "management_goal",
             "question_collections",
             "simulation_fragments",

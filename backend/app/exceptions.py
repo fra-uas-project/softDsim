@@ -29,3 +29,19 @@ class RequestMembersException(BaseException):
 
 class SimulationException(BaseException):
     """Raised when simulation cannot be executed because of wrong data in request."""
+
+
+class RequestTypeMismatchException(BaseException):
+    """Raised when request type does not match response type of last step in history."""
+
+    def __init__(self, type):
+        super().__init__(f"Request type {type} does not match previous response type.")
+
+
+class TooManyMeetingsException(BaseException):
+    """Raised when user requests more meetings per day than available work hours"""
+
+    def __init__(self, meetings, hours):
+        super().__init__(
+            f"Requested {meetings} hours of meetings per day, but only {hours} hours are available per day."
+        )

@@ -1,6 +1,5 @@
 import logging
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
+
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -14,7 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from app.models.team import SkillType, Team, Member
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class TeamViews(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -50,8 +48,7 @@ class TeamViews(APIView):
                 msg = f"Team with id {id} does not exist in database"
                 logging.error(msg)
                 return Response(
-                    {"status": "error", "data": msg},
-                    status=status.HTTP_404_NOT_FOUND,
+                    {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND,
                 )
 
         items = Team.objects.all()
@@ -81,7 +78,6 @@ class TeamViews(APIView):
         return Response({"status": "success", "data": "Item Deleted"})
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class MemberView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -95,10 +91,7 @@ class MemberView(APIView):
             msg = f"'{skill_type_str}' is not a name of an existing skill-type in the database."
             logging.error(msg)
             return Response(
-                {
-                    "status": "error",
-                    "data": {"skill_type": msg},
-                },
+                {"status": "error", "data": {"skill_type": msg},},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         serializer = MemberSerializer(data=request.data)
@@ -162,7 +155,6 @@ class MemberView(APIView):
         return Response({"status": "success", "data": "Item Deleted"})
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class SkillTypeView(APIView):
     permission_classes = (IsAuthenticated,)
 

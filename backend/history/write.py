@@ -9,14 +9,16 @@ from history.models.question import HistoryQuestion, HistoryAnswer
 from history.models.member import HistoryMemberChanges, HistoryMemberStatus
 
 
-def write_history(scenario, request: ScenarioRequest):
+def write_history(scenario, request: ScenarioRequest, response_type):
 
     # 1 Write basic stats into a new history entry
     try:
         h = History(
-            type=request.type,
+            request_type=request.type,
+            response_type=response_type,
             user_scenario=scenario,
-            counter=scenario.state.counter,
+            component_counter=scenario.state.component_counter,
+            step_counter=scenario.state.step_counter,
             day=scenario.state.day,
             cost=scenario.state.cost,
             model=scenario.model,
@@ -62,7 +64,7 @@ def write_history(scenario, request: ScenarioRequest):
 
     try:
         # 4 Save Member Stats
-        for member in TeamSerializer(scenario.team).data.get("member"):
+        for member in TeamSerializer(scenario.team).data.get("members"):
             HistoryMemberStatus.objects.create(
                 history=h,
                 member_id=member.get("id"),

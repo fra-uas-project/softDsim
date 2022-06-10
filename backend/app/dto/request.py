@@ -59,3 +59,7 @@ class QuestionRequest(ScenarioRequest):
 
 class ModelRequest(ScenarioRequest):
     """not finished, just shell"""
+
+
+class StartRequest(ScenarioRequest):
+    """not finished, just shell"""

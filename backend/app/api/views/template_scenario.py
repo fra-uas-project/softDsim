@@ -11,6 +11,16 @@ from app.exceptions import IndexException
 from app.models.template_scenario import TemplateScenario
 from app.serializers.template_scenario import TemplateScenarioSerializer
 
+from app.models.question_collection import QuestionCollection
+from app.models.question import Question
+from app.models.answer import Answer
+from app.models.simulation_end import SimulationEnd
+from app.models.simulation_fragment import SimulationFragment
+from app.models.action import Action
+from app.models.model_selection import ModelSelection
+from app.models.score_card import ScoreCard
+from app.models.management_goal import ManagementGoal
+
 
 class TemplateScenarioView(APIView):
 
@@ -53,8 +63,7 @@ class TemplateScenarioView(APIView):
                     serializer.save()
                 except IndexException as e:
                     return Response(
-                        {"message": str(e)},
-                        status=status.HTTP_400_BAD_REQUEST,
+                        {"message": str(e)}, status=status.HTTP_400_BAD_REQUEST,
                     )
 
                 return Response(
@@ -124,3 +133,155 @@ class TemplateScenarioView(APIView):
                 {"status": "something went wrong internally"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class TemplateScenarioFromStudioView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    @allowed_roles(["creator"])
+    def post(self, request):
+        try:
+            logging.info("Creating template scenario from studio")
+            scenario = TemplateScenario()
+            scenario.save()
+
+            caller = {
+                "BASE": handle_base,
+                "QUESTIONS": handle_question,
+                "FRAGMENT": handle_simulation,
+                "MODELSELECTION": handle_model,
+                "EVENT": handle_event,
+            }
+            i = 0
+            for component in request.data:
+                try:
+                    i = caller[component.get("type", "not-found")](
+                        component, scenario, i
+                    )
+                except KeyError:
+                    msg = f"Invalid component type {component.get('type')}"
+                    logging.warning(msg)
+                    return Response(
+                        dict(status="error", data=msg,),
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+            scenario.save()
+            logging.info("Template scenario created with id: " + str(scenario.id))
+
+            # Create Scorecard
+            scorecard = ScoreCard(template_scenario=scenario)
+            scorecard.save()  # TODO: this should be set by the creator in studio
+
+            return Response(
+                dict(status="success", data={"id": scenario.id}),
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception as e:
+            msg = f"{e.__class__.__name__} occured while creating template scenario from studio"
+            logging.error(msg)
+            return Response(
+                dict(status="error", data=msg),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+def handle_base(data, scenario: TemplateScenario, i):
+    scenario.name = data.get("template_name")
+    scenario.story = data.get("text")
+    # Create Management Goal
+    mgoal = ManagementGoal(
+        budget=data.get("budget"),
+        duration=data.get("duration"),
+        easy_tasks=int(data.get("easy_tasks")),
+        medium_tasks=int(data.get("medium_tasks")),
+        hard_tasks=int(data.get("hard_tasks")),
+        tasks_predecessor_p=0.3,  # TODO: this should be set by the creator in studio
+        template_scenario=scenario,
+    )
+
+    mgoal.save()
+    return i
+
+
+def handle_question(data, scenario: TemplateScenario, i):
+    qc = QuestionCollection(index=i, template_scenario=scenario)
+    qc.save()
+    qi = 0
+    for question_data in data.get("questions", []):
+
+        q = Question(
+            question_index=qi,
+            question_collection=qc,
+            text=question_data.get("text"),
+            multi=question_data.get("type") == "MULTI",
+        )
+        q.save()
+
+        for answer_data in question_data.get("answers"):
+            a = Answer(
+                label=answer_data.get("label"),
+                points=int(answer_data.get("points")),
+                question=q,
+            )
+            a.save()
+        qi += 1
+
+    return i + 1
+
+
+def handle_simulation(data, scenario: TemplateScenario, i):
+    # Initialize Fragment
+    simfragment = SimulationFragment(
+        index=i, text=data.get("text"), template_scenario=scenario
+    )
+    simfragment.save()
+
+    # Create Simulation End
+    simend_data = data.get("simulation_end")
+    simend = SimulationEnd(
+        limit=simend_data.get("limit"),
+        type=simend_data.get("type"),
+        limit_type=simend_data.get("limit_type"),
+        simulation_fragment=simfragment,
+    )
+    simend.save()
+
+    # Create Actions
+    for action_data in data.get("actions"):
+        action = Action(
+            title=action_data.get("action"),
+            lower_limit=action_data.get("lower_limit"),
+            upper_limit=action_data.get("upper_limit"),
+            simulation_fragment=simfragment,
+        )
+        action.save()
+
+    return i + 1
+
+
+def handle_model(data, scenario: TemplateScenario, i):
+    m = ModelSelection(
+        index=i,
+        text=data.get("text"),
+        waterfall="waterfall" in data.get("models"),
+        kanban="kanban" in data.get("models"),
+        scrum="scrum" in data.get("models"),
+        template_scenario=scenario,
+    )
+
+    if not m.waterfall and not m.kanban and not m.scrum:
+        # If no model is selected, select all models
+        m.waterfall = True
+        m.scrum = True
+        m.kanban = True
+
+    m.save()
+    return i + 1
+
+
+def handle_event(data, scenario: TemplateScenario, i):
+    # Events are not yet implemented
+    return i

@@ -1,11 +1,8 @@
-from django.contrib.auth.models import Group
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout, authenticate
 
 from app.decorators.decorators import allowed_roles
 from app.serializers.user import UserSerializer
@@ -16,7 +13,6 @@ Views for user authentication (login, logout, creation, csrf-token handling)
 """
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class RegisterView(APIView):
     """
     View for registering a new user.
@@ -76,7 +72,6 @@ class RegisterView(APIView):
         #     )
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class LoginView(APIView):
     """
     View for logging in an existing user.
@@ -91,7 +86,7 @@ class LoginView(APIView):
         """
         Method for POST-Requests to the /api/login endpoint.
         Logs in user if username and password (from json body) match a user in the database.
-        Sets new CSRF-Cookie and a Session Cookie
+        Sets a Session Cookie
 
         Returns: Response with information about login, logged-in user and HTTP-Status Code.
         """
@@ -101,6 +96,7 @@ class LoginView(APIView):
         password = data["password"]
 
         try:
+            # user = User.objects.get(username=username)
             user = authenticate(username=username, password=password)
 
             if user is not None:
@@ -125,7 +121,6 @@ class LoginView(APIView):
             )
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class LogoutView(APIView):
     """
     View for logging out a user.
@@ -159,28 +154,6 @@ class LogoutView(APIView):
             )
 
 
-@method_decorator(ensure_csrf_cookie, name="dispatch")
-class GetCSRFToken(APIView):
-    """
-    View for setting a CSRF-Cookie
-    Has one GET Method.
-    Methods are available to anyone.
-    """
-
-    permission_classes = (AllowAny,)
-
-    @allowed_roles(["all"])
-    def get(self, request, format=None):
-        """
-        Method for POST-Requests to the /api/csrf-token endpoint.
-        Sets a CSRF-Cookie to the client.
-
-        Returns: Response with information about cookie set and HTTP-Status Code.
-        """
-        return Response({"success": "CSRF cookie set"}, status=status.HTTP_200_OK)
-
-
-@method_decorator(csrf_protect, name="dispatch")
 class CheckAuthenticatedView(APIView):
     """
     View to see if user is authenticated.
@@ -210,8 +183,3 @@ class CheckAuthenticatedView(APIView):
             {"authentication-status": "user is not authenticated"},
             status=status.HTTP_403_FORBIDDEN,
         )
-
-
-# X-CSRFToken:
-# https://stackoverflow.com/questions/34782493/difference-between-csrf-and-x-csrf-token
-# https://www.stackhawk.com/blog/django-csrf-protection-guide/

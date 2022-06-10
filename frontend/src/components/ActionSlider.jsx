@@ -1,31 +1,20 @@
-import { Text, Slider, Grid, SliderTrack, SliderFilledTrack, SliderThumb, SliderMark, Box } from "@chakra-ui/react"
+import { Slider, Grid, SliderTrack, SliderFilledTrack, SliderThumb, SliderMark, Box } from "@chakra-ui/react"
 import React, { useState } from "react";
 
-const ActionSlider = () => {
-
-    const [testValues, setTestValues] = useState(
-        {
-            text: "Anzahl Meetings",
-            lower: 0,
-            upper: 40
-        }
-    )
+const ActionSlider = (props) => {
 
     const [sliderValue, setSliderValue] = useState(0)
 
     return (
         <>
-            <Grid _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' p='3'>
-                <Text size='lg' fontWeight='bold' mb='2'>
-                    {testValues.text}
-                </Text>
+            <Grid>
                 <Box p='3' mt='2'>
-                    <Slider defaultValue='0' min={testValues.lower} max={testValues.upper} onChange={(val) => setSliderValue(val)}>
-                        <SliderMark value={testValues.lower}>
-                            {testValues.lower}
+                    <Slider defaultValue='0' min={props.lower_limit} max={props.upper_limit} onChange={(val) => setSliderValue(val)}>
+                        <SliderMark value={props.lower_limit}>
+                            {props.lower_limit}
                         </SliderMark>
-                        <SliderMark value={testValues.upper}>
-                            {testValues.upper}
+                        <SliderMark value={props.upper_limit}>
+                            {props.upper_limit}
                         </SliderMark>
                         <SliderMark
                             value={sliderValue}

@@ -3,6 +3,8 @@ import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin } from "react-icons/hi";
 import React, { useContext, useState } from "react";
 import { getCookie } from "../utils/utils"
 import { AuthContext } from "../AuthProvider";
+import { Link } from 'react-router-dom'
+import landing_bg from "../images/landing_bg.svg"
 
 const Login = () => {
     const { setCurrentUser } = useContext(AuthContext);
@@ -104,12 +106,12 @@ const Login = () => {
 
     return (
         <>
-            <Flex align="center" justify="center" flexGrow="1">
+            <Flex align="center" justify="center" flexGrow="1" backgroundImage={landing_bg} backgroundPosition="center" backgroundSize="cover" backgroundRepeat="no-repeat">
                 <Flex justify="center" p="10" w="40vw" maxW="400px" bg='white' rounded="2xl" flexFlow="column"
                     shadow="xl">
                     {/* input fields */}
                     <Stack spacing={5}>
-                        <Heading as="h3" textAlign="center">SoftDSim</Heading>
+                        <Heading as="h3" textAlign="center">Simplify</Heading>
                         <Input type="text" placeholder="User ID" size='lg' bg='#efefef' onChange={useridInput} />
                         <InputGroup>
                             <Input type={showPassword ? "text" : "password"} placeholder="Password" size="lg" onKeyPress={e => { if (e.key === 'Enter') { handleLogin() } }}
@@ -135,6 +137,12 @@ const Login = () => {
                         onClick={handleLogin} isDisabled={!(idInputValid && passwortInputValid)}>
                         Login
                     </Button>
+                    {/* Register Link */}
+                    <Flex mt={5}>
+                        <Text w="full" align="center" justify="center" cursor="pointer" fontWeight="semibold" _hover={{ fontWeight: 'bold' }} onClick={() => { }}>
+                            <Link to={{ pathname: "/register" }} >Noch nicht registriert?</Link>
+                        </Text>
+                    </Flex>
                 </Flex>
             </Flex>
         </>
