@@ -17,8 +17,7 @@ const DeleteButton = (props) => {
 
         props.updateEditorList(
             (draft) => {
-                const updatedEditorList = draft.filter((component) => component.id !== props.component.id)
-                return updatedEditorList
+                return draft.filter((component) => component.id !== props.component.id)
             })
     };
 
