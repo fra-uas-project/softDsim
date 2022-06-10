@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import {useState} from "react";
 import MarkdownTextfield from "./MarkdownTextfield";
+import DeleteButton from "./DeleteButton";
 
 const BaseInspectorForm = (props) => {
     const formatDays = (val) => val + ` days`
@@ -167,7 +168,11 @@ const BaseInspectorForm = (props) => {
                 </NumberInput>
                 <FormHelperText></FormHelperText>
             </FormControl>
-
+            <DeleteButton
+                component={props.baseData}
+                updateEditorList={props.updateEditorList}
+                setSelectedObject={props.setSelectedObject}
+            />
         </>
     )
 }

@@ -2,6 +2,7 @@ import {Box, Divider, Editable, EditableInput, EditablePreview} from "@chakra-ui
 import MarkdownTextfield from "./MarkdownTextfield";
 import InspectorItemSelector from "./InspectorItemSelector";
 import {useState} from "react";
+import DeleteButton from "./DeleteButton";
 
 const QuestionsInspectorForm = (props) => {
     const [displayName, setDisplayName] = useState(props.questionsData.displayName);
@@ -45,6 +46,11 @@ const QuestionsInspectorForm = (props) => {
                 itemList={props.finalQuestionList}
                 type="question"
                 headline="Question Types"
+            />
+            <DeleteButton
+                component={props.questionsData}
+                updateEditorList={props.updateEditorList}
+                setSelectedObject={props.setSelectedObject}
             />
         </>
     )
