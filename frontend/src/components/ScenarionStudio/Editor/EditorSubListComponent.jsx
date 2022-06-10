@@ -2,7 +2,7 @@ import {Box, Flex, Heading, HStack, Icon, ListItem, Text, VStack} from "@chakra-
 import {MdDragIndicator} from "react-icons/md";
 import {Draggable} from "react-beautiful-dnd";
 
-const EditorQuestionComponent = (props) => {
+const EditorSubListComponent = (props) => {
 
     return (
         <Draggable key={props.id} draggableId={props.id} index={props.index}>
@@ -41,4 +41,4 @@ const EditorQuestionComponent = (props) => {
     )
 }
 
-export default EditorQuestionComponent;
+export default EditorSubListComponent;

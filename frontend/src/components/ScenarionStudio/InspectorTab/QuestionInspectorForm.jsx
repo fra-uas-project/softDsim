@@ -15,27 +15,30 @@ import {useEffect, useState} from "react";
 import QuestionAnswer from "./QuestionAnswer";
 import {v4 as uuidv4} from 'uuid';
 import {HiOutlinePlus} from "react-icons/hi";
+import {questionEnum} from "../scenarioStudioData";
+import {findQuestion} from "../../../utils/utils";
+import DeleteButton from "./DeleteButton";
 
-const QuestionInspectorForm = (props) => {
-    const basicAnswers = [
-        {
-            id: uuidv4(),
-            label: "",
-            points: "0",
-            right: true
-        },
-        {
-            id: uuidv4(),
-            label: "",
-            points: "0",
-            right: false
-        },
+const basicAnswers = [
+    {
+        id: uuidv4(),
+        label: "",
+        points: "0",
+        right: true
+    },
+    {
+        id: uuidv4(),
+        label: "",
+        points: "0",
+        right: false
+    },
+]
 
-    ]
+const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObject}) => {
 
-    const [answers, setAnswers] = useState(props.questionData?.answers);
-    const [displayName, setDisplayName] = useState(props.questionData?.displayName);
-    const [questionText, setQuestionText] = useState(props.questionData?.text);
+    const [answers, setAnswers] = useState(questionData?.answers);
+    const [displayName, setDisplayName] = useState(questionData?.displayName);
+    const [questionText, setQuestionText] = useState(questionData?.text);
 
     const onChangeDisplayName =  (value) => {
         setDisplayName(value)
@@ -43,6 +46,22 @@ const QuestionInspectorForm = (props) => {
 
     const onChangeQuestionText =  (event) => {
         setQuestionText(event.target.value)
+    }
+
+    const onSubmitDisplayName = () => {
+        updateEditorList(
+            (draft) => {
+                const question = findQuestion(questionData.id, draft)
+                question.displayName = displayName;
+            })
+    }
+
+    const onSubmitQuestionText = () => {
+        updateEditorList(
+            (draft) => {
+                const question = findQuestion(questionData.id, draft)
+                question.text = questionText;
+            })
     }
 
     const addAnswer = () => {
@@ -62,28 +81,26 @@ const QuestionInspectorForm = (props) => {
         setAnswers(copyAnswers)
     };
 
-
-    // Update answers (not react way. should update answers in parent component with setEditorList
-    const updateAnswers = () => {
-        props.questionData.answers = answers
-    };
+    useEffect(() => {
+        updateEditorList(
+            (draft) => {
+                const question = findQuestion(questionData.id, draft)
+                question.answers = answers;
+            })
+    }, [answers, updateEditorList, questionData.id])
 
     useEffect(() => {
-        updateAnswers()
-    }, [answers])
-
-    useEffect(() => {
-        console.log(props.questionData)
-    })
-
-    useEffect(() => {
-        props.questionData.displayName = displayName
-        props.questionData.text = questionText
-    }, [displayName, questionText])
+        if (answers.length === 0) {
+            setAnswers(basicAnswers)
+        }
+    }, [answers.length])
 
     return(
-        <VStack maxW="300px">
-            <Editable value={displayName} w="full" fontWeight="bold" onChange={(value) => onChangeDisplayName(value)}>
+        <VStack maxW="300px" mb={3}>
+            <Editable value={displayName} w="full" fontWeight="bold"
+                      onChange={(value) => onChangeDisplayName(value)}
+                      onSubmit={onSubmitDisplayName}
+            >
                 <EditablePreview
                     w="full"
                     _hover={{
@@ -97,26 +114,27 @@ const QuestionInspectorForm = (props) => {
             <Box h={3}/>
             <FormControl>
                 <FormLabel htmlFor='question' color="gray.400" fontWeight="semibold">Question</FormLabel>
-                {/* TODO persist question and question name */}
-                <Input id="question" value={questionText} onChange={(value) => onChangeQuestionText(value)} />
+                <Input id="question" value={questionText}
+                       onChange={(value) => onChangeQuestionText(value)}
+                       onBlur={onSubmitQuestionText}
+                />
                 <FormHelperText></FormHelperText>
             </FormControl>
             <Box h={3}/>
             <FormControl>
                 <FormLabel color="gray.400" fontWeight="semibold" htmlFor="">Answers</FormLabel>
                 {
-                    answers.length ?
                         answers.map((answer, index) => {
-                            return <QuestionAnswer // TODO make first element not removable
+                            return <QuestionAnswer
                                         key={answer.id}
+                                        questionId={questionData.id}
+                                        updateEditorList={updateEditorList}
                                         answer={answer}
                                         removeAnswer={() => {removeAnswer(answer.id)}}
-                                        multiRight={props.questionData.type === "MULTI"} //TODO Use Enum (make enum globally accessible)
+                                        multiRight={questionData.type === questionEnum.MULTI}
                                         isNotRemovable={index < 1} // Minimum one
                             />
                         })
-                        :
-                        setAnswers(basicAnswers)
                 }
                 {
                     answers.length < 6 ?
@@ -127,6 +145,11 @@ const QuestionInspectorForm = (props) => {
                         <FormHelperText color="red.400" textAlign="center">Maximum 6 answers allowed!</FormHelperText>
                 }
             </FormControl>
+            <DeleteButton
+                component={questionData}
+                updateEditorList={updateEditorList}
+                setSelectedObject={setSelectedObject}
+            />
         </VStack>
     )
 }

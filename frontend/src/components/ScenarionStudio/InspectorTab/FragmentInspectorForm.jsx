@@ -16,9 +16,10 @@ import {
     Select,
     VStack
 } from "@chakra-ui/react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import InspectorItemSelector from "./InspectorItemSelector";
 import MarkdownTextfield from "./MarkdownTextfield";
+import DeleteButton from "./DeleteButton";
 
 const FragmentInspectorForm = (props) => {
 
@@ -32,33 +33,56 @@ const FragmentInspectorForm = (props) => {
         setDisplayName(value)
     }
 
-    const onChangeEndConditionType =  (event) => {
+    const onSubmitDisplayName = () => {
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.fragmentData.id)
+                component.displayName = displayName;
+            })
+    }
+
+    const onChangeEndConditionType = (event) => {
         setEndConditionType(event.target.value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.fragmentData.id)
+                component.simulation_end.type = event.target.value;
+            })
     }
 
-    const onChangeEndConditionLimit =  (value) => {
+    const onChangeEndConditionLimit = (value) => {
         setEndConditionLimit(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.fragmentData.id)
+                component.simulation_end.limit = value;
+            })
     }
 
-    const onChangeLimitType =  (event) => {
+    const onChangeLimitType = (event) => {
         setLimitType(event.target.value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.fragmentData.id)
+                component.simulation_end.limit_type = event.target.value;
+            })
     }
 
     const addActions =  (value) => {
         setActions(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.fragmentData.id)
+                component.actions = value;
+            })
     }
 
-    useEffect(() => {
-        props.fragmentData.displayName = displayName;
-        props.fragmentData.simulation_end.type = endConditionType;
-        props.fragmentData.simulation_end.limit = endConditionLimit;
-        props.fragmentData.simulation_end.limit_type = limitType;
-        props.fragmentData.actions = actions;
-    }, [displayName, endConditionType, endConditionLimit, limitType, actions])
-
     return (
-        <VStack maxW="300px" alignItems="flex-start">
-            <Editable value={displayName} w="full" fontWeight="bold" onChange={(value) => onChangeDisplayName(value)}>
+        <VStack maxW="300px" alignItems="flex-start" mb={3}>
+            <Editable value={displayName} w="full" fontWeight="bold"
+                      onChange={(value) => onChangeDisplayName(value)}
+                      onSubmit={onSubmitDisplayName}
+            >
                 <EditablePreview
                     w="full"
                     _hover={{
@@ -72,6 +96,7 @@ const FragmentInspectorForm = (props) => {
             <Box h={3}/>
             <MarkdownTextfield
                 data={props.fragmentData}
+                updateEditorList={props.updateEditorList}
             />
             <Box h={3}/>
             <FormControl>
@@ -118,6 +143,11 @@ const FragmentInspectorForm = (props) => {
                 type="action"
                 headline="Actions"
                 addActions={addActions}
+            />
+            <DeleteButton
+                component={props.fragmentData}
+                updateEditorList={props.updateEditorList}
+                setSelectedObject={props.setSelectedObject}
             />
         </VStack>
     )

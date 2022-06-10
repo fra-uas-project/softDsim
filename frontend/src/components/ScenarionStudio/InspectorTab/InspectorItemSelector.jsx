@@ -5,6 +5,7 @@ import styled from "@emotion/styled";
 import InspectorListElement from "./InspectorListElement";
 import {HiOutlinePlus} from "react-icons/hi";
 import {finalActionList} from "../scenarioStudioData";
+import {v4 as uuidv4} from 'uuid';
 
 const Clone = styled(ListItem)`
   margin-bottom: 12px;
@@ -17,6 +18,17 @@ const Clone = styled(ListItem)`
 
 const InspectorItemSelector = (props) => {
 
+    const copyAllActions = () => {
+        // Creating a deep copy (deep copy does not copy functions (icon)
+        const actionListItems = JSON.parse(JSON.stringify(finalActionList));
+
+        for (let i = 0; i < finalActionList.length; i++) {
+            actionListItems[i].id = uuidv4();
+            actionListItems[i].icon = finalActionList[i].icon
+        }
+        return actionListItems
+    }
+
     return (
         <>
             <HStack justifyContent="space-between" w="full">
@@ -26,7 +38,7 @@ const InspectorItemSelector = (props) => {
                     variant="solid"
                     size="xs"
                     leftIcon={<HiOutlinePlus/>}
-                    onClick={() => {props.addActions(finalActionList)}}
+                    onClick={() => {props.addActions(copyAllActions())}}
                 >Add all</Button>
             }
             </HStack>
