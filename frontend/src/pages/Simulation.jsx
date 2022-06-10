@@ -189,8 +189,11 @@ const Simulation = () => {
                         <Text>Scenario Description Here</Text>
                     </ModalBody>
 
-                    <ModalFooter>
-                        <Button colorScheme='blue' mr={3} onClick={() => { onClose(); startScenario() }}>
+                    <ModalFooter align="center" placeContent="center" gap={5}>
+                        <Button w="25%" colorScheme="blue">
+                            <Link to={{ pathname: "/scenarios" }} >Back</Link>
+                        </Button>
+                        <Button w="25%" colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
                             Start
                         </Button>
                     </ModalFooter>
