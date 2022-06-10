@@ -24,6 +24,10 @@ export const componentEnum = {
     "EVENT": "EVENT"
 }
 
+export const actionEnum = {
+    "ACTION": "ACTION"
+}
+
 export const questionEnum = {
     "SINGLE": "SINGLE",
     "MULTI": "MULTI",
