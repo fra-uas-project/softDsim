@@ -1,15 +1,18 @@
 import {
     AlertDialog,
     AlertDialogBody,
-    AlertDialogContent, AlertDialogFooter,
+    AlertDialogContent,
+    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogOverlay,
-    Button, useDisclosure
+    Button,
+    useDisclosure
 } from "@chakra-ui/react";
 import {useRef} from "react";
+import {actionEnum, questionEnum} from "../scenarioStudioData";
 
 const DeleteButton = (props) => {
-    const { isOpen: isDeleteOpen , onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+    const {isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose} = useDisclosure();
     const cancelRef = useRef();
 
     const deleteComponent = () => {
@@ -17,19 +20,36 @@ const DeleteButton = (props) => {
 
         props.updateEditorList(
             (draft) => {
-                return draft.filter((component) => component.id !== props.component.id)
-            })
+                if (props.component.type === actionEnum.ACTION) {
+                    for (const fragment of draft) {
+                        if (fragment?.actions) {
+                            fragment.actions = fragment.actions.filter(action => action.id !== props.component.id)
+                        }
+                    }
+                    return draft
+                } else if (props.component.type === questionEnum.SINGLE || props.component.type === questionEnum.MULTI) {
+                    for (const fragment of draft) {
+                        if (fragment?.questions) {
+                            fragment.questions = fragment.questions.filter(question => question.id !== props.component.id)
+                        }
+                    }
+                    return draft
+                } else {
+                    return draft.filter((component) => component.id !== props.component.id)
+                }
+            }
+        )
     };
 
-    return(
+    return (
         <>
-        <Button
-            w="full"
-            colorScheme="red"
-            onClick={onDeleteOpen}
-        >
-            Delete component
-        </Button>
+            <Button
+                w="full"
+                colorScheme="red"
+                onClick={onDeleteOpen}
+            >
+                Delete component
+            </Button>
 
 
             {/*Delete user alert pop up*/}
@@ -47,7 +67,8 @@ const DeleteButton = (props) => {
                         </AlertDialogHeader>
 
                         <AlertDialogBody>
-                            Are you sure that you want to delete {props.component.displayName}? You can't undo this action afterwards.
+                            Are you sure that you want to delete {props.component.displayName}? You can't undo this
+                            action afterwards.
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
