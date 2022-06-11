@@ -34,10 +34,6 @@ const ScenarioOverview = () => {
         setIsLoading(false)
     };
 
-    const navigateToScenario = (scn_id) => {
-        navigate(`${scn_id}`)
-    };
-
     useEffect(() => {
         fetchScenarios();
     }, []);
@@ -73,7 +69,8 @@ const ScenarioOverview = () => {
                                             return <Tr key={index}>
                                                 <Td fontWeight="500">
                                                     <Button variant="link" color="black" onClick={() => {
-                                                        navigateToScenario(scenario.id)
+                                                        navigate(`${scenario.id}`, {state: scenario})
+                                                        console.log("S", scenario)
                                                     }}
                                                     >{scenario.name}</Button>
                                                 </Td>
