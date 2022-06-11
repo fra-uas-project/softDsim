@@ -4,7 +4,10 @@ import {
     BreadcrumbItem,
     BreadcrumbLink,
     Button,
-    Container, Flex,
+    Container,
+    Flex,
+    Grid,
+    GridItem,
     Heading,
     Modal,
     ModalBody,
@@ -12,28 +15,18 @@ import {
     ModalFooter,
     ModalHeader,
     ModalOverlay,
+    Spacer,
     Text,
     useDisclosure,
-    Grid,
-    GridItem,
-    Spacer,
-
 } from "@chakra-ui/react";
-import { HiChevronRight } from "react-icons/hi";
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import {HiChevronRight} from "react-icons/hi";
+import {useEffect, useState} from "react";
+import {Link, useLocation} from "react-router-dom";
 import Question from "../components/Question";
 import Action from "../components/Action"
 import ModelSelection from '../components/ModelSelection'
-import { getCookie } from "../utils/utils"
-import TasksPanel from "../components/TasksPanel";
-import StressPanel from "../components/StressPanel";
-import EmployeesPanel from "../components/EmployeesPanel";
-import ProgressPanel from "../components/ProgressPanel";
-import MilestonesPanel from "../components/MilestonesPanel";
-import MotivationPanel from "../components/MotivationPanel";
-import FamiliarityPanel from "../components/FamiliarityPanel";
-import SideDrawerLeft from "../components/SideDrawerLeft";
+import {getCookie} from "../utils/utils"
+import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
@@ -216,25 +209,9 @@ const Simulation = () => {
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                <Box boxShadow='md' rounded='md' p='3' mb='5' bg='white' _hover={{ boxShadow: '2xl' }}><SideDrawerLeft /></Box>
-                                <Grid
-                                    templateRows='repeat(4, 1fr)'
-                                    templateColumns='repeat(6, 1fr)'
-                                    gap={5}
-                                    textAlign='center'
-                                    fontWeight='bold'
-                                    color='white'
-                                >
-                                    <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='white' ><TasksPanel simTasks={simTasks} /></GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><ProgressPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><MilestonesPanel /></GridItem>
-                                    <GridItem colSpan={6} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><EmployeesPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white' p='2'><StressPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white' p='2'><MotivationPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white' p='2'><FamiliarityPanel /></GridItem>
-                                </Grid>
+                                <Dashboard simTasks={simTasks} />
                             </Box>
-                            <Spacer />
+                            <Spacer/>
                             {/* right side of simulation studio */}
                             <Box
                                 p='3'
