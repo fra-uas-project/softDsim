@@ -79,6 +79,9 @@ class Team(models.Model):
         work_hours = NORMAL_WORK_HOUR_DAY + workpack.overtime
 
         members = Member.objects.filter(team_id=scenario.team.id)
+        staff_cost = sum([m.skill_type.cost_per_day for m in members])
+        logging.debug(f"staff cost: {staff_cost}")
+        scenario.state.cost += staff_cost
 
         # 1. meeting
         for _ in range(workpack_status.meetings_per_day[current_day]):

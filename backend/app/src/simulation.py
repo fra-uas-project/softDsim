@@ -110,6 +110,7 @@ def simulate(req, scenario: UserScenario):
     ## scenario.team.work(workpack) (ein tag simuliert)
     for day in range(0, days):
         scenario.team.work(workpack, scenario, workpack_status, day, tasks)
+        scenario.state.day += 1
 
     # team event
     if req.actions.teamevent:
