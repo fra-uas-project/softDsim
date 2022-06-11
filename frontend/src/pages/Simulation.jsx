@@ -33,6 +33,9 @@ const Simulation = () => {
 
     const location = useLocation();
 
+    // scenario template data
+    const {state} = useLocation();
+
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const fetchUserScenario = () => {
@@ -160,6 +163,7 @@ const Simulation = () => {
     }
 
     useEffect(() => {
+        console.log("TS", state)
         fetchUserScenario();
         onOpen();
     }, [onOpen]);
