@@ -7,6 +7,7 @@ class SimulationFragment(models.Model):
     id = models.AutoField(primary_key=True)
     index = models.PositiveIntegerField()
     text = models.TextField()
+    last = models.BooleanField(default=False)
     # simulation_end = SimulationEnd
     # actions: List[Action]
 
