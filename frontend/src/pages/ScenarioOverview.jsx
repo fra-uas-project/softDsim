@@ -70,7 +70,6 @@ const ScenarioOverview = () => {
                                                 <Td fontWeight="500">
                                                     <Button variant="link" color="black" onClick={() => {
                                                         navigate(`${scenario.id}`, {state: scenario})
-                                                        console.log("S", scenario)
                                                     }}
                                                     >{scenario.name}</Button>
                                                 </Td>

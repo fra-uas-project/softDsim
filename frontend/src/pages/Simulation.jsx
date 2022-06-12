@@ -27,6 +27,7 @@ import Action from "../components/Action"
 import ModelSelection from '../components/ModelSelection'
 import {getCookie} from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
+import MarkdownDisplay from "../components/MarkdownDisplay";
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
@@ -178,37 +179,37 @@ const Simulation = () => {
 
     return (
         <>
-            <Modal isOpen={isOpen} closeOnOverlayClick={false} isCentered>
+            <Modal isOpen={isOpen} closeOnOverlayClick={false} isCentered size="3xl">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Modal Title</ModalHeader>
+                    <ModalHeader>Story</ModalHeader>
                     <ModalBody>
-                        <Text>Scenario Description Here</Text>
+                        <MarkdownDisplay markdownText={state.story} />
                     </ModalBody>
 
-                    <ModalFooter align="center" placeContent="center" gap={5}>
-                        <Button w="25%" colorScheme="blue">
-                            <Link to={{ pathname: "/scenarios" }} >Back</Link>
+                    <ModalFooter gap={5}>
+                        <Button colorScheme="blue" variant="ghost" as={Link} to="/scenarios">
+                            Cancel
                         </Button>
-                        <Button w="25%" colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
-                            Start
+                        <Button colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
+                            Start Simulation
                         </Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
+
+
             <Flex px={10} pt={2} flexDir="column" flexGrow={0}>
                 <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500' />}>
                     <BreadcrumbItem>
                         <BreadcrumbLink as={Link} to={scenarioPath()}>Scenarios</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href=''>{userScenario.scn_name}</BreadcrumbLink>
+                        <BreadcrumbLink href=''>{state.name}</BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
-
-
                 <Flex flexDir="column" flexGrow={1}>
-                    <Heading p='5'>Active Scenario: {userScenario.scn_name}</Heading>
+                    <Heading p='5'>Active Scenario: {state.name}</Heading>
 
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
