@@ -49,7 +49,7 @@ def create_correct_request_model(request) -> ScenarioRequest:
 
 def handle_model_request(req, scenario):
     # todo: we could implement a check here to see if the model in the request is actually available in the scenario, but the frontend should only diplay the available options anyway
-    UserScenario.objects.filter(id=scenario.id).update(model=req.model)
+    UserScenario.objects.filter(id=scenario.id).update(model=req.model.upper())
 
 
 def handle_start_request(req, scenario):
