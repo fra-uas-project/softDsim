@@ -168,6 +168,7 @@ class TemplateScenarioFromStudioView(APIView):
                     )
 
             scenario.save()
+            set_last_fragement(scenario)
             logging.info("Template scenario created with id: " + str(scenario.id))
 
             # Create Scorecard
@@ -285,3 +286,15 @@ def handle_model(data, scenario: TemplateScenario, i):
 def handle_event(data, scenario: TemplateScenario, i):
     # Events are not yet implemented
     return i
+
+
+def set_last_fragement(scenario: TemplateScenario):
+    # Find all fragements
+    fragments = SimulationFragment.objects.filter(template_scenario=scenario).order_by(
+        "-index"
+    )
+    # Set the one with highest index as last fragment
+    if fragments.count():
+        fragments[0].last = True
+        fragments[0].save()
+
