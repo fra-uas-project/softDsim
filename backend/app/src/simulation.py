@@ -184,6 +184,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
+            text=next_component.text,
         )
     # 5.2 Check if next component is a Question Component
     elif isinstance(next_component, QuestionCollection):
@@ -192,6 +193,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             state=get_scenario_state_dto(scenario),
             tasks=get_tasks_status(scenario.id),
             members=get_member_report(scenario.team.id),
+            text=next_component.text,
         )
     # 5.3 Check if next component is a Model Selection
     elif isinstance(next_component, ModelSelection):
@@ -200,6 +202,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
             models=next_component.models(),
+            text=next_component.text,
         )
 
     write_history(scenario, req, scenario_response.type)

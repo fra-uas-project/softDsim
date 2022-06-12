@@ -7,6 +7,7 @@ class QuestionCollection(models.Model):
 
     id = models.AutoField(primary_key=True)
     index = models.PositiveIntegerField()
+    text = models.TextField(default="", blank=True, null=True)
     # questions: List[Question]
 
     template_scenario = models.ForeignKey(

@@ -9,6 +9,7 @@ class ModelSelection(models.Model):
     waterfall = models.BooleanField(default=True)
     kanban = models.BooleanField(default=True)
     scrum = models.BooleanField(default=True)
+    text = models.TextField(default="", blank=True, null=True)
 
     template_scenario = models.ForeignKey(
         TemplateScenario,

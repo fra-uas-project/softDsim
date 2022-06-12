@@ -295,6 +295,7 @@ def set_last_fragement(scenario: TemplateScenario):
     )
     # Set the one with highest index as last fragment
     if fragments.count():
-        fragments[0].last = True
-        fragments[0].save()
+        last_fragment = fragments[0]
+        last_fragment.last = True
+        last_fragment.save()
 

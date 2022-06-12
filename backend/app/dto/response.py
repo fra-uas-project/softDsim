@@ -70,6 +70,7 @@ class ScenarioResponse(BaseModel, ABC):
     state: ScenarioStateDTO
     tasks: TasksStatusDTO
     members: List[MemberDTO]
+    text = ""
 
 
 class SimulationResponse(ScenarioResponse):
