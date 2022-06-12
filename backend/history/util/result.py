@@ -4,9 +4,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 
 from app.dto.response import ResultResponse
-from app.models.task import TaskStatus
+from app.models.task import CachedTasks, Task, TaskStatus
 from app.models.user_scenario import UserScenario
 from app.src.util.member_util import get_member_report
+from app.src.util.score_util import calc_scores
 from app.src.util.task_util import (
     get_tasks_customer_view,
     get_tasks_status,
@@ -21,18 +22,15 @@ def get_result_response(scenario: UserScenario) -> ResultResponse:
         try:
             result: Result = Result.objects.get(user_scenario=scenario)
         except ObjectDoesNotExist:
+            final_tasks = CachedTasks(scenario_id=scenario.id)
             result: Result = Result.objects.create(
                 user_scenario=scenario,
-                total_score=200,  # todo: get total score
                 total_steps=scenario.state.step_counter,
                 total_days=scenario.state.day,
                 total_cost=scenario.state.cost,
                 **get_tasks_status_detailed(scenario_id=scenario.id),
                 **get_tasks_customer_view(scenario_id=scenario.id),
-                quality_score=100,  # todo: get quality score
-                time_score=50,  # todo: get time score
-                budget_score=25,  # todo: get budget score
-                question_score=25,  # todo: get question score
+                **calc_scores(scenario=scenario, tasks=final_tasks),
                 model=scenario.model or "",
             )
 
