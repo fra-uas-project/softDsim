@@ -1,11 +1,5 @@
-import {
-    StatLabel,
-    StatNumber,
-    StatHelpText,
-    StatArrow,
-    Box, Stat, Heading, Flex,
-} from "@chakra-ui/react"
-import React, { useState } from "react";
+import {Box, Flex, Heading, Stat, StatArrow, StatHelpText, StatLabel, StatNumber,} from "@chakra-ui/react"
+import React from "react";
 
 const TasksPanel = (props) => {
 
@@ -18,7 +12,7 @@ const TasksPanel = (props) => {
                 <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
                     <Stat>
                         <StatLabel>Todo</StatLabel>
-                        <StatNumber>{props.simTasks.tasks_todo}</StatNumber>
+                        <StatNumber>{props.simTasks?.tasks_todo}</StatNumber>
                         {/* set api calls here*/}
 
                         <StatHelpText>
@@ -30,7 +24,7 @@ const TasksPanel = (props) => {
                 <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
                     <Stat>
                         <StatLabel>Done</StatLabel>
-                        <StatNumber>{props.simTasks.task_done}</StatNumber>
+                        <StatNumber>{props.simTasks?.task_done}</StatNumber>
 
                         <StatHelpText>
                             <StatArrow type='increase' />
@@ -41,7 +35,7 @@ const TasksPanel = (props) => {
                 <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
                     <Stat>
                         <StatLabel>Unittested</StatLabel>
-                        <StatNumber>{props.simTasks.tasks_unit_tested}</StatNumber>
+                        <StatNumber>{props.simTasks?.tasks_unit_tested}</StatNumber>
 
                         <StatHelpText>
                             <StatArrow type='increase' />
@@ -53,7 +47,7 @@ const TasksPanel = (props) => {
                 <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
                     <Stat>
                         <StatLabel>Integrationtested</StatLabel>
-                        <StatNumber>{props.simTasks.tasks_integration_tested}</StatNumber>
+                        <StatNumber>{props.simTasks?.tasks_integration_tested}</StatNumber>
 
                         <StatHelpText>
                             <StatArrow type='increase' />
@@ -65,7 +59,7 @@ const TasksPanel = (props) => {
                 <Box m="2" bg='blue.100' borderRadius='2xl' boxShadow='md'>
                     <Stat>
                         <StatLabel>Bug</StatLabel>
-                        <StatNumber>{props.simTasks.tasks_bug}</StatNumber>
+                        <StatNumber>{props.simTasks?.tasks_bug}</StatNumber>
 
                         <StatHelpText>
                             <StatArrow type='increase' />
