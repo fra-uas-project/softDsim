@@ -7,7 +7,7 @@ class Answer(models.Model):
 
     id = models.AutoField(primary_key=True)
     label = models.TextField(default="answer")
-    points = models.PositiveIntegerField(default=0)
+    points = models.IntegerField(default=0)
 
     question = models.ForeignKey(
         Question,

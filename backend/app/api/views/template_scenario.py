@@ -168,6 +168,7 @@ class TemplateScenarioFromStudioView(APIView):
                     )
 
             scenario.save()
+            set_last_fragement(scenario)
             logging.info("Template scenario created with id: " + str(scenario.id))
 
             # Create Scorecard
@@ -190,7 +191,7 @@ class TemplateScenarioFromStudioView(APIView):
 
 def handle_base(data, scenario: TemplateScenario, i):
     scenario.name = data.get("template_name")
-    scenario.story = data.get("text")
+    scenario.story = data.get("text", "")
     # Create Management Goal
     mgoal = ManagementGoal(
         budget=data.get("budget"),
@@ -215,7 +216,7 @@ def handle_question(data, scenario: TemplateScenario, i):
         q = Question(
             question_index=qi,
             question_collection=qc,
-            text=question_data.get("text"),
+            text=question_data.get("text", ""),
             multi=question_data.get("type") == "MULTI",
         )
         q.save()
@@ -235,7 +236,7 @@ def handle_question(data, scenario: TemplateScenario, i):
 def handle_simulation(data, scenario: TemplateScenario, i):
     # Initialize Fragment
     simfragment = SimulationFragment(
-        index=i, text=data.get("text"), template_scenario=scenario
+        index=i, text=data.get("text", ""), template_scenario=scenario
     )
     simfragment.save()
 
@@ -265,7 +266,7 @@ def handle_simulation(data, scenario: TemplateScenario, i):
 def handle_model(data, scenario: TemplateScenario, i):
     m = ModelSelection(
         index=i,
-        text=data.get("text"),
+        text=data.get("text", ""),
         waterfall="waterfall" in data.get("models"),
         kanban="kanban" in data.get("models"),
         scrum="scrum" in data.get("models"),
@@ -285,3 +286,16 @@ def handle_model(data, scenario: TemplateScenario, i):
 def handle_event(data, scenario: TemplateScenario, i):
     # Events are not yet implemented
     return i
+
+
+def set_last_fragement(scenario: TemplateScenario):
+    # Find all fragements
+    fragments = SimulationFragment.objects.filter(template_scenario=scenario).order_by(
+        "-index"
+    )
+    # Set the one with highest index as last fragment
+    if fragments.count():
+        last_fragment = fragments[0]
+        last_fragment.last = True
+        last_fragment.save()
+

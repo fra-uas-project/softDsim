@@ -51,6 +51,9 @@ def end_of_fragment(scenario) -> bool:
     except:
         return False
 
+    if fragment.last:
+        return end_of_simulation(scenario)
+
     tasks_done = Task.objects.filter(user_scenario=scenario, done=True)
 
     end_types = ["tasks_done", "motivation"]
@@ -62,6 +65,18 @@ def end_of_fragment(scenario) -> bool:
                     return True
                 else:
                     return False
+
+
+def end_of_simulation(scenario: UserScenario) -> bool:
+    tasks = Task.objects.filter(user_scenario=scenario).count()
+    tasks_integration = Task.objects.filter(
+        user_scenario=scenario,
+        unit_tested=True,  # TODO: CAHNGE BACK TO INTEGRATIO TESTED
+        # THIS IS ONLY BECAUSE WE CANNOT INTEGRATION TEST YET
+    ).count()
+    if tasks == tasks_integration:
+        return True
+    return False
 
 
 class WorkpackStatus:

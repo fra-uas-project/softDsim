@@ -23,7 +23,7 @@ from app.exceptions import (
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
 from app.models.user_scenario import UserScenario
-from app.models.task import Task
+from app.models.task import CachedTasks, Task
 from app.models.model_selection import ModelSelection
 from app.src.util.question_util import get_question_collection, handle_question_answers
 from app.src.util.scenario_util import (
@@ -73,6 +73,7 @@ def simulate(req, scenario: UserScenario):
             (workpack.meetings / days), (normal_work_hour_day + workpack.overtime)
         )
 
+    # Add or remove members from the team
     member_change = req.members
     for m in member_change:
         try:
@@ -97,17 +98,7 @@ def simulate(req, scenario: UserScenario):
                 raise SimulationException(msg)
 
     # Simulate what happens
-    tasks = Task.objects.filter(user_scenario=scenario, done=False)
-    done_tasks = []
-    for i in range(min(days, len(tasks))):
-        t = tasks[i]
-        t.done = True
-        done_tasks.append(t)
-
-    # write updates to database
-    Task.objects.bulk_update(done_tasks, fields=["done"])
-
-    # new
+    tasks = CachedTasks(scenario_id=scenario.id)  # Read tasks once
     # team event
     if req.actions.teamevent:
         days = days - 1
@@ -118,7 +109,8 @@ def simulate(req, scenario: UserScenario):
     # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
     ## scenario.team.work(workpack) (ein tag simuliert)
     for day in range(0, days):
-        scenario.team.work(workpack, scenario, workpack_status, day)
+        scenario.team.work(workpack, scenario, workpack_status, day, tasks)
+        scenario.state.day += 1
 
     # team event
     if req.actions.teamevent:
@@ -129,9 +121,10 @@ def simulate(req, scenario: UserScenario):
             # Stress is reduced by 50% ?
             member.stress = member.stress * 0.5
             # Motivation is increased by 20% ?
-            member.motivation = min([member.motivation * 1.2, 1])
+            member.motivation = min((member.motivation * 1.2, 1))
             member.save()
     scenario.save()
+    tasks.save()  # Save all tasks once at the end of the simulation
 
 
 def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
@@ -191,6 +184,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
+            text=next_component.text,
         )
     # 5.2 Check if next component is a Question Component
     elif isinstance(next_component, QuestionCollection):
@@ -199,6 +193,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             state=get_scenario_state_dto(scenario),
             tasks=get_tasks_status(scenario.id),
             members=get_member_report(scenario.team.id),
+            text=next_component.text,
         )
     # 5.3 Check if next component is a Model Selection
     elif isinstance(next_component, ModelSelection):
@@ -207,6 +202,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
             models=next_component.models(),
+            text=next_component.text,
         )
 
     write_history(scenario, req, scenario_response.type)
