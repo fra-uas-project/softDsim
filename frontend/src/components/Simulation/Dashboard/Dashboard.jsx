@@ -1,5 +1,4 @@
-import {Box, Grid, GridItem} from "@chakra-ui/react";
-import SideDrawerLeft from "../../SideDrawerLeft";
+import {Grid, GridItem, HStack} from "@chakra-ui/react";
 import TasksPanel from "../../TasksPanel";
 import ProgressPanel from "../../ProgressPanel";
 import MilestonesPanel from "../../MilestonesPanel";
@@ -7,11 +6,44 @@ import EmployeesPanel from "../../EmployeesPanel";
 import StressPanel from "../../StressPanel";
 import MotivationPanel from "../../MotivationPanel";
 import FamiliarityPanel from "../../FamiliarityPanel";
+import StatElement from "./StatElement";
+import {MdOutlineTask} from "react-icons/md";
+import {HiOutlineCalendar, HiOutlineCash} from "react-icons/hi";
+import OpenStoryButton from "./OpenStoryButton";
 
-const Dashboard = ({simTasks}) => {
+const Dashboard = ({simTasks, templateScenario}) => {
     return (
         <>
-        <Box boxShadow='md' rounded='md' p='3' mb='5' bg='white' _hover={{boxShadow: '2xl'}}><SideDrawerLeft/></Box>
+            <HStack pb={5} spacing={5}>
+                <OpenStoryButton templateScenario={templateScenario} />
+                <StatElement
+                    icon={HiOutlineCalendar}
+                    title="Days until deadline"
+                    value="365"
+                    suffix="days"
+                    indicator="decrease"
+                    indicatorValue="7 days"
+                    indicatorColor="red.400"
+                />
+                <StatElement
+                    icon={HiOutlineCash}
+                    title="Expenses"
+                    value="379,392"
+                    prefix="$"
+                    indicatorValue="$ 37,920"
+                    indicator="increase"
+                    indicatorColor="red.400"
+                />
+                <StatElement
+                    icon={MdOutlineTask}
+                    title="Finished tasks"
+                    value="394"
+                    suffix="tasks"
+                    indicator="increase"
+                    indicatorValue="42 tasks"
+                    indicatorColor="green.400"
+                />
+            </HStack>
         <Grid
             templateRows='repeat(4, 1fr)'
             templateColumns='repeat(6, 1fr)'
