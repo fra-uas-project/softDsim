@@ -97,16 +97,8 @@ class WorkpackStatus:
             else:
                 self.meetings_per_day.append(meetings_per_day_without_modulo)
 
-    def set_remaining_trainings(self, remaining_hours):
-        self.remaining_trainings = remaining_hours
-        if self.remaining_trainings < 0:
-            self.remaining_trainings = 0
-
-    # def calculate_trainings_per_day(self, days, workpack):
-    #     trainings_per_day_without_modulo = math.floor(workpack.training / days)
-    #     modulo = workpack.training % days
-    #     for day in range(days):
-    #         if day < modulo:
-    #             self.trainings_per_day.append(trainings_per_day_without_modulo + 1)
-    #         else:
-    #             self.trainings_per_day.append(trainings_per_day_without_modulo)
+    # def set_remaining_trainings(self, remaining_trainings_today, remaining_work_hours):
+    #     if remaining_trainings_today > remaining_work_hours:
+    #         self.remaining_trainings = remaining_trainings_today - remaining_work_hours
+    #     else:
+    #         self.remaining_trainings = 0

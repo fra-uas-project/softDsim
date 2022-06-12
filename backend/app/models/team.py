@@ -1,13 +1,15 @@
 from asyncio import tasks
 import logging
 import random
+from statistics import mean
 from typing import List
 
+from deprecated.classic import deprecated
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-
-from app.models.task import TaskStatus
+from app.dto.request import Workpack
+from app.models.task import TaskStatus, CachedTasks, Task
 from app.models.user_scenario import UserScenario
 from app.src.util.util import probability
 
@@ -60,36 +62,53 @@ class Team(models.Model):
 
         return work_hours - 1
 
-    def training(self, scenario, members, work_hours) -> int:
+    @deprecated
+    def training_without_recursion(
+        self, scenario, members, work_hours, mean_real_throughput
+    ) -> int:
 
         for member in members:
-            # todo philip: implement real delta
-            delta = 1
-            xp = (delta * scenario.config.train_skill_increase_rate) / (
-                1 + member.xp
-            ) ** 2
-            member.xp = xp
+            delta = mean_real_throughput - (
+                member.skill_type.throughput * (1 + member.xp)
+            )
+            if delta > 0:
+                xp = (delta * scenario.config.train_skill_increase_rate) / (
+                    1 + member.xp
+                ) ** 2
+                member.xp += xp
 
-            member.motivation = min(1, member.motivation + 0.1)
-
+                member.motivation = min(1, member.motivation + 0.1)
         Member.objects.bulk_update(members, fields=["xp", "motivation"])
-        # training aus alter train methode
-        # self.xp_factor += (hours * delta * TRAIN_SKILL_INCREASE_AMOUNT) / (
-        #     (1 + self.xp_factor) ** 2
-        # )  # Divide by xp_factor^2 to make it grow less with increasing xp factor
-        # self.motivation = min(1, self.motivation + 0.1 * hours)
-        # return self.xp_factor
-
-        # delta aus alter train methode
-        # m = mean(
-        #     [member.skill_type.throughput for member in self.staff if not member.halted]
-        # )
-        # for member in self.staff:
-        #     delta = m - member.skill_type.throughput
-        #     if delta > 0:
-        #         member.train(total_training_h, delta)
 
         return work_hours - 1
+
+    def training(
+        self, scenario, members, work_hours, mean_real_throughput, remaining_trainings
+    ) -> int:
+
+        for member in members:
+            delta = mean_real_throughput - (
+                member.skill_type.throughput * (1 + member.xp)
+            )
+            if delta > 0:
+                xp = (delta * scenario.config.train_skill_increase_rate) / (
+                    1 + member.xp
+                ) ** 2
+                member.xp += xp
+
+                member.motivation = min(1, member.motivation + 0.1)
+
+        remaining_trainings -= 1
+        work_hours -= 1
+
+        # call training function recursive -> only one database call at the end of all trainings, instead of after each hour
+        if remaining_trainings > 0:
+            return self.training(
+                scenario, members, work_hours, mean_real_throughput, remaining_trainings
+            )
+        else:
+            Member.objects.bulk_update(members, fields=["xp", "motivation"])
+            return work_hours
 
     # ein tag
     def work(
@@ -98,7 +117,7 @@ class Team(models.Model):
         scenario,
         workpack_status,
         current_day,
-        tasks: CachedTasks,
+        cached_tasks: CachedTasks,
     ):
 
         # work hours
@@ -112,27 +131,55 @@ class Team(models.Model):
 
         # 1. meeting
         for _ in range(workpack_status.meetings_per_day[current_day]):
-            remaining_work_hours = self.meeting(scenario, members, work_hours, tasks)
+            remaining_work_hours = self.meeting(
+                scenario, members, remaining_work_hours, cached_tasks
+            )
 
         # 2. training
-        remaining_trainings = workpack_status.remaining_trainings
-        if remaining_trainings > 0:
-            if remaining_trainings > remaining_work_hours:
+        remaining_trainings_today = workpack_status.remaining_trainings
+        if remaining_trainings_today > 0:
+            # todo philip: put this in function
+            if remaining_trainings_today > remaining_work_hours:
                 workpack_status.remaining_trainings = (
-                    remaining_trainings - remaining_work_hours
+                    remaining_trainings_today - remaining_work_hours
                 )
-                remaining_trainings = remaining_work_hours
+                remaining_trainings_today = remaining_work_hours
             else:
                 workpack_status.remaining_trainings = 0
+
+            mean_real_throughput_of_team = mean(
+                [(member.skill_type.throughput * (1 + member.xp)) for member in members]
+            )
+
+            # recursive approach
+            # call training method once, training method calls itself recursively -> write to db at the end -> reduce db calls
+            remaining_work_hours = self.training(
+                scenario,
+                members,
+                remaining_work_hours,
+                mean_real_throughput_of_team,
+                remaining_trainings_today,
+            )
+
+            # standard approach -> more db calls
             # training wird so oft aufgerufen wie Stunden an Training geplant sind
             # jedes Aufrufen der training methode ist eine Stunde
-            for _ in range(remaining_trainings):
-                remaining_work_hours = self.training(
-                    scenario, members, remaining_work_hours
-                )
+            # for _ in range(remaining_trainings):
+            #     remaining_work_hours = self.training(
+            #         scenario,
+            #         members,
+            #         remaining_work_hours,
+            #         mean_real_throughput_of_team,
+            #     )
 
         # 3. task work
-        self.task_work(tasks, work_hours, members, workpack.bugfix, workpack.unittest)
+        self.task_work(
+            cached_tasks,
+            remaining_work_hours,
+            members,
+            workpack.bugfix,
+            workpack.unittest,
+        )
 
     # def work(workpack)
     ## 1. meeting (done)
