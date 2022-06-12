@@ -102,7 +102,7 @@ const Simulation = () => {
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/sim/start`, {
                 method: 'POST',
                 credentials: 'include',
-                body: JSON.stringify({ "template-id": 1, "config-id": 1 }),
+                body: JSON.stringify({ "template-id": state.id, "config-id": 1 }),
                 headers: {
                     "X-CSRFToken": getCookie("csrftoken"),
                     "Content-Type": "application/json"
@@ -214,7 +214,7 @@ const Simulation = () => {
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                <Dashboard simTasks={simTasks} />
+                                <Dashboard simTasks={simTasks} templateScenario={state} />
                             </Box>
                             <Spacer/>
                             {/* right side of simulation studio */}
