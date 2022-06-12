@@ -1,11 +1,15 @@
+from asyncio import tasks
 import logging
+import random
+from typing import List
 
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-
-from app.models.task import TaskStatus
+from app.dto.request import Workpack
+from app.models.task import Task, CachedTasks
 from app.models.user_scenario import UserScenario
+from app.src.util.util import probability
 
 import numpy as np
 
@@ -34,9 +38,14 @@ class Team(models.Model):
         c = self.num_communication_channels
         return 1 / (1 + (c / 20 - 0.05))
 
+    @property
+    def management_skill(self):
+        """Returns the team's management skill."""
+        return 0.5  # TODO: implement
+
     # increases familiarity with the project for each member
-    def meeting(self, scenario, members, work_hours) -> int:
-        solved_tasks = TaskStatus.solved(scenario.id)
+    def meeting(self, scenario, members, work_hours, tasks: CachedTasks) -> int:
+        solved_tasks = tasks.solved()
         for member in members:
             tasks_in_meeting = scenario.config.done_tasks_per_meeting
 
@@ -56,7 +65,14 @@ class Team(models.Model):
         return work_hours - 1
 
     # ein tag
-    def work(self, workpack, scenario, workpack_status, current_day):
+    def work(
+        self,
+        workpack: Workpack,
+        scenario,
+        workpack_status,
+        current_day,
+        tasks: CachedTasks,
+    ):
 
         # work hours
         NORMAL_WORK_HOUR_DAY: int = 8
@@ -66,14 +82,14 @@ class Team(models.Model):
 
         # 1. meeting
         for _ in range(workpack_status.meetings_per_day[current_day]):
-            work_hours = self.meeting(scenario, members, work_hours)
+            work_hours = self.meeting(scenario, members, work_hours, tasks)
 
         # 2. training
         for _ in range(workpack_status.trainings_per_day[current_day]):
             work_hours = self.training(scenario, members, work_hours)
 
         # 3. task work
-        # self.task_work()
+        self.task_work(tasks, work_hours, members, workpack.bugfix, workpack.unittest)
 
     # def work(workpack)
     ## 1. meeting (done)
@@ -84,10 +100,36 @@ class Team(models.Model):
     ## 3. ab hier geht um tasks
     ## self.task_work()
 
-    # def task_work(stundenanzahl):
-    ## for m in members:
-    ### alle punkte hier werden nur ausgeführt wenn diese action auch ausgewählt sind
-    ### poisson verteilung wie viele tasks kann dieser member absolvieren (wie viel tasks kann member in $studenanzahl absolvieren)
+    def task_work(self, tasks, hours, members, bugfix, unittest):
+        for m in members:
+            n = m.n_tasks(hours)
+            if unittest:
+                tasks_to_test = tasks.done()
+                while n and len(tasks_to_test):
+                    t: Task = tasks_to_test.pop()
+                    t.unit_tested = True
+                    n -= 1
+            if bugfix:
+                tasks_to_fix = tasks.bug()
+                while n and len(tasks_to_fix):
+                    t: Task = tasks_to_fix.pop()
+                    t.bug = False
+                    n -= 1
+            tasks_to_do = tasks.todo()
+            while n and len(tasks_to_do):
+                t: Task = tasks_to_do.pop()
+                t.done = True
+                t.bug = probability((m.skill_type.error_rate + m.stress) / 2)
+                t.correct_specification = probability(self.management_skill)
+                t.unit_tested = False
+                t.integration_tested = False
+                m.familiar_tasks += 1
+                if t.bug:
+                    m.stress = min(
+                        (1, m.stress + self.user_scenario.config.stress_error_increase)
+                    )
+                n -= 1
+
     ### 3. unit tests (poisson zahl z.B. *1.3, unit test könnte schneller gehen als task machen)
     #### alle tasks aus db holen die unit tested werden müssen (TaskStatus.done() (sind alle tasks die done sind und jetzt unit tested werden können)
     #### junior skill type würde leichte tasks nehmen, senior schwere (am anfang einfach zufällig)
@@ -154,6 +196,8 @@ class Member(models.Model):
         return sum([self.familiarity, self.motivation, self.stress]) / 3
 
     def calculate_familiarity(self, solved_tasks):
+        if solved_tasks == 0:
+            return 1.0
         self.familiarity = self.familiar_tasks / solved_tasks
 
     def n_tasks(self, hours) -> int:
