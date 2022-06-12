@@ -35,13 +35,6 @@ const UserOverview = () => {
 
     const toast = useToast()
 
-    // const role = {
-    //     ADMIN: "admin",
-    //     STAFF: "staff",
-    //     CREATOR: "creator",
-    //     STUDENT: "student"
-    // }
-
     const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose:  onRoleClose} = useDisclosure()
     const { isOpen: isDeleteOpen , onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const cancelRef = useRef();
