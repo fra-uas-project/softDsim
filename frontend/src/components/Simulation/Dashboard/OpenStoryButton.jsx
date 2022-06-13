@@ -22,8 +22,8 @@ const OpenStoryButton = ({templateScenario}) => {
                 _hover={{boxShadow: 'xl'}}
                 onClick={onOpen}
         >
-            <Flex borderRadius="100%" backgroundColor="gray.200" p={2}>
-                <Icon w={10} h={10} as={HiOutlineDocumentText} color="gray.500" />
+            <Flex borderRadius="100%" backgroundColor="blue.100" p={2}>
+                <Icon w={10} h={10} as={HiOutlineDocumentText} color="blue.600" />
             </Flex>
             <Text fontWeight="semibold" color="gray.400" fontSize="sm">Open Story</Text>
         </VStack>
