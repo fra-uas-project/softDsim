@@ -123,6 +123,7 @@ def simulate(req, scenario: UserScenario) -> None:
         members: List[Member] = Member.objects.filter(team_id=scenario.team.id)
         cost = len(members) * scenario.config.cost_member_team_event
         scenario.state.cost += cost
+        scenario.state.day += 1
         for member in members:
             # Stress is reduced by 50% ?
             member.stress = member.stress * 0.5

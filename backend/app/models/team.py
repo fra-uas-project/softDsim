@@ -241,7 +241,8 @@ class Member(models.Model):
         return sum([self.familiarity, self.motivation, self.stress]) / 3
 
     def calculate_familiarity(self, solved_tasks):
-        self.familiarity = self.familiar_tasks / solved_tasks
+        if solved_tasks > 0:
+            self.familiarity = self.familiar_tasks / solved_tasks
 
     def n_tasks(self, hours) -> int:
         """Returns the number of tasks that the member can do in the given hours"""
