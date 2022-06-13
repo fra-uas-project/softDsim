@@ -139,7 +139,7 @@ import {
           <Stack spacing={3}>
   <Text as='b'>Email Guidelines:</Text>
   <Text as='i' color='red'>Email must be within the FRA-UAS domain.</Text>
-  <Text as='b'>Password Guideline</Text>
+  <Text as='b'>Password Guideline:</Text>
   <Text as='i' color='red'>Password must be at least 6 characters strong and contain at least one number.</Text>
  
 </Stack>
