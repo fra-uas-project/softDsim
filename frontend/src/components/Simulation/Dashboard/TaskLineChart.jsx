@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import Chart from "react-apexcharts";
 import {Heading, HStack, Stat, StatArrow, StatHelpText, StatLabel, StatNumber, VStack} from "@chakra-ui/react";
 
-const TaskLineChart = ({title}) => {
+const TaskLineChart = ({title, data}) => {
     // remove from here when we have real data
     const tmpOptions = {
         chart: {
@@ -68,7 +68,7 @@ const TaskLineChart = ({title}) => {
             <VStack w="full">
                 <Stat>
                     <StatLabel color="gray.400">Done</StatLabel>
-                    <StatNumber>4830</StatNumber>
+                    <StatNumber>{data.tasks.task_done}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
                         232 since last iteration
@@ -76,7 +76,7 @@ const TaskLineChart = ({title}) => {
                 </Stat>
                 <Stat>
                     <StatLabel color="gray.400">Integration tested</StatLabel>
-                    <StatNumber>3824</StatNumber>
+                    <StatNumber>{data.tasks.tasks_integration_tested}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
                         232 since last iteration
@@ -84,7 +84,7 @@ const TaskLineChart = ({title}) => {
                 </Stat>
                 <Stat>
                     <StatLabel color="gray.400">Unit tested</StatLabel>
-                    <StatNumber>4230</StatNumber>
+                    <StatNumber>{data.tasks.tasks_unit_tested}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
                         232 since last iteration
@@ -92,7 +92,7 @@ const TaskLineChart = ({title}) => {
                 </Stat>
                 <Stat>
                     <StatLabel color="gray.400">Bugs</StatLabel>
-                    <StatNumber>4830</StatNumber>
+                    <StatNumber>{data.tasks.tasks_bug}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
                         232 since last iteration
