@@ -7,6 +7,7 @@ from app.dto.request import (
     StartRequest,
 )
 from app.dto.response import ActionDTO
+from app.models.user_scenario import UserScenario
 from history.models.history import History
 
 
@@ -47,7 +48,8 @@ def create_correct_request_model(request) -> ScenarioRequest:
 
 
 def handle_model_request(req, scenario):
-    pass
+    # todo: we could implement a check here to see if the model in the request is actually available in the scenario, but the frontend should only diplay the available options anyway
+    UserScenario.objects.filter(id=scenario.id).update(model=req.model.upper())
 
 
 def handle_start_request(req, scenario):
