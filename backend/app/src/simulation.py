@@ -107,17 +107,16 @@ def simulate(req, scenario: UserScenario) -> None:
     workpack_status = WorkpackStatus(days, workpack)
 
     # check if there are members to work
-    if len(scenario.team.members.values()) == 0:
+    if len(scenario.team.members.values()) > 0:
+        # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
+        ## scenario.team.work(workpack) (ein tag simuliert)
+        for day in range(0, days):
+            scenario.team.work(workpack, scenario, workpack_status, day, tasks)
+            scenario.state.day += 1
+    else:
         logging.info(
             "There are no members in the team, so there is nothing to simulate."
         )
-        return
-
-    # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
-    ## scenario.team.work(workpack) (ein tag simuliert)
-    for day in range(0, days):
-        scenario.team.work(workpack, scenario, workpack_status, day, tasks)
-        scenario.state.day += 1
 
     # team event
     if req.actions.teamevent:

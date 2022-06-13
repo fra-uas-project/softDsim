@@ -82,9 +82,7 @@ class Team(models.Model):
 
         return work_hours - 1
 
-    def training(
-        self, scenario, members, work_hours, mean_real_throughput, remaining_trainings
-    ) -> int:
+    def training(self, scenario, members, work_hours, mean_real_throughput) -> None:
 
         for member in members:
             delta = mean_real_throughput - (
@@ -98,17 +96,7 @@ class Team(models.Model):
 
                 member.motivation = min(1, member.motivation + 0.1)
 
-        remaining_trainings -= 1
         work_hours -= 1
-
-        # call training function recursive -> only one database call at the end of all trainings, instead of after each hour
-        if remaining_trainings > 0:
-            return self.training(
-                scenario, members, work_hours, mean_real_throughput, remaining_trainings
-            )
-        else:
-            Member.objects.bulk_update(members, fields=["xp", "motivation"])
-            return work_hours
 
     # ein tag
     def work(
@@ -150,27 +138,14 @@ class Team(models.Model):
             mean_real_throughput_of_team = mean(
                 [(member.skill_type.throughput * (1 + member.xp)) for member in members]
             )
-
-            # recursive approach
-            # call training method once, training method calls itself recursively -> write to db at the end -> reduce db calls
-            remaining_work_hours = self.training(
-                scenario,
-                members,
-                remaining_work_hours,
-                mean_real_throughput_of_team,
-                remaining_trainings_today,
-            )
-
-            # standard approach -> more db calls
-            # training wird so oft aufgerufen wie Stunden an Training geplant sind
-            # jedes Aufrufen der training methode ist eine Stunde
-            # for _ in range(remaining_trainings):
-            #     remaining_work_hours = self.training(
-            #         scenario,
-            #         members,
-            #         remaining_work_hours,
-            #         mean_real_throughput_of_team,
-            #     )
+            for _ in range(remaining_trainings_today):
+                self.training(
+                    scenario,
+                    members,
+                    remaining_work_hours,
+                    mean_real_throughput_of_team,
+                )
+            Member.objects.bulk_update(members, fields=["xp", "motivation"])
 
         # 3. task work
         self.task_work(
