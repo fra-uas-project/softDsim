@@ -40,7 +40,7 @@ const UserOverview = () => {
     const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose:  onRoleClose} = useDisclosure()
     const { isOpen: isDeleteOpen , onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const cancelRef = useRef();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    
    
 
     const fetchUsers = async () => {
