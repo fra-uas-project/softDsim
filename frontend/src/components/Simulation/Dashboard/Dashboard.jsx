@@ -1,41 +1,89 @@
-import {Box, Grid, GridItem} from "@chakra-ui/react";
-import SideDrawerLeft from "../../SideDrawerLeft";
-import TasksPanel from "../../TasksPanel";
-import ProgressPanel from "../../ProgressPanel";
-import MilestonesPanel from "../../MilestonesPanel";
-import EmployeesPanel from "../../EmployeesPanel";
-import StressPanel from "../../StressPanel";
-import MotivationPanel from "../../MotivationPanel";
-import FamiliarityPanel from "../../FamiliarityPanel";
+import {Flex, HStack} from "@chakra-ui/react";
+import StatElement from "./StatElement";
+import {HiOutlineCalendar, HiOutlineCash, HiOutlineDocumentText} from "react-icons/hi";
+import OpenStoryButton from "./OpenStoryButton";
+import TaskLineChart from "./TaskLineChart";
+import CircularChart from "./CircularChart";
+import BudgetLineChart from "./BudgetLineChart";
+import {useEffect, useState} from "react";
 
-const Dashboard = ({simTasks}) => {
+const Dashboard = ({templateScenario, data}) => {
+
+    const [expenses, setExpenses] = useState(0);
+    const [expensesBefore, setExpensesBefore] = useState(0);
+
+    const [daysUntilDeadline, setDaysUntilDeadline] = useState(templateScenario.management_goal.duration);
+    const [daysUntilDeadlineBefore, setDaysUntilDeadlineBefore] = useState(0);
+
+    const [tasks, setTasks] = useState(templateScenario.management_goal.easy_tasks + templateScenario.management_goal.medium_tasks + templateScenario.management_goal.hard_tasks)
+    const [tasksBefore, setTasksBefore] = useState(0)
+
+    const calcDelta = (value, valueBefore) => {
+        if(value - valueBefore === 0) {
+            return ""
+        } else if (value - valueBefore > 0) {
+            return "increase"
+        }else if (value - valueBefore < 0) {
+            return "decrease"
+        }
+    }
+
+    useEffect(() => {
+        setDaysUntilDeadlineBefore(daysUntilDeadline)
+        setDaysUntilDeadline(templateScenario.management_goal.duration - data.state.day)
+
+        setExpensesBefore(expenses)
+        setExpenses(data.state.cost)
+
+        setTasksBefore(tasks)
+        setTasks(data.tasks.tasks_todo)
+    }, [data])
+
     return (
         <>
-        <Box boxShadow='md' rounded='md' p='3' mb='5' bg='white' _hover={{boxShadow: '2xl'}}><SideDrawerLeft/></Box>
-        <Grid
-            templateRows='repeat(4, 1fr)'
-            templateColumns='repeat(6, 1fr)'
-            gap={5}
-            textAlign='center'
-            fontWeight='bold'
-            color='white'
-        >
-            <GridItem rowSpan={1} _hover={{boxShadow: '2xl'}} colSpan={1} boxShadow='md' rounded='md'
-                      bg='white'><TasksPanel simTasks={simTasks}/></GridItem>
-            <GridItem colSpan={3} _hover={{boxShadow: '2xl'}} boxShadow='md' rounded='md'
-                      bg='white'><ProgressPanel/></GridItem>
-            <GridItem colSpan={2} _hover={{boxShadow: '2xl'}} boxShadow='md' rounded='md' bg='white'><MilestonesPanel/></GridItem>
-            <GridItem colSpan={6} _hover={{boxShadow: '2xl'}} boxShadow='md' rounded='md'
-                      bg='white'><EmployeesPanel/></GridItem>
-            <GridItem colSpan={2} _hover={{boxShadow: '2xl'}} boxShadow='md' rounded='md' bg='white'
-                      p='2'><StressPanel/></GridItem>
-            <GridItem colSpan={2} _hover={{boxShadow: '2xl'}} boxShadow='md' rounded='md' bg='white'
-                      p='2'><MotivationPanel/></GridItem>
-            <GridItem colSpan={2} _hover={{boxShadow: '2xl'}} boxShadow='md' rounded='md' bg='white'
-                      p='2'><FamiliarityPanel/></GridItem>
-        </Grid>
-</>
-)
+            <HStack pb={5} spacing={5}>
+                <OpenStoryButton templateScenario={templateScenario}/>
+                <StatElement
+                    icon={HiOutlineCalendar}
+                    title="Days until deadline"
+                    value={daysUntilDeadline}
+                    suffix="days"
+                    indicator={calcDelta(daysUntilDeadline, daysUntilDeadlineBefore)}
+                    indicatorValue={`${daysUntilDeadline - daysUntilDeadlineBefore} days`}
+                    indicatorColor={daysUntilDeadline - daysUntilDeadlineBefore < 0 ? "red.400" : "green.400"}
+                />
+                <StatElement
+                    icon={HiOutlineCash}
+                    title="Expenses"
+                    value={expenses}
+                    prefix="$"
+                    indicatorValue={`$ ${expenses - expensesBefore}`}
+                    indicator={calcDelta(expenses, expensesBefore)}
+                    indicatorColor={expenses - expensesBefore < 0 ? "green.400" : "red.400"}
+                />
+                <StatElement
+                    icon={HiOutlineDocumentText}
+                    title="Remaining tasks"
+                    value={data.tasks.tasks_todo}
+                    suffix="tasks"
+                    indicator={calcDelta(tasks, tasksBefore)}
+                    indicatorValue={`${tasks - tasksBefore} tasks`}
+                    indicatorColor={tasks - tasksBefore < 0 ? "green.400" : "red.400"}
+                />
+            </HStack>
+
+            <TaskLineChart title="Tasks" data={data}/>
+            <BudgetLineChart title="Budget"/>
+
+            <Flex>
+                <HStack backgroundColor="white" borderRadius="2xl" p={5} mb={5} w="full" justifyContent="center">
+                    <CircularChart value={[60]} inverseColors={true} title="Avg. Stress"/>
+                    <CircularChart value={[20]} inverseColors={false} title="Avg. Motivation"/>
+                    <CircularChart value={[20]} inverseColors={false} title="Avg. Familarity"/>
+                </HStack>
+            </Flex>
+        </>
+    )
 }
 
 export default Dashboard;

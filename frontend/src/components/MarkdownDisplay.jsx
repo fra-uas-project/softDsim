@@ -22,6 +22,7 @@ const MarkdownDisplay = ({markdownText}) => {
 
   .EasyMDEContainer .CodeMirror {
     border-radius: 10px;
+    height: 80vh;
   }
   
   .editor-toolbar {
