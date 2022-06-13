@@ -54,7 +54,7 @@ from app.src.util.scenario_util import get_actions_from_fragment
 from history.write import write_history
 
 
-def simulate(req, scenario: UserScenario):
+def simulate(req, scenario: UserScenario) -> None:
     """This function does the actual simulation of a scenario fragment."""
     if req.actions is None:
         raise RequestActionException()
@@ -106,11 +106,17 @@ def simulate(req, scenario: UserScenario):
 
     workpack_status = WorkpackStatus(days, workpack)
 
-    # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
-    ## scenario.team.work(workpack) (ein tag simuliert)
-    for day in range(0, days):
-        scenario.team.work(workpack, scenario, workpack_status, day, tasks)
-        scenario.state.day += 1
+    # check if there are members to work
+    if len(scenario.team.members.values()) > 0:
+        # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
+        ## scenario.team.work(workpack) (ein tag simuliert)
+        for day in range(0, days):
+            scenario.team.work(workpack, scenario, workpack_status, day, tasks)
+            scenario.state.day += 1
+    else:
+        logging.info(
+            "There are no members in the team, so there is nothing to simulate."
+        )
 
     # team event
     if req.actions.teamevent:

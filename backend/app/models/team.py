@@ -1,13 +1,15 @@
 from asyncio import tasks
 import logging
 import random
+from statistics import mean
 from typing import List
 
+from deprecated.classic import deprecated
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from app.dto.request import Workpack
-from app.models.task import Task, CachedTasks
+from app.models.task import TaskStatus, CachedTasks, Task
 from app.models.user_scenario import UserScenario
 from app.src.util.util import probability
 
@@ -44,8 +46,8 @@ class Team(models.Model):
         return 0.5  # TODO: implement
 
     # increases familiarity with the project for each member
-    def meeting(self, scenario, members, work_hours, tasks: CachedTasks) -> int:
-        solved_tasks = tasks.solved()
+    def meeting(self, scenario, members, work_hours, cached_tasks) -> int:
+        solved_tasks = cached_tasks.solved()
         for member in members:
             tasks_in_meeting = scenario.config.done_tasks_per_meeting
 
@@ -60,9 +62,21 @@ class Team(models.Model):
 
         return work_hours - 1
 
-    def training(self, scenario, members, work_hours) -> int:
+    def training(self, scenario, members, work_hours, mean_real_throughput) -> None:
 
-        return work_hours - 1
+        for member in members:
+            delta = mean_real_throughput - (
+                member.skill_type.throughput * (1 + member.xp)
+            )
+            if delta > 0:
+                xp = (delta * scenario.config.train_skill_increase_rate) / (
+                    1 + member.xp
+                ) ** 2
+                member.xp += xp
+
+                member.motivation = min(1, member.motivation + 0.1)
+
+        work_hours -= 1
 
     # ein tag
     def work(
@@ -71,12 +85,12 @@ class Team(models.Model):
         scenario,
         workpack_status,
         current_day,
-        tasks: CachedTasks,
+        cached_tasks: CachedTasks,
     ):
 
         # work hours
         NORMAL_WORK_HOUR_DAY: int = 8
-        work_hours = NORMAL_WORK_HOUR_DAY + workpack.overtime
+        remaining_work_hours = NORMAL_WORK_HOUR_DAY + workpack.overtime
 
         members = Member.objects.filter(team_id=scenario.team.id)
         staff_cost = sum([m.skill_type.cost_per_day for m in members])
@@ -85,14 +99,42 @@ class Team(models.Model):
 
         # 1. meeting
         for _ in range(workpack_status.meetings_per_day[current_day]):
-            work_hours = self.meeting(scenario, members, work_hours, tasks)
+            remaining_work_hours = self.meeting(
+                scenario, members, remaining_work_hours, cached_tasks
+            )
 
         # 2. training
-        for _ in range(workpack_status.trainings_per_day[current_day]):
-            work_hours = self.training(scenario, members, work_hours)
+        remaining_trainings_today = workpack_status.remaining_trainings
+        if remaining_trainings_today > 0:
+            # todo philip: put this in function
+            if remaining_trainings_today > remaining_work_hours:
+                workpack_status.remaining_trainings = (
+                    remaining_trainings_today - remaining_work_hours
+                )
+                remaining_trainings_today = remaining_work_hours
+            else:
+                workpack_status.remaining_trainings = 0
+
+            mean_real_throughput_of_team = mean(
+                [(member.skill_type.throughput * (1 + member.xp)) for member in members]
+            )
+            for _ in range(remaining_trainings_today):
+                self.training(
+                    scenario,
+                    members,
+                    remaining_work_hours,
+                    mean_real_throughput_of_team,
+                )
+            Member.objects.bulk_update(members, fields=["xp", "motivation"])
 
         # 3. task work
-        self.task_work(tasks, work_hours, members, workpack.bugfix, workpack.unittest)
+        self.task_work(
+            cached_tasks,
+            remaining_work_hours,
+            members,
+            workpack.bugfix,
+            workpack.unittest,
+        )
 
     # def work(workpack)
     ## 1. meeting (done)
@@ -199,8 +241,6 @@ class Member(models.Model):
         return sum([self.familiarity, self.motivation, self.stress]) / 3
 
     def calculate_familiarity(self, solved_tasks):
-        if solved_tasks == 0:
-            return 1.0
         self.familiarity = self.familiar_tasks / solved_tasks
 
     def n_tasks(self, hours) -> int:

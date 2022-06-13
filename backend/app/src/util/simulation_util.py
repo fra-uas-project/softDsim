@@ -80,15 +80,13 @@ def end_of_simulation(scenario: UserScenario) -> bool:
 
 
 class WorkpackStatus:
-    meetings: int = 0
-    training: int = 0
+    remaining_trainings: int = 0
 
     meetings_per_day = []
-    trainings_per_day = []
 
     def __init__(self, days, workpack):
         self.calculate_meetings_per_day(days, workpack)
-        self.calculate_trainings_per_day(days, workpack)
+        self.remaining_trainings = workpack.training
 
     def calculate_meetings_per_day(self, days, workpack):
         meetings_per_day_without_modulo = math.floor(workpack.meetings / days)
@@ -99,19 +97,8 @@ class WorkpackStatus:
             else:
                 self.meetings_per_day.append(meetings_per_day_without_modulo)
 
-    def calculate_trainings_per_day(self, days, workpack):
-        trainings_per_day_without_modulo = math.floor(workpack.training / days)
-        modulo = workpack.training % days
-        for day in range(days):
-            if day < modulo:
-                self.trainings_per_day.append(trainings_per_day_without_modulo + 1)
-            else:
-                self.trainings_per_day.append(trainings_per_day_without_modulo)
-
-    @deprecated
-    def meeting_completed(self, number_of_completed_meetings=1):
-        self.meetings = self.meetings + number_of_completed_meetings
-
-    @deprecated
-    def training_completed(self, number_of_completed_trainings=1):
-        self.training = self.training + number_of_completed_trainings
+    # def set_remaining_trainings(self, remaining_trainings_today, remaining_work_hours):
+    #     if remaining_trainings_today > remaining_work_hours:
+    #         self.remaining_trainings = remaining_trainings_today - remaining_work_hours
+    #     else:
+    #         self.remaining_trainings = 0
