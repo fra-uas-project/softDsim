@@ -46,8 +46,8 @@ class Team(models.Model):
         return 0.5  # TODO: implement
 
     # increases familiarity with the project for each member
-    def meeting(self, scenario, members, work_hours) -> int:
-        solved_tasks = TaskStatus.solved(scenario.id)
+    def meeting(self, scenario, members, work_hours, cached_tasks) -> int:
+        solved_tasks = cached_tasks.solved()
         for member in members:
             tasks_in_meeting = scenario.config.done_tasks_per_meeting
 
@@ -59,26 +59,6 @@ class Team(models.Model):
         # save members
         # todo: wir können überlegen ob man member auch in der work methode in einem bulk update mit anderen Sachen speichern kann
         Member.objects.bulk_update(members, fields=["familiar_tasks", "familiarity"])
-
-        return work_hours - 1
-
-    @deprecated
-    def training_without_recursion(
-        self, scenario, members, work_hours, mean_real_throughput
-    ) -> int:
-
-        for member in members:
-            delta = mean_real_throughput - (
-                member.skill_type.throughput * (1 + member.xp)
-            )
-            if delta > 0:
-                xp = (delta * scenario.config.train_skill_increase_rate) / (
-                    1 + member.xp
-                ) ** 2
-                member.xp += xp
-
-                member.motivation = min(1, member.motivation + 0.1)
-        Member.objects.bulk_update(members, fields=["xp", "motivation"])
 
         return work_hours - 1
 
