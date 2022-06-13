@@ -7,10 +7,11 @@ import {
     DrawerOverlay,
     Flex,
     Icon,
-    Text, useDisclosure,
+    Text,
+    useDisclosure,
     VStack
 } from "@chakra-ui/react";
-import {HiOutlineDocumentText} from "react-icons/hi";
+import {HiOutlineBookOpen} from "react-icons/hi";
 import MarkdownDisplay from "../../MarkdownDisplay";
 
 const OpenStoryButton = ({templateScenario}) => {
@@ -23,7 +24,7 @@ const OpenStoryButton = ({templateScenario}) => {
                 onClick={onOpen}
         >
             <Flex borderRadius="100%" backgroundColor="blue.100" p={2}>
-                <Icon w={10} h={10} as={HiOutlineDocumentText} color="blue.600" />
+                <Icon w={10} h={10} as={HiOutlineBookOpen} color="blue.600" />
             </Flex>
             <Text fontWeight="semibold" color="gray.400" fontSize="sm">Open Story</Text>
         </VStack>
