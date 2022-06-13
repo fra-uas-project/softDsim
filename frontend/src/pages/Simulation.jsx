@@ -14,7 +14,7 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-    ModalOverlay,
+    ModalOverlay, Skeleton,
     Spacer,
     Text,
     useDisclosure,
@@ -38,19 +38,6 @@ const Simulation = () => {
     const {state} = useLocation();
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-
-    const fetchUserScenario = () => {
-        const userScenarioMock = {
-            scn_name: "Scenario 1"
-        }
-        setUserScenario(userScenarioMock)
-    };
-
-    const scenarioPath = () => {
-        const url = location.pathname;
-        const newUrl = url.slice(0, url.lastIndexOf("/"));
-        return newUrl;
-    }
 
     // current simulation play id
     const [currentSimID, setCurrentSimID] = useState()
@@ -77,6 +64,21 @@ const Simulation = () => {
     // contains the values that should be sent to the next endpoint
     const [returnValues, setReturnValues] = useState()
 
+    const [scenarioIsLoading, setScenarioIsLoading] = useState(true);
+
+    const fetchUserScenario = () => {
+        const userScenarioMock = {
+            scn_name: "Scenario 1"
+        }
+        setUserScenario(userScenarioMock)
+    };
+
+    const scenarioPath = () => {
+        const url = location.pathname;
+        const newUrl = url.slice(0, url.lastIndexOf("/"));
+        return newUrl;
+    }
+
     async function handleSelection(event) {
         if (currentType === 'MODEL') {
             setReturnValues({
@@ -97,7 +99,6 @@ const Simulation = () => {
     }
 
     async function startScenario() {
-        console.log('ES STARTET')
         try {
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/sim/start`, {
                 method: 'POST',
@@ -111,7 +112,8 @@ const Simulation = () => {
 
             const scenario = await res.json()
             setCurrentSimID(scenario.data.id)
-            handleNext(scenario.data.id)
+            await handleNext(scenario.data.id)
+            setScenarioIsLoading(false)
         } catch (err) {
             console.log(err)
         }
@@ -214,7 +216,8 @@ const Simulation = () => {
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                <Dashboard simTasks={simTasks} templateScenario={state} />
+                                {scenarioIsLoading ? <Skeleton height='80vh' />: <Dashboard templateScenario={state} data={scenarioValues} />}
+
                             </Box>
                             <Spacer/>
                             {/* right side of simulation studio */}
