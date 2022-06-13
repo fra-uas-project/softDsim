@@ -137,7 +137,7 @@ import {
           </ModalBody>
           <Box m='3' p='3'>
           <Stack spacing={3}>
-  <Text as='b'>Email Guidelines:</Text>
+  <Text as='b'>Email Guideline:</Text>
   <Text as='i' color='red'>Email must be within the FRA-UAS domain.</Text>
   <Text as='b'>Password Guideline:</Text>
   <Text as='i' color='red'>Password must be at least 6 characters strong and contain at least one number.</Text>
