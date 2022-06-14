@@ -47,6 +47,7 @@ class ScenarioStateDTO(BaseModel):
 class ManagementGoalDTO(BaseModel):
     budget: float
     duration: int
+    tasks: int
 
 
 class TasksStatusDTO(BaseModel):

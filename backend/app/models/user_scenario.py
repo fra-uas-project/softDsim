@@ -22,7 +22,11 @@ class UserScenario(models.Model):
     def get_management_goal_dto(self) -> ManagementGoalDTO:
         try:
             mgoal: ManagementGoal = self.template.management_goal
-            return ManagementGoalDTO(budget=mgoal.budget, duration=mgoal.duration)
+            return ManagementGoalDTO(
+                budget=mgoal.budget,
+                duration=mgoal.duration,
+                tasks=sum((mgoal.easy_tasks, mgoal.medium_tasks, mgoal.hard_tasks)),
+            )
         except Exception as e:
             logging.error(e)
         return ManagementGoalDTO(budget=-1, duration=-1)
