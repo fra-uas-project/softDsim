@@ -50,13 +50,6 @@ const Simulation = () => {
 
     // values for simulation
     const [simValues, setSimValues] = useState({})
-    const [simTasks, setSimTasks] = useState({
-        tasks_todo: 0,
-        task_done: 0,
-        tasks_unit_tested: 0,
-        tasks_integration_tested: 0,
-        tasks_bug: 0
-    })
 
     // contains all values from next endpoint
     const [scenarioValues, setScenarioValues] = useState({})
@@ -153,9 +146,12 @@ const Simulation = () => {
                 setDataValidationStatus(true)
                 // TEMPORARY! TODO: Implement actual functionality
                 const tempReturnValues = {
-                    scenario_id: currentSimID,
+                    scenario_id: simID,
                     type: nextData.type,
-                    actions: [],
+                    actions: {
+                        "unittest": true,
+                        "integrationtest": true,
+                    },
                     members: [{
                         "skill_type": "senior",
                         "change": 2
@@ -173,8 +169,6 @@ const Simulation = () => {
                 setDataValidationStatus(true)
                 setSimValues(nextData)
             }
-            // set taskValues
-            setSimTasks(nextData.tasks)
 
             // set overall scenario values
             setScenarioValues(nextData)
@@ -234,7 +228,7 @@ const Simulation = () => {
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                {scenarioIsLoading ? <Skeleton height='80vh' /> : <Dashboard templateScenario={state} data={scenarioValues} />}
+                                {scenarioIsLoading ? <Skeleton height='80vh' />: <Dashboard templateScenario={state} data={scenarioValues} />}
 
                             </Box>
                             <Spacer />
