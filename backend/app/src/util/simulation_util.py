@@ -1,11 +1,14 @@
 import math
 
+
 from deprecated.classic import deprecated
+from numpy import mean
 
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
 from app.models.model_selection import ModelSelection
 from app.models.task import Task
+from app.models.team import Member
 from app.models.user_scenario import UserScenario
 
 
@@ -39,11 +42,10 @@ def find_next_scenario_component(scenario: UserScenario):
 
 def end_of_fragment(scenario) -> bool:
     """
-    THIS IMPLEMENTATION IS NOT FINAL AND NOT FINISHED (wip for testing)
     This function determines if the end condition of a simulation fragment is reached
     returns: boolean
     """
-    # todo philip: clean this up
+
     try:
         fragment = SimulationFragment.objects.get(
             template_scenario=scenario.template, index=scenario.state.component_counter
@@ -54,17 +56,57 @@ def end_of_fragment(scenario) -> bool:
     if fragment.last:
         return end_of_simulation(scenario)
 
-    tasks_done = Task.objects.filter(user_scenario=scenario, done=True)
+    limit = None
+    end_type = fragment.simulation_end.type.lower()
 
-    end_types = ["tasks_done", "motivation"]
+    if end_type == "stress" or end_type == "motivation":
+        members = Member.objects.filter(team_id=scenario.team.id)
+        limit = mean([getattr(member, end_type) for member in members] or 0)
+    elif end_type == "duration":
+        limit = scenario.state.day
+    elif end_type == "tasks_done":
+        tasks_done = Task.objects.filter(user_scenario=scenario, done=True)
+        limit = len(tasks_done)
+    elif end_type == "budget":
+        pass
+        # TODO philip: implement budget end condition
 
-    for end_type in end_types:
-        if fragment.simulation_end.type == end_type:
-            if fragment.simulation_end.limit_type == "ge":
-                if len(tasks_done) >= fragment.simulation_end.limit:
-                    return True
-                else:
-                    return False
+    if (
+        fragment.simulation_end.limit_type == "ge"
+        and limit >= fragment.simulation_end.limit
+    ):
+        return True
+
+    if (
+        fragment.simulation_end.limit_type == "le"
+        and limit <= fragment.simulation_end.limit
+    ):
+        return True
+
+    return False
+
+    # end_types = ["tasks_done", "motivation", "duration", "stress", "budget"]
+    #
+    # end_condition = {
+    #     "tasks_done": tasks_done_end,
+    #     "motivation": is_end,
+    #     "duration": is_end,
+    #     "stress": is_end,
+    #     "budget": is_end,
+    # }
+    #
+    # end_condition[fragment.simulation_end.type.lower()](
+    #     scenario, fragment, fragment.simulation_end.type.lower()
+    # )
+
+    # for end_type in end_types:
+    #     if fragment.simulation_end.type.lower() == end_type:
+    #         if fragment.simulation_end.limit_type == "ge":
+    #             if len(tasks_done) >= fragment.simulation_end.limit:
+    #                 return True
+    #             else:
+    #                 return False
+    #         # elif fragment.simulation_end.limit_type == "le":
 
 
 def end_of_simulation(scenario: UserScenario) -> bool:

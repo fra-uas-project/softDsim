@@ -59,7 +59,7 @@ def simulate(req, scenario: UserScenario) -> None:
     if req.actions is None:
         raise RequestActionException()
 
-    if not req.members:
+    if req.members is None:
         raise RequestMembersException()
 
     normal_work_hour_day: int = 8
