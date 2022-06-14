@@ -251,4 +251,4 @@ class Member(models.Model):
             * ((self.efficiency + self.team.efficiency) / 2)
             * (self.skill_type.throughput + self.xp)
         )
-        return np.random.poisson(mu)
+        return int(np.mean((np.random.poisson(mu), mu)))
