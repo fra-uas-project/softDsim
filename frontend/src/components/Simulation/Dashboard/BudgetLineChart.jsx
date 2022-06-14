@@ -1,8 +1,9 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Chart from "react-apexcharts";
 import {Heading, HStack, VStack} from "@chakra-ui/react";
+import {useImmer} from "use-immer";
 
-const LineChart = ({title}) => {
+const LineChart = ({title, templateScenario, data}) => {
     // remove from here when we have real data
     const tmpOptions = {
         chart: {
@@ -17,7 +18,7 @@ const LineChart = ({title}) => {
         annotations: {
             yaxis: [
                 {
-                    y: 80,
+                    y: templateScenario.management_goal.budget,
                     borderColor: "#00E396",
                     label: {
                         borderColor: "#00E396",
@@ -31,7 +32,7 @@ const LineChart = ({title}) => {
             ],
             xaxis: [
                 {
-                    x: 6,
+                    x: 365,
                     borderColor: "#FEB019",
                     label: {
                         borderColor: "#FEB019",
@@ -46,7 +47,11 @@ const LineChart = ({title}) => {
             ]
         },
         xaxis: {
-            categories: Array.from(Array(365).keys())
+            categories: Array.from(Array(100).keys(), item => item*5), // Change hardcoded value 100
+            tickAmount: 10,
+            labels: {
+                rotate: 0
+            }
         },
         stroke: {
             curve: 'smooth',
@@ -54,98 +59,26 @@ const LineChart = ({title}) => {
         colors: ['#4299E1'],
     }
 
-    const tmpOptions2 = {
-        annotations: {
-            yaxis: [
-                {
-                    y: 80,
-                    borderColor: "#00E396",
-                    label: {
-                        borderColor: "#00E396",
-                        style: {
-                            color: "#fff",
-                            background: "#00E396"
-                        },
-                        text: "Y Axis Annotation"
-                    }
-                }
-            ],
-            xaxis: [
-                {
-                    // in a datetime series, the x value should be a timestamp, just like it is generated below
-                    x: new Date("11/17/2017").getTime(),
-                    strokeDashArray: 0,
-                    borderColor: "#775DD0",
-                    label: {
-                        borderColor: "#775DD0",
-                        style: {
-                            color: "#fff",
-                            background: "#775DD0"
-                        },
-                        text: "X Axis Anno Vertical"
-                    }
-                },
-                {
-                    x: new Date("03 Dec 2017").getTime(),
-                    borderColor: "#FEB019",
-                    label: {
-                        borderColor: "#FEB019",
-                        style: {
-                            color: "#fff",
-                            background: "#FEB019"
-                        },
-                        orientation: "horizontal",
-                        text: "X Axis Anno Horizonal"
-                    }
-                }
-            ],
-            points: [
-                {
-                    x: 4,
-                    y: 50,
-                    marker: {
-                        size: 6,
-                        fillColor: "#fff",
-                        strokeColor: "#2698FF",
-                        radius: 2
-                    },
-                    label: {
-                        borderColor: "#FF4560",
-                        offsetY: 0,
-                        style: {
-                            color: "#fff",
-                            background: "#FF4560"
-                        },
-
-                        text: "Point Annotation (XY)"
-                    }
-                }
-            ]
-        },
-        chart: {
-            height: 380,
-            type: "line",
-            id: "areachart-2"
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: "straight"
-        },
-    }
-
     const tmpSeries = [
         {
-            name: "series-1",
-            data: [30, 40, 45, 50, 49, 60, 70, 91]
+            name: "Cost",
+            data: []
         },
     ]
 
 
 
     const [options, setOptions] = useState(tmpOptions);
-    const [series, setSeries] = useState(tmpSeries);
+    const [series, setSeries] = useImmer(tmpSeries);
+
+    useEffect(() => {
+        if(data.type === "SIMULATION") {
+            setSeries(
+                (draft) => {
+                    draft[0].data.push(data.state.cost)
+                })
+        }
+    }, [data])
 
     return (
         <HStack backgroundColor="white" borderRadius="2xl" p={5} mb={5} spacing={15} >
