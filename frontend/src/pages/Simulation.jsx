@@ -19,13 +19,13 @@ import {
     Text,
     useDisclosure,
 } from "@chakra-ui/react";
-import {HiChevronRight} from "react-icons/hi";
-import {useEffect, useState} from "react";
-import {Link, useLocation} from "react-router-dom";
+import { HiChevronRight } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Question from "../components/Question";
 import Action from "../components/Action"
 import ModelSelection from '../components/ModelSelection'
-import {getCookie} from "../utils/utils"
+import { getCookie } from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 
@@ -35,7 +35,7 @@ const Simulation = () => {
     const location = useLocation();
 
     // scenario template data
-    const {state} = useLocation();
+    const { state } = useLocation();
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -151,7 +151,25 @@ const Simulation = () => {
             } else if (nextData.type === 'SIMULATION') {
                 setSimValues(nextData)
                 setDataValidationStatus(true)
+                // TEMPORARY! TODO: Implement actual functionality
+                const tempReturnValues = {
+                    scenario_id: currentSimID,
+                    type: nextData.type,
+                    actions: [],
+                    members: [{
+                        "skill_type": "senior",
+                        "change": 2
+                    },
+                    {
+                        "skill_type": "junior",
+                        "change": 2
+                    }]
+                }
+                setReturnValues(tempReturnValues)
             } else if (nextData.type === 'EVENT') {
+                setDataValidationStatus(true)
+                setSimValues(nextData)
+            } else if (nextData.type === 'RESULT') {
                 setDataValidationStatus(true)
                 setSimValues(nextData)
             }
@@ -216,10 +234,10 @@ const Simulation = () => {
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                {scenarioIsLoading ? <Skeleton height='80vh' />: <Dashboard templateScenario={state} data={scenarioValues} />}
+                                {scenarioIsLoading ? <Skeleton height='80vh' /> : <Dashboard templateScenario={state} data={scenarioValues} />}
 
                             </Box>
-                            <Spacer/>
+                            <Spacer />
                             {/* right side of simulation studio */}
                             <Box
                                 p='3'
