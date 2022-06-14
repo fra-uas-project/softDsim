@@ -1,6 +1,7 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Chart from "react-apexcharts";
 import {Heading, HStack, Stat, StatArrow, StatHelpText, StatLabel, StatNumber, VStack} from "@chakra-ui/react";
+import {useImmer} from "use-immer";
 
 const TaskLineChart = ({title, data}) => {
     // remove from here when we have real data
@@ -32,26 +33,54 @@ const TaskLineChart = ({title, data}) => {
             ]
         },
         xaxis: {
-            categories: Array.from(Array(365).keys())
+            categories: Array.from(Array(100).keys(), item => item*5), // Change hardcoded value 100
+            tickAmount: 10,
+            labels: {
+                rotate: 0
+            }
         },
         stroke: {
             curve: 'smooth',
         },
-        colors: ['#4299E1'],
+        colors: ['#4299E1', "#63B3ED", "#90CDF4", "#000000"],
     }
 
 
     const tmpSeries = [
         {
-            name: "series-1",
-            data: [30, 40, 45, 50, 49, 60, 70, 91]
+            name: "Tasks Done",
+            data: []
+        },
+        {
+            name: "Tasks Unit Tested",
+            data: []
+        },
+        {
+            name: "Tasks Integration Tested",
+            data: []
+        },
+        {
+            name: "Tasks with Bugs",
+            data: []
         },
     ]
 
 
 
     const [options, setOptions] = useState(tmpOptions);
-    const [series, setSeries] = useState(tmpSeries);
+    const [series, setSeries] = useImmer(tmpSeries);
+
+    useEffect(() => {
+        if(data.type === "SIMULATION") {
+            setSeries(
+                (draft) => {
+                    draft[0].data.push(data.tasks.tasks_done)
+                    draft[1].data.push(data.tasks.tasks_unit_tested)
+                    draft[2].data.push(data.tasks.tasks_integration_tested)
+                    draft[3].data.push(data.tasks.tasks_bug)
+                })
+        }
+    }, [data])
 
     return (
         <HStack backgroundColor="white" borderRadius="2xl" p={5} mb={5} spacing={15} >
@@ -68,7 +97,7 @@ const TaskLineChart = ({title, data}) => {
             <VStack w="full">
                 <Stat>
                     <StatLabel color="gray.400">Done</StatLabel>
-                    <StatNumber>{data.tasks.task_done}</StatNumber>
+                    <StatNumber>{data.tasks.tasks_done}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
                         232 since last iteration
