@@ -46,7 +46,7 @@ class ScenarioStateDTO(BaseModel):
 
 class TasksStatusDTO(BaseModel):
     tasks_todo: int
-    task_done: int
+    tasks_done: int
     tasks_unit_tested: int
     tasks_integration_tested: int
     tasks_bug: int
