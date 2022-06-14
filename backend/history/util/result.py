@@ -26,6 +26,7 @@ def get_result_response(scenario: UserScenario) -> ResultResponse:
             result = handle_scenario_ending(scenario)
 
         return ResultResponse(
+            management=scenario.get_management_goal_dto(),
             state=get_scenario_state_dto(scenario),
             tasks=TasksStatusDTO(
                 tasks_todo=result.tasks_todo,

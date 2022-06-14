@@ -187,6 +187,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     # 5.1 Check if next component is a Simulation Component
     elif isinstance(next_component, SimulationFragment):
         scenario_response = SimulationResponse(
+            management=scenario.get_management_goal_dto(),
             actions=get_actions_from_fragment(next_component),
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
@@ -196,6 +197,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     # 5.2 Check if next component is a Question Component
     elif isinstance(next_component, QuestionCollection):
         scenario_response = QuestionResponse(
+            management=scenario.get_management_goal_dto(),
             question_collection=get_question_collection(scenario),
             state=get_scenario_state_dto(scenario),
             tasks=get_tasks_status(scenario.id),
@@ -205,6 +207,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     # 5.3 Check if next component is a Model Selection
     elif isinstance(next_component, ModelSelection):
         scenario_response = ModelSelectionResponse(
+            management=scenario.get_management_goal_dto(),
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
