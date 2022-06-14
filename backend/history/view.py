@@ -28,7 +28,7 @@ class HistoryView(APIView):
             day=scenario.state.day,
             cost=scenario.state.cost,
             tasks_todo=0,
-            task_done=0,
+            tasks_done=0,
             tasks_unit_tested=0,
             tasks_integration_tested=0,
             tasks_bug_discovered=0,

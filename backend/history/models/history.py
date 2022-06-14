@@ -21,7 +21,7 @@ class History(models.Model):
 
     # Tasks
     tasks_todo = models.PositiveIntegerField(null=True)
-    task_done = models.PositiveIntegerField(null=True)
+    tasks_done = models.PositiveIntegerField(null=True)
     tasks_unit_tested = models.PositiveIntegerField(null=True)
     tasks_integration_tested = models.PositiveIntegerField(null=True)
     tasks_bug_discovered = models.PositiveIntegerField(null=True)
