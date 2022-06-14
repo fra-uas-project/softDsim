@@ -64,12 +64,11 @@ def end_of_fragment(scenario) -> bool:
         limit = mean([getattr(member, end_type) for member in members] or 0)
     elif end_type == "duration":
         limit = scenario.state.day
+    elif end_type == "budget":
+        limit = scenario.state.cost
     elif end_type == "tasks_done":
         tasks_done = Task.objects.filter(user_scenario=scenario, done=True)
         limit = len(tasks_done)
-    elif end_type == "budget":
-        pass
-        # TODO philip: implement budget end condition
 
     if (
         fragment.simulation_end.limit_type == "ge"
