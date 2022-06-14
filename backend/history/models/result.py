@@ -19,7 +19,7 @@ class Result(models.Model):
 
     # Tasks state of the scenario when the result was created
     tasks_todo = models.PositiveIntegerField(default=0)
-    task_done = models.PositiveIntegerField(default=0)
+    tasks_done = models.PositiveIntegerField(default=0)
     tasks_unit_tested = models.PositiveIntegerField(default=0)
     tasks_integration_tested = models.PositiveIntegerField(default=0)
     tasks_bug_discovered = models.PositiveIntegerField(default=0)

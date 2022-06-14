@@ -29,7 +29,7 @@ def get_result_response(scenario: UserScenario) -> ResultResponse:
             state=get_scenario_state_dto(scenario),
             tasks=TasksStatusDTO(
                 tasks_todo=result.tasks_todo,
-                tasks_done=result.task_done,
+                tasks_done=result.tasks_done,
                 tasks_unit_tested=result.tasks_unit_tested,
                 tasks_integration_tested=result.tasks_integration_tested,
                 tasks_bug=result.tasks_bug_discovered,

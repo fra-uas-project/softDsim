@@ -18,7 +18,7 @@ class ResultSerializer(serializers.ModelSerializer):
             "tasks_accepted",
             "tasks_rejected",
             "tasks_todo",
-            "task_done",
+            "tasks_done",
             "tasks_unit_tested",
             "tasks_integration_tested",
             "tasks_bug_discovered",
