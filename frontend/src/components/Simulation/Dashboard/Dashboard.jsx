@@ -72,8 +72,8 @@ const Dashboard = ({templateScenario, data}) => {
                 />
             </HStack>
 
-            <TaskLineChart title="Tasks" data={data}/>
-            <BudgetLineChart title="Budget"/>
+            <TaskLineChart title="Tasks" data={data} templateScenario={templateScenario}/>
+            <BudgetLineChart title="Budget" templateScenario={templateScenario} data={data}/>
 
             <Flex>
                 <HStack backgroundColor="white" borderRadius="2xl" p={5} mb={5} w="full" justifyContent="center">
