@@ -22,11 +22,13 @@ import {
     Thead,
     Tr,
     useDisclosure,
-    useToast
+    useToast,
+    Divider,
 } from "@chakra-ui/react";
 import {HiChevronRight, HiOutlineCheck, HiOutlineTrash, HiOutlineX} from "react-icons/hi";
 import {useEffect, useRef, useState} from "react";
 import {getCookie, role} from "../utils/utils";
+import AddUser from "../components/AddUser";
 
 const UserOverview = () => {
     const [users, setUsers] = useState([]);
@@ -35,16 +37,11 @@ const UserOverview = () => {
 
     const toast = useToast()
 
-    // const role = {
-    //     ADMIN: "admin",
-    //     STAFF: "staff",
-    //     CREATOR: "creator",
-    //     STUDENT: "student"
-    // }
-
     const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose:  onRoleClose} = useDisclosure()
     const { isOpen: isDeleteOpen , onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const cancelRef = useRef();
+    
+   
 
     const fetchUsers = async () => {
         const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user`, {
@@ -84,6 +81,8 @@ const UserOverview = () => {
             console.log(e);
         }
     };
+
+   
 
     const toggleRole = async (username) => {
         try {
@@ -229,6 +228,8 @@ const UserOverview = () => {
                             </Tbody>
                         </Table>
                     </TableContainer>
+                   <Divider />
+                   <AddUser />
                 </Container>
             </Box>
 

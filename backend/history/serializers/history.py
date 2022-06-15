@@ -30,7 +30,7 @@ class HistorySerializer(serializers.ModelSerializer):
             "cost",
             # Task stuff
             "tasks_todo",
-            "task_done",
+            "tasks_done",
             "tasks_unit_tested",
             "tasks_integration_tested",
             "tasks_bug_discovered",

@@ -24,6 +24,10 @@ export const componentEnum = {
     "EVENT": "EVENT"
 }
 
+export const actionEnum = {
+    "ACTION": "ACTION"
+}
+
 export const questionEnum = {
     "SINGLE": "SINGLE",
     "MULTI": "MULTI",
@@ -37,7 +41,7 @@ export const finalComponentList = [
         content: "Define the basic stats for a new simulation.",
         icon: MdOutlineInfo,
         displayName: "Base Information",
-        template_name: `Scenario ${uuidv4().slice(0, 8)}`,
+        template_name: `Scenario`,
         text: "",
         budget: "0",
         duration: "0",
@@ -51,7 +55,7 @@ export const finalComponentList = [
         title: "Simulation Fragment",
         content: "Control the simulation by defining fragments.",
         icon: MdTimeline,
-        displayName: `Simulation ${uuidv4().slice(0, 8)}`,
+        displayName: `Simulation`,
         actions: [],
         simulation_end: {}
     },
@@ -71,7 +75,7 @@ export const finalComponentList = [
         title: "Questions",
         content: "Create questions which need to be answered.",
         icon: MdRule,
-        displayName: `Questions ${uuidv4().slice(0, 8)}`,
+        displayName: `Questions`,
         text: "",
         questions: [],
 
@@ -80,7 +84,7 @@ export const finalComponentList = [
         id: uuidv4(),
         type: "EVENT",
         title: "Event",
-        displayName: `Event ${uuidv4().slice(0, 8)}`,
+        displayName: `Event`,
         content: "Add events that have an impact on the management objectives.",
         text: "",
         icon: MdOutlineAttractions,
@@ -172,7 +176,7 @@ export const finalQuestionList = [
         type: "SINGLE",
         title: "Single Answer",
         icon: MdOutlineRadioButtonChecked,
-        displayName: `Question ${uuidv4().slice(0, 8)}`,
+        displayName: `Question`,
         text: "",
         answers: []
     },
@@ -181,7 +185,7 @@ export const finalQuestionList = [
         type: "MULTI",
         title: "Multiple Answers",
         icon: MdOutlineCheckBox,
-        displayName: `Question ${uuidv4().slice(0, 8)}`,
+        displayName: `Question`,
         text: "",
         answers: []
     },

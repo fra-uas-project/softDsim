@@ -38,14 +38,15 @@ class QuestionCollectionDTO(BaseModel):
 
 
 class ScenarioStateDTO(BaseModel):
-    counter: int
+    component_counter: int
+    step_counter: int
     day: int
     cost: float
 
 
 class TasksStatusDTO(BaseModel):
     tasks_todo: int
-    task_done: int
+    tasks_done: int
     tasks_unit_tested: int
     tasks_integration_tested: int
     tasks_bug: int
@@ -69,6 +70,7 @@ class ScenarioResponse(BaseModel, ABC):
     state: ScenarioStateDTO
     tasks: TasksStatusDTO
     members: List[MemberDTO]
+    text = ""
 
 
 class SimulationResponse(ScenarioResponse):
@@ -88,7 +90,15 @@ class ModelResponse(ScenarioResponse):
 
 class ResultResponse(ScenarioResponse):
     type: str = "RESULT"
-    # ToDo: Add result stats (Issue #237)
+    total_score: int
+    question_score: int
+    quality_score: int
+    budget_score: int
+    time_score: int
+    tasks_accepted: int
+    tasks_rejected: int
+    total_days: int
+    total_cost: int
 
 
 class ModelSelectionResponse(ScenarioResponse):

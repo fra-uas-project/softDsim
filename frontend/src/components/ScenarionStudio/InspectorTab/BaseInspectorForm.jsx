@@ -14,8 +14,9 @@ import {
     NumberInputField,
     NumberInputStepper
 } from "@chakra-ui/react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import MarkdownTextfield from "./MarkdownTextfield";
+import DeleteButton from "./DeleteButton";
 
 const BaseInspectorForm = (props) => {
     const formatDays = (val) => val + ` days`
@@ -30,36 +31,57 @@ const BaseInspectorForm = (props) => {
 
     const handleTemplateName = (event) => {
         setTemplateName(event.target.value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.baseData.id)
+                component.template_name = event.target.value;
+            })
     };
 
     const handleChangeDuration = (valueString) => {
         setDuration(parseDays(valueString))
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.baseData.id)
+                component.duration = valueString;
+            })
     };
 
     const handleChangeBudget = (value) => {
         setBudget(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.baseData.id)
+                component.budget = value;
+            })
     };
 
     const handleChangeEasyTasks = (value) => {
         setEasyTasks(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.baseData.id)
+                component.easy_tasks = value;
+            })
     };
 
     const handleChangeMediumTasks = (value) => {
         setMediumTasks(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.baseData.id)
+                component.medium_tasks = value;
+            })
     };
 
     const handleChangeHardTasks = (value) => {
         setHardTasks(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.baseData.id)
+                component.hard_tasks = value;
+            })
     };
-
-    useEffect(() => {
-        props.baseData.template_name = templateName;
-        props.baseData.duration = duration;
-        props.baseData.budget = budget;
-        props.baseData.easy_tasks = easyTasks;
-        props.baseData.medium_tasks = mediumTasks;
-        props.baseData.hard_tasks = hardTasks;
-    }, [templateName, duration, budget, easyTasks, mediumTasks, hardTasks, props.baseData])
 
     return (
         <>
@@ -73,7 +95,8 @@ const BaseInspectorForm = (props) => {
 
             <FormControl>
                 <FormLabel color="gray.400" htmlFor="templateName">Scenario Name</FormLabel>
-                <Input id="templateName" value={templateName} onChange={(event) => {handleTemplateName(event)}}/>
+                <Input id="templateName" value={templateName}
+                       onChange={(event) => {handleTemplateName(event)}}/>
                 <FormHelperText></FormHelperText>
 
             <Box h={3}/>
@@ -81,6 +104,7 @@ const BaseInspectorForm = (props) => {
             <MarkdownTextfield
                 key={props.baseData.id}
                 data={props.baseData}
+                updateEditorList={props.updateEditorList}
             />
 
             <Box h={3}/>
@@ -144,7 +168,11 @@ const BaseInspectorForm = (props) => {
                 </NumberInput>
                 <FormHelperText></FormHelperText>
             </FormControl>
-
+            <DeleteButton
+                component={props.baseData}
+                updateEditorList={props.updateEditorList}
+                setSelectedObject={props.setSelectedObject}
+            />
         </>
     )
 }

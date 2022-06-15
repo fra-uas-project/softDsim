@@ -31,41 +31,12 @@ const EditorBaseComponent = (props) => {
                                 <Heading size="sm">{props.component.displayName}</Heading>
                                 <Text fontSize="sm" fontWeight="500" color="gray.400">{props.component.title}</Text>
                             </VStack>
-                            {/*<HStack>*/}
-                            {/*    <VStack>*/}
-                            {/*        <Text fontSize="sm" fontWeight="500" color="gray.400">Budget: {props.component.budget}</Text>*/}
-                            {/*        <Text fontSize="sm" fontWeight="500" color="gray.400">Duration: {props.component.budget}</Text>*/}
-                            {/*        <Text fontSize="sm" fontWeight="500" color="gray.400">Easy Tasks: {props.component.budget}</Text>*/}
-                            {/*    </VStack>*/}
-                            {/*</HStack>*/}
+
                             <Box {...provided.dragHandleProps}>
                                 <Icon as={MdDragIndicator}
                                       fontSize={20}/>
                             </Box>
                         </HStack>
-                        {/*<Droppable droppableId={props.id} type="question">*/}
-                        {/*    {(provided, snapshot) => (*/}
-                        {/*        <UnorderedList*/}
-                        {/*            listStyleType="none"*/}
-                        {/*            m="0 !important"*/}
-                        {/*            py={snapshot.isDraggingOver ? 3 : 3}*/}
-                        {/*            transition="all 0.2s ease"*/}
-                        {/*            minH="1px"*/}
-                        {/*            minW="full"*/}
-                        {/*            {...provided.droppableProps}*/}
-                        {/*            ref={provided.innerRef}*/}
-                        {/*            backgroundColor={snapshot.isDraggingOver ? "gray.200" : ""}*/}
-                        {/*            display="flex"*/}
-                        {/*            flexDir="column"*/}
-                        {/*            alignItems="center"*/}
-                        {/*            borderRadius="2xl">*/}
-                        {/*            {*/}
-                        {/*                */}
-                        {/*            }*/}
-                        {/*            {provided.placeholder}*/}
-                        {/*        </UnorderedList>*/}
-                        {/*    )}*/}
-                        {/*</Droppable>*/}
                     </VStack>
                 </ListItem>
             )

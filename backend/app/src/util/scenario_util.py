@@ -4,8 +4,11 @@ from app.dto.request import (
     SimulationRequest,
     QuestionRequest,
     ModelRequest,
+    StartRequest,
 )
 from app.dto.response import ActionDTO
+from app.models.user_scenario import UserScenario
+from history.models.history import History
 
 
 def check_indexes(data) -> bool:
@@ -36,6 +39,7 @@ def create_correct_request_model(request) -> ScenarioRequest:
         "SIMULATION": SimulationRequest,
         "QUESTION": QuestionRequest,
         "MODEL": ModelRequest,
+        "START": StartRequest,
     }
     for key, value in request_types.items():
         if request.data.get("type") == key:
@@ -44,6 +48,11 @@ def create_correct_request_model(request) -> ScenarioRequest:
 
 
 def handle_model_request(req, scenario):
+    # todo: we could implement a check here to see if the model in the request is actually available in the scenario, but the frontend should only diplay the available options anyway
+    UserScenario.objects.filter(id=scenario.id).update(model=req.model.upper())
+
+
+def handle_start_request(req, scenario):
     pass
 
 
@@ -58,3 +67,15 @@ def get_actions_from_fragment(next_component) -> List[ActionDTO]:
         )
         for a in next_component.actions.values()
     ]
+
+
+def request_type_matches_previous_response_type(scenario, req) -> bool:
+
+    if scenario.state.step_counter == 0:
+        return req.type == "START"
+
+    # get last step from history
+    history = History.objects.get(
+        user_scenario_id=scenario.id, step_counter=scenario.state.step_counter - 1
+    )
+    return req.type == history.response_type

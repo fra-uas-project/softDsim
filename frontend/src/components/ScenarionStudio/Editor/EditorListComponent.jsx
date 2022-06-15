@@ -1,9 +1,17 @@
-import {Box, Flex, Heading, HStack, Icon, ListItem, Text, UnorderedList, VStack} from "@chakra-ui/react";
+import {Box, Flex, Heading, HStack, Icon, IconButton, ListItem, Text, UnorderedList, VStack} from "@chakra-ui/react";
 import {MdDragIndicator} from "react-icons/md";
 import {Draggable, Droppable} from "react-beautiful-dnd";
-import EditorQuestionComponent from "./EditorQuestionComponent";
+import EditorSubListComponent from "./EditorSubListComponent";
+import {HiOutlineChevronDown, HiOutlineChevronLeft} from "react-icons/hi";
+import {useState} from "react";
 
-const EditorQuestionsComponent = (props) => {
+const EditorListComponent = (props) => {
+
+    const [actionListExpanded, setActionListExpanded] = useState(true);
+
+    const toggleActionList = () => {
+        setActionListExpanded(!actionListExpanded)
+    }
 
     return (
         <Draggable key={props.id} draggableId={props.id} index={props.index}>
@@ -30,7 +38,15 @@ const EditorQuestionsComponent = (props) => {
                                     pl={3}
                             >
                                 <Heading size="sm">{props.component.displayName}</Heading>
+                                <HStack>
                                 <Text fontSize="sm" fontWeight="500" color="gray.400">{props.component.title}</Text>
+                                    <IconButton aria-label="Expand and collapse actions"
+                                                icon={actionListExpanded ? <HiOutlineChevronDown/> : <HiOutlineChevronLeft/>}
+                                                variant="ghost"
+                                                size="xs"
+                                                onClick={toggleActionList}
+                                    />
+                                </HStack>
                             </VStack>
                             <Box {...provided.dragHandleProps}>
                                 <Icon as={MdDragIndicator}
@@ -52,17 +68,17 @@ const EditorQuestionsComponent = (props) => {
                                     alignItems="center"
                                     borderRadius="2xl">
                                     {
-                                        props.actions &&
+                                        (props.actions && actionListExpanded) &&
                                         props.actions.map((action, index) => {
                                             return (
-                                                <EditorQuestionComponent
+                                                <EditorSubListComponent
                                                     key={action.id}
                                                     elementid={action.id}
                                                     onClick={props.onClick}
                                                     id={action.id}
                                                     question={action}
                                                     index={index}
-                                                    isSelected={props.selectedItem === action.id}
+                                                    isSelected={props.selectedItem ? props.selectedItem === action.id : false}
                                                 />
                                             )
                                         })}
@@ -78,4 +94,4 @@ const EditorQuestionsComponent = (props) => {
         </Draggable>
     )
 };
-export default EditorQuestionsComponent;
+export default EditorListComponent;

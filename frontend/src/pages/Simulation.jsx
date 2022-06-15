@@ -4,44 +4,67 @@ import {
     BreadcrumbItem,
     BreadcrumbLink,
     Button,
-    Container, Flex,
+    Container,
+    Flex,
+    Grid,
+    GridItem,
     Heading,
     Modal,
     ModalBody,
-    ModalCloseButton,
     ModalContent,
     ModalFooter,
     ModalHeader,
-    ModalOverlay,
+    ModalOverlay, Skeleton,
+    Spacer,
     Text,
     useDisclosure,
-    Grid,
-    GridItem,
-    Spacer,
-
 } from "@chakra-ui/react";
-import { HiChevronRight } from "react-icons/hi";
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import {HiChevronRight} from "react-icons/hi";
+import {useEffect, useState} from "react";
+import {Link, useLocation} from "react-router-dom";
 import Question from "../components/Question";
 import Action from "../components/Action"
 import ModelSelection from '../components/ModelSelection'
-import { getCookie } from "../utils/utils"
-import TasksPanel from "../components/TasksPanel";
-import StressPanel from "../components/StressPanel";
-import EmployeesPanel from "../components/EmployeesPanel";
-import ProgressPanel from "../components/ProgressPanel";
-import MilestonesPanel from "../components/MilestonesPanel";
-import MotivationPanel from "../components/MotivationPanel";
-import FamiliarityPanel from "../components/FamiliarityPanel";
-import SideDrawerLeft from "../components/SideDrawerLeft";
+import {getCookie} from "../utils/utils"
+import Dashboard from "../components/Simulation/Dashboard/Dashboard";
+import MarkdownDisplay from "../components/MarkdownDisplay";
 
 const Simulation = () => {
     const [userScenario, setUserScenario] = useState({});
 
     const location = useLocation();
 
+    // scenario template data
+    const {state} = useLocation();
+
     const { isOpen, onOpen, onClose } = useDisclosure();
+
+    // current simulation play id
+    const [currentSimID, setCurrentSimID] = useState()
+
+    // current simulation type (eg. model, question, segment, event)
+    const [currentType, setCurrentType] = useState()
+
+    // validation status of user selected data
+    const [dataValidationStatus, setDataValidationStatus] = useState(false)
+
+    // values for simulation
+    const [simValues, setSimValues] = useState({})
+    const [simTasks, setSimTasks] = useState({
+        tasks_todo: 0,
+        task_done: 0,
+        tasks_unit_tested: 0,
+        tasks_integration_tested: 0,
+        tasks_bug: 0
+    })
+
+    // contains all values from next endpoint
+    const [scenarioValues, setScenarioValues] = useState({})
+
+    // contains the values that should be sent to the next endpoint
+    const [returnValues, setReturnValues] = useState()
+
+    const [scenarioIsLoading, setScenarioIsLoading] = useState(true);
 
     const fetchUserScenario = () => {
         const userScenarioMock = {
@@ -56,42 +79,31 @@ const Simulation = () => {
         return newUrl;
     }
 
-    const [currentSimID, setCurrentSimID] = useState()
-
-    const [currentType, setCurrentType] = useState()
-
-    const [dataValidationStatus, setDataValidationStatus] = useState(false)
-
-    // test values for simulation
-    const [simValues, setSimValues] = useState({})
-    const [simTasks, setSimTasks] = useState({tasks_todo: 0,
-        task_done: 0,
-        tasks_unit_tested: 0,
-        tasks_integration_tested: 0,
-        tasks_bug: 0})
-
-    const [returnValues, setReturnValues] = useState()
-
     async function handleSelection(event) {
         if (currentType === 'MODEL') {
-            await setReturnValues({
+            setReturnValues({
                 scenario_id: currentSimID,
                 type: currentType,
                 model: event
             })
             setDataValidationStatus(true)
-        } else if (currentType === 'question_collections') {
-
+        } else if (currentType === 'QUESTION') {
+            const tempReturnValues = {
+                scenario_id: currentSimID,
+                type: currentType,
+                question_collection: event
+            }
+            setReturnValues(tempReturnValues)
+            setDataValidationStatus(true)
         }
     }
 
     async function startScenario() {
-        console.log('ES STARTET')
         try {
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/sim/start`, {
                 method: 'POST',
                 credentials: 'include',
-                body: JSON.stringify({ "template-id": 1, "config-id": 1 }),
+                body: JSON.stringify({ "template-id": state.id, "config-id": 1 }),
                 headers: {
                     "X-CSRFToken": getCookie("csrftoken"),
                     "Content-Type": "application/json"
@@ -100,18 +112,18 @@ const Simulation = () => {
 
             const scenario = await res.json()
             setCurrentSimID(scenario.data.id)
-            handleNext(scenario.data.id)
+            await handleNext(scenario.data.id)
+            setScenarioIsLoading(false)
         } catch (err) {
             console.log(err)
         }
     }
 
     async function handleNext(simID) {
-        console.log('next: ', simID)
         setDataValidationStatus(false)
         var nextValues = {}
         if (returnValues === undefined) {
-            nextValues = { "scenario_id": simID, "type": "MODEL" }
+            nextValues = { "scenario_id": simID, "type": "START" }
         } else {
             nextValues = returnValues
         }
@@ -133,19 +145,28 @@ const Simulation = () => {
             // set data
             if (nextData.type === 'QUESTION') {
                 setSimValues(nextData.question_collection)
+                setDataValidationStatus(true)
             } else if (nextData.type === 'MODEL') {
                 setSimValues(nextData.models)
+            } else if (nextData.type === 'SIMULATION') {
+                setSimValues(nextData)
+                setDataValidationStatus(true)
+            } else if (nextData.type === 'EVENT') {
+                setDataValidationStatus(true)
+                setSimValues(nextData)
             }
             // set taskValues
             setSimTasks(nextData.tasks)
 
-            // setSimValues(scenario.data.id)
+            // set overall scenario values
+            setScenarioValues(nextData)
         } catch (err) {
             console.log(err)
         }
     }
 
     useEffect(() => {
+        console.log("TS", state)
         fetchUserScenario();
         onOpen();
     }, [onOpen]);
@@ -154,61 +175,51 @@ const Simulation = () => {
         console.log('currentSimID', currentSimID)
     }, [currentSimID]);
 
+    useEffect(() => {
+        console.log('dataValidationStatus', dataValidationStatus)
+    }, [dataValidationStatus]);
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+            <Modal isOpen={isOpen} closeOnOverlayClick={false} isCentered size="3xl">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Modal Title</ModalHeader>
-                    <ModalCloseButton />
+                    <ModalHeader>Story</ModalHeader>
                     <ModalBody>
-                        <Text>Scenario Description Here</Text>
+                        <MarkdownDisplay markdownText={state.story} />
                     </ModalBody>
 
-                    <ModalFooter>
-                        <Button colorScheme='blue' mr={3} onClick={() => { onClose(); startScenario() }}>
-                            Start
+                    <ModalFooter gap={5}>
+                        <Button colorScheme="blue" variant="ghost" as={Link} to="/scenarios">
+                            Cancel
+                        </Button>
+                        <Button colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
+                            Start Simulation
                         </Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
+
+
             <Flex px={10} pt={2} flexDir="column" flexGrow={0}>
                 <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500' />}>
                     <BreadcrumbItem>
                         <BreadcrumbLink as={Link} to={scenarioPath()}>Scenarios</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href=''>{userScenario.scn_name}</BreadcrumbLink>
+                        <BreadcrumbLink href=''>{state.name}</BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
-
-
                 <Flex flexDir="column" flexGrow={1}>
-                    <Heading p='5'>Active Scenario: {userScenario.scn_name}</Heading>
+                    <Heading p='5'>Active Scenario: {state.name}</Heading>
 
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                <Box boxShadow='md' rounded='md' p='3' mb='5' bg='white' _hover={{ boxShadow: '2xl' }}><SideDrawerLeft /></Box>
-                                <Grid
-                                    templateRows='repeat(4, 1fr)'
-                                    templateColumns='repeat(6, 1fr)'
-                                    gap={5}
-                                    textAlign='center'
-                                    fontWeight='bold'
-                                    color='white'
-                                >
-                                    <GridItem rowSpan={1} _hover={{ boxShadow: '2xl' }} colSpan={1} boxShadow='md' rounded='md' bg='white' ><TasksPanel simTasks={simTasks}/></GridItem>
-                                    <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><ProgressPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><MilestonesPanel /></GridItem>
-                                    <GridItem colSpan={6} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white'><EmployeesPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white' p='2'><StressPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white' p='2'><MotivationPanel /></GridItem>
-                                    <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='white' p='2'><FamiliarityPanel /></GridItem>
-                                </Grid>
+                                {scenarioIsLoading ? <Skeleton height='80vh' />: <Dashboard templateScenario={state} data={scenarioValues} />}
+
                             </Box>
-                            <Spacer />
+                            <Spacer/>
                             {/* right side of simulation studio */}
                             <Box
                                 p='3'
@@ -238,7 +249,7 @@ const Simulation = () => {
                                     {/* Question Collection */}
                                     {currentType === 'QUESTION' ?
                                         <>
-                                            <Question onSelectModel={(event) => handleSelection(event, simValues.question_collections)}
+                                            <Question onSelect={(event) => handleSelection(event)}
                                                 question_collection={simValues}
                                             />
                                         </>

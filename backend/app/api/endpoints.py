@@ -8,7 +8,6 @@ from app.api.views.question import QuestionView
 from app.api.views.management_goal import ManagementGoalView
 from app.api.security.security import (
     LoginView,
-    GetCSRFToken,
     LogoutView,
     CheckAuthenticatedView,
     RegisterView,
@@ -16,7 +15,10 @@ from app.api.security.security import (
 
 
 # all request with /api/ land here (see softDsim/urls.py)
-from app.api.views.template_scenario import TemplateScenarioView
+from app.api.views.template_scenario import (
+    TemplateScenarioView,
+    TemplateScenarioFromStudioView,
+)
 from app.api.views.user import UserView
 
 from app.api.views.simulation import (
@@ -25,20 +27,22 @@ from app.api.views.simulation import (
     NextStepView,
 )
 
-from history.view import HistoryView
+from history.view import HistoryView, ResultView
 
 
 urlpatterns = [
     # User stuff
     path("login", LoginView.as_view(), name="login"),
     path("logout", LogoutView.as_view(), name="logout"),
-    path("csrf-cookie", GetCSRFToken.as_view(), name="csrf-cookie"),
     path("authenticated", CheckAuthenticatedView.as_view(), name="authenticated"),
     path("register", RegisterView.as_view(), name="register"),
     path("user", UserView.as_view()),
     path("user/<str:username>", UserView.as_view()),
     # template scenario
     path("template-scenario", TemplateScenarioView.as_view()),
+    path(
+        "template-scenario/create-from-studio", TemplateScenarioFromStudioView.as_view()
+    ),
     path("template-scenario/<str:scenario_id>", TemplateScenarioView.as_view()),
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
@@ -71,4 +75,5 @@ urlpatterns = [
     # HISTORY Endpoints
     path("history", HistoryView.as_view()),
     path("history/<int:id>", HistoryView.as_view()),
+    path("result/<int:id>", ResultView.as_view()),
 ]

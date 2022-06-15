@@ -17,7 +17,8 @@ import {
     VStack
 } from "@chakra-ui/react";
 import MarkdownTextfield from "./MarkdownTextfield";
-import {useEffect, useState} from "react";
+import {useState} from "react";
+import DeleteButton from "./DeleteButton";
 
 const EventInspectorForm = (props) => {
 
@@ -41,63 +42,107 @@ const EventInspectorForm = (props) => {
         setDisplayName(value)
     }
 
+    const onSubmitDisplayName = () => {
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.displayName = displayName;
+            })
+    }
+
     const onChangeEndConditionType = (event) => {
         setEndConditionType(event.target.value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.trigger.type = event.target.value;
+            })
     }
 
     const onChangeEndConditionLimit = (value) => {
         setEndConditionLimit(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.trigger.limit = value;
+            })
     }
 
     const onChangeLimitType = (event) => {
         setLimitType(event.target.value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.trigger.limit_type = event.target.value;
+            })
     }
 
     const handleChangeDuration = (valueString) => {
         setDuration(parseDays(valueString))
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.duration = valueString;
+            })
     };
 
     const handleChangeBudget = (value) => {
         setBudget(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.budget = value;
+            })
     };
 
     const handleChangeEasyTasks = (value) => {
         setEasyTasks(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.easy_tasks = value;
+            })
     };
 
     const handleChangeMediumTasks = (value) => {
         setMediumTasks(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.medium_tasks = value;
+            })
     };
 
     const handleChangeHardTasks = (value) => {
         setHardTasks(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.hard_tasks = value;
+            })
     };
 
     const handleChangeStress = (value) => {
         setStress(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.stress = value;
+            })
     };
 
     const handleChangeMotivation = (value) => {
         setMotivation(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                component.motivation = value;
+            })
     };
-
-    useEffect(() => {
-        props.eventData.displayName = displayName;
-        props.eventData.trigger.type = endConditionType;
-        props.eventData.trigger.limit = endConditionLimit;
-        props.eventData.trigger.limit_type = limitType;
-        props.eventData.budget = budget;
-        props.eventData.duration = duration;
-        props.eventData.easy_tasks = easyTasks;
-        props.eventData.medium_tasks = mediumTasks;
-        props.eventData.hard_tasks = hardTasks;
-        props.eventData.stress = stress;
-        props.eventData.motivation = motivation;
-    }, [displayName, endConditionType, endConditionLimit, limitType, budget, duration, easyTasks, mediumTasks, hardTasks, stress, motivation])
 
     return (
         <VStack maxW="300px" alignItems="flex-start" mb={5}>
-            <Editable value={displayName} w="full" fontWeight="bold" onChange={(value) => onChangeDisplayName(value)}>
+            <Editable value={displayName} w="full" fontWeight="bold" onChange={(value) => onChangeDisplayName(value)} onSubmit={onSubmitDisplayName}>
                 <EditablePreview
                     w="full"
                     _hover={{
@@ -111,6 +156,7 @@ const EventInspectorForm = (props) => {
             <Box h={3}/>
             <MarkdownTextfield
                 data={props.eventData}
+                updateEditorList={props.updateEditorList}
             />
             <Box h={3}/>
             <FormControl>
@@ -242,6 +288,11 @@ const EventInspectorForm = (props) => {
                 <FormHelperText>Motivation</FormHelperText>
 
             </FormControl>
+            <DeleteButton
+                component={props.eventData}
+                updateEditorList={props.updateEditorList}
+                setSelectedObject={props.setSelectedObject}
+            />
         </VStack>
     )
 }

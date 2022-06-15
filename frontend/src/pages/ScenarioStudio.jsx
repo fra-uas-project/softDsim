@@ -23,7 +23,7 @@ import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import {useEffect, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
-import EditorListComponent from "../components/ScenarionStudio/Editor/EditorQuestionsComponent";
+import EditorListComponent from "../components/ScenarionStudio/Editor/EditorListComponent";
 import ComponentTab from "../components/ScenarionStudio/ComponentTab/ComponentTab";
 import QuestionInspectorForm from "../components/ScenarionStudio/InspectorTab/QuestionInspectorForm";
 import BaseInspectorForm from "../components/ScenarionStudio/InspectorTab/BaseInspectorForm";
@@ -43,6 +43,7 @@ import {
     questionEnum,
     tabIndexEnum
 } from "../components/ScenarionStudio/scenarioStudioData";
+import {useImmer} from "use-immer";
 
 const ScenarioStudio = () => {
 
@@ -50,13 +51,12 @@ const ScenarioStudio = () => {
     const toast = useToast();
 
     const [tabIndex, setTabIndex] = useState(1);
-    const [editorList, updateEditorList] = useState([]);
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [editorList, updateEditorList] = useImmer([]);
     const [selectedObject, setSelectedObject] = useState(null);
 
     const saveScenarioTemplate = async () => {
         try {
-            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario`, {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/create-from-studio`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -100,8 +100,6 @@ const ScenarioStudio = () => {
             const [reorderedItem] = items.splice(result.source.index, 1);
             items.splice(result.destination.index, 0, reorderedItem);
 
-            // console.log("test", editorList[result.source.index])
-            // setSelectedItem(editorList[result.source.index].id)
             updateEditorList(items);
 
             // moving from component list to editor list
@@ -113,12 +111,15 @@ const ScenarioStudio = () => {
             // copy because item needs to be unique
             let movedItemCopy = {...movedItem};
             movedItemCopy.id = uuidv4();
+            if(movedItemCopy.type === componentEnum.BASE) {
+                movedItemCopy.template_name += ` ${uuidv4().slice(0, 8)}`
+            } else {
+                movedItemCopy.displayName += ` ${uuidv4().slice(0, 8)}`
+            }
             editorListItems.splice(result.destination.index, 0, movedItemCopy);
             updateEditorList(editorListItems);
 
-            setSelectedItem(movedItemCopy.id)
             setSelectedObject(movedItemCopy)
-            // setTabIndex(tabIndexEnum.INSPECTOR) // Deactivated for demonstration purposes
 
             // moving from action list to fragment in editor
         } else if (result.source.droppableId === "actionList") {
@@ -129,138 +130,95 @@ const ScenarioStudio = () => {
             let movedActionCopy = {...movedAction};
             movedActionCopy.id = uuidv4();
 
-            // get fragment which needs to be updated
-            const editorListItems = Array.from(editorList);
-            const fragment = editorListItems.find(fragment => fragment.id === result.destination.droppableId)
-            const fragmentActions = Array.from(fragment.actions);
-
-            fragmentActions.splice(result.destination.index, 0, movedActionCopy);
-            fragment.actions = fragmentActions
-
-            updateEditorList(editorListItems);
+            updateEditorList((draft) => {
+                const fragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
+                fragmentComponent.actions.splice(result.destination.index, 0, movedActionCopy)
+            })
 
             // Reorder actions in same list
         } else if (result.type === "action" && result.source.droppableId === result.destination.droppableId) {
-
-            // Get fragment which actions need to be changed
-            const editorListItems = Array.from(editorList);
-            const fragment = editorListItems.find(fragment => fragment.id === result.source.droppableId)
-
-            // Update actions
-            const fragmentActions = Array.from(fragment.actions);
-            const [reorderedAction] = fragmentActions.splice(result.source.index, 1);
-            fragmentActions.splice(result.destination.index, 0, reorderedAction);
-
-            fragment.actions = fragmentActions
-            updateEditorList(editorListItems);
-
+            updateEditorList((draft) => {
+                const fragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.source.droppableId)
+                const [reorderedAction] = fragmentComponent.actions.splice(result.source.index, 1);
+                fragmentComponent.actions.splice(result.destination.index, 0, reorderedAction)
+            })
 
             // Remove from one action list and add to another
         } else if (result.type === "action" && result.source.droppableId !== result.destination.droppableId) {
-            const editorListItems = Array.from(editorList);
+            updateEditorList((draft) => {
+                // Remove from source action list
+                const sourceFragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.source.droppableId)
+                const [reorderedAction] = sourceFragmentComponent.actions.splice(result.source.index, 1);
 
-            // Change source fragment action list
-            const sourceFragment = editorListItems.find(fragment => fragment.id === result.source.droppableId)
-            const sourceFragmentActions = Array.from(sourceFragment.actions);
-            const [reorderedAction] = sourceFragmentActions.splice(result.source.index, 1);
-
-            // Change destination fragment action list
-            const destinationFragment = editorListItems.find(fragment => fragment.id === result.destination.droppableId)
-            const destinationFragmentActions = Array.from(destinationFragment.actions);
-            destinationFragmentActions.splice(result.destination.index, 0, reorderedAction);
-
-            sourceFragment.actions = sourceFragmentActions
-            destinationFragment.actions = destinationFragmentActions
-            updateEditorList(editorListItems);
+                // Add to destination action list
+                const destinationFragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
+                destinationFragmentComponent.actions.splice(result.destination.index, 0, reorderedAction);
+            })
         }
 
-        // moving from action list to fragment in editor
+        // moving from question list to questions component in editor
         else if (result.source.droppableId === "questionList") {
+            // copy because item needs to be unique
             const questionsListItems = Array.from(finalQuestionList);
             const [movedQuestion] = questionsListItems.splice(result.source.index, 1);
-
-            // copy because item needs to be unique
             let movedQuestionCopy = {...movedQuestion};
             movedQuestionCopy.id = uuidv4();
+            movedQuestionCopy.displayName += ` ${uuidv4().slice(0, 8)}`;
 
-            // get fragment which needs to be updated
-            const editorListItems = Array.from(editorList);
-            const questionsComponent = editorListItems.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
-            const questionsComponentQuestions = Array.from(questionsComponent.questions);
-
-            questionsComponentQuestions.splice(result.destination.index, 0, movedQuestionCopy);
-            questionsComponent.questions = questionsComponentQuestions
-
-            updateEditorList(editorListItems);
+            updateEditorList((draft) => {
+                const questionsComponent = draft.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
+                questionsComponent.questions.splice(result.destination.index, 0, movedQuestionCopy)
+            })
         }
 
         // Reorder questions in same list
         else if (result.type === "question" && result.source.droppableId === result.destination.droppableId) {
-
-            // Get fragment which actions need to be changed
-            const editorListItems = Array.from(editorList);
-            const questionsComponent = editorListItems.find(questionsComponent => questionsComponent.id === result.source.droppableId)
-
-            // Update actions
-            const questionsComponentQuestions = Array.from(questionsComponent.questions);
-            const [reorderedQuestions] = questionsComponentQuestions.splice(result.source.index, 1);
-            questionsComponentQuestions.splice(result.destination.index, 0, reorderedQuestions);
-
-            questionsComponent.questions = questionsComponentQuestions
-            updateEditorList(editorListItems);
-
+            updateEditorList((draft) => {
+                const questionsComponent = draft.find(component => component.id === result.source.droppableId)
+                const [reorderedAction] = questionsComponent.questions.splice(result.source.index, 1);
+                questionsComponent.questions.splice(result.destination.index, 0, reorderedAction)
+            })
 
             // Remove from one question list and add to another
         } else if (result.type === "question" && result.source.droppableId !== result.destination.droppableId) {
-            const editorListItems = Array.from(editorList);
+            updateEditorList((draft) => {
+                // Remove from source questions list
+                const sourceQuestionsComponent = draft.find(component => component.id === result.source.droppableId)
+                const [reorderedAction] = sourceQuestionsComponent.questions.splice(result.source.index, 1);
 
-            // Change source fragment action list
-            const sourceQuestionsComponent = editorListItems.find(component => component.id === result.source.droppableId)
-            const sourceQuestionsComponentQuestions = Array.from(sourceQuestionsComponent.questions);
-            const [reorderedQuestion] = sourceQuestionsComponentQuestions.splice(result.source.index, 1);
-
-            // Change destination fragment action list
-            const destinationQuestionsComponent = editorListItems.find(component => component.id === result.destination.droppableId)
-            const destinationQuestionsComponentQuestions = Array.from(destinationQuestionsComponent.questions);
-            destinationQuestionsComponentQuestions.splice(result.destination.index, 0, reorderedQuestion);
-
-            sourceQuestionsComponent.questions = sourceQuestionsComponentQuestions
-            destinationQuestionsComponent.questions = destinationQuestionsComponentQuestions
-            updateEditorList(editorListItems);
+                // Add to destination questions list
+                const destinationQuestionsComponent = draft.find(component => component.id === result.destination.droppableId)
+                destinationQuestionsComponent.questions.splice(result.destination.index, 0, reorderedAction);
+            })
         }
 
         console.log(result)
     };
 
-    const findComponent = (componentId) => {
-        return (editorList.find(component => component.id === componentId))
-    };
+    const handleSelect = (e) => {
+        const component = editorList.find(component => component.id === e.currentTarget.getAttribute("elementid"))
 
-    const findQuestion = (questionId) => {
-        const questionsList = editorList.filter(component => component.type === componentEnum.QUESTIONS)
-
-        let questions = []
-        for (const questionsListElement of questionsList) {
-            questions = [...questions, ...questionsListElement.questions]
-        }
-
-        return (questions.find(question => question.id === questionId))
-    };
-
-    const findAction = (actionId) => {
         const fragmentList = editorList.filter(component => component.type === componentEnum.FRAGMENT)
-
         let actions = []
         for (const fragment of fragmentList) {
             actions = [...actions, ...fragment.actions]
         }
+        const action = actions.find(action => action.id === e.currentTarget.getAttribute("elementid"))
 
-        return (actions.find(action => action.id === actionId))
-    }
+        const questionsList = editorList.filter(component => component.type === componentEnum.QUESTIONS)
+        let questions = []
+        for (const questionsListElement of questionsList) {
+            questions = [...questions, ...questionsListElement.questions]
+        }
+        const question = questions.find(question => question.id === e.currentTarget.getAttribute("elementid"))
 
-    const handleSelect = (e) => {
-        setSelectedItem(e.currentTarget.getAttribute("elementid"))
-        setSelectedObject(editorList.find(component => component.id === e.currentTarget.getAttribute("elementid")))
+        if(component) {
+            setSelectedObject(component)
+        } else if(action) {
+            setSelectedObject(action)
+        } else if(question) {
+            setSelectedObject(question)
+        }
     }
 
     const handleTabsChange = (index) => {
@@ -268,24 +226,31 @@ const ScenarioStudio = () => {
     };
 
     const handleEditorBackgroundClick = (e) => {
-        // if (e.target.getAttribute("role") === "list") {
+        // if (e.target.getAttribute("elementid") === "backgroundList") {
         //     setTabIndex(tabIndexEnum.COMPONENTS)
-        //     setSelectedItem("")
         //     setSelectedObject(null)
         // }
     };
 
     // If item is selected, switch to inspector tab
     useEffect(() => {
-        if (selectedItem) {
+        if (selectedObject) {
             setTabIndex(tabIndexEnum.INSPECTOR);
         }
-    }, [selectedItem]);
+    }, [selectedObject]);
+
+    useEffect(() => {
+        if (selectedObject) {
+            setTabIndex(tabIndexEnum.INSPECTOR);
+        } else {
+            setTabIndex(tabIndexEnum.COMPONENTS);
+        }
+    }, [selectedObject]);
 
     useEffect(() => {
         console.log(editorList)
         console.log("SO", selectedObject)
-    }, [selectedItem, editorList, selectedObject])
+    }, [editorList, selectedObject])
 
     return (
         <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
@@ -324,11 +289,12 @@ const ScenarioStudio = () => {
                                                    justifyContent={editorList.length ? "flex-start" : "center"}
                                                    alignItems="center"
                                                    borderRadius="2xl"
-                                                   flexGrow="1">
+                                                   flexGrow="1"
+                                                   elementid="backgroundList"
+                                    >
                                         {
                                             editorList.length ?
                                                 editorList.map((component, index) => {
-
                                                         if (component.type === componentEnum.BASE) {
                                                             return (
                                                                 <EditorBaseComponent
@@ -336,8 +302,7 @@ const ScenarioStudio = () => {
                                                                     onClick={((e) => handleSelect(e))}
                                                                     index={index}
                                                                     component={component}
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
                                                                 />
                                                             )
                                                         } else if (component.type === componentEnum.FRAGMENT) {
@@ -351,8 +316,8 @@ const ScenarioStudio = () => {
                                                                     index={index}
                                                                     component={component}
                                                                     droppableType="action"
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
+                                                                    selectedItem={selectedObject?.id}
                                                                     actions={component.actions}
                                                                 />
                                                             )
@@ -367,8 +332,8 @@ const ScenarioStudio = () => {
                                                                     index={index}
                                                                     component={component}
                                                                     droppableType="question"
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
+                                                                    selectedItem={selectedObject?.id}
                                                                     actions={component.questions}
                                                                 />
                                                             )
@@ -379,24 +344,20 @@ const ScenarioStudio = () => {
                                                                     onClick={((e) => handleSelect(e))}
                                                                     index={index}
                                                                     component={component}
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
                                                                 />
                                                             )
                                                         } else {
-                                                            // //    TODO Implement other types
                                                             return (
                                                                 <EditorBaseComponent
                                                                     key={component.id}
                                                                     onClick={((e) => handleSelect(e))}
                                                                     index={index}
                                                                     component={component}
-                                                                    isSelected={selectedItem === component.id}
-                                                                    selectedItem={selectedItem}
+                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
                                                                 />
                                                             )
                                                         }
-
                                                     }
                                                 )
                                                 :
@@ -431,12 +392,14 @@ const ScenarioStudio = () => {
                                 <TabPanels minW="350px" h="850px" overflow="auto">
                                     <TabPanel height="full">
                                         {/* Inspector Items */}
-                                        {selectedItem ?
+                                        {selectedObject ?
                                             <VStack alignItems="flex-start" pt={2}>
                                                 {selectedObject?.type === componentEnum.BASE &&
                                                     <BaseInspectorForm
                                                         key={selectedObject.id}
-                                                        baseData={findComponent(selectedItem)}
+                                                        baseData={selectedObject}
+                                                        updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
@@ -445,6 +408,8 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         finalQuestionList={finalQuestionList}
                                                         questionsData={selectedObject}
+                                                        updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
@@ -452,14 +417,18 @@ const ScenarioStudio = () => {
                                                     <FragmentInspectorForm
                                                         key={selectedObject.id}
                                                         finalActionList={finalActionList}
-                                                        fragmentData={findComponent(selectedItem)}
+                                                        fragmentData={selectedObject}
+                                                        updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
                                                 {selectedObject?.type === componentEnum.EVENT &&
                                                     <EventInspectorForm
                                                         key={selectedObject.id}
-                                                        eventData={findComponent(selectedItem)}
+                                                        eventData={selectedObject}
+                                                        updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
@@ -467,20 +436,26 @@ const ScenarioStudio = () => {
                                                     <ModelSelectionInspectorForm
                                                         key={selectedObject.id}
                                                         modelSelectionData={selectedObject}
+                                                        updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
-                                                {findAction(selectedItem)?.type === "ACTION" &&
+                                                {selectedObject?.type === "ACTION" &&
                                                     <ActionInspectorForm
-                                                        key={findAction(selectedItem).id}
-                                                        actionData={findAction(selectedItem)}
+                                                        key={selectedObject.id}
+                                                        actionData={selectedObject}
+                                                        updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
 
-                                                {(findQuestion(selectedItem)?.type === questionEnum.SINGLE || findQuestion(selectedItem)?.type === questionEnum.MULTI) &&
+                                                {(selectedObject?.type === questionEnum.SINGLE || selectedObject?.type === questionEnum.MULTI) &&
                                                     <QuestionInspectorForm
-                                                        key={findQuestion(selectedItem).id}
-                                                        questionData={findQuestion(selectedItem)}
+                                                        key={selectedObject.id}
+                                                        questionData={selectedObject}
+                                                        updateEditorList={updateEditorList}
+                                                        setSelectedObject={setSelectedObject}
                                                     />
                                                 }
                                             </VStack>

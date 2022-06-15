@@ -7,7 +7,7 @@ env
 .vscode/settings.json
 .env
 backend/database/mongo*
-migrations
+
 
 .empty
 .vscode

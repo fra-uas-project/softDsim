@@ -1,18 +1,17 @@
 import logging
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
+
 from rest_framework import status
-from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from app.decorators.decorators import allowed_roles
-from app.dto.request import Workpack, QuestionRequest, ModelRequest
 from app.exceptions import (
     SimulationException,
     RequestTypeException,
     RequestActionException,
     RequestMembersException,
+    RequestTypeMismatchException,
+    TooManyMeetingsException,
 )
 from app.models.scenario import ScenarioConfig
 from django.core.exceptions import ObjectDoesNotExist
@@ -40,7 +39,6 @@ from rest_framework.views import APIView
 from app.src.util.scenario_util import create_correct_request_model
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class StartUserScenarioView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -67,20 +65,24 @@ class StartUserScenarioView(APIView):
             )
 
         try:
-            team = Team()
-            team.save()
-            state = ScenarioState()
-            state.save()
+            # Craete UserScenario
             user_scenario = UserScenario(
                 user=request.user,
                 template=template,
                 config=config,
-                team=team,
-                state=state,
             )
             user_scenario.save()
+
+            # Create ScenarioState
+            state = ScenarioState(user_scenario=user_scenario)
+            state.save()
+
+            # Create Team
+            team = Team(user_scenario=user_scenario)
+            team.save()
+
             serializer = UserScenarioSerializer(user_scenario)
-            # create tasks
+            # Create Tasks
             tasks = [  # easy
                 Task(difficulty=1, user_scenario=user_scenario)
                 for _ in range(template.management_goal.easy_tasks)
@@ -110,7 +112,6 @@ class StartUserScenarioView(APIView):
         )
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class NextStepView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -139,6 +140,8 @@ class NextStepView(APIView):
             RequestTypeException,
             RequestActionException,
             RequestMembersException,
+            RequestTypeMismatchException,
+            TooManyMeetingsException,
         ) as e:
             return Response(
                 {"status": "error", "error-message": str(e)},
@@ -152,7 +155,6 @@ class NextStepView(APIView):
             )
 
 
-@method_decorator(csrf_protect, name="dispatch")
 class AdjustMemberView(APIView):
     permission_classes = (IsAuthenticated,)
 
