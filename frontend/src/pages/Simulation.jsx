@@ -22,8 +22,8 @@ import {
 import { HiChevronRight } from "react-icons/hi";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import Question from "../components/Question";
-import Action from "../components/Action"
+import Question from "../components/Simulation/Actions/Question";
+import Action from "../components/Simulation/Actions/Action"
 import ModelSelection from '../components/ModelSelection'
 import { getCookie } from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
@@ -62,9 +62,14 @@ const Simulation = () => {
     const [scenarioValues, setScenarioValues] = useState({})
 
     // contains the values that should be sent to the next endpoint
-    const [returnValues, setReturnValues] = useState()
+    const [returnValues, setReturnValues] = useState();
 
     const [scenarioIsLoading, setScenarioIsLoading] = useState(true);
+
+    const [rerender, setRerender] = useState(0);
+
+    // define simulation fragment values
+    const [simFragmentActions, setSimFragmentActions] = useState();
 
     const fetchUserScenario = () => {
         const userScenarioMock = {
@@ -93,6 +98,31 @@ const Simulation = () => {
                 type: currentType,
                 question_collection: event
             }
+            setReturnValues(tempReturnValues)
+            setDataValidationStatus(true)
+        } else if (currentType === 'SIMULATION') {
+            var tempSimFragmentActions = simFragmentActions
+
+            // write new value into action fragment
+            tempSimFragmentActions[event.type] = event.value
+
+            // set fragment state
+            setSimFragmentActions(tempSimFragmentActions)
+
+            const tempReturnValues = {
+                scenario_id: currentSimID,
+                type: currentType,
+                actions: tempSimFragmentActions,
+                members: [{
+                    "skill_type": "senior",
+                    "change": 2
+                },
+                {
+                    "skill_type": "junior",
+                    "change": 2
+                }]
+            }
+
             setReturnValues(tempReturnValues)
             setDataValidationStatus(true)
         }
@@ -152,10 +182,36 @@ const Simulation = () => {
                 setSimValues(nextData)
                 setDataValidationStatus(true)
                 // TEMPORARY! TODO: Implement actual functionality
+                let tempActions = {}
+
+                // get all actions from next data object
+                for (const action of nextData.actions) {
+                    if (action.action === 'bugfix') {
+                        tempActions.bugfix = false
+                    } else if (action.action === 'unittest') {
+                        tempActions.unittest = false
+                    } else if (action.action === 'integrationtest') {
+                        tempActions.integrationtest = false
+                    } else if (action.action === 'meetings') {
+                        tempActions.meetings = action.lower_limit
+                    } else if (action.action === 'teamevent') {
+                        tempActions.teamevent = false
+                    } else if (action.action === 'training') {
+                        tempActions.training = action.lower_limit
+                    } else if (action.action === 'salary') {
+                        tempActions.salary = 1
+                    } else if (action.action === 'overtime') {
+                        tempActions.overtime = 0
+                    }
+                }
+
+                // set action values with default values
+                setSimFragmentActions(tempActions)
+
                 const tempReturnValues = {
                     scenario_id: currentSimID,
                     type: nextData.type,
-                    actions: [],
+                    actions: tempActions,
                     members: [{
                         "skill_type": "senior",
                         "change": 2
@@ -166,6 +222,9 @@ const Simulation = () => {
                     }]
                 }
                 setReturnValues(tempReturnValues)
+
+                // quick and dirty solution for rerendering, please don't judge
+                setRerender(rerender + 20)
             } else if (nextData.type === 'EVENT') {
                 setDataValidationStatus(true)
                 setSimValues(nextData)
@@ -192,10 +251,6 @@ const Simulation = () => {
     useEffect(() => {
         console.log('currentSimID', currentSimID)
     }, [currentSimID]);
-
-    useEffect(() => {
-        console.log('dataValidationStatus', dataValidationStatus)
-    }, [dataValidationStatus]);
 
     return (
         <>
@@ -253,9 +308,10 @@ const Simulation = () => {
                                     {/* change heading depending on dataset */}
                                     <b>
                                         {
-                                            Object.keys(simValues)[0] === 'question_collections' ? 'Questions' :
-                                                Object.keys(simValues)[0] === 'simulation_fragments' ? 'Actions' :
-                                                    Object.keys(simValues)[0] === 'model_selection' ? 'Model Selection' : ''
+                                            currentType === 'QUESTION' ? 'Questions' :
+                                                currentType === 'SIMULATION' ? 'Actions' :
+                                                    currentType === 'MODEL' ? 'Model Selection' :
+                                                        currentType === 'EVENT' ? 'Event' : ''
                                         }
                                     </b>
                                 </p>
@@ -274,10 +330,10 @@ const Simulation = () => {
                                         : <></>
                                     }
                                     {/* Simulation Fragment */}
-                                    {Object.keys(simValues)[0] === 'simulation_fragments' ?
+                                    {currentType === 'SIMULATION' ?
                                         <>
-                                            {simValues.simulation_fragments.map((actions, index) => {
-                                                return <Action key={index} text={actions.text} actions={actions.actions} />
+                                            {simValues.actions.map((action, index) => {
+                                                return <Action onSelectAction={(event) => handleSelection(event)} key={index + rerender} action={action} />
                                             })}
                                         </>
                                         : <></>
@@ -290,14 +346,14 @@ const Simulation = () => {
                                         : <></>
                                     }
                                     {/* Event */}
-                                    {Object.keys(simValues)[0] === 'event' ?
+                                    {currentType === 'EVENT' ?
                                         <>
                                         </>
                                         : <></>
                                     }
                                     <GridItem colSpan={1}>
                                         <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg'>
-                                            Next Week
+                                            {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
                                         </Button>
                                     </GridItem>
                                 </Grid>
