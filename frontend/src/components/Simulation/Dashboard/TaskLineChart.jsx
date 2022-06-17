@@ -16,21 +16,21 @@ const TaskLineChart = ({title, data}) => {
             }
         },
         annotations: {
-            xaxis: [
-                {
-                    x: 6,
-                    borderColor: "#FEB019",
-                    label: {
-                        borderColor: "#FEB019",
-                        style: {
-                            color: "#fff",
-                            background: "#FEB019"
-                        },
-                        orientation: "horizontal",
-                        text: "Deadline"
-                    }
-                }
-            ]
+            // xaxis: [
+            //     {
+            //         x: 6,
+            //         borderColor: "#FEB019",
+            //         label: {
+            //             borderColor: "#FEB019",
+            //             style: {
+            //                 color: "#fff",
+            //                 background: "#FEB019"
+            //             },
+            //             orientation: "horizontal",
+            //             text: "Deadline"
+            //         }
+            //     }
+            // ]
         },
         xaxis: {
             categories: Array.from(Array(100).keys(), item => item*5), // Change hardcoded value 100
@@ -70,8 +70,20 @@ const TaskLineChart = ({title, data}) => {
     const [options, setOptions] = useState(tmpOptions);
     const [series, setSeries] = useImmer(tmpSeries);
 
+    const [tasksUnitTested, setTasksUnitTested] = useState(data.tasks.tasks_unit_tested)
+    const [tasksUnitTestedBefore, setTasksUnitTestedBefore] = useState(0)
+
+    const [tasksIntegrationTested, setTasksIntegrationTested] = useState(data.tasks.tasks_integration_tested)
+    const [tasksIntegrationTestedBefore, setTasksIntegrationTestedBefore] = useState(0)
+
+    const [tasksBug, setTasksBug] = useState(data.tasks.tasks_bug)
+    const [tasksBugBefore, setTasksBugBefore] = useState(0)
+
+    const [tasksDone, setTasksDone] = useState(data.tasks.tasks_done)
+    const [tasksDoneBefore, setTasksDoneBefore] = useState(0)
+
     useEffect(() => {
-        if(data.type === "SIMULATION") {
+        if(data.type === "SIMULATION" || data.type === "RESULT") {
             setSeries(
                 (draft) => {
                     draft[0].data.push(data.tasks.tasks_done)
@@ -79,6 +91,18 @@ const TaskLineChart = ({title, data}) => {
                     draft[2].data.push(data.tasks.tasks_integration_tested)
                     draft[3].data.push(data.tasks.tasks_bug)
                 })
+
+            setTasksUnitTestedBefore(tasksUnitTested)
+            setTasksUnitTested(data.tasks.tasks_unit_tested)
+
+            setTasksIntegrationTestedBefore(tasksIntegrationTested)
+            setTasksIntegrationTested(data.tasks.tasks_integration_tested)
+
+            setTasksBugBefore(tasksBug)
+            setTasksBug(data.tasks.tasks_bug)
+
+            setTasksDoneBefore(tasksDoneBefore)
+            setTasksDone(data.tasks.tasks_done)
         }
     }, [data])
 
@@ -100,7 +124,7 @@ const TaskLineChart = ({title, data}) => {
                     <StatNumber>{data.tasks.tasks_done}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
-                        232 since last iteration
+                        {tasksDone - tasksDoneBefore} since last iteration
                     </StatHelpText>
                 </Stat>
                 <Stat>
@@ -108,7 +132,7 @@ const TaskLineChart = ({title, data}) => {
                     <StatNumber>{data.tasks.tasks_integration_tested}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
-                        232 since last iteration
+                        {tasksIntegrationTested - tasksIntegrationTestedBefore} since last iteration
                     </StatHelpText>
                 </Stat>
                 <Stat>
@@ -116,7 +140,7 @@ const TaskLineChart = ({title, data}) => {
                     <StatNumber>{data.tasks.tasks_unit_tested}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
-                        232 since last iteration
+                        {tasksUnitTested - tasksUnitTestedBefore} since last iteration
                     </StatHelpText>
                 </Stat>
                 <Stat>
@@ -124,7 +148,7 @@ const TaskLineChart = ({title, data}) => {
                     <StatNumber>{data.tasks.tasks_bug}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
-                        232 since last iteration
+                        {tasksBug - tasksBugBefore} since last iteration
                     </StatHelpText>
                 </Stat>
             </VStack>
