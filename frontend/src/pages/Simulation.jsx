@@ -22,8 +22,8 @@ import {
 import { HiChevronRight } from "react-icons/hi";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import Question from "../components/Question";
-import Action from "../components/Action"
+import Question from "../components/Simulation/Actions/Question";
+import Action from "../components/Simulation/Actions/Action"
 import ModelSelection from '../components/ModelSelection'
 import { getCookie } from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
