@@ -17,7 +17,7 @@ const Skilltype = (props) => {
 
     return (
         <>
-            <Flex _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' p='3' flexFlow="column" align="center" justify="center">
+            <Flex borderRadius="xl" bg='gray.100' p='3' flexFlow="column" align="center" justify="center">
                 <Flex w="full">
                     <Flex w="50%" align="center" justify="center">{'Currently: ' + props.currentCount}</Flex>
                     <Flex w="50%" align="center" justify="center">{'Change: ' + props.countChange}</Flex>

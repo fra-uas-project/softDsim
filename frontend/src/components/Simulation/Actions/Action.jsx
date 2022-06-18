@@ -7,7 +7,7 @@ const Action = (props) => {
     if (Object.keys(props).length > 0) {
         return (
             <>
-                <Grid _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' p='3'>
+                <Grid  borderRadius="xl" bg='gray.100' p='3'>
                     {
                         // Bugfix
                         props.action.action === 'bugfix' ?
@@ -84,7 +84,7 @@ const Action = (props) => {
                                                     <ActionToggle onEventbutton={(event) => props.onSelectAction({
                                                         type: props.action.action,
                                                         value: event
-                                                    })} />
+                                                    })} textTrue="Team Event Scheduled" textFalse="Schedule Team Event" />
                                                 </GridItem>
                                                 :
                                                 // Salary
