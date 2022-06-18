@@ -3,7 +3,7 @@ import {Flex, HStack, Icon, Stat, StatArrow, StatHelpText, StatLabel, StatNumber
 const StatElement = ({icon, title, value, prefix, suffix, indicator, indicatorValue, indicatorColor}) => {
 
     return (
-        <Flex backgroundColor="white" p={5} borderRadius="2xl" minW="300px">
+        <Flex backgroundColor="white" p={5} borderRadius="2xl" minW="280px">
             <HStack spacing={3}>
                 <Flex borderRadius="100%" backgroundColor="blue.100" p={2}>
                     <Icon w={10} h={10} as={icon} color="blue.600" />
