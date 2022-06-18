@@ -20,7 +20,7 @@ const ActionSelect = (props) => {
         }
     }
     return (
-        <Select bg="white" shadow="md" onChange={(event) => handleSelect(event)} defaultValue={props.type === 'salary' ? 'Average' : 'Normal hours'}>
+        <Select pl={3} onChange={(event) => handleSelect(event)} defaultValue={props.type === 'salary' ? 'Average' : 'Normal hours'}>
             {props.selection.map((value, index) => {
                 return <option key={index} value={value}>{value}</option>
             })}

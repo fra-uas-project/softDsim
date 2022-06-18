@@ -16,7 +16,6 @@ const ActionToggle = (props) => {
                 <Button
                     colorScheme={buttonValue ? 'blue' : 'blackAlpha'} size='lg'
                     onClick={handleButtonClick}
-                    w='50%'
                 >
                     {buttonValue ? props.textTrue : props.textFalse}
                 </Button>
