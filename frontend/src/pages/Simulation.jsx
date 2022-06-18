@@ -393,7 +393,8 @@ const Simulation = () => {
                                     {/* Simulation Fragment */}
                                     {currentType === 'SIMULATION' ?
                                         <>
-                                            <Grid templateColumns='repeat(2, 1fr)'>
+                                            <Heading size="sm">Employees</Heading>
+                                            <Grid templateColumns='repeat(2, 1fr)' gap={2}>
                                                 {skillTypeReturn.map((skilltype, index) => {
                                                     return <Skilltype key={index + rerenderSkill}
                                                         onUpdateChange={(event) => { updateSkillTypeObject(event.name, event.value) }}
