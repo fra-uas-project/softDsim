@@ -44,6 +44,12 @@ class ScenarioStateDTO(BaseModel):
     cost: float
 
 
+class ManagementGoalDTO(BaseModel):
+    budget: float
+    duration: int
+    tasks: int
+
+
 class TasksStatusDTO(BaseModel):
     tasks_todo: int
     tasks_done: int
@@ -67,6 +73,7 @@ class ScenarioResponse(BaseModel, ABC):
     """
 
     type: str
+    management: ManagementGoalDTO
     state: ScenarioStateDTO
     tasks: TasksStatusDTO
     members: List[MemberDTO]

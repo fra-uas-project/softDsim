@@ -1,11 +1,14 @@
 import { Grid, Button } from "@chakra-ui/react"
 import React, { useState } from "react";
 
-const ActionToggle = () => {
+const ActionToggle = (props) => {
 
     const [buttonValue, setButtonValue] = useState(false)
 
-    function handleButtonClick() { setButtonValue(!buttonValue) }
+    function handleButtonClick() {
+        setButtonValue(!buttonValue)
+        props.onEventbutton(!buttonValue)
+    }
 
     return (
         <>

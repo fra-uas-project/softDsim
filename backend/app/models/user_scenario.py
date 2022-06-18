@@ -1,4 +1,7 @@
+import logging
 from django.db import models
+from app.dto.response import ManagementGoalDTO
+from app.models.management_goal import ManagementGoal
 
 from app.models.scenario import ScenarioConfig
 from app.models.template_scenario import TemplateScenario
@@ -15,6 +18,18 @@ class UserScenario(models.Model):
     template = models.ForeignKey(TemplateScenario, on_delete=models.SET_NULL, null=True)
     # team = app.models.team.Team
     # state = State
+
+    def get_management_goal_dto(self) -> ManagementGoalDTO:
+        try:
+            mgoal: ManagementGoal = self.template.management_goal
+            return ManagementGoalDTO(
+                budget=mgoal.budget,
+                duration=mgoal.duration,
+                tasks=sum((mgoal.easy_tasks, mgoal.medium_tasks, mgoal.hard_tasks)),
+            )
+        except Exception as e:
+            logging.error(e)
+        return ManagementGoalDTO(budget=-1, duration=-1)
 
 
 class ScenarioState(models.Model):
