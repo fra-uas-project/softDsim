@@ -14,19 +14,19 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-    ModalOverlay, Skeleton,
+    ModalOverlay,
+    Skeleton,
     Spacer,
-    Text,
     useDisclosure,
 } from "@chakra-ui/react";
-import { HiChevronRight } from "react-icons/hi";
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import {HiChevronRight} from "react-icons/hi";
+import {useEffect, useState} from "react";
+import {Link, useLocation} from "react-router-dom";
 import Question from "../components/Simulation/Actions/Question";
 import Action from "../components/Simulation/Actions/Action"
 import ModelSelection from '../components/ModelSelection'
 import Skilltype from "../components/Simulation/Actions/Skilltype"
-import { getCookie } from "../utils/utils"
+import {getCookie} from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 
@@ -403,7 +403,7 @@ const Simulation = () => {
                                     {/* Simulation Fragment */}
                                     {currentType === 'SIMULATION' ?
                                         <>
-                                            <Grid templateColumns='repeat(2, 1fr)' gap={5}>
+                                            <Grid templateColumns='repeat(2, 1fr)'>
                                                 {skillTypeReturn.map((skilltype, index) => {
                                                     return <Skilltype key={index + rerenderSkill}
                                                         onUpdateChange={(event) => { updateSkillTypeObject(event.name, event.value) }}
@@ -432,7 +432,7 @@ const Simulation = () => {
                                         : <></>
                                     }
                                     <GridItem colSpan={1}>
-                                        <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg'>
+                                        <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg' mt={3}>
                                             {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
                                         </Button>
                                     </GridItem>
