@@ -228,7 +228,7 @@ const Simulation = () => {
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                {scenarioIsLoading ? <Skeleton height='80vh' />: <Dashboard templateScenario={state} data={scenarioValues} />}
+                                {scenarioIsLoading ? <Skeleton height='80vh' />: <Dashboard templateScenario={state} data={simValues} />}
 
                             </Box>
                             <Spacer />
