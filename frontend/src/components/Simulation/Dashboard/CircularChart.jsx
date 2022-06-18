@@ -48,7 +48,7 @@ const CircularChart = ({value, inverseColors, title}) => {
                 shade: 'dark',
                 type: 'horizontal',
                 shadeIntensity: 0.5,
-                gradientToColors: ['#48BB78'],
+                gradientToColors: ['#48a6bb'],
                 inverseColors: inverseColors,
                 opacityFrom: 1,
                 opacityTo: 1,
@@ -63,8 +63,6 @@ const CircularChart = ({value, inverseColors, title}) => {
     };
 
     const [options, setOptions] = useState(tmpOptions);
-    const [series, setSeries] = useState(value);
-
 
     return (
         <Flex>
@@ -72,7 +70,7 @@ const CircularChart = ({value, inverseColors, title}) => {
                 <Heading size="md">{title}</Heading>
                 <Chart
                     options={options}
-                    series={series}
+                    series={[value*100]}
                     type="radialBar"
                     width="300"
                 />

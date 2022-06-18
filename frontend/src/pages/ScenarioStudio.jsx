@@ -212,11 +212,11 @@ const ScenarioStudio = () => {
         }
         const question = questions.find(question => question.id === e.currentTarget.getAttribute("elementid"))
 
-        if(component) {
+        if (component) {
             setSelectedObject(component)
-        } else if(action) {
+        } else if (action) {
             setSelectedObject(action)
-        } else if(question) {
+        } else if (question) {
             setSelectedObject(question)
         }
     }
@@ -233,12 +233,6 @@ const ScenarioStudio = () => {
     };
 
     // If item is selected, switch to inspector tab
-    useEffect(() => {
-        if (selectedObject) {
-            setTabIndex(tabIndexEnum.INSPECTOR);
-        }
-    }, [selectedObject]);
-
     useEffect(() => {
         if (selectedObject) {
             setTabIndex(tabIndexEnum.INSPECTOR);
@@ -365,7 +359,8 @@ const ScenarioStudio = () => {
                                                     <Icon as={RiDragDropLine} w={20} h={20} mb={6}/>
                                                     <Heading size="lg" pointerEvents="none">Drag a component
                                                         here</Heading>
-                                                    <Text pointerEvents="none" fontSize="xl" mt="20px">(Create a complex
+                                                    <Text pointerEvents="none" fontSize="xl" mt="20px">(Create a
+                                                        complex
                                                         scenario by drag and dropping different components)</Text>
                                                 </VStack>
                                         }

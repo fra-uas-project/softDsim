@@ -255,7 +255,7 @@ const Simulation = () => {
                 setSimValues(nextData.question_collection)
                 setDataValidationStatus(true)
             } else if (nextData.type === 'MODEL') {
-                setSimValues(nextData.models)
+                setSimValues(nextData)
             } else if (nextData.type === 'SIMULATION') {
                 setSimValues(nextData)
                 setDataValidationStatus(true)
@@ -286,7 +286,7 @@ const Simulation = () => {
                 setSimFragmentActions(tempActions)
 
                 const tempReturnValues = {
-                    scenario_id: currentSimID,
+                    scenario_id: simID,
                     type: nextData.type,
                     actions: tempActions,
                     members: skillTypeReturn
@@ -304,8 +304,6 @@ const Simulation = () => {
                 setDataValidationStatus(true)
                 setSimValues(nextData)
             }
-            // set taskValues
-            setSimTasks(nextData.tasks)
 
             // set overall scenario values
             setScenarioValues(nextData)
@@ -361,7 +359,7 @@ const Simulation = () => {
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                {scenarioIsLoading ? <Skeleton height='80vh' /> : <Dashboard templateScenario={state} data={scenarioValues} />}
+                                {scenarioIsLoading ? <Skeleton height='80vh' />: <Dashboard templateScenario={state} data={simValues} />}
 
                             </Box>
                             <Spacer />
@@ -422,7 +420,7 @@ const Simulation = () => {
                                     {/* Model Selection */}
                                     {currentType === 'MODEL' ?
                                         <>
-                                            <ModelSelection onSelectModel={(event) => handleSelection(event)} models={simValues} />
+                                            <ModelSelection onSelectModel={(event) => handleSelection(event)} models={simValues.models} />
                                         </>
                                         : <></>
                                     }
