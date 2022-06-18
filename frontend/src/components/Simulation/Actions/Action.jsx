@@ -1,121 +1,116 @@
-import { Grid, Text, FormControl, Switch, GridItem } from '@chakra-ui/react'
+import {Flex, FormControl, Grid, Switch} from '@chakra-ui/react'
 import ActionSlider from './ActionSlider'
 import ActionToggle from './ActionToggle'
 import ActionSelect from './ActionSelect'
+import {actionIcon} from "../../../utils/utils";
+import ActionElement from "./ActionElement";
 
 const Action = (props) => {
     if (Object.keys(props).length > 0) {
         return (
-            <>
-                <Grid  borderRadius="xl" bg='gray.100' p='3'>
-                    {
-                        // Bugfix
-                        props.action.action === 'bugfix' ?
-                            <GridItem my={2}>
-                                <Text size='lg' fontWeight='bold' mb='2'>
-                                    Bugfixes
-                                </Text>
-                                <FormControl display='flex' justifyContent='center' >
+            <Grid borderRadius="xl">
+                {
+                    // Bugfix
+                    props.action.action === 'bugfix' ?
+                        <ActionElement title="Bugfixing" secondaryText="Start Bugfixing" icon={actionIcon.BUGFIX}>
+                            <FormControl display="flex" justifyContent="end">
+                                <Switch onChange={(event) => props.onSelectAction({
+                                    type: props.action.action,
+                                    value: event.target.checked
+                                })} size='lg'/>
+                            </FormControl>
+                        </ActionElement>
+                        :
+                        // Unit Test
+                        props.action.action === 'unittest' ?
+                            <ActionElement title="Unit Testing" secondaryText="Start Unit Testing"
+                                           icon={actionIcon.UNITTEST}>
+                                <FormControl display="flex" justifyContent="end">
                                     <Switch onChange={(event) => props.onSelectAction({
                                         type: props.action.action,
                                         value: event.target.checked
-                                    })} size='lg' />
+                                    })} size='lg'/>
                                 </FormControl>
-                            </GridItem>
+                            </ActionElement>
                             :
-                            // Unit Test
-                            props.action.action === 'unittest' ?
-                                <GridItem my={2}>
-                                    <Text size='lg' fontWeight='bold' mb='2'>
-                                        Unit Test
-                                    </Text>
-                                    <FormControl display='flex' justifyContent='center' >
+                            // Integration Test
+                            props.action.action === 'integrationtest' ?
+                                <ActionElement title="Integration Testing" secondaryText="Start Integration Testing"
+                                               icon={actionIcon.INTEGRATIONTEST}>
+                                    <FormControl display="flex" justifyContent="end">
                                         <Switch onChange={(event) => props.onSelectAction({
                                             type: props.action.action,
                                             value: event.target.checked
-                                        })} size='lg' />
+                                        })} size='lg'/>
                                     </FormControl>
-                                </GridItem>
+                                </ActionElement>
                                 :
-                                // Integration Test
-                                props.action.action === 'integrationtest' ?
-                                    <GridItem my={2}>
-                                        <Text size='lg' fontWeight='bold' mb='2'>
-                                            Integration Test
-                                        </Text>
-                                        <FormControl display='flex' justifyContent='center' >
-                                            <Switch onChange={(event) => props.onSelectAction({
-                                                type: props.action.action,
-                                                value: event.target.checked
-                                            })} size='lg' />
-                                        </FormControl>
-                                    </GridItem>
-                                    :
-                                    // Meeting
-                                    props.action.action === 'meetings' ?
-                                        <GridItem my={2}>
-                                            <Text size='lg' fontWeight='bold' mb='2'>
-                                                Meetings
-                                            </Text>
+                                // Meeting
+                                props.action.action === 'meetings' ?
+                                    <ActionElement title="Meetings" secondaryText="Set number of meetings"
+                                                   icon={actionIcon.MEETINGS}>
+                                        <Flex w="full">
                                             <ActionSlider onSlide={(event) => props.onSelectAction({
                                                 type: props.action.action,
                                                 value: event
-                                            })} lower_limit={props.action.lower_limit} upper_limit={props.action.upper_limit} />
-                                        </GridItem>
-                                        :
-                                        // Training
-                                        props.action.action === 'training' ?
-                                            <GridItem my={2}>
-                                                <Text size='lg' fontWeight='bold' mb='2'>
-                                                    Trainings
-                                                </Text>
+                                            })} lower_limit={props.action.lower_limit}
+                                                          upper_limit={props.action.upper_limit}/>
+                                        </Flex>
+                                    </ActionElement>
+                                    :
+                                    // Training
+                                    props.action.action === 'training' ?
+                                        <ActionElement title="Training" secondaryText="Set training for employees"
+                                                       icon={actionIcon.TRAINING}>
+                                            <Flex w="full">
                                                 <ActionSlider onSlide={(event) => props.onSelectAction({
                                                     type: props.action.action,
                                                     value: event
-                                                })} lower_limit={props.action.lower_limit} upper_limit={props.action.upper_limit} />
-                                            </GridItem>
+                                                })} lower_limit={props.action.lower_limit}
+                                                              upper_limit={props.action.upper_limit}/>
+                                            </Flex>
+                                        </ActionElement>
+                                        :
+                                        // Team Event
+                                        props.action.action === 'teamevent' ?
+                                            <ActionElement title="Team Event" secondaryText="Schedule teamevent"
+                                                           icon={actionIcon.TEAMEVENT}>
+                                                <ActionToggle onEventbutton={(event) => props.onSelectAction({
+                                                    type: props.action.action,
+                                                    value: event
+                                                })} textTrue="Team Event Scheduled"
+                                                              textFalse="Schedule Team Event"/>
+                                            </ActionElement>
                                             :
-                                            // Team Event
-                                            props.action.action === 'teamevent' ?
-                                                <GridItem my={2}>
-                                                    <Text size='lg' fontWeight='bold' mb='2'>
-                                                        Team Event
-                                                    </Text>
-                                                    <ActionToggle onEventbutton={(event) => props.onSelectAction({
+                                            // Salary
+                                            props.action.action === 'salary' ?
+                                                <ActionElement title="Salary"
+                                                               secondaryText="Change Salary of employees"
+                                                               icon={actionIcon.SALARY}>
+                                                    <ActionSelect onActionSelect={(event) => props.onSelectAction({
                                                         type: props.action.action,
                                                         value: event
-                                                    })} textTrue="Team Event Scheduled" textFalse="Schedule Team Event" />
-                                                </GridItem>
+                                                    })} type="salary"
+                                                                  selection={['Below Average', 'Average', 'Above Average']}/>
+                                                </ActionElement>
                                                 :
-                                                // Salary
-                                                props.action.action === 'salary' ?
-                                                    <GridItem my={2}>
-                                                        <Text size='lg' fontWeight='bold' mb='2'>
-                                                            Salary
-                                                        </Text>
-                                                        <ActionSelect onActionSelect={(event) => props.onSelectAction({
-                                                            type: props.action.action,
-                                                            value: event
-                                                        })} type="salary" selection={['Below Average', 'Average', 'Above Average']} />
-                                                    </GridItem>
-                                                    :
-                                                    // Overtime
-                                                    props.action.action === 'overtime' ?
-                                                        <GridItem my={2}>
-                                                            <Text size='lg' fontWeight='bold' mb='2'>
-                                                                Overtime
-                                                            </Text>
-                                                            <ActionSelect onActionSelect={(event) => props.onSelectAction({
+                                                // Overtime
+                                                props.action.action === 'overtime' ?
+                                                    <ActionElement title="Overtime"
+                                                                   secondaryText="Change working hours"
+                                                                   icon={actionIcon.OVERTIME}>
+                                                        <ActionSelect
+                                                            onActionSelect={(event) => props.onSelectAction({
                                                                 type: props.action.action,
                                                                 value: event
-                                                            })} type="overtime" selection={['Leave early', 'Normal hours', 'Encourage overtime', 'Enforce overtime']} />
-                                                        </GridItem>
-                                                        :
-                                                        <></>
-                    }
+                                                            })} type="overtime"
+                                                            selection={['Leave early', 'Normal hours', 'Encourage overtime', 'Enforce overtime']}/>
+                                                    </ActionElement>
+                                                    :
+                                                    <></>
+                }
 
-                </Grid>
-            </>
+            </Grid>
         )
     } else {
         return <></>
