@@ -359,7 +359,6 @@ const Simulation = () => {
                             {/* right side of simulation studio */}
                             <Box
                                 p='3'
-
                                 w='38%'
                                 h='full'
                                 borderRadius="2xl"
