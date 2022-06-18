@@ -77,9 +77,9 @@ const Dashboard = ({templateScenario, data}) => {
 
             <Flex>
                 <HStack backgroundColor="white" borderRadius="2xl" p={5} mb={5} w="full" justifyContent="center">
-                    <CircularChart value={[60]} inverseColors={true} title="Avg. Stress"/>
-                    <CircularChart value={[20]} inverseColors={false} title="Avg. Motivation"/>
-                    <CircularChart value={[20]} inverseColors={false} title="Avg. Familarity"/>
+                    <CircularChart value={data.team.stress} inverseColors={true} title="Avg. Stress"/>
+                    <CircularChart value={data.team.motivation} inverseColors={false} title="Avg. Motivation"/>
+                    <CircularChart value={data.team.familiarity} inverseColors={false} title="Avg. Familarity"/>
                 </HStack>
             </Flex>
         </>
