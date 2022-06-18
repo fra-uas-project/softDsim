@@ -252,7 +252,7 @@ const Simulation = () => {
             setCurrentType(nextData.type)
             // set data
             if (nextData.type === 'QUESTION') {
-                setSimValues(nextData.question_collection)
+                setSimValues(nextData)
                 setDataValidationStatus(true)
             } else if (nextData.type === 'MODEL') {
                 setSimValues(nextData)
@@ -369,21 +369,22 @@ const Simulation = () => {
 
                                 w='38%'
                                 h='full'
-                                boxShadow='md'
-                                rounded='md'
+                                // boxShadow='md'
+                                // rounded='md'
+                                borderRadius="2xl"
                                 bg='white'
                                 textAlign='center'
                             >
                                 <p>
                                     {/* change heading depending on dataset */}
-                                    <b>
+                                    <Heading size="lg" mt={3}>
                                         {
                                             currentType === 'QUESTION' ? 'Questions' :
                                                 currentType === 'SIMULATION' ? 'Actions' :
                                                     currentType === 'MODEL' ? 'Model Selection' :
                                                         currentType === 'EVENT' ? 'Event' : ''
                                         }
-                                    </b>
+                                    </Heading>
                                 </p>
                                 <Grid
                                     gap={4}
@@ -394,7 +395,7 @@ const Simulation = () => {
                                     {currentType === 'QUESTION' ?
                                         <>
                                             <Question onSelect={(event) => handleSelection(event)}
-                                                question_collection={simValues}
+                                                question_collection={simValues.question_collection}
                                             />
                                         </>
                                         : <></>
