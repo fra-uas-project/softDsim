@@ -19,32 +19,32 @@ const LineChart = ({title, templateScenario, data}) => {
             yaxis: [
                 {
                     y: templateScenario.management_goal.budget,
-                    borderColor: "#00E396",
+                    borderColor: "#ff9d9d",
                     label: {
-                        borderColor: "#00E396",
+                        borderColor: "#ff9d9d",
                         style: {
                             color: "#fff",
-                            background: "#00E396"
+                            background: "#ff9d9d"
                         },
                         text: "Budget Limit"
                     }
                 }
             ],
-            xaxis: [
-                {
-                    x: 365,
-                    borderColor: "#FEB019",
-                    label: {
-                        borderColor: "#FEB019",
-                        style: {
-                            color: "#fff",
-                            background: "#FEB019"
-                        },
-                        orientation: "horizontal",
-                        text: "Deadline"
-                    }
-                }
-            ]
+            // xaxis: [
+            //     {
+            //         x: 365,
+            //         borderColor: "#FEB019",
+            //         label: {
+            //             borderColor: "#FEB019",
+            //             style: {
+            //                 color: "#fff",
+            //                 background: "#FEB019"
+            //             },
+            //             orientation: "horizontal",
+            //             text: "Deadline"
+            //         }
+            //     }
+            // ]
         },
         xaxis: {
             categories: Array.from(Array(100).keys(), item => item*5), // Change hardcoded value 100
@@ -56,12 +56,16 @@ const LineChart = ({title, templateScenario, data}) => {
         stroke: {
             curve: 'smooth',
         },
-        colors: ['#4299E1'],
+        colors: ['#4299E1', "#ff9d9d"],
     }
 
     const tmpSeries = [
         {
             name: "Cost",
+            data: []
+        },
+        {
+            name: "Linear Cost",
             data: []
         },
     ]
@@ -70,13 +74,16 @@ const LineChart = ({title, templateScenario, data}) => {
 
     const [options, setOptions] = useState(tmpOptions);
     const [series, setSeries] = useImmer(tmpSeries);
+    const [linearCost, setLinearCost] = useState(0)
 
     useEffect(() => {
-        if(data.type === "SIMULATION") {
+        if(data.type === "SIMULATION" || data.type === "RESULT") {
             setSeries(
                 (draft) => {
                     draft[0].data.push(data.state.cost)
+                    draft[1].data.push(linearCost)
                 })
+            setLinearCost(parseFloat(linearCost) + parseFloat((templateScenario.management_goal.budget / (templateScenario.management_goal.duration / 5)).toFixed(2)))
         }
     }, [data])
 
