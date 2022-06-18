@@ -25,6 +25,7 @@ import { Link, useLocation } from "react-router-dom";
 import Question from "../components/Simulation/Actions/Question";
 import Action from "../components/Simulation/Actions/Action"
 import ModelSelection from '../components/ModelSelection'
+import Skilltype from "../components/Simulation/Actions/Skilltype"
 import { getCookie } from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
@@ -66,10 +67,20 @@ const Simulation = () => {
 
     const [scenarioIsLoading, setScenarioIsLoading] = useState(true);
 
+    // rerender function for actions
     const [rerender, setRerender] = useState(0);
+
+    // rerender function for skilltypes
+    const [rerenderSkill, setRerenderSkill] = useState(0);
 
     // define simulation fragment values
     const [simFragmentActions, setSimFragmentActions] = useState();
+
+    // save all available skilltypes
+    const [skillTypes, setSkillTypes] = useState([])
+
+    // save skilltype return object
+    const [skillTypeReturn, setSkillTypeReturn] = useState([])
 
     const fetchUserScenario = () => {
         const userScenarioMock = {
@@ -113,19 +124,65 @@ const Simulation = () => {
                 scenario_id: currentSimID,
                 type: currentType,
                 actions: tempSimFragmentActions,
-                members: [{
-                    "skill_type": "senior",
-                    "change": 2
-                },
-                {
-                    "skill_type": "junior",
-                    "change": 2
-                }]
+                members: skillTypeReturn
             }
 
             setReturnValues(tempReturnValues)
             setDataValidationStatus(true)
         }
+    }
+
+    function createSkillTypeObject(skillTypesList) {
+        // create list that can be returned to next endpoint
+        var list = []
+        for (const type of skillTypesList) {
+            list.push(
+                {
+                    "skill_type": type,
+                    "change": 0
+                }
+            )
+        }
+        // set state
+        setSkillTypeReturn(list)
+        return list
+    }
+
+    function resetSkillTypeObject() {
+        // reset change values for each skill type, required for displaying on frontend after clicking next
+        var tempSKillTypeList = skillTypeReturn
+        for (const type in tempSKillTypeList) {
+            tempSKillTypeList[type].change = 0
+        }
+
+        setSkillTypeReturn(tempSKillTypeList)
+    }
+
+    function updateSkillTypeObject(skill, value) {
+        // get index of skill that will be updates
+        const skillIndex = skillTypeReturn.findIndex(object => {
+            return object.skill_type === skill;
+        });
+
+        // create temporary object to overwrite current one
+        var tempSkillTypeReturn = skillTypeReturn
+
+        // update change value
+        tempSkillTypeReturn[skillIndex].change = tempSkillTypeReturn[skillIndex].change + value
+
+        // update state
+        setSkillTypeReturn(tempSkillTypeReturn)
+        setRerenderSkill(rerenderSkill + 50)
+    }
+
+    function getSkillTypeCount(skill) {
+        var skillTypeCount = 0
+        for (const type of simValues.members) {
+            if (type.skill_type.name === skill) {
+                skillTypeCount = skillTypeCount + 1
+            }
+        }
+        return skillTypeCount
     }
 
     async function startScenario() {
@@ -144,6 +201,27 @@ const Simulation = () => {
             setCurrentSimID(scenario.data.id)
             await handleNext(scenario.data.id)
             setScenarioIsLoading(false)
+
+            // get skilltypes
+            const resSkill = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/skill-type`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+            })
+
+            var skillTypesList = []
+
+            const resSkillReturn = await resSkill.json()
+
+            for (const type of resSkillReturn.data) {
+                skillTypesList.push(type.name)
+            }
+
+            setSkillTypes(skillTypesList)
+            createSkillTypeObject(skillTypesList)
         } catch (err) {
             console.log(err)
         }
@@ -181,7 +259,6 @@ const Simulation = () => {
             } else if (nextData.type === 'SIMULATION') {
                 setSimValues(nextData)
                 setDataValidationStatus(true)
-                // TEMPORARY! TODO: Implement actual functionality
                 let tempActions = {}
 
                 // get all actions from next data object
@@ -212,19 +289,14 @@ const Simulation = () => {
                     scenario_id: currentSimID,
                     type: nextData.type,
                     actions: tempActions,
-                    members: [{
-                        "skill_type": "senior",
-                        "change": 2
-                    },
-                    {
-                        "skill_type": "junior",
-                        "change": 2
-                    }]
+                    members: skillTypeReturn
                 }
                 setReturnValues(tempReturnValues)
 
                 // quick and dirty solution for rerendering, please don't judge
+                resetSkillTypeObject()
                 setRerender(rerender + 20)
+                setRerenderSkill(rerenderSkill + 50)
             } else if (nextData.type === 'EVENT') {
                 setDataValidationStatus(true)
                 setSimValues(nextData)
@@ -332,6 +404,15 @@ const Simulation = () => {
                                     {/* Simulation Fragment */}
                                     {currentType === 'SIMULATION' ?
                                         <>
+                                            <Grid templateColumns='repeat(2, 1fr)' gap={5}>
+                                                {skillTypeReturn.map((skilltype, index) => {
+                                                    return <Skilltype key={index + rerenderSkill}
+                                                        onUpdateChange={(event) => { updateSkillTypeObject(event.name, event.value) }}
+                                                        skillTypeName={skilltype.skill_type}
+                                                        currentCount={getSkillTypeCount(skilltype.skill_type)}
+                                                        countChange={skilltype.change} />
+                                                })}
+                                            </Grid>
                                             {simValues.actions.map((action, index) => {
                                                 return <Action onSelectAction={(event) => handleSelection(event)} key={index + rerender} action={action} />
                                             })}
@@ -352,7 +433,7 @@ const Simulation = () => {
                                         : <></>
                                     }
                                     <GridItem colSpan={1}>
-                                        <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg'>
+                                        <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg'>
                                             {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
                                         </Button>
                                     </GridItem>
