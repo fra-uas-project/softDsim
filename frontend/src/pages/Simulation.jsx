@@ -51,13 +51,6 @@ const Simulation = () => {
 
     // values for simulation
     const [simValues, setSimValues] = useState({})
-    const [simTasks, setSimTasks] = useState({
-        tasks_todo: 0,
-        task_done: 0,
-        tasks_unit_tested: 0,
-        tasks_integration_tested: 0,
-        tasks_bug: 0
-    })
 
     // contains all values from next endpoint
     const [scenarioValues, setScenarioValues] = useState({})
@@ -369,8 +362,6 @@ const Simulation = () => {
 
                                 w='38%'
                                 h='full'
-                                // boxShadow='md'
-                                // rounded='md'
                                 borderRadius="2xl"
                                 bg='white'
                                 textAlign='center'
