@@ -255,7 +255,7 @@ const Simulation = () => {
                 setSimValues(nextData.question_collection)
                 setDataValidationStatus(true)
             } else if (nextData.type === 'MODEL') {
-                setSimValues(nextData.models)
+                setSimValues(nextData)
             } else if (nextData.type === 'SIMULATION') {
                 setSimValues(nextData)
                 setDataValidationStatus(true)
@@ -286,11 +286,12 @@ const Simulation = () => {
                 setSimFragmentActions(tempActions)
 
                 const tempReturnValues = {
-                    scenario_id: currentSimID,
+                    scenario_id: simID,
                     type: nextData.type,
                     actions: tempActions,
                     members: skillTypeReturn
                 }
+                console.log(tempReturnValues)
                 setReturnValues(tempReturnValues)
 
                 // quick and dirty solution for rerendering, please don't judge
@@ -420,7 +421,7 @@ const Simulation = () => {
                                     {/* Model Selection */}
                                     {currentType === 'MODEL' ?
                                         <>
-                                            <ModelSelection onSelectModel={(event) => handleSelection(event)} models={simValues} />
+                                            <ModelSelection onSelectModel={(event) => handleSelection(event)} models={simValues.models} />
                                         </>
                                         : <></>
                                     }
