@@ -291,7 +291,6 @@ const Simulation = () => {
                     actions: tempActions,
                     members: skillTypeReturn
                 }
-                console.log(tempReturnValues)
                 setReturnValues(tempReturnValues)
 
                 // quick and dirty solution for rerendering, please don't judge
