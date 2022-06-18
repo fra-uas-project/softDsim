@@ -1,15 +1,14 @@
 import {
-    MdAlarm,
-    MdIntegrationInstructions, MdLocalBar, MdMiscellaneousServices, MdOutlineAttachMoney,
     MdOutlineAttractions,
-    MdOutlineBugReport, MdOutlineCheckBox,
-    MdOutlineInfo, MdOutlineRadioButtonChecked,
-    MdRule, MdSchool,
+    MdOutlineCheckBox,
+    MdOutlineInfo,
+    MdOutlineRadioButtonChecked,
+    MdRule,
     MdTimeline
 } from "react-icons/md";
 import {BsLightningCharge} from "react-icons/bs";
-import {HiUserGroup} from "react-icons/hi";
 import {v4 as uuidv4} from 'uuid';
+import {actionIcon} from "../../utils/utils";
 
 export const tabIndexEnum = {
     "INSPECTOR": 0,
@@ -104,7 +103,7 @@ export const finalActionList = [
         id: uuidv4(),
         type: "ACTION",
         title: "Bug Fixing",
-        icon: MdOutlineBugReport,
+        icon: actionIcon.BUGFIX,
         displayName: "Bug Fixing",
         action: "bugfix",
     },
@@ -112,7 +111,7 @@ export const finalActionList = [
         id: uuidv4(),
         type: "ACTION",
         title: "Unit Testing",
-        icon: MdIntegrationInstructions,
+        icon: actionIcon.UNITTEST,
         displayName: "Unit Testing",
         action: "unittest",
     },
@@ -120,7 +119,7 @@ export const finalActionList = [
         id: uuidv4(),
         type: "ACTION",
         title: "Integration Testing",
-        icon: MdMiscellaneousServices,
+        icon: actionIcon.INTEGRATIONTEST,
         displayName: "Integration Testing",
         action: "integrationtest",
     },
@@ -128,7 +127,7 @@ export const finalActionList = [
         id: uuidv4(),
         type: "ACTION",
         title: "Meetings",
-        icon: HiUserGroup,
+        icon: actionIcon.MEETINGS,
         displayName: "Meetings",
         action: "meetings",
         lower_limit: "0",
@@ -138,7 +137,7 @@ export const finalActionList = [
         id: uuidv4(),
         type: "ACTION",
         title: "Team Event",
-        icon: MdLocalBar,
+        icon: actionIcon.TEAMEVENT,
         displayName: "Team Event",
         action: "teamevent",
     },
@@ -146,7 +145,7 @@ export const finalActionList = [
         id: uuidv4(),
         type: "ACTION",
         title: "Training",
-        icon: MdSchool,
+        icon: actionIcon.TRAINING,
         displayName: "Training",
         action: "training",
         lower_limit: "0",
@@ -156,7 +155,7 @@ export const finalActionList = [
         id: uuidv4(),
         type: "ACTION",
         title: "Salary",
-        icon: MdOutlineAttachMoney,
+        icon: actionIcon.SALARY,
         displayName: "Salary",
         action: "salary",
     },
@@ -164,7 +163,7 @@ export const finalActionList = [
         id: uuidv4(),
         type: "ACTION",
         title: "Overtime",
-        icon: MdAlarm,
+        icon: actionIcon.OVERTIME,
         displayName: "Overtime",
         action: "overtime",
     },
