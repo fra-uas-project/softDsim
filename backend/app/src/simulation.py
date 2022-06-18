@@ -192,6 +192,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
+            team=scenario.team.stats(),
             text=next_component.text,
         )
     # 5.2 Check if next component is a Question Component
@@ -202,6 +203,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             state=get_scenario_state_dto(scenario),
             tasks=get_tasks_status(scenario.id),
             members=get_member_report(scenario.team.id),
+            team=scenario.team.stats(),
             text=next_component.text,
         )
     # 5.3 Check if next component is a Model Selection
@@ -212,6 +214,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
             models=next_component.models(),
+            team=scenario.team.stats(),
             text=next_component.text,
         )
 

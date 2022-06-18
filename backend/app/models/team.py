@@ -9,6 +9,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from app.dto.request import Workpack
+from app.dto.response import TeamStatsDTO
 from app.models.task import TaskStatus, CachedTasks, Task
 from app.models.user_scenario import UserScenario
 from app.src.util.util import probability
@@ -44,6 +45,38 @@ class Team(models.Model):
     def management_skill(self):
         """Returns the team's management skill."""
         return 0.5  # TODO: implement
+
+    def motivation(self, members=None):
+        """Returns the team's motivation."""
+        if members is None:
+            members = Member.objects.filter(team_id=self.id)
+        if len(members) == 0:
+            return 0
+        return mean([m.motivation for m in members])
+
+    def familiarity(self, members=None):
+        """Returns the team's familiarity."""
+        if members is None:
+            members = Member.objects.filter(team_id=self.id)
+        if len(members) == 0:
+            return 0
+        return mean([m.familiarity for m in members])
+
+    def stress(self, members=None):
+        """Returns the team's stress."""
+        if members is None:
+            members = Member.objects.filter(team_id=self.id)
+        if len(members) == 0:
+            return 0
+        return mean([m.stress for m in members])
+
+    def stats(self, members=None) -> TeamStatsDTO:
+        """Returns all team stats."""
+        return TeamStatsDTO(
+            motivation=self.motivation(members),
+            familiarity=self.familiarity(members),
+            stress=self.stress(members),
+        )
 
     # increases familiarity with the project for each member
     def meeting(self, scenario, members, work_hours, cached_tasks) -> int:

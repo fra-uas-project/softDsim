@@ -64,6 +64,12 @@ class ActionDTO(BaseModel):
     upper_limit: Optional[int] = None
 
 
+class TeamStatsDTO(BaseModel):
+    motivation: float
+    familiarity: float
+    stress: float
+
+
 class ScenarioResponse(BaseModel, ABC):
     """
     This is the abstract response class that provides all data
@@ -77,6 +83,7 @@ class ScenarioResponse(BaseModel, ABC):
     state: ScenarioStateDTO
     tasks: TasksStatusDTO
     members: List[MemberDTO]
+    team: TeamStatsDTO
     text = ""
 
 
