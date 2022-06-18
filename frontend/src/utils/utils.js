@@ -1,13 +1,4 @@
 import {componentEnum} from "../components/ScenarionStudio/scenarioStudioData";
-import {
-    MdAlarm,
-    MdIntegrationInstructions,
-    MdLocalBar,
-    MdMiscellaneousServices, MdOutlineAttachMoney,
-    MdOutlineBugReport,
-    MdSchool
-} from "react-icons/md";
-import {HiUserGroup} from "react-icons/hi";
 
 export function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -31,17 +22,6 @@ export const action = {
     TRAINING: "training",
     SALARY: "salary",
     OVERTIME: "overtime"
-}
-
-export const actionIcon = {
-    BUGFIX: MdOutlineBugReport,
-    UNITTEST: MdIntegrationInstructions,
-    INTEGRATIONTEST: MdMiscellaneousServices,
-    TEAMEVENT: MdLocalBar,
-    MEETINGS: HiUserGroup,
-    TRAINING: MdSchool,
-    SALARY: MdOutlineAttachMoney,
-    OVERTIME: MdAlarm
 }
 
 export const findQuestion = (questionId, editorList) => {

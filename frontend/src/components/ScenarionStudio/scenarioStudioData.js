@@ -1,14 +1,16 @@
 import {
-    MdOutlineAttractions,
+    MdAlarm,
+    MdIntegrationInstructions, MdLocalBar, MdMiscellaneousServices, MdOutlineAttachMoney,
+    MdOutlineAttractions, MdOutlineBugReport,
     MdOutlineCheckBox,
     MdOutlineInfo,
     MdOutlineRadioButtonChecked,
-    MdRule,
+    MdRule, MdSchool,
     MdTimeline
 } from "react-icons/md";
 import {BsLightningCharge} from "react-icons/bs";
 import {v4 as uuidv4} from 'uuid';
-import {actionIcon} from "../../utils/utils";
+import {HiUserGroup} from "react-icons/hi";
 
 export const tabIndexEnum = {
     "INSPECTOR": 0,
@@ -30,6 +32,17 @@ export const actionEnum = {
 export const questionEnum = {
     "SINGLE": "SINGLE",
     "MULTI": "MULTI",
+}
+
+export const actionIcon = {
+    BUGFIX: MdOutlineBugReport,
+    UNITTEST: MdIntegrationInstructions,
+    INTEGRATIONTEST: MdMiscellaneousServices,
+    TEAMEVENT: MdLocalBar,
+    MEETINGS: HiUserGroup,
+    TRAINING: MdSchool,
+    SALARY: MdOutlineAttachMoney,
+    OVERTIME: MdAlarm
 }
 
 export const finalComponentList = [

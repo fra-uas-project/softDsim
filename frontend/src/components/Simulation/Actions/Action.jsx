@@ -2,7 +2,7 @@ import {Flex, FormControl, Grid, Switch} from '@chakra-ui/react'
 import ActionSlider from './ActionSlider'
 import ActionToggle from './ActionToggle'
 import ActionSelect from './ActionSelect'
-import {actionIcon} from "../../../utils/utils";
+import {actionIcon} from "../../ScenarionStudio/scenarioStudioData"
 import ActionElement from "./ActionElement";
 
 const Action = (props) => {
