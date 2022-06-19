@@ -1,4 +1,7 @@
+import logging
+
 from app.dto.response import QuestionCollectionDTO
+from app.models.answer import Answer
 from app.models.question_collection import QuestionCollection
 from app.serializers.question_collection import QuestionCollectionSerializer
 
@@ -21,8 +24,14 @@ def get_question_collection(scenario):
 
 
 def handle_question_answers(req, scenario):
-    """This method is just for developing. It prints the answers of the user."""
-    for q in req.question_collection.questions:
-        print(f"Question #{q.id}")
-        for a in q.answers:
-            print(f"For Answer-Option with ID:{a.id}, User selected: {a.answer}")
+    """Adds points to the user scenario for each question answer."""
+    try:
+        for q in req.question_collection.questions:
+            selected_answers = Answer.objects.filter(
+                id__in=[a.id for a in q.answers if a.answer]
+            )
+            scenario.question_points += sum([a.points for a in selected_answers])
+    except Exception as e:
+        logging.warning(
+            f"{e.__class__.__name__} occurred when handling question answers"
+        )

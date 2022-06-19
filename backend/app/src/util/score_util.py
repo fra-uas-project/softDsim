@@ -19,14 +19,16 @@ def calc_scores(scenario: UserScenario, tasks: CachedTasks) -> dict:
     budget_score = calc_budget_score(
         scenario.state.cost, goal.budget, score.budget_limit, score.budget_p
     )
-    question_score = 25  # todo: get question score
 
     return {
         "quality_score": quality_score,
         "time_score": time_score,
         "budget_score": budget_score,
-        "question_score": question_score,
-        "total_score": quality_score + time_score + budget_score + question_score,
+        "question_score": scenario.question_points,
+        "total_score": quality_score
+        + time_score
+        + budget_score
+        + scenario.question_points,
     }
 
 

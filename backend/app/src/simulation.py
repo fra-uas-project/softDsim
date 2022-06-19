@@ -224,5 +224,5 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     increase_scenario_step_counter(scenario)
     if scenario_response.type != "SIMULATION":
         increase_scenario_component_counter(scenario)
-
+    scenario.save()
     return scenario_response
