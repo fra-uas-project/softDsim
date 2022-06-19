@@ -16,6 +16,7 @@ class UserScenario(models.Model):
     )
     model = models.CharField(max_length=16, null=True, blank=True)
     template = models.ForeignKey(TemplateScenario, on_delete=models.SET_NULL, null=True)
+    question_points = models.PositiveIntegerField(default=0, blank=True, null=True)
     # team = app.models.team.Team
     # state = State
 

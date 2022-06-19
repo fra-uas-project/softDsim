@@ -21,11 +21,13 @@ class HistorySerializer(serializers.ModelSerializer):
         model = History
         fields = [
             "user_scenario",
-            "type",
+            "request_type",
+            "response_type",
             "timestamp",
             "model",
             # state
-            "counter",
+            "component_counter",
+            "step_counter",
             "day",
             "cost",
             # Task stuff
