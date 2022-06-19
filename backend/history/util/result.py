@@ -46,6 +46,11 @@ def get_result_response(scenario: UserScenario) -> ResultResponse:
             tasks_rejected=result.tasks_rejected,
             total_days=result.total_days,
             total_cost=result.total_cost,
+            max_question_score=0,
+            max_quality_score=scenario.scorecard.quality_limit,
+            max_budget_score=scenario.scorecard.budget_limit,
+            max_time_score=scenario.scorecard.time_limit,
+            max_total_score=0,
         )
     except Exception as e:
         msg = f"{e.__class__.__name__} occurred while getting result response for scenario {scenario.id}"

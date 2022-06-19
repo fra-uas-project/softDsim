@@ -113,6 +113,11 @@ class ResultResponse(ScenarioResponse):
     tasks_rejected: int
     total_days: int
     total_cost: int
+    max_total_score: int
+    max_question_score: int
+    max_quality_score: int
+    max_budget_score: int
+    max_time_score: int
 
 
 class ModelSelectionResponse(ScenarioResponse):
