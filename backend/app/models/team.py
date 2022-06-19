@@ -239,6 +239,13 @@ class SkillType(models.Model):
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
     throughput = models.FloatField(validators=[MinValueValidator(0.0)])
+    management_quality = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
+    development_quality = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
+    signing_bonus = models.FloatField(validators=[MinValueValidator(0.0)])
 
     def __str__(self):
         return self.name
