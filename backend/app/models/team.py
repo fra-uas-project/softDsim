@@ -161,13 +161,7 @@ class Team(models.Model):
             Member.objects.bulk_update(members, fields=["xp", "motivation"])
 
         # 3. task work
-        self.task_work(
-            cached_tasks,
-            remaining_work_hours,
-            members,
-            workpack.bugfix,
-            workpack.unittest,
-        )
+        self.task_work(cached_tasks, remaining_work_hours, members, workpack)
 
     # def work(workpack)
     ## 1. meeting (done)
@@ -178,16 +172,22 @@ class Team(models.Model):
     ## 3. ab hier geht um tasks
     ## self.task_work()
 
-    def task_work(self, tasks, hours, members, bugfix, unittest):
+    def task_work(self, tasks, hours, members, workpack):
         for m in members:
             n = m.n_tasks(hours)
-            if unittest:
+            if workpack.integrationtest:
+                tasks_to_integration_test = tasks.unit_tested()
+                while n and len(tasks_to_integration_test):
+                    t: Task = tasks_to_integration_test.pop()
+                    t.integration_tested = True
+                    n -= 1
+            if workpack.unittest:
                 tasks_to_test = tasks.done()
                 while n and len(tasks_to_test):
                     t: Task = tasks_to_test.pop()
                     t.unit_tested = True
                     n -= 1
-            if bugfix:
+            if workpack.bugfix:
                 tasks_to_fix = tasks.bug()
                 while n and len(tasks_to_fix):
                     t: Task = tasks_to_fix.pop()
