@@ -59,9 +59,6 @@ def simulate(req, scenario: UserScenario) -> None:
     if req.actions is None:
         raise RequestActionException()
 
-    if not req.members:
-        raise RequestMembersException()
-
     normal_work_hour_day: int = 8
 
     workpack = req.actions
@@ -73,29 +70,32 @@ def simulate(req, scenario: UserScenario) -> None:
             (workpack.meetings / days), (normal_work_hour_day + workpack.overtime)
         )
 
-    # Add or remove members from the team
-    member_change = req.members
-    for m in member_change:
-        try:
-            s = SkillType.objects.get(name=m.skill_type)
-        except ObjectDoesNotExist:
-            msg = f"SkillType {m.skill_type} does not exist."
-            logging.error(msg)
-            raise SimulationException(msg)
-        if m.change > 0:
-            for _ in range(m.change):
-                new_member = Member(skill_type=s, team=scenario.team)
-                new_member.save()
-        else:
-            list_of_members = Member.objects.filter(team=scenario.team, skill_type=s)
+    if req.members and req.members != []:
+        # Add or remove members from the team
+        member_change = req.members
+        for m in member_change:
             try:
-                for i in range(abs(m.change)):
-                    m_to_delete: Member = list_of_members[0]
-                    m_to_delete.delete()
-            except IndexError:
-                msg = f"Cannot remove {m.change} members of type {s.name}."
+                s = SkillType.objects.get(name=m.skill_type)
+            except ObjectDoesNotExist:
+                msg = f"SkillType {m.skill_type} does not exist."
                 logging.error(msg)
                 raise SimulationException(msg)
+            if m.change > 0:
+                for _ in range(m.change):
+                    new_member = Member(skill_type=s, team=scenario.team)
+                    new_member.save()
+            else:
+                list_of_members = Member.objects.filter(
+                    team=scenario.team, skill_type=s
+                )
+                try:
+                    for i in range(abs(m.change)):
+                        m_to_delete: Member = list_of_members[0]
+                        m_to_delete.delete()
+                except IndexError:
+                    msg = f"Cannot remove {m.change} members of type {s.name}."
+                    logging.error(msg)
+                    raise SimulationException(msg)
 
     # Simulate what happens
     tasks = CachedTasks(scenario_id=scenario.id)  # Read tasks once
