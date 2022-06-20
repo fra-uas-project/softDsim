@@ -14,19 +14,19 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-    ModalOverlay, Skeleton,
+    ModalOverlay,
+    Skeleton,
     Spacer,
-    Text,
     useDisclosure,
 } from "@chakra-ui/react";
-import { HiChevronRight } from "react-icons/hi";
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import {HiChevronRight} from "react-icons/hi";
+import {useEffect, useState} from "react";
+import {Link, useLocation} from "react-router-dom";
 import Question from "../components/Simulation/Actions/Question";
 import Action from "../components/Simulation/Actions/Action"
 import ModelSelection from '../components/ModelSelection'
 import Skilltype from "../components/Simulation/Actions/Skilltype"
-import { getCookie } from "../utils/utils"
+import {getCookie} from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 
@@ -51,13 +51,6 @@ const Simulation = () => {
 
     // values for simulation
     const [simValues, setSimValues] = useState({})
-    const [simTasks, setSimTasks] = useState({
-        tasks_todo: 0,
-        task_done: 0,
-        tasks_unit_tested: 0,
-        tasks_integration_tested: 0,
-        tasks_bug: 0
-    })
 
     // contains all values from next endpoint
     const [scenarioValues, setScenarioValues] = useState({})
@@ -252,7 +245,7 @@ const Simulation = () => {
             setCurrentType(nextData.type)
             // set data
             if (nextData.type === 'QUESTION') {
-                setSimValues(nextData.question_collection)
+                setSimValues(nextData)
                 setDataValidationStatus(true)
             } else if (nextData.type === 'MODEL') {
                 setSimValues(nextData)
@@ -366,24 +359,22 @@ const Simulation = () => {
                             {/* right side of simulation studio */}
                             <Box
                                 p='3'
-
                                 w='38%'
                                 h='full'
-                                boxShadow='md'
-                                rounded='md'
+                                borderRadius="2xl"
                                 bg='white'
                                 textAlign='center'
                             >
                                 <p>
                                     {/* change heading depending on dataset */}
-                                    <b>
+                                    <Heading size="lg" mt={3}>
                                         {
                                             currentType === 'QUESTION' ? 'Questions' :
                                                 currentType === 'SIMULATION' ? 'Actions' :
                                                     currentType === 'MODEL' ? 'Model Selection' :
                                                         currentType === 'EVENT' ? 'Event' : ''
                                         }
-                                    </b>
+                                    </Heading>
                                 </p>
                                 <Grid
                                     gap={4}
@@ -394,7 +385,7 @@ const Simulation = () => {
                                     {currentType === 'QUESTION' ?
                                         <>
                                             <Question onSelect={(event) => handleSelection(event)}
-                                                question_collection={simValues}
+                                                question_collection={simValues.question_collection}
                                             />
                                         </>
                                         : <></>
@@ -402,7 +393,8 @@ const Simulation = () => {
                                     {/* Simulation Fragment */}
                                     {currentType === 'SIMULATION' ?
                                         <>
-                                            <Grid templateColumns='repeat(2, 1fr)' gap={5}>
+                                            <Heading size="sm">Employees</Heading>
+                                            <Grid templateColumns='repeat(2, 1fr)' gap={2}>
                                                 {skillTypeReturn.map((skilltype, index) => {
                                                     return <Skilltype key={index + rerenderSkill}
                                                         onUpdateChange={(event) => { updateSkillTypeObject(event.name, event.value) }}
@@ -431,7 +423,7 @@ const Simulation = () => {
                                         : <></>
                                     }
                                     <GridItem colSpan={1}>
-                                        <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg'>
+                                        <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg' mt={3}>
                                             {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
                                         </Button>
                                     </GridItem>

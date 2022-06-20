@@ -1,5 +1,5 @@
-import { Button, Flex, Text } from "@chakra-ui/react"
-import { HiPlus, HiMinus } from "react-icons/hi";
+import {Flex, IconButton, Stat, StatArrow, StatHelpText, StatLabel, StatNumber, Text, VStack} from "@chakra-ui/react"
+import {HiMinus, HiPlus} from "react-icons/hi";
 
 
 const Skilltype = (props) => {
@@ -16,25 +16,32 @@ const Skilltype = (props) => {
     }
 
     return (
-        <>
-            <Flex _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='gray.100' p='3' flexFlow="column" align="center" justify="center">
-                <Flex w="full">
-                    <Flex w="50%" align="center" justify="center">{'Currently: ' + props.currentCount}</Flex>
-                    <Flex w="50%" align="center" justify="center">{'Change: ' + props.countChange}</Flex>
+        <Flex borderRadius="2xl" p='3' flexFlow="column" align="center" justify="center"
+              _hover={{boxShadow: "rgb(112 144 176 / 12%) 0px 40px 58px -20px"}}>
+            <VStack spacing={0}>
+                <Text
+                    fontWeight="bold">{props.skillTypeName.charAt(0).toUpperCase() + props.skillTypeName.slice(1)}</Text>
+                <Flex w="full" alignItems="center">
+                    <IconButton colorScheme="blue" variant="outline" icon={<HiMinus/>} onClick={() => {
+                        updateChange(-1)
+                    }} aria-label="Remove employee"/>
+                    <VStack spacing={0}>
+                        <Stat>
+                            <StatLabel color="gray.400">Curr. employed</StatLabel>
+                            <StatNumber>{props.currentCount}</StatNumber>
+                            <StatHelpText>
+                                {props.countChange !== 0 ?
+                                    <StatArrow type={props.countChange > 0 ? "increase" : "decrease"}/> : <></>}
+                                {props.countChange}
+                            </StatHelpText>
+                        </Stat>
+                    </VStack>
+                    <IconButton colorScheme="blue" variant="outline" icon={<HiPlus/>} onClick={() => {
+                        updateChange(1)
+                    }} aria-label="Add employee"/>
                 </Flex>
-                <Flex w="full" mt={2}>
-                    <Button w="15%" colorScheme="blue" onClick={() => { updateChange(-1) }}>
-                        <HiMinus />
-                    </Button>
-                    <Text w="70%" p={2}>
-                        {props.skillTypeName.charAt(0).toUpperCase() + props.skillTypeName.slice(1)}
-                    </Text>
-                    <Button w="15%" colorScheme="blue" onClick={() => { updateChange(1) }}>
-                        <HiPlus />
-                    </Button>
-                </Flex>
-            </Flex>
-        </>
+            </VStack>
+        </Flex>
     )
 }
 
