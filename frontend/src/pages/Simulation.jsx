@@ -16,7 +16,7 @@ import {
     ModalHeader,
     ModalOverlay,
     Skeleton,
-    Spacer,
+    Spacer, Tooltip,
     useDisclosure,
 } from "@chakra-ui/react";
 import {HiChevronRight} from "react-icons/hi";
@@ -393,7 +393,9 @@ const Simulation = () => {
                                     {/* Simulation Fragment */}
                                     {currentType === 'SIMULATION' ?
                                         <>
+                                        <Tooltip label="Add tooltip here" aria-label='A tooltip' placement="top">
                                             <Heading size="sm">Employees</Heading>
+                                        </Tooltip>
                                             <Grid templateColumns='repeat(2, 1fr)' gap={2}>
                                                 {skillTypeReturn.map((skilltype, index) => {
                                                     return <Skilltype key={index + rerenderSkill}
