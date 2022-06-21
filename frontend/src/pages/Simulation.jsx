@@ -61,6 +61,8 @@ const Simulation = () => {
 
     const [scenarioIsLoading, setScenarioIsLoading] = useState(true);
 
+    const [nextIsLoading, setNextIsLoading] = useState(false);
+
     // rerender function for actions
     const [rerender, setRerender] = useState(0);
 
@@ -222,6 +224,7 @@ const Simulation = () => {
     }
 
     async function handleNext(simID) {
+        setNextIsLoading(true)
         setDataValidationStatus(false)
         var nextValues = {}
         if (returnValues === undefined) {
@@ -301,6 +304,7 @@ const Simulation = () => {
 
             // set overall scenario values
             setScenarioValues(nextData)
+            setNextIsLoading(false)
         } catch (err) {
             console.log(err)
         }
@@ -352,104 +356,107 @@ const Simulation = () => {
 
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
-                            <Box w='60%'>
-                                {scenarioIsLoading ? <Skeleton height='80vh' /> : <Dashboard templateScenario={state} data={simValues} />}
-
-                            </Box>
-                            <Spacer />
+                            {scenarioIsLoading ? <Skeleton height='80vh' w="full" borderRadius="2xl"/> :
+                                <>
+                                <Box w='62%'>
+                                    <Dashboard templateScenario={state} data={simValues}/>
+                                </Box>
+                                <Spacer />
                             {/* right side of simulation studio */}
-                            <Box
+                                <Box
                                 p='3'
-                                w='38%'
+                                w='36%'
                                 h='full'
                                 borderRadius="2xl"
                                 bg='white'
                                 textAlign='center'
-                            >
+                                >
                                 <p>
-                                    {/* change heading depending on dataset */}
-                                    <Heading size="lg" mt={3}>
-                                        {
-                                            currentType === 'QUESTION' ? 'Questions' :
-                                                currentType === 'SIMULATION' ? 'Actions' :
-                                                    currentType === 'MODEL' ? 'Model Selection' :
-                                                        currentType === 'EVENT' ? 'Event' :
-                                                            currentType === 'RESULT' ? 'Result' : ''
-                                        }
-                                    </Heading>
+                            {/* change heading depending on dataset */}
+                                <Heading size="lg" mt={3}>
+                            {
+                                currentType === 'QUESTION' ? 'Questions' :
+                                currentType === 'SIMULATION' ? 'Actions' :
+                                currentType === 'MODEL' ? 'Model Selection' :
+                                currentType === 'EVENT' ? 'Event' :
+                                currentType === 'RESULT' ? 'Result' : ''
+                            }
+                                </Heading>
                                 </p>
                                 <Grid
-                                    gap={4}
-                                    p='5'
-                                    justify="flex-end"
+                                gap={4}
+                                p='5'
+                                justify="flex-end"
                                 >
-                                    {/* Question Collection */}
-                                    {currentType === 'QUESTION' ?
-                                        <>
-                                            <Question onSelect={(event) => handleSelection(event)}
-                                                question_collection={simValues.question_collection}
-                                            />
-                                        </>
-                                        : <></>
-                                    }
-                                    {/* Simulation Fragment */}
-                                    {currentType === 'SIMULATION' ?
-                                        <>
-                                        <Tooltip label="Add tooltip here" aria-label='A tooltip' placement="top">
-                                            <Heading size="sm">Employees</Heading>
-                                        </Tooltip>
-                                            <Grid templateColumns='repeat(2, 1fr)' gap={2}>
-                                                {skillTypeReturn.map((skilltype, index) => {
-                                                    return <Skilltype key={index + rerenderSkill}
-                                                        onUpdateChange={(event) => { updateSkillTypeObject(event.name, event.value) }}
-                                                        skillTypeName={skilltype.skill_type}
-                                                        currentCount={getSkillTypeCount(skilltype.skill_type)}
-                                                        countChange={skilltype.change} />
-                                                })}
-                                            </Grid>
-                                            {simValues.actions.map((action, index) => {
-                                                return <Action onSelectAction={(event) => handleSelection(event)} key={index + rerender} action={action} />
-                                            })}
-                                        </>
-                                        : <></>
-                                    }
-                                    {/* Model Selection */}
-                                    {currentType === 'MODEL' ?
-                                        <>
-                                            <ModelSelection onSelectModel={(event) => handleSelection(event)} models={simValues.models} />
-                                        </>
-                                        : <></>
-                                    }
-                                    {/* Event */}
-                                    {currentType === 'EVENT' ?
-                                        <>
-                                        </>
-                                        : <></>
-                                    }
-                                    {currentType === 'RESULT' ?
-                                        <>
-                                            <Result resultParams={simValues} />
-                                        </>
-                                        : <></>
-                                    }
-                                    <GridItem colSpan={1}>
-                                        {currentType === 'RESULT' ?
-                                            <>
-                                                <Button colorScheme="blue" size='lg' mt={3}>
-                                                    <Link to={{ pathname: "/" }} >Finish</Link>
-                                                </Button>
-                                            </>
-                                            : <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg' mt={3}>
-                                                {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
-                                            </Button>
-                                        }
-
-                                    </GridItem>
+                            {/* Question Collection */}
+                            {currentType === 'QUESTION' ?
+                                <>
+                                <Question onSelect={(event) => handleSelection(event)}
+                                question_collection={simValues.question_collection}
+                                />
+                                </>
+                                : <></>
+                            }
+                            {/* Simulation Fragment */}
+                            {currentType === 'SIMULATION' ?
+                                <>
+                                <Tooltip label="Add tooltip here" aria-label='A tooltip' placement="top">
+                                <Heading size="sm">Employees</Heading>
+                                </Tooltip>
+                                <Grid templateColumns='repeat(2, 1fr)' gap={2}>
+                            {skillTypeReturn.map((skilltype, index) => {
+                                return <Skilltype key={index + rerenderSkill}
+                                onUpdateChange={(event) => {updateSkillTypeObject(event.name, event.value)}}
+                                skillTypeName={skilltype.skill_type}
+                                currentCount={getSkillTypeCount(skilltype.skill_type)}
+                                countChange={skilltype.change} />
+                            })}
                                 </Grid>
-                            </Box>
+                            {simValues.actions.map((action, index) => {
+                                return <Action onSelectAction={(event) => handleSelection(event)} key={index + rerender} action={action} />
+                            })}
+                                </>
+                                : <></>
+                            }
+                            {/* Model Selection */}
+                            {currentType === 'MODEL' ?
+                                <>
+                                <ModelSelection onSelectModel={(event) => handleSelection(event)} models={simValues.models} />
+                                </>
+                                : <></>
+                            }
+                            {/* Event */}
+                            {currentType === 'EVENT' ?
+                                <>
+                                </>
+                                : <></>
+                            }
+                            {currentType === 'RESULT' ?
+                                <>
+                                <Result resultParams={simValues} />
+                                </>
+                                : <></>
+                            }
+                                <GridItem colSpan={1}>
+                            {currentType === 'RESULT' ?
+                                <>
+                                <Button colorScheme="blue" size='lg' mt={3}>
+                                <Link to={{pathname: "/"}} >Finish</Link>
+                                </Button>
+                                </>
+                                : <Button onClick={() => {dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus)}}
+                                colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg' mt={3} isLoading={nextIsLoading}>
+                            {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
+                                </Button>
+                            }
+
+                                </GridItem>
+                                </Grid>
+                                </Box>
+                                </>
+                            }
                         </Flex >
                     </Container >
-
                 </Flex>
             </Flex>
         </>
