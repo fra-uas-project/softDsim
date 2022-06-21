@@ -12,7 +12,7 @@ const Action = (props) => {
                 {
                     // Bugfix
                     props.action.action === 'bugfix' ?
-                        <ActionElement title="Bugfixing" secondaryText="Start Bugfixing" icon={actionIcon.BUGFIX}>
+                        <ActionElement title="Bugfixing" secondaryText="Start Bugfixing" icon={actionIcon.BUGFIX} tooltip={"Add tooltip here"}>
                             <FormControl display="flex" justifyContent="end">
                                 <Switch onChange={(event) => props.onSelectAction({
                                     type: props.action.action,
@@ -24,7 +24,7 @@ const Action = (props) => {
                         // Unit Test
                         props.action.action === 'unittest' ?
                             <ActionElement title="Unit Testing" secondaryText="Start Unit Testing"
-                                           icon={actionIcon.UNITTEST}>
+                                           icon={actionIcon.UNITTEST} tooltip={"Add tooltip here"}>
                                 <FormControl display="flex" justifyContent="end">
                                     <Switch onChange={(event) => props.onSelectAction({
                                         type: props.action.action,
@@ -36,7 +36,7 @@ const Action = (props) => {
                             // Integration Test
                             props.action.action === 'integrationtest' ?
                                 <ActionElement title="Integration Testing" secondaryText="Start Integration Testing"
-                                               icon={actionIcon.INTEGRATIONTEST}>
+                                               icon={actionIcon.INTEGRATIONTEST} tooltip={"Add tooltip here"}>
                                     <FormControl display="flex" justifyContent="end">
                                         <Switch onChange={(event) => props.onSelectAction({
                                             type: props.action.action,
@@ -48,7 +48,7 @@ const Action = (props) => {
                                 // Meeting
                                 props.action.action === 'meetings' ?
                                     <ActionElement title="Meetings" secondaryText="Set number of meetings"
-                                                   icon={actionIcon.MEETINGS}>
+                                                   icon={actionIcon.MEETINGS} tooltip={"Add tooltip here"}>
                                         <Flex w="full">
                                             <ActionSlider onSlide={(event) => props.onSelectAction({
                                                 type: props.action.action,
@@ -61,7 +61,7 @@ const Action = (props) => {
                                     // Training
                                     props.action.action === 'training' ?
                                         <ActionElement title="Training" secondaryText="Set training for employees"
-                                                       icon={actionIcon.TRAINING}>
+                                                       icon={actionIcon.TRAINING} tooltip={"Add tooltip here"}>
                                             <Flex w="full">
                                                 <ActionSlider onSlide={(event) => props.onSelectAction({
                                                     type: props.action.action,
@@ -74,7 +74,7 @@ const Action = (props) => {
                                         // Team Event
                                         props.action.action === 'teamevent' ?
                                             <ActionElement title="Team Event" secondaryText="Schedule teamevent"
-                                                           icon={actionIcon.TEAMEVENT}>
+                                                           icon={actionIcon.TEAMEVENT} tooltip={"Add tooltip here"}>
                                                 <ActionToggle onEventbutton={(event) => props.onSelectAction({
                                                     type: props.action.action,
                                                     value: event
@@ -86,7 +86,7 @@ const Action = (props) => {
                                             props.action.action === 'salary' ?
                                                 <ActionElement title="Salary"
                                                                secondaryText="Change Salary of employees"
-                                                               icon={actionIcon.SALARY}>
+                                                               icon={actionIcon.SALARY} tooltip={"Add tooltip here"}>
                                                     <ActionSelect onActionSelect={(event) => props.onSelectAction({
                                                         type: props.action.action,
                                                         value: event
@@ -98,7 +98,7 @@ const Action = (props) => {
                                                 props.action.action === 'overtime' ?
                                                     <ActionElement title="Overtime"
                                                                    secondaryText="Change working hours"
-                                                                   icon={actionIcon.OVERTIME}>
+                                                                   icon={actionIcon.OVERTIME} tooltip={"Add tooltip here"}>
                                                         <ActionSelect
                                                             onActionSelect={(event) => props.onSelectAction({
                                                                 type: props.action.action,

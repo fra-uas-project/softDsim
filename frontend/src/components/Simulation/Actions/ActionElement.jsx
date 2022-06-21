@@ -1,4 +1,4 @@
-import {Flex, GridItem, Heading, HStack, Icon, Text, VStack} from "@chakra-ui/react";
+import {Flex, GridItem, Heading, HStack, Icon, Text, Tooltip, VStack} from "@chakra-ui/react";
 
 const ActionElement = (props) => {
 
@@ -15,8 +15,11 @@ const ActionElement = (props) => {
                             spacing={1}
                             pl={3}
                     >
-                        <Heading size="sm">{props.title}</Heading>
+                        <Tooltip label={props.tooltip} aria-label='A tooltip' placement="top">
+                            <Heading size="sm">{props.title}</Heading>
+                        </Tooltip>
                         <Text fontSize="sm" fontWeight="500" color="gray.400">{props.secondaryText}</Text>
+                            Hover me
                     </VStack>
                 </HStack>
                 {props.children}
