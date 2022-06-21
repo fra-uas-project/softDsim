@@ -5,3 +5,7 @@
 > - currently no effective loadtest (max 50 User)
 > - Backend is not build for Cluster purpose 
 > - working with single Container approach for Application
+
+
+### Domain, proposal: own Domain, not via CIT
+> pro: fast adjustable, automatable
