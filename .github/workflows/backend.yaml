@@ -41,21 +41,21 @@ jobs:
       if: ${{ github.ref == 'refs/heads/develop' }}
       run: |
             echo "APP_ENV=DEV" >> $GITHUB_ENV
-    - name: Check for Changes
-      run: |
-            > diff
-            git diff HEAD~1 HEAD backend/requirements.txt >> diff
-            git diff HEAD~1 HEAD deploy/Dockerfile >> diff
-            git diff HEAD~1 HEAD deploy/entrypoint.sh >> diff
-            if [ -s diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
-            echo ${{ env.DIFF }}
+    # - name: Check for Changes
+    #   run: |
+    #         > diff
+    #         git diff HEAD~1 HEAD backend/requirements.txt >> diff
+    #         git diff HEAD~1 HEAD deploy/Dockerfile >> diff
+    #         git diff HEAD~1 HEAD deploy/entrypoint.sh >> diff
+    #         if [ -s diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
+    #         echo ${{ env.DIFF }}
     
     - name: Copy Docker Build
-      if: ${{ env.DIFF == 'true' }}
+      # if: ${{ env.DIFF == 'true' }}
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./backend/requirements.txt ./deploy/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_APP }}build
     - name: Build Image
-      if: ${{ env.DIFF == 'true' }}
+      # if: ${{ env.DIFF == 'true' }}
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
             ssh docker-agent <<-'EOF2'
