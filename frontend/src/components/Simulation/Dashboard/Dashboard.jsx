@@ -7,7 +7,7 @@ import CircularChart from "./CircularChart";
 import BudgetLineChart from "./BudgetLineChart";
 import {useEffect, useState} from "react";
 
-const Dashboard = ({templateScenario, data}) => {
+const Dashboard = ({templateScenario, data, story}) => {
 
     const [expenses, setExpenses] = useState(0);
     const [expensesBefore, setExpensesBefore] = useState(0);
@@ -42,7 +42,7 @@ const Dashboard = ({templateScenario, data}) => {
     return (
         <>
             <HStack pb={5} spacing={5} justifyContent="space-between">
-                <OpenStoryButton templateScenario={templateScenario}/>
+                <OpenStoryButton story={story}/>
                 <StatElement
                     icon={HiOutlineCalendar}
                     title="Days until deadline"

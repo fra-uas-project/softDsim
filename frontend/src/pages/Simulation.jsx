@@ -16,18 +16,19 @@ import {
     ModalHeader,
     ModalOverlay,
     Skeleton,
-    Spacer, Tooltip,
+    Spacer,
+    Tooltip,
     useDisclosure,
 } from "@chakra-ui/react";
-import { HiChevronRight } from "react-icons/hi";
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import {HiChevronRight} from "react-icons/hi";
+import {useEffect, useState} from "react";
+import {Link, useLocation} from "react-router-dom";
 import Question from "../components/Simulation/Actions/Question";
 import Action from "../components/Simulation/Actions/Action"
 import ModelSelection from '../components/ModelSelection'
 import Skilltype from "../components/Simulation/Actions/Skilltype"
 import Result from "../components/Simulation/Result/Result"
-import { getCookie } from "../utils/utils"
+import {getCookie} from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 
@@ -40,6 +41,7 @@ const Simulation = () => {
     const { state } = useLocation();
 
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isStoryOpen , onOpen: onStoryOpen, onClose: onStoryClose } = useDisclosure();
 
     // current simulation play id
     const [currentSimID, setCurrentSimID] = useState()
@@ -52,6 +54,11 @@ const Simulation = () => {
 
     // values for simulation
     const [simValues, setSimValues] = useState({})
+
+    // sim values before
+    const [simValuesBefore, setSimValuesBefore] = useState({})
+
+    const [story, setStory] = useState("")
 
     // contains all values from next endpoint
     const [scenarioValues, setScenarioValues] = useState({})
@@ -312,6 +319,7 @@ const Simulation = () => {
 
     useEffect(() => {
         console.log("TS", state)
+        setStory(state.story)
         fetchUserScenario();
         onOpen();
     }, [onOpen]);
@@ -320,6 +328,15 @@ const Simulation = () => {
         console.log('currentSimID', currentSimID)
     }, [currentSimID]);
 
+    useEffect(() => {
+        setSimValuesBefore(simValues)
+        // open story only if there is a story and if it is not the same story as before
+        if(simValues.text && simValues.text !== simValuesBefore.text) {
+            onStoryOpen();
+            setStory(story +  "\n" + simValues.text)
+        }
+
+    }, [simValues])
     return (
         <>
             <Modal isOpen={isOpen} closeOnOverlayClick={false} isCentered size="3xl">
@@ -327,7 +344,7 @@ const Simulation = () => {
                 <ModalContent>
                     <ModalHeader>Story</ModalHeader>
                     <ModalBody>
-                        <MarkdownDisplay markdownText={state.story} />
+                        <MarkdownDisplay markdownText={story}/>
                     </ModalBody>
 
                     <ModalFooter gap={5}>
@@ -336,6 +353,21 @@ const Simulation = () => {
                         </Button>
                         <Button colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
                             Start Simulation
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+
+            <Modal isOpen={isStoryOpen} isCentered size="3xl" closeOnOverlayClick={true}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Story</ModalHeader>
+                    <ModalBody>
+                        <MarkdownDisplay markdownText={simValues.text} />
+                    </ModalBody>
+                    <ModalFooter gap={5}>
+                        <Button colorScheme='blue' onClick={onStoryClose}>
+                            Close Story
                         </Button>
                     </ModalFooter>
                 </ModalContent>
@@ -359,7 +391,7 @@ const Simulation = () => {
                             {scenarioIsLoading ? <Skeleton height='80vh' w="full" borderRadius="2xl"/> :
                                 <>
                                 <Box w='62%'>
-                                    <Dashboard templateScenario={state} data={simValues}/>
+                                    <Dashboard templateScenario={state} data={simValues} story={story}/>
                                 </Box>
                                 <Spacer />
                             {/* right side of simulation studio */}
