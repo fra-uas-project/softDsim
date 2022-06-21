@@ -19,14 +19,15 @@ import {
     Spacer,
     useDisclosure,
 } from "@chakra-ui/react";
-import {HiChevronRight} from "react-icons/hi";
-import {useEffect, useState} from "react";
-import {Link, useLocation} from "react-router-dom";
+import { HiChevronRight } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Question from "../components/Simulation/Actions/Question";
 import Action from "../components/Simulation/Actions/Action"
 import ModelSelection from '../components/ModelSelection'
 import Skilltype from "../components/Simulation/Actions/Skilltype"
-import {getCookie} from "../utils/utils"
+import Result from "../components/Simulation/Result/Result"
+import { getCookie } from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 
@@ -352,7 +353,7 @@ const Simulation = () => {
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
                             <Box w='60%'>
-                                {scenarioIsLoading ? <Skeleton height='80vh' />: <Dashboard templateScenario={state} data={simValues} />}
+                                {scenarioIsLoading ? <Skeleton height='80vh' /> : <Dashboard templateScenario={state} data={simValues} />}
 
                             </Box>
                             <Spacer />
@@ -372,7 +373,8 @@ const Simulation = () => {
                                             currentType === 'QUESTION' ? 'Questions' :
                                                 currentType === 'SIMULATION' ? 'Actions' :
                                                     currentType === 'MODEL' ? 'Model Selection' :
-                                                        currentType === 'EVENT' ? 'Event' : ''
+                                                        currentType === 'EVENT' ? 'Event' :
+                                                            currentType === 'RESULT' ? 'Result' : ''
                                         }
                                     </Heading>
                                 </p>
@@ -422,10 +424,24 @@ const Simulation = () => {
                                         </>
                                         : <></>
                                     }
+                                    {currentType === 'RESULT' ?
+                                        <>
+                                            <Result resultParams={simValues} />
+                                        </>
+                                        : <></>
+                                    }
                                     <GridItem colSpan={1}>
-                                        <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg' mt={3}>
-                                            {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
-                                        </Button>
+                                        {currentType === 'RESULT' ?
+                                            <>
+                                                <Button colorScheme="blue" size='lg' mt={3}>
+                                                    <Link to={{ pathname: "/" }} >Finish</Link>
+                                                </Button>
+                                            </>
+                                            : <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg' mt={3}>
+                                                {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
+                                            </Button>
+                                        }
+
                                     </GridItem>
                                 </Grid>
                             </Box>
