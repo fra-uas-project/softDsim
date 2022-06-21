@@ -61,6 +61,8 @@ const Simulation = () => {
 
     const [scenarioIsLoading, setScenarioIsLoading] = useState(true);
 
+    const [nextIsLoading, setNextIsLoading] = useState(false);
+
     // rerender function for actions
     const [rerender, setRerender] = useState(0);
 
@@ -222,6 +224,7 @@ const Simulation = () => {
     }
 
     async function handleNext(simID) {
+        setNextIsLoading(true)
         setDataValidationStatus(false)
         var nextValues = {}
         if (returnValues === undefined) {
@@ -301,6 +304,7 @@ const Simulation = () => {
 
             // set overall scenario values
             setScenarioValues(nextData)
+            setNextIsLoading(false)
         } catch (err) {
             console.log(err)
         }
@@ -439,7 +443,8 @@ const Simulation = () => {
                                                     <Link to={{ pathname: "/" }} >Finish</Link>
                                                 </Button>
                                             </>
-                                            : <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg' mt={3}>
+                                            : <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }}
+                                                      colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg' mt={3} isLoading={nextIsLoading}>
                                                 {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
                                             </Button>
                                         }
@@ -449,7 +454,6 @@ const Simulation = () => {
                             </Box>
                         </Flex >
                     </Container >
-
                 </Flex>
             </Flex>
         </>
