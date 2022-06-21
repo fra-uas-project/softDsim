@@ -32,10 +32,10 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 2
-    - name: Check / set env Prod
-      if: ${{ github.ref == 'refs/heads/main' }}
-      run: |  
-            echo "APP_ENV=PROD" >> $GITHUB_ENV
+    # - name: Check / set env Prod
+    #   if: ${{ github.ref == 'refs/heads/main' }}
+    #   run: |  
+    #         echo "APP_ENV=PROD" >> $GITHUB_ENV
 
     - name: Check / set env Dev
       if: ${{ github.ref == 'refs/heads/develop' }}
@@ -77,10 +77,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Check / set env Prod
-      if: ${{ github.ref == 'refs/heads/main' }}
-      run: |  
-            echo "APP_ENV=PROD" >> $GITHUB_ENV
+    # - name: Check / set env Prod
+    #   if: ${{ github.ref == 'refs/heads/main' }}
+    #   run: |  
+    #         echo "APP_ENV=PROD" >> $GITHUB_ENV
 
     - name: Check / set env Dev
       if: ${{ github.ref == 'refs/heads/develop' }}

@@ -3,7 +3,7 @@ name: Deploy Frontend
 on:
   push:
     branches:
-      - main
+      # - main
       - develop
     paths:
       - 'frontend/**'
@@ -30,11 +30,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Check / set env Prod
-      if: ${{ github.ref == 'refs/heads/main' }}
-      run: |  
-            echo "DIR=PROD" >> $GITHUB_ENV
-            echo "REACT_APP_DJANGO_HOST=${{ secrets.DOMAIN_PROD }}" >> $GITHUB_ENV
+    # - name: Check / set env Prod
+    #   if: ${{ github.ref == 'refs/heads/main' }}
+    #   run: |  
+    #         echo "DIR=PROD" >> $GITHUB_ENV
+    #         echo "REACT_APP_DJANGO_HOST=${{ secrets.DOMAIN_PROD }}" >> $GITHUB_ENV
     - name: Check / set env Dev
       if: ${{ github.ref == 'refs/heads/develop' }}
       run: |
