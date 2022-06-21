@@ -51,7 +51,7 @@ const ScenarioOverview = () => {
             <Heading>Scenarios</Heading>
             <Box h={5}></Box>
             <Box backgroundColor="white" borderRadius="2xl" minH="60vh">
-                <Container maxW='4xl' pt={10}>
+                <Container maxW='6xl' pt={10}>
                     {
                         isLoading ?
                             <Flex w="full" justifyContent="center" alignItems="center">
@@ -62,6 +62,7 @@ const ScenarioOverview = () => {
                                 <Table variant='simple' size="lg">
                                     <Thead>
                                         <Tr>
+                                            <Th color="gray.400">Scenario ID</Th>
                                             <Th color="gray.400">Scenario Name</Th>
                                             <Th color="gray.400">Tries</Th>
                                             <Th color="gray.400" isNumeric>Best Score</Th>
@@ -70,6 +71,7 @@ const ScenarioOverview = () => {
                                     <Tbody>
                                         {scenarios.map((scenario, index) => {
                                             return <Tr key={index}>
+                                                <Td fontWeight="500">{scenario.id}</Td>
                                                 <Td fontWeight="500">
                                                     <Button variant="link" color="black" onClick={() => {
                                                         navigate(`${scenario.id}`, { state: scenario })
