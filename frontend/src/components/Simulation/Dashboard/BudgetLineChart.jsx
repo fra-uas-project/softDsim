@@ -3,7 +3,7 @@ import Chart from "react-apexcharts";
 import {Heading, HStack, VStack} from "@chakra-ui/react";
 import {useImmer} from "use-immer";
 
-const LineChart = ({title, templateScenario, data}) => {
+const LineChart = ({title, data}) => {
     // remove from here when we have real data
     const tmpOptions = {
         chart: {
@@ -18,7 +18,7 @@ const LineChart = ({title, templateScenario, data}) => {
         annotations: {
             yaxis: [
                 {
-                    y: templateScenario.management_goal.budget,
+                    y: data.management.budget,
                     borderColor: "#ff9d9d",
                     label: {
                         borderColor: "#ff9d9d",
@@ -83,7 +83,7 @@ const LineChart = ({title, templateScenario, data}) => {
                     draft[0].data.push(data.state.cost)
                     draft[1].data.push(linearCost)
                 })
-            setLinearCost(parseFloat(linearCost) + parseFloat((templateScenario.management_goal.budget / (templateScenario.management_goal.duration / 5)).toFixed(2)))
+            setLinearCost(parseFloat(linearCost) + parseFloat((data.management.budget / (data.management.duration / 5)).toFixed(2)))
         }
     }, [data])
 
