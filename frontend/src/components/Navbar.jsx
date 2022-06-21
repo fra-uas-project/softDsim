@@ -70,13 +70,17 @@ const Navbar = () => {
                 <Button variant='link' as={Link} to="/scenarios">
                     Scenarios
                 </Button>
-                <Button variant='link' as={Link} to="/scenario-studio">
-                    Scenario Studio
-                </Button>
+
                 {currentUser?.creator &&
+                    <Button variant='link' as={Link} to="/scenario-studio">
+                        Scenario Studio
+                    </Button>
+                    }
+                {currentUser?.staff &&
                     <Button variant='link' as={Link} to="/users">
                         User Management
-                    </Button>}
+                    </Button>
+                }
                 <Button variant='link' as={Link} to="/help">
                     Help
                 </Button>
