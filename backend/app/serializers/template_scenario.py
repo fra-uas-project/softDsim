@@ -142,3 +142,10 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
 
         new_template_scenario = self.create(validated_data, instance_id)
         return new_template_scenario
+
+
+class ReducedTemplateScenarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TemplateScenario
+        fields = ("id", "name", "story")
+
