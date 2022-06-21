@@ -26,6 +26,7 @@ def get_result_response(scenario: UserScenario) -> ResultResponse:
             result = handle_scenario_ending(scenario)
 
         return ResultResponse(
+            management=scenario.get_management_goal_dto(),
             state=get_scenario_state_dto(scenario),
             tasks=TasksStatusDTO(
                 tasks_todo=result.tasks_todo,
@@ -34,6 +35,7 @@ def get_result_response(scenario: UserScenario) -> ResultResponse:
                 tasks_integration_tested=result.tasks_integration_tested,
                 tasks_bug=result.tasks_bug_discovered,
             ),
+            team=scenario.team.stats(),
             members=get_member_report(scenario.team.id),
             total_score=result.total_score,
             quality_score=result.quality_score,

@@ -19,18 +19,22 @@ def calc_scores(scenario: UserScenario, tasks: CachedTasks) -> dict:
     budget_score = calc_budget_score(
         scenario.state.cost, goal.budget, score.budget_limit, score.budget_p
     )
-    question_score = 25  # todo: get question score
 
     return {
         "quality_score": quality_score,
         "time_score": time_score,
         "budget_score": budget_score,
-        "question_score": question_score,
-        "total_score": quality_score + time_score + budget_score + question_score,
+        "question_score": scenario.question_points,
+        "total_score": quality_score
+        + time_score
+        + budget_score
+        + scenario.question_points,
     }
 
 
 def calc_time_score(actual_time, scheduled_time, limit, p) -> int:
+    if scheduled_time == 0:
+        return 0
     if actual_time <= scheduled_time:
         return limit
     exceed_ratio = ((actual_time / scheduled_time) - 1) * 100
@@ -38,6 +42,8 @@ def calc_time_score(actual_time, scheduled_time, limit, p) -> int:
 
 
 def calc_budget_score(cost, budget, limit, p) -> int:
+    if budget == 0:
+        return 0
     if cost <= budget:
         return 1 * limit
     exceed_ratio = ((cost / budget) - 1) * 100
@@ -45,5 +51,7 @@ def calc_budget_score(cost, budget, limit, p) -> int:
 
 
 def calc_quality_score(tasks, err, limit, k) -> int:
+    if tasks == 0:
+        return 0
     return int((1 - (err / tasks)) ** k * limit)
 

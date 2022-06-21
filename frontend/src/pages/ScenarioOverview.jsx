@@ -13,9 +13,9 @@ import {
     Thead,
     Tr,
 } from "@chakra-ui/react";
-import {HiChevronRight} from "react-icons/hi";
-import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import { HiChevronRight } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ScenarioOverview = () => {
     const [scenarios, setScenarios] = useState([]);
@@ -31,6 +31,9 @@ const ScenarioOverview = () => {
         })
         const scens = await res.json();
         setScenarios(scens)
+        if ('error' in scens) {
+            return
+        }
         setIsLoading(false)
     };
 
@@ -40,7 +43,7 @@ const ScenarioOverview = () => {
 
     return (
         <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-            <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
+            <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500' />}>
                 <BreadcrumbItem>
                     <BreadcrumbLink href=''>Scenarios</BreadcrumbLink>
                 </BreadcrumbItem>
@@ -52,7 +55,7 @@ const ScenarioOverview = () => {
                     {
                         isLoading ?
                             <Flex w="full" justifyContent="center" alignItems="center">
-                                <Spinner size='xl'/>
+                                <Spinner size='xl' />
                             </Flex>
                             :
                             <TableContainer>
@@ -69,7 +72,7 @@ const ScenarioOverview = () => {
                                             return <Tr key={index}>
                                                 <Td fontWeight="500">
                                                     <Button variant="link" color="black" onClick={() => {
-                                                        navigate(`${scenario.id}`, {state: scenario})
+                                                        navigate(`${scenario.id}`, { state: scenario })
                                                     }}
                                                     >{scenario.name}</Button>
                                                 </Td>
