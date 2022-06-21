@@ -33,7 +33,7 @@ const ScenarioOverview = () => {
 
     const fetchScenarios = async () => {
         setIsLoading(true)
-        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario`, {
+        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-overview`, {
             method: 'GET',
             credentials: 'include',
         })
@@ -115,8 +115,8 @@ const ScenarioOverview = () => {
                                                         }}
                                                         >{scenario.name}</Button>
                                                     </Td>
-                                                    <Td fontWeight="500">NOT_IMPLEMENTED_YET</Td>
-                                                    <Td fontWeight="500">NOT_IMPLEMENTED_YET</Td>
+                                                    <Td fontWeight="500">{scenario.tries}</Td>
+                                                    <Td fontWeight="500">{scenario.max_score}</Td>
                                                     <Td fontWeight="500">
                                                         <IconButton
                                                             variant='ghost'
