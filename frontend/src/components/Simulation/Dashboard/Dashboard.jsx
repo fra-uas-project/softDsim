@@ -41,15 +41,16 @@ const Dashboard = ({templateScenario, data}) => {
 
     return (
         <>
-            <HStack pb={5} spacing={5}>
+            <HStack pb={5} spacing={5} justifyContent="space-between">
                 <OpenStoryButton templateScenario={templateScenario}/>
                 <StatElement
                     icon={HiOutlineCalendar}
                     title="Days until deadline"
                     value={daysUntilDeadline}
                     suffix="days"
+                    decimals="0"
                     indicator={calcDelta(daysUntilDeadline, daysUntilDeadlineBefore)}
-                    indicatorValue={`${daysUntilDeadline - daysUntilDeadlineBefore} days`}
+                    indicatorValue={daysUntilDeadline - daysUntilDeadlineBefore}
                     indicatorColor={daysUntilDeadline - daysUntilDeadlineBefore < 0 ? "red.400" : "green.400"}
                 />
                 <StatElement
@@ -57,7 +58,8 @@ const Dashboard = ({templateScenario, data}) => {
                     title="Expenses"
                     value={expenses}
                     prefix="$"
-                    indicatorValue={`$ ${expenses - expensesBefore}`}
+                    decimals="2"
+                    indicatorValue={expenses - expensesBefore}
                     indicator={calcDelta(expenses, expensesBefore)}
                     indicatorColor={expenses - expensesBefore < 0 ? "green.400" : "red.400"}
                 />
@@ -66,8 +68,9 @@ const Dashboard = ({templateScenario, data}) => {
                     title="Remaining tasks"
                     value={data.tasks.tasks_todo}
                     suffix="tasks"
+                    decimals="0"
                     indicator={calcDelta(tasks, tasksBefore)}
-                    indicatorValue={`${tasks - tasksBefore} tasks`}
+                    indicatorValue={tasks - tasksBefore}
                     indicatorColor={tasks - tasksBefore < 0 ? "green.400" : "red.400"}
                 />
             </HStack>

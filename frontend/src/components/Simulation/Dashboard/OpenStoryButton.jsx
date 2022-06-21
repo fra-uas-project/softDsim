@@ -26,7 +26,7 @@ const OpenStoryButton = ({templateScenario}) => {
             <Flex borderRadius="100%" backgroundColor="blue.100" p={2}>
                 <Icon w={10} h={10} as={HiOutlineBookOpen} color="blue.600" />
             </Flex>
-            <Text fontWeight="semibold" color="gray.400" fontSize="sm">Open Story</Text>
+            <Text fontWeight="semibold" color="gray.400" fontSize="sm" whiteSpace="nowrap">Open Story</Text>
         </VStack>
 
             <Drawer onClose={onClose} isOpen={isOpen} placement="left" size="lg">

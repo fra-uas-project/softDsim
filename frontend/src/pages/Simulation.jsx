@@ -358,14 +358,14 @@ const Simulation = () => {
                         <Flex h='full'>
                             {scenarioIsLoading ? <Skeleton height='80vh' w="full" borderRadius="2xl"/> :
                                 <>
-                                <Box w='60%'>
+                                <Box w='62%'>
                                     <Dashboard templateScenario={state} data={simValues}/>
                                 </Box>
                                 <Spacer />
                             {/* right side of simulation studio */}
                                 <Box
                                 p='3'
-                                w='38%'
+                                w='36%'
                                 h='full'
                                 borderRadius="2xl"
                                 bg='white'
