@@ -163,8 +163,12 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
         "QUESTION": handle_question_answers,
         "MODEL": handle_model_request,
         "START": handle_start_request,
+        # todo philip: add event handler
     }
     request_handling_mapper[req.type](req, scenario)
+
+    # check if event occured
+    # check if this event already happened (bool for every event in db -> set 'happened' to true if event happened)
 
     # 2. Check if Simulation Fragment ended
     # if fragment ended -> increase counter -> next component will be loaded in next step
