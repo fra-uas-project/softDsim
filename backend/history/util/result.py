@@ -70,6 +70,9 @@ def write_result_entry(scenario):
         **get_tasks_customer_view(scenario_id=scenario.id),
         **calc_scores(scenario=scenario, tasks=final_tasks),
         model=scenario.model or "",
+        template_scenario_id=scenario.template_id,
+        template_scenario_name=scenario.template.name,
+        username=scenario.user.username,
     )
     logging.info(f"Created result entry for scenario {scenario.id}")
     return result
