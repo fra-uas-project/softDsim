@@ -12,10 +12,10 @@ const Dashboard = ({templateScenario, data}) => {
     const [expenses, setExpenses] = useState(0);
     const [expensesBefore, setExpensesBefore] = useState(0);
 
-    const [daysUntilDeadline, setDaysUntilDeadline] = useState(templateScenario.management_goal.duration);
+    const [daysUntilDeadline, setDaysUntilDeadline] = useState(data.management.duration);
     const [daysUntilDeadlineBefore, setDaysUntilDeadlineBefore] = useState(0);
 
-    const [tasks, setTasks] = useState(templateScenario.management_goal.easy_tasks + templateScenario.management_goal.medium_tasks + templateScenario.management_goal.hard_tasks)
+    const [tasks, setTasks] = useState(data.management.easy_tasks + data.management.medium_tasks + data.management.hard_tasks)
     const [tasksBefore, setTasksBefore] = useState(0)
 
     const calcDelta = (value, valueBefore) => {
@@ -30,7 +30,7 @@ const Dashboard = ({templateScenario, data}) => {
 
     useEffect(() => {
         setDaysUntilDeadlineBefore(daysUntilDeadline)
-        setDaysUntilDeadline(templateScenario.management_goal.duration - data.state.day)
+        setDaysUntilDeadline(data.management.duration - data.state.day)
 
         setExpensesBefore(expenses)
         setExpenses(data.state.cost)
@@ -75,8 +75,8 @@ const Dashboard = ({templateScenario, data}) => {
                 />
             </HStack>
 
-            <TaskLineChart title="Tasks" data={data} templateScenario={templateScenario}/>
-            <BudgetLineChart title="Budget" templateScenario={templateScenario} data={data}/>
+            <TaskLineChart title="Tasks" data={data} />
+            <BudgetLineChart title="Budget" data={data}/>
 
             <Flex>
                 <HStack backgroundColor="white" borderRadius="2xl" p={5} w="full" justifyContent="center">
