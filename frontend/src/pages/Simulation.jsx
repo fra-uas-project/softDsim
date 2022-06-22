@@ -391,7 +391,7 @@ const Simulation = () => {
                             {scenarioIsLoading ? <Skeleton height='80vh' w="full" borderRadius="2xl"/> :
                                 <>
                                 <Box w='62%'>
-                                    <Dashboard templateScenario={state} data={simValues} story={story}/>
+                                    <Dashboard data={simValues} story={story}/>
                                 </Box>
                                 <Spacer />
                             {/* right side of simulation studio */}
