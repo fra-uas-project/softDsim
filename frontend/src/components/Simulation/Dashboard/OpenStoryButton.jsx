@@ -14,7 +14,7 @@ import {
 import {HiOutlineBookOpen} from "react-icons/hi";
 import MarkdownDisplay from "../../MarkdownDisplay";
 
-const OpenStoryButton = ({templateScenario}) => {
+const OpenStoryButton = ({story}) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     return (
@@ -35,7 +35,7 @@ const OpenStoryButton = ({templateScenario}) => {
                     <DrawerCloseButton />
                     <DrawerHeader>Story</DrawerHeader>
                     <DrawerBody>
-                        <MarkdownDisplay markdownText={templateScenario.story} />
+                        <MarkdownDisplay markdownText={story} />
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>
