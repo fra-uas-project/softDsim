@@ -17,7 +17,7 @@ const Register = () => {
     // validate user ID input
     function useridInput(event) {
         setUserID(event.target.value)
-        const mailDomain = new RegExp(/^\S+@stud.fra-uas.de\s*$/)
+        const mailDomain = new RegExp(/^\S+\.fra-uas\.de\s*$/)
         if (mailDomain.test(String(event.target.value).toLowerCase())) {
             setIdInputValid(true)
         } else {
