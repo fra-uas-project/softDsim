@@ -11,5 +11,3 @@ class QuestionCollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionCollection
         fields = ("id", "index", "questions", "text")
-
-    # todo philip: add create method

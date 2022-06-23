@@ -143,3 +143,12 @@ class WorkpackStatus:
     #         self.remaining_trainings = remaining_trainings_today - remaining_work_hours
     #     else:
     #         self.remaining_trainings = 0
+
+
+def event_triggered(scenario):
+
+    x = 5
+    # get all events
+    events = scenario.template.events.values()
+
+    return False

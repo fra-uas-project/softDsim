@@ -43,6 +43,7 @@ from app.src.util.simulation_util import (
     end_of_fragment,
     find_next_scenario_component,
     WorkpackStatus,
+    event_triggered,
 )
 from app.models.team import SkillType
 from app.models.team import Member
@@ -169,6 +170,8 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
 
     # check if event occured
     # check if this event already happened (bool for every event in db -> set 'happened' to true if event happened)
+    if event_triggered(scenario):
+        return
 
     # 2. Check if Simulation Fragment ended
     # if fragment ended -> increase counter -> next component will be loaded in next step
