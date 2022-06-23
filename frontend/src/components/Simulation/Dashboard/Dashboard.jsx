@@ -7,7 +7,7 @@ import CircularChart from "./CircularChart";
 import BudgetLineChart from "./BudgetLineChart";
 import {useEffect, useState} from "react";
 
-const Dashboard = ({templateScenario, data, story}) => {
+const Dashboard = ({data, story}) => {
 
     const [expenses, setExpenses] = useState(0);
     const [expensesBefore, setExpensesBefore] = useState(0);
@@ -15,7 +15,7 @@ const Dashboard = ({templateScenario, data, story}) => {
     const [daysUntilDeadline, setDaysUntilDeadline] = useState(data.management.duration);
     const [daysUntilDeadlineBefore, setDaysUntilDeadlineBefore] = useState(0);
 
-    const [tasks, setTasks] = useState(data.management.easy_tasks + data.management.medium_tasks + data.management.hard_tasks)
+    const [tasks, setTasks] = useState(data.management.tasks)
     const [tasksBefore, setTasksBefore] = useState(0)
 
     const calcDelta = (value, valueBefore) => {
@@ -59,8 +59,8 @@ const Dashboard = ({templateScenario, data, story}) => {
                     value={expenses}
                     prefix="$"
                     decimals="2"
-                    indicatorValue={expenses - expensesBefore}
                     indicator={calcDelta(expenses, expensesBefore)}
+                    indicatorValue={expenses - expensesBefore}
                     indicatorColor={expenses - expensesBefore < 0 ? "green.400" : "red.400"}
                 />
                 <StatElement

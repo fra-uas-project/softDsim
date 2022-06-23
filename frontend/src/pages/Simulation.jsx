@@ -17,7 +17,6 @@ import {
     ModalOverlay,
     Skeleton,
     Spacer,
-    Tooltip,
     useDisclosure,
 } from "@chakra-ui/react";
 import {HiChevronRight} from "react-icons/hi";
@@ -26,15 +25,13 @@ import {Link, useLocation} from "react-router-dom";
 import Question from "../components/Simulation/Actions/Question";
 import Action from "../components/Simulation/Actions/Action"
 import ModelSelection from '../components/ModelSelection'
-import Skilltype from "../components/Simulation/Actions/Skilltype"
 import Result from "../components/Simulation/Result/Result"
 import {getCookie} from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
+import SkilltypeContainer from "../components/Simulation/Actions/SkilltypeContainer";
 
 const Simulation = () => {
-    const [userScenario, setUserScenario] = useState({});
-
     const location = useLocation();
 
     // scenario template data
@@ -60,9 +57,6 @@ const Simulation = () => {
 
     const [story, setStory] = useState("")
 
-    // contains all values from next endpoint
-    const [scenarioValues, setScenarioValues] = useState({})
-
     // contains the values that should be sent to the next endpoint
     const [returnValues, setReturnValues] = useState();
 
@@ -84,13 +78,6 @@ const Simulation = () => {
 
     // save skilltype return object
     const [skillTypeReturn, setSkillTypeReturn] = useState([])
-
-    const fetchUserScenario = () => {
-        const userScenarioMock = {
-            scn_name: "Scenario 1"
-        }
-        setUserScenario(userScenarioMock)
-    };
 
     const scenarioPath = () => {
         const url = location.pathname;
@@ -237,6 +224,7 @@ const Simulation = () => {
         if (returnValues === undefined) {
             nextValues = { "scenario_id": simID, "type": "START" }
         } else {
+            console.log("rv", returnValues)
             nextValues = returnValues
         }
         try {
@@ -309,8 +297,6 @@ const Simulation = () => {
                 setSimValues(nextData)
             }
 
-            // set overall scenario values
-            setScenarioValues(nextData)
             setNextIsLoading(false)
         } catch (err) {
             console.log(err)
@@ -318,15 +304,13 @@ const Simulation = () => {
     }
 
     useEffect(() => {
-        console.log("TS", state)
-        setStory(state.story)
-        fetchUserScenario();
-        onOpen();
-    }, [onOpen]);
+        console.log("skRet",skillTypeReturn)
+    }, [skillTypeReturn])
 
     useEffect(() => {
-        console.log('currentSimID', currentSimID)
-    }, [currentSimID]);
+        setStory(state.story)
+        onOpen();
+    }, [onOpen]);
 
     useEffect(() => {
         setSimValuesBefore(simValues)
@@ -337,6 +321,14 @@ const Simulation = () => {
         }
 
     }, [simValues])
+
+    const [actionListExpanded, setActionListExpanded] = useState(false);
+
+    const toggleActionList = () => {
+        setActionListExpanded(!actionListExpanded)
+    }
+
+
     return (
         <>
             <Modal isOpen={isOpen} closeOnOverlayClick={false} isCentered size="3xl">
@@ -391,7 +383,7 @@ const Simulation = () => {
                             {scenarioIsLoading ? <Skeleton height='80vh' w="full" borderRadius="2xl"/> :
                                 <>
                                 <Box w='62%'>
-                                    <Dashboard templateScenario={state} data={simValues} story={story}/>
+                                    <Dashboard data={simValues} story={story}/>
                                 </Box>
                                 <Spacer />
                             {/* right side of simulation studio */}
@@ -432,18 +424,7 @@ const Simulation = () => {
                             {/* Simulation Fragment */}
                             {currentType === 'SIMULATION' ?
                                 <>
-                                <Tooltip label="Add tooltip here" aria-label='A tooltip' placement="top">
-                                <Heading size="sm">Employees</Heading>
-                                </Tooltip>
-                                <Grid templateColumns='repeat(2, 1fr)' gap={2}>
-                            {skillTypeReturn.map((skilltype, index) => {
-                                return <Skilltype key={index + rerenderSkill}
-                                onUpdateChange={(event) => {updateSkillTypeObject(event.name, event.value)}}
-                                skillTypeName={skilltype.skill_type}
-                                currentCount={getSkillTypeCount(skilltype.skill_type)}
-                                countChange={skilltype.change} />
-                            })}
-                                </Grid>
+                                    <SkilltypeContainer skillTypeReturn={skillTypeReturn} simValues={simValues} updateSkillTypeObject={updateSkillTypeObject}/>
                             {simValues.actions.map((action, index) => {
                                 return <Action onSelectAction={(event) => handleSelection(event)} key={index + rerender} action={action} />
                             })}

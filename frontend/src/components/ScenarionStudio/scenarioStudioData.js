@@ -4,7 +4,7 @@ import {
     MdOutlineAttractions, MdOutlineBugReport,
     MdOutlineCheckBox,
     MdOutlineInfo,
-    MdOutlineRadioButtonChecked,
+    MdOutlineRadioButtonChecked, MdPersonAddAlt1,
     MdRule, MdSchool,
     MdTimeline
 } from "react-icons/md";
@@ -42,7 +42,8 @@ export const actionIcon = {
     MEETINGS: HiUserGroup,
     TRAINING: MdSchool,
     SALARY: MdOutlineAttachMoney,
-    OVERTIME: MdAlarm
+    OVERTIME: MdAlarm,
+    SKILLTYPE: MdPersonAddAlt1
 }
 
 export const finalComponentList = [
