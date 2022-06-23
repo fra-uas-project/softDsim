@@ -124,6 +124,12 @@ const Login = () => {
                             </InputRightElement>
                         </InputGroup>
                     </Stack>
+                    {/* Reset Link */}
+                    <Flex>
+                        <Text w="full" color="blue.400" cursor="pointer" fontWeight="normal" _hover={{ fontWeight: 'semibold' }} onClick={() => { }}>
+                            <Link to={{ pathname: "/reset-password" }} >Forgot password?</Link>
+                        </Text>
+                    </Flex>
                     {/* Failed login message */}
                     <Flex align="center" justify="center" h="40px">
                         {logInSuccess === 'wrongCredentials' ?
@@ -140,7 +146,7 @@ const Login = () => {
                     {/* Register Link */}
                     <Flex mt={5}>
                         <Text w="full" align="center" justify="center" cursor="pointer" fontWeight="semibold" _hover={{ fontWeight: 'bold' }} onClick={() => { }}>
-                            <Link to={{ pathname: "/register" }} >Noch nicht registriert?</Link>
+                            <Link to={{ pathname: "/register" }} >Not registered?</Link>
                         </Text>
                     </Flex>
                 </Flex>
