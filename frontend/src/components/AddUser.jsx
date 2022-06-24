@@ -6,7 +6,8 @@ import {
     ModalFooter,
     ModalBody,
     ModalCloseButton,
-    Button, useDisclosure,Box,Stack, Input,InputGroup,InputRightElement, Text, Divider,
+    Button, useDisclosure,Box,Stack, Input,InputGroup,InputRightElement, Flex, Heading,
+    Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody 
   } from '@chakra-ui/react';
   import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin, HiOutlineInformationCircle } from "react-icons/hi";
   import React, { useState } from "react";
@@ -25,7 +26,7 @@ import {
     // validate user ID input
     function useridInput(event) {
         setUserID(event.target.value)
-        const mailDomain = new RegExp(/^\S+@stud.fra-uas.de\s*$/)
+        const mailDomain = new RegExp(/^\S+@*.fra-uas.de\s*$/)
         if (mailDomain.test(String(event.target.value).toLowerCase())) {
             setIdInputValid(true)
         } else {
@@ -106,7 +107,24 @@ import {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create New User</ModalHeader>
+          <ModalHeader>Adding User</ModalHeader>
+          <Flex align="center" justify="center" mb={5}>
+                        <Flex w="10%"></Flex>
+                        <Heading w="80%" as="h5" textAlign="center">Create New User</Heading>
+                        <Popover w="10%">
+                            <PopoverTrigger>
+                                <Button><HiOutlineInformationCircle /></Button>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                                <PopoverArrow />
+                                <PopoverCloseButton />
+                                <PopoverHeader fontWeight="bold">Email Guideline</PopoverHeader>
+                                <PopoverBody>Email must be within the FRA-UAS domain.</PopoverBody>
+                                <PopoverHeader fontWeight="bold">Password Guideline</PopoverHeader>
+                                <PopoverBody>Password must be at least 6 characters strong and contain at least one number.</PopoverBody>
+                            </PopoverContent>
+                        </Popover>
+                    </Flex>
           <ModalCloseButton />
           <ModalBody>
           
@@ -135,15 +153,7 @@ import {
                     </Stack>
 
           </ModalBody>
-          <Box m='3' p='3'>
-          <Stack spacing={3}>
-  <Text as='b'>Email Guideline:</Text>
-  <Text as='i' color='red'>Email must be within the FRA-UAS domain.</Text>
-  <Text as='b'>Password Guideline:</Text>
-  <Text as='i' color='red'>Password must be at least 6 characters strong and contain at least one number.</Text>
- 
-</Stack>
-          </Box>
+          
 
           <ModalFooter>
           
@@ -152,7 +162,7 @@ import {
                         onClick={register} isDisabled={!(idInputValid && passwortInputValid && passwortRepeatInputValid)}>
                         Register
                     </Button>
-            <Button variant='ghost' colorScheme='red'>Close</Button>
+            
           </ModalFooter>
         </ModalContent>
       </Modal>

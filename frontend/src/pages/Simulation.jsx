@@ -14,30 +14,31 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-    ModalOverlay, Skeleton,
+    ModalOverlay,
+    Skeleton,
     Spacer,
-    Text,
     useDisclosure,
 } from "@chakra-ui/react";
-import {HiChevronRight} from "react-icons/hi";
-import {useEffect, useState} from "react";
-import {Link, useLocation} from "react-router-dom";
-import Question from "../components/Question";
-import Action from "../components/Action"
+import { HiChevronRight } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import Question from "../components/Simulation/Actions/Question";
+import Action from "../components/Simulation/Actions/Action"
 import ModelSelection from '../components/ModelSelection'
-import {getCookie} from "../utils/utils"
+import Result from "../components/Simulation/Result/Result"
+import { getCookie } from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
+import SkilltypeContainer from "../components/Simulation/Actions/SkilltypeContainer";
 
 const Simulation = () => {
-    const [userScenario, setUserScenario] = useState({});
-
     const location = useLocation();
 
     // scenario template data
-    const {state} = useLocation();
+    const { state } = useLocation();
 
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isStoryOpen, onOpen: onStoryOpen, onClose: onStoryClose } = useDisclosure();
 
     // current simulation play id
     const [currentSimID, setCurrentSimID] = useState()
@@ -50,28 +51,45 @@ const Simulation = () => {
 
     // values for simulation
     const [simValues, setSimValues] = useState({})
-    const [simTasks, setSimTasks] = useState({
-        tasks_todo: 0,
-        task_done: 0,
-        tasks_unit_tested: 0,
-        tasks_integration_tested: 0,
-        tasks_bug: 0
-    })
 
-    // contains all values from next endpoint
-    const [scenarioValues, setScenarioValues] = useState({})
+    // sim values before
+    const [simValuesBefore, setSimValuesBefore] = useState({})
+
+    const [story, setStory] = useState("")
 
     // contains the values that should be sent to the next endpoint
-    const [returnValues, setReturnValues] = useState()
+    const [returnValues, setReturnValues] = useState();
 
     const [scenarioIsLoading, setScenarioIsLoading] = useState(true);
 
-    const fetchUserScenario = () => {
-        const userScenarioMock = {
-            scn_name: "Scenario 1"
+    const [nextIsLoading, setNextIsLoading] = useState(false);
+
+    // rerender function for actions
+    const [rerender, setRerender] = useState(0);
+
+    // rerender function for skilltypes
+    const [rerenderSkill, setRerenderSkill] = useState(0);
+
+    // define simulation fragment values
+    const [simFragmentActions, setSimFragmentActions] = useState();
+
+    // save all available skilltypes
+    const [skillTypes, setSkillTypes] = useState([])
+
+    // save skilltype return object
+    const [skillTypeReturn, setSkillTypeReturn] = useState([])
+
+    // save maximum number of task
+    const [tasksMax, setTasksMax] = useState(0)
+
+    // default values for actions
+    const [actionDefaultValues, setActionDefaultValues] = useState(
+        {
+            bugfix: false,
+            unittest: false,
+            integrationtest: false
         }
-        setUserScenario(userScenarioMock)
-    };
+    )
 
     const scenarioPath = () => {
         const url = location.pathname;
@@ -95,7 +113,90 @@ const Simulation = () => {
             }
             setReturnValues(tempReturnValues)
             setDataValidationStatus(true)
+        } else if (currentType === 'SIMULATION') {
+            var tempSimFragmentActions = simFragmentActions
+
+            // write new value into action fragment
+            tempSimFragmentActions[event.type] = event.value
+
+            // write new default values
+            if (event.type === 'bugfix' || event.type === 'unittest' || event.type === 'integrationtest') {
+                // create copy of state
+                var tempActionDefaultValues = actionDefaultValues
+
+                // change default values in copy
+                tempActionDefaultValues[event.type] = event.value
+
+                // write copy into state
+                setActionDefaultValues(tempActionDefaultValues)
+            }
+
+            // set fragment state
+            setSimFragmentActions(tempSimFragmentActions)
+
+            const tempReturnValues = {
+                scenario_id: currentSimID,
+                type: currentType,
+                actions: tempSimFragmentActions,
+                members: skillTypeReturn
+            }
+
+            setReturnValues(tempReturnValues)
+            setDataValidationStatus(true)
         }
+    }
+
+    function createSkillTypeObject(skillTypesList) {
+        // create list that can be returned to next endpoint
+        var list = []
+        for (const type of skillTypesList) {
+            list.push(
+                {
+                    "skill_type": type,
+                    "change": 0
+                }
+            )
+        }
+        // set state
+        setSkillTypeReturn(list)
+        return list
+    }
+
+    function resetSkillTypeObject() {
+        // reset change values for each skill type, required for displaying on frontend after clicking next
+        var tempSKillTypeList = skillTypeReturn
+        for (const type in tempSKillTypeList) {
+            tempSKillTypeList[type].change = 0
+        }
+
+        setSkillTypeReturn(tempSKillTypeList)
+    }
+
+    function updateSkillTypeObject(skill, value) {
+        // get index of skill that will be updates
+        const skillIndex = skillTypeReturn.findIndex(object => {
+            return object.skill_type === skill;
+        });
+
+        // create temporary object to overwrite current one
+        var tempSkillTypeReturn = skillTypeReturn
+
+        // update change value
+        tempSkillTypeReturn[skillIndex].change = tempSkillTypeReturn[skillIndex].change + value
+
+        // update state
+        setSkillTypeReturn(tempSkillTypeReturn)
+        setRerenderSkill(rerenderSkill + 50)
+    }
+
+    function getSkillTypeCount(skill) {
+        var skillTypeCount = 0
+        for (const type of simValues.members) {
+            if (type.skill_type.name === skill) {
+                skillTypeCount = skillTypeCount + 1
+            }
+        }
+        return skillTypeCount
     }
 
     async function startScenario() {
@@ -111,20 +212,44 @@ const Simulation = () => {
             })
 
             const scenario = await res.json()
+            console.log('scenario', scenario)
             setCurrentSimID(scenario.data.id)
             await handleNext(scenario.data.id)
             setScenarioIsLoading(false)
+
+            // get skilltypes
+            const resSkill = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/skill-type`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+            })
+
+            var skillTypesList = []
+
+            const resSkillReturn = await resSkill.json()
+
+            for (const type of resSkillReturn.data) {
+                skillTypesList.push(type.name)
+            }
+
+            setSkillTypes(skillTypesList)
+            createSkillTypeObject(skillTypesList)
         } catch (err) {
             console.log(err)
         }
     }
 
     async function handleNext(simID) {
+        setNextIsLoading(true)
         setDataValidationStatus(false)
         var nextValues = {}
         if (returnValues === undefined) {
             nextValues = { "scenario_id": simID, "type": "START" }
         } else {
+            console.log("rv", returnValues)
             nextValues = returnValues
         }
         try {
@@ -140,44 +265,106 @@ const Simulation = () => {
 
             const nextData = await res.json()
             console.log('NextData:', nextData)
+
+            // get total tasks
+            if (tasksMax === 0) {
+                setTasksMax(nextData.tasks.tasks_todo)
+            }
+
             // set type
             setCurrentType(nextData.type)
             // set data
             if (nextData.type === 'QUESTION') {
-                setSimValues(nextData.question_collection)
+                setSimValues(nextData)
                 setDataValidationStatus(true)
             } else if (nextData.type === 'MODEL') {
-                setSimValues(nextData.models)
+                setSimValues(nextData)
             } else if (nextData.type === 'SIMULATION') {
                 setSimValues(nextData)
                 setDataValidationStatus(true)
+                let tempActions = {}
+
+                // get all actions from next data object
+                for (const action of nextData.actions) {
+                    if (action.action === 'bugfix') {
+                        tempActions.bugfix = actionDefaultValues.bugfix
+                    } else if (action.action === 'unittest') {
+                        tempActions.unittest = actionDefaultValues.unittest
+                    } else if (action.action === 'integrationtest') {
+                        tempActions.integrationtest = actionDefaultValues.integrationtest
+                    } else if (action.action === 'meetings') {
+                        tempActions.meetings = action.lower_limit
+                    } else if (action.action === 'teamevent') {
+                        tempActions.teamevent = false
+                    } else if (action.action === 'training') {
+                        tempActions.training = action.lower_limit
+                    } else if (action.action === 'salary') {
+                        tempActions.salary = 1
+                    } else if (action.action === 'overtime') {
+                        tempActions.overtime = 0
+                    }
+                }
+
+                // set action values with default values
+                setSimFragmentActions(tempActions)
+
+                const tempReturnValues = {
+                    scenario_id: simID,
+                    type: nextData.type,
+                    actions: tempActions,
+                    members: skillTypeReturn
+                }
+                setReturnValues(tempReturnValues)
+
+                // quick and dirty solution for rerendering, please don't judge
+                resetSkillTypeObject()
+                setRerender(rerender + 20)
+                setRerenderSkill(rerenderSkill + 50)
             } else if (nextData.type === 'EVENT') {
                 setDataValidationStatus(true)
                 setSimValues(nextData)
+            } else if (nextData.type === 'RESULT') {
+                setDataValidationStatus(true)
+                setSimValues(nextData)
             }
-            // set taskValues
-            setSimTasks(nextData.tasks)
 
-            // set overall scenario values
-            setScenarioValues(nextData)
+            setNextIsLoading(false)
         } catch (err) {
             console.log(err)
         }
     }
 
+    // end simulation on user request
+    function manualEndSimulation() {
+        // TODO: Implement API call, once available
+        console.log('ending simulation')
+    }
+
     useEffect(() => {
-        console.log("TS", state)
-        fetchUserScenario();
+        console.log("skRet", skillTypeReturn)
+    }, [skillTypeReturn])
+
+    useEffect(() => {
+        setStory(state.story)
         onOpen();
     }, [onOpen]);
 
     useEffect(() => {
-        console.log('currentSimID', currentSimID)
-    }, [currentSimID]);
+        setSimValuesBefore(simValues)
+        // open story only if there is a story and if it is not the same story as before
+        if (simValues.text && simValues.text !== simValuesBefore.text) {
+            onStoryOpen();
+            setStory(story + "\n" + simValues.text)
+        }
 
-    useEffect(() => {
-        console.log('dataValidationStatus', dataValidationStatus)
-    }, [dataValidationStatus]);
+    }, [simValues])
+
+    const [actionListExpanded, setActionListExpanded] = useState(false);
+
+    const toggleActionList = () => {
+        setActionListExpanded(!actionListExpanded)
+    }
+
 
     return (
         <>
@@ -186,7 +373,7 @@ const Simulation = () => {
                 <ModalContent>
                     <ModalHeader>Story</ModalHeader>
                     <ModalBody>
-                        <MarkdownDisplay markdownText={state.story} />
+                        <MarkdownDisplay markdownText={story} />
                     </ModalBody>
 
                     <ModalFooter gap={5}>
@@ -195,6 +382,21 @@ const Simulation = () => {
                         </Button>
                         <Button colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
                             Start Simulation
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+
+            <Modal isOpen={isStoryOpen} isCentered size="3xl" closeOnOverlayClick={true}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Story</ModalHeader>
+                    <ModalBody>
+                        <MarkdownDisplay markdownText={simValues.text} />
+                    </ModalBody>
+                    <ModalFooter gap={5}>
+                        <Button colorScheme='blue' onClick={onStoryClose}>
+                            Close Story
                         </Button>
                     </ModalFooter>
                 </ModalContent>
@@ -215,78 +417,107 @@ const Simulation = () => {
 
                     <Container maxW='container.2xl' h='full'>
                         <Flex h='full'>
-                            <Box w='60%'>
-                                {scenarioIsLoading ? <Skeleton height='80vh' />: <Dashboard templateScenario={state} data={scenarioValues} />}
-
-                            </Box>
-                            <Spacer/>
-                            {/* right side of simulation studio */}
-                            <Box
-                                p='3'
-
-                                w='38%'
-                                h='full'
-                                boxShadow='md'
-                                rounded='md'
-                                bg='white'
-                                textAlign='center'
-                            >
-                                <p>
-                                    {/* change heading depending on dataset */}
-                                    <b>
-                                        {
-                                            Object.keys(simValues)[0] === 'question_collections' ? 'Questions' :
-                                                Object.keys(simValues)[0] === 'simulation_fragments' ? 'Actions' :
-                                                    Object.keys(simValues)[0] === 'model_selection' ? 'Model Selection' : ''
-                                        }
-                                    </b>
-                                </p>
-                                <Grid
-                                    gap={4}
-                                    p='5'
-                                    justify="flex-end"
-                                >
-                                    {/* Question Collection */}
-                                    {currentType === 'QUESTION' ?
-                                        <>
-                                            <Question onSelect={(event) => handleSelection(event)}
-                                                question_collection={simValues}
-                                            />
-                                        </>
-                                        : <></>
-                                    }
-                                    {/* Simulation Fragment */}
-                                    {Object.keys(simValues)[0] === 'simulation_fragments' ?
-                                        <>
-                                            {simValues.simulation_fragments.map((actions, index) => {
-                                                return <Action key={index} text={actions.text} actions={actions.actions} />
-                                            })}
-                                        </>
-                                        : <></>
-                                    }
-                                    {/* Model Selection */}
-                                    {currentType === 'MODEL' ?
-                                        <>
-                                            <ModelSelection onSelectModel={(event) => handleSelection(event)} models={simValues} />
-                                        </>
-                                        : <></>
-                                    }
-                                    {/* Event */}
-                                    {Object.keys(simValues)[0] === 'event' ?
-                                        <>
-                                        </>
-                                        : <></>
-                                    }
-                                    <GridItem colSpan={1}>
-                                        <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID) : console.log('data status:', dataValidationStatus) }} colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg'>
-                                            Next Week
-                                        </Button>
-                                    </GridItem>
-                                </Grid>
-                            </Box>
+                            {scenarioIsLoading ? <Skeleton height='80vh' w="full" borderRadius="2xl" /> :
+                                <>
+                                    <Box w='62%'>
+                                        <Dashboard data={simValues} story={story} />
+                                    </Box>
+                                    <Spacer />
+                                    {/* right side of simulation studio */}
+                                    <Box
+                                        p='3'
+                                        w='36%'
+                                        h='full'
+                                        borderRadius="2xl"
+                                        bg='white'
+                                        textAlign='center'
+                                    >
+                                        <p>
+                                            {/* change heading depending on dataset */}
+                                            <Heading size="lg" mt={3}>
+                                                {
+                                                    currentType === 'QUESTION' ? 'Questions' :
+                                                        currentType === 'SIMULATION' ? 'Actions' :
+                                                            currentType === 'MODEL' ? 'Model Selection' :
+                                                                currentType === 'EVENT' ? 'Event' :
+                                                                    currentType === 'RESULT' ? 'Result' : ''
+                                                }
+                                            </Heading>
+                                        </p>
+                                        <Grid
+                                            gap={4}
+                                            p='5'
+                                            justify="flex-end"
+                                        >
+                                            {/* Question Collection */}
+                                            {currentType === 'QUESTION' ?
+                                                <>
+                                                    <Question onSelect={(event) => handleSelection(event)}
+                                                        question_collection={simValues.question_collection}
+                                                    />
+                                                </>
+                                                : <></>
+                                            }
+                                            {/* Simulation Fragment */}
+                                            {currentType === 'SIMULATION' ?
+                                                <>
+                                                    <SkilltypeContainer skillTypeReturn={skillTypeReturn} simValues={simValues} updateSkillTypeObject={updateSkillTypeObject} />
+                                                    {simValues.actions.map((action, index) => {
+                                                        return <Action onSelectAction={(event) => handleSelection(event)} key={index + rerender} action={action} actionDefaultValues={actionDefaultValues} />
+                                                    })}
+                                                </>
+                                                : <></>
+                                            }
+                                            {/* Model Selection */}
+                                            {currentType === 'MODEL' ?
+                                                <>
+                                                    <ModelSelection onSelectModel={(event) => handleSelection(event)} models={simValues.models} />
+                                                </>
+                                                : <></>
+                                            }
+                                            {/* Event */}
+                                            {currentType === 'EVENT' ?
+                                                <>
+                                                </>
+                                                : <></>
+                                            }
+                                            {/* Result page */}
+                                            {currentType === 'RESULT' ?
+                                                <>
+                                                    <Result resultParams={simValues} />
+                                                </>
+                                                : <></>
+                                            }
+                                            <GridItem colSpan={1}>
+                                                {/* end simulation button */}
+                                                {
+                                                    (!(currentType === 'RESULT') && (tasksMax > 0) && (simValues.tasks.tasks_done / tasksMax >= 0.8)) ?
+                                                        <Button onClick={() => { manualEndSimulation() }}
+                                                            colorScheme='blue' size='lg' mt={3} mr={5} w="35%" isLoading={nextIsLoading}>
+                                                            Finish Early
+                                                        </Button>
+                                                        : <></>
+                                                }
+                                                {/* Finish and Next buttons */}
+                                                {
+                                                    currentType === 'RESULT' ?
+                                                        <>
+                                                            <Button colorScheme="blue" size='lg' mt={3}>
+                                                                <Link to={{ pathname: "/" }} >Finish</Link>
+                                                            </Button>
+                                                        </>
+                                                        : <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }}
+                                                            colorScheme={dataValidationStatus ? 'blue' : 'gray'} size='lg' mt={3} w="35%" isLoading={nextIsLoading}>
+                                                            {currentType === 'SIMULATION' ? 'Next Week' : 'Next'}
+                                                        </Button>
+                                                }
+                                            </GridItem>
+                                        </Grid>
+                                    </Box>
+                                </>
+                            }
                         </Flex >
                     </Container >
-
                 </Flex>
             </Flex>
         </>

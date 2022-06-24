@@ -47,3 +47,9 @@ class Result(models.Model):
 
     # Model Selection
     model = models.TextField(max_length=64, default="none")
+
+    # Extra values for simulation group
+    template_scenario_id = models.PositiveIntegerField(blank=True, null=True)
+    template_scenario_name = models.TextField(blank=True, null=True)
+    username = models.TextField(blank=True, null=True)
+    avg_mu = models.FloatField(blank=True, null=True)

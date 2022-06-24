@@ -59,9 +59,6 @@ def simulate(req, scenario: UserScenario) -> None:
     if req.actions is None:
         raise RequestActionException()
 
-    if not req.members:
-        raise RequestMembersException()
-
     normal_work_hour_day: int = 8
 
     workpack = req.actions
@@ -73,29 +70,32 @@ def simulate(req, scenario: UserScenario) -> None:
             (workpack.meetings / days), (normal_work_hour_day + workpack.overtime)
         )
 
-    # Add or remove members from the team
-    member_change = req.members
-    for m in member_change:
-        try:
-            s = SkillType.objects.get(name=m.skill_type)
-        except ObjectDoesNotExist:
-            msg = f"SkillType {m.skill_type} does not exist."
-            logging.error(msg)
-            raise SimulationException(msg)
-        if m.change > 0:
-            for _ in range(m.change):
-                new_member = Member(skill_type=s, team=scenario.team)
-                new_member.save()
-        else:
-            list_of_members = Member.objects.filter(team=scenario.team, skill_type=s)
+    if req.members and req.members != []:
+        # Add or remove members from the team
+        member_change = req.members
+        for m in member_change:
             try:
-                for i in range(abs(m.change)):
-                    m_to_delete: Member = list_of_members[0]
-                    m_to_delete.delete()
-            except IndexError:
-                msg = f"Cannot remove {m.change} members of type {s.name}."
+                s = SkillType.objects.get(name=m.skill_type)
+            except ObjectDoesNotExist:
+                msg = f"SkillType {m.skill_type} does not exist."
                 logging.error(msg)
                 raise SimulationException(msg)
+            if m.change > 0:
+                for _ in range(m.change):
+                    new_member = Member(skill_type=s, team=scenario.team)
+                    new_member.save()
+            else:
+                list_of_members = Member.objects.filter(
+                    team=scenario.team, skill_type=s
+                )
+                try:
+                    for i in range(abs(m.change)):
+                        m_to_delete: Member = list_of_members[0]
+                        m_to_delete.delete()
+                except IndexError:
+                    msg = f"Cannot remove {m.change} members of type {s.name}."
+                    logging.error(msg)
+                    raise SimulationException(msg)
 
     # Simulate what happens
     tasks = CachedTasks(scenario_id=scenario.id)  # Read tasks once
@@ -187,28 +187,34 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     # 5.1 Check if next component is a Simulation Component
     elif isinstance(next_component, SimulationFragment):
         scenario_response = SimulationResponse(
+            management=scenario.get_management_goal_dto(),
             actions=get_actions_from_fragment(next_component),
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
+            team=scenario.team.stats(),
             text=next_component.text,
         )
     # 5.2 Check if next component is a Question Component
     elif isinstance(next_component, QuestionCollection):
         scenario_response = QuestionResponse(
+            management=scenario.get_management_goal_dto(),
             question_collection=get_question_collection(scenario),
             state=get_scenario_state_dto(scenario),
             tasks=get_tasks_status(scenario.id),
             members=get_member_report(scenario.team.id),
+            team=scenario.team.stats(),
             text=next_component.text,
         )
     # 5.3 Check if next component is a Model Selection
     elif isinstance(next_component, ModelSelection):
         scenario_response = ModelSelectionResponse(
+            management=scenario.get_management_goal_dto(),
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),
             members=get_member_report(scenario.team.id),
             models=next_component.models(),
+            team=scenario.team.stats(),
             text=next_component.text,
         )
 
@@ -218,5 +224,5 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     increase_scenario_step_counter(scenario)
     if scenario_response.type != "SIMULATION":
         increase_scenario_component_counter(scenario)
-
+    scenario.save()
     return scenario_response

@@ -1,4 +1,5 @@
 import logging
+from unittest import result
 from deprecated.classic import deprecated
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -9,7 +10,10 @@ from rest_framework.views import APIView
 from app.decorators.decorators import allowed_roles
 from app.exceptions import IndexException
 from app.models.template_scenario import TemplateScenario
-from app.serializers.template_scenario import TemplateScenarioSerializer
+from app.serializers.template_scenario import (
+    ReducedTemplateScenarioSerializer,
+    TemplateScenarioSerializer,
+)
 
 from app.models.question_collection import QuestionCollection
 from app.models.question import Question
@@ -20,6 +24,7 @@ from app.models.action import Action
 from app.models.model_selection import ModelSelection
 from app.models.score_card import ScoreCard
 from app.models.management_goal import ManagementGoal
+from history.models.result import Result
 
 
 class TemplateScenarioView(APIView):
@@ -299,3 +304,48 @@ def set_last_fragement(scenario: TemplateScenario):
         last_fragment.last = True
         last_fragment.save()
 
+
+class TemplateScenarioUserListView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    @allowed_roles(["student"])
+    def get(self, request, scenario_id=None, format=None):
+
+        try:
+            if scenario_id:
+                data = self.get_data_for_single_scenario(
+                    scenario_id, request.user.username
+                )
+                return Response(data, status=status.HTTP_200_OK)
+
+            template_scenarios = TemplateScenario.objects.all()
+            data = [
+                self.get_data_for_single_scenario(scenario.id, request.user.username)
+                for scenario in template_scenarios
+            ]
+            return Response(data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logging.error(f"{e.__class__.__name__} occurred in GET template-scenario")
+            logging.error(f"{str(e)} occurred in GET template-scenario")
+            return Response(
+                {
+                    "error": "something went wrong on server side (except clause)",
+                    "data": str(e),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def get_data_for_single_scenario(self, scenario_id: int, username: str):
+        template_scenario = TemplateScenario.objects.get(id=scenario_id)
+        serializer = ReducedTemplateScenarioSerializer(template_scenario, many=False)
+        results = Result.objects.filter(
+            user_scenario__user__username=username,
+            user_scenario__template__id=template_scenario.id,
+        )
+        tries = len(results)
+        max_score = 0
+        if tries:
+            max_score = max(map(lambda x: x.total_score, results))
+        return {**serializer.data, "tries": tries, "max_score": max_score}

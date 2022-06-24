@@ -10,7 +10,7 @@ import {
     MenuItem,
     MenuList
 } from "@chakra-ui/react"
-import Logo from "../images/modern-logo.png"
+import Logo from "../images/logo-simplify.png"
 import { HiMenu, HiOutlineLogout } from "react-icons/hi";
 import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
@@ -70,13 +70,17 @@ const Navbar = () => {
                 <Button variant='link' as={Link} to="/scenarios">
                     Scenarios
                 </Button>
-                <Button variant='link' as={Link} to="/scenario-studio">
-                    Scenario Studio
-                </Button>
+
                 {currentUser?.creator &&
+                    <Button variant='link' as={Link} to="/scenario-studio">
+                        Scenario Studio
+                    </Button>
+                    }
+                {currentUser?.staff &&
                     <Button variant='link' as={Link} to="/users">
                         User Management
-                    </Button>}
+                    </Button>
+                }
                 <Button variant='link' as={Link} to="/help">
                     Help
                 </Button>

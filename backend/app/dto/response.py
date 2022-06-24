@@ -44,6 +44,12 @@ class ScenarioStateDTO(BaseModel):
     cost: float
 
 
+class ManagementGoalDTO(BaseModel):
+    budget: float
+    duration: int
+    tasks: int
+
+
 class TasksStatusDTO(BaseModel):
     tasks_todo: int
     tasks_done: int
@@ -58,6 +64,12 @@ class ActionDTO(BaseModel):
     upper_limit: Optional[int] = None
 
 
+class TeamStatsDTO(BaseModel):
+    motivation: float
+    familiarity: float
+    stress: float
+
+
 class ScenarioResponse(BaseModel, ABC):
     """
     This is the abstract response class that provides all data
@@ -67,9 +79,11 @@ class ScenarioResponse(BaseModel, ABC):
     """
 
     type: str
+    management: ManagementGoalDTO
     state: ScenarioStateDTO
     tasks: TasksStatusDTO
     members: List[MemberDTO]
+    team: TeamStatsDTO
     text = ""
 
 

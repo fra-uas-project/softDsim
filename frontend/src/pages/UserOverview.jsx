@@ -126,7 +126,7 @@ const UserOverview = () => {
             <Heading>Users</Heading>
             <Box h={5}></Box>
             <Box backgroundColor="white" borderRadius="2xl" minH="60vh">
-                <Container maxW='4xl' pt={10}>
+                <Container maxW='6xl' pt={10}>
                     <TableContainer>
                         <Table variant='simple' size="lg">
                             <Thead>
