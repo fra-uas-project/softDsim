@@ -82,6 +82,15 @@ const Simulation = () => {
     // save maximum number of task
     const [tasksMax, setTasksMax] = useState(0)
 
+    // default values for actions
+    const [actionDefaultValues, setActionDefaultValues] = useState(
+        {
+            bugfix: false,
+            unittest: false,
+            integrationtest: false
+        }
+    )
+
     const scenarioPath = () => {
         const url = location.pathname;
         const newUrl = url.slice(0, url.lastIndexOf("/"));
@@ -109,6 +118,18 @@ const Simulation = () => {
 
             // write new value into action fragment
             tempSimFragmentActions[event.type] = event.value
+
+            // write new default values
+            if (event.type === 'bugfix' || event.type === 'unittest' || event.type === 'integrationtest') {
+                // create copy of state
+                var tempActionDefaultValues = actionDefaultValues
+
+                // change default values in copy
+                tempActionDefaultValues[event.type] = event.value
+
+                // write copy into state
+                setActionDefaultValues(tempActionDefaultValues)
+            }
 
             // set fragment state
             setSimFragmentActions(tempSimFragmentActions)
@@ -266,11 +287,11 @@ const Simulation = () => {
                 // get all actions from next data object
                 for (const action of nextData.actions) {
                     if (action.action === 'bugfix') {
-                        tempActions.bugfix = false
+                        tempActions.bugfix = actionDefaultValues.bugfix
                     } else if (action.action === 'unittest') {
-                        tempActions.unittest = false
+                        tempActions.unittest = actionDefaultValues.unittest
                     } else if (action.action === 'integrationtest') {
-                        tempActions.integrationtest = false
+                        tempActions.integrationtest = actionDefaultValues.integrationtest
                     } else if (action.action === 'meetings') {
                         tempActions.meetings = action.lower_limit
                     } else if (action.action === 'teamevent') {
@@ -442,7 +463,7 @@ const Simulation = () => {
                                                 <>
                                                     <SkilltypeContainer skillTypeReturn={skillTypeReturn} simValues={simValues} updateSkillTypeObject={updateSkillTypeObject} />
                                                     {simValues.actions.map((action, index) => {
-                                                        return <Action onSelectAction={(event) => handleSelection(event)} key={index + rerender} action={action} />
+                                                        return <Action onSelectAction={(event) => handleSelection(event)} key={index + rerender} action={action} actionDefaultValues={actionDefaultValues} />
                                                     })}
                                                 </>
                                                 : <></>
