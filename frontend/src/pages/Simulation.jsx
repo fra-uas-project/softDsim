@@ -470,10 +470,10 @@ const Simulation = () => {
                                             <GridItem colSpan={1}>
                                                 {/* end simulation button */}
                                                 {
-                                                    ((tasksMax > 0) && (simValues.tasks.tasks_done / tasksMax >= 0.8)) ?
+                                                    (!(currentType === 'RESULT') && (tasksMax > 0) && (simValues.tasks.tasks_done / tasksMax >= 0.8)) ?
                                                         <Button onClick={() => { manualEndSimulation() }}
                                                             colorScheme='blue' size='lg' mt={3} mr={5} w="35%" isLoading={nextIsLoading}>
-                                                            Finish
+                                                            Finish Early
                                                         </Button>
                                                         : <></>
                                                 }
