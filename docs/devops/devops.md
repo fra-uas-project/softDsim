@@ -1,7 +1,7 @@
 ### Zertifikate (if own Domain)
 ```
-certbot run -n -d uas.bspace.xyz,uas.dev.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de
-certbot certonly --standalone -n -d uas.bspace.xyz,dev.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de --dry-run 
+certbot run -n -d uas.bspace.xyz,uas.dev.bspace.xyz,pp.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de
+certbot certonly --standalone -n -d uas.bspace.xyz,dev.uas.bspace.xyz,pp.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de --dry-run 
 ```
 ```
 certbot renew \
