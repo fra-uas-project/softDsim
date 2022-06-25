@@ -2,6 +2,9 @@
 ```
 certbot run -n -d uas.bspace.xyz,uas.dev.bspace.xyz,pp.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de
 certbot certonly --standalone -n -d uas.bspace.xyz,dev.uas.bspace.xyz,pp.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de --dry-run 
+certbot --expand -n -d uas.bspace.xyz,dev.uas.bspace.xyz,pp.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de 
+certbot certonly --cert-name uas.bspace.xyz -d dev.uas.bspace.xyz,pp.uas.bspace.xyz
+
 ```
 ```
 certbot renew \
@@ -29,6 +32,9 @@ fi
 
 ## nginx
 [nginx-digital ocean](https://www.digitalocean.com/community/tools/nginx?domains.0.php.php=false&domains.0.reverseProxy.reverseProxy=true&domains.0.routing.root=false&global.app.lang=de)
+
+https://docs.ispsystem.com/ispmanager-business/troubleshooting-guide/if-nginx-does-not-start-after-rebooting-the-server
+
 ```
 ├── conf.d
 ├── backup
