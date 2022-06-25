@@ -1,14 +1,18 @@
 import math
+import operator
 
 
 from deprecated.classic import deprecated
 from numpy import mean
+from pydantic import BaseModel
 
+from app.dto.response import EventResponse
+from app.models.event import Event
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
 from app.models.model_selection import ModelSelection
-from app.models.task import Task
-from app.models.team import Member
+from app.models.task import Task, CachedTasks
+from app.models.team import Member, Team
 from app.models.user_scenario import UserScenario
 
 
@@ -145,10 +149,84 @@ class WorkpackStatus:
     #         self.remaining_trainings = 0
 
 
-def event_triggered(scenario):
+def adjust_team_stress(scenario, event_effect):
+    members = Member.objects.filter(team_id=scenario.team.id)
+    for member in members:
+        member.stress = min(member.stress + event_effect.change, 1)
+    Member.objects.bulk_update(members, ["stress"])
 
-    x = 5
+
+def adjust_team_motivation(scenario, event_effect):
+    members = Member.objects.filter(team_id=scenario.team.id)
+    for member in members:
+        member.motivation = min(member.motivation + event_effect.change, 1)
+    Member.objects.bulk_update(members, ["motivation"])
+
+
+def adjust_team_familiarity(scenario, event_effect):
+    members = Member.objects.filter(team_id=scenario.team.id)
+    for member in members:
+        member.familiarity = min(member.familiarity + event_effect.change, 1)
+    Member.objects.bulk_update(members, ["familiarity"])
+
+
+def adjust_budget(scenario, event_effect):
+    pass
+
+
+def add_tasks(scenario, event_effect):
+    """Currently we only add tasks via an event effect - we could also add the option to remove tasks through an event in the future"""
+    tasks = [
+        Task(difficulty=event_effect.task_difficulty, user_scenario=scenario)
+        for _ in range(int(event_effect.change))
+    ]
+    Task.objects.bulk_create(tasks)
+
+
+class EventEffectDTO(BaseModel):
+    change: float
+    task_difficulty: int = 0
+
+
+def event_triggered(scenario, tasks: CachedTasks):
+
+    trigger_types = {
+        "motivation": scenario.team.motivation(),
+        "tasks_done": len(tasks.done()),
+        "time": scenario.state.day,
+        "stress": scenario.team.stress(),
+        "cost": scenario.state.cost,
+    }
+
+    effect_types = {
+        "stress": adjust_team_stress,
+        "motivation": adjust_team_motivation,
+        "familiarity": adjust_team_familiarity,
+        "tasks": add_tasks,
+        "budget": adjust_budget,
+    }
+
     # get all events
-    events = scenario.template.events.values()
+    events = Event.objects.filter(template_scenario_id=scenario.template.id)
 
-    return False
+    for event in events:
+
+        compare = operator.le if event.trigger_comparator == "le" else operator.ge
+
+        if (
+            compare(trigger_types[event.trigger_type], event.trigger_value)
+            and not event.has_occurred
+        ):
+            # event condition is triggered
+            event_effect = EventEffectDTO(
+                change=event.effect_value, task_difficulty=event.task_difficulty
+            )
+
+            # handle event effect
+            effect_types[event.effect_type](scenario, event_effect)
+
+            event.has_occurred = True
+            event.save()
+            return event
+
+    return None

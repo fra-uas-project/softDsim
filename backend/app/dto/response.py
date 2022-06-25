@@ -118,3 +118,8 @@ class ResultResponse(ScenarioResponse):
 class ModelSelectionResponse(ScenarioResponse):
     type: str = "MODEL"
     models: List[str]
+
+
+class EventResponse(ScenarioResponse):
+    type: str = "EVENT"
+    event_text: str

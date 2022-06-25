@@ -8,11 +8,13 @@ class Event(models.Model):
     #     abstract = True
 
     text = models.TextField()
-    trigger_type = (models.TextField(max_length=64, null=True, blank=True),)
+    trigger_type = models.TextField(max_length=64, null=True, blank=True)
     trigger_value = models.FloatField(null=True, blank=True)
+    trigger_comparator = models.TextField(max_length=2, null=True, blank=True)
     effect_type = models.TextField(max_length=64, null=True, blank=True)
     effect_value = models.FloatField(null=True, blank=True)
-    has_occured = models.BooleanField(default=False)
+    task_difficulty = models.PositiveSmallIntegerField(default=1, null=True, blank=True)
+    has_occurred = models.BooleanField(default=False)
 
     template_scenario = models.ForeignKey(
         TemplateScenario,

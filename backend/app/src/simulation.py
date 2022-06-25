@@ -11,6 +11,7 @@ from app.dto.response import (
     QuestionResponse,
     ScenarioResponse,
     ResultResponse,
+    EventResponse,
 )
 from app.exceptions import (
     SimulationException,
@@ -20,6 +21,7 @@ from app.exceptions import (
     RequestTypeMismatchException,
     TooManyMeetingsException,
 )
+from app.models.event import Event
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
 from app.models.user_scenario import UserScenario
@@ -55,7 +57,7 @@ from app.src.util.scenario_util import get_actions_from_fragment
 from history.write import write_history
 
 
-def simulate(req, scenario: UserScenario) -> None:
+def simulate(req, scenario: UserScenario, tasks: CachedTasks) -> None:
     """This function does the actual simulation of a scenario fragment."""
     if req.actions is None:
         raise RequestActionException()
@@ -99,7 +101,7 @@ def simulate(req, scenario: UserScenario) -> None:
                     raise SimulationException(msg)
 
     # Simulate what happens
-    tasks = CachedTasks(scenario_id=scenario.id)  # Read tasks once
+
     # team event
     if req.actions.teamevent:
         days = days - 1
@@ -133,6 +135,7 @@ def simulate(req, scenario: UserScenario) -> None:
             member.save()
     scenario.save()
     tasks.save()  # Save all tasks once at the end of the simulation
+    # todo: why does tasks.save() take so long?
 
 
 def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
@@ -158,6 +161,8 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     if not request_type_matches_previous_response_type(scenario, req):
         raise RequestTypeMismatchException(req.type)
 
+    tasks = CachedTasks(scenario_id=scenario.id)  # Read tasks once
+
     # 1.3 handle the request data
     request_handling_mapper = {
         "SIMULATION": simulate,
@@ -166,12 +171,26 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
         "START": handle_start_request,
         # todo philip: add event handler
     }
-    request_handling_mapper[req.type](req, scenario)
+    # temp workaround (simulate needs tasks as arguments but other methods do not - haven't found a better way yet_
+    if req.type == "SIMULATION":
+        simulate(req, scenario, tasks)
+    else:
+        request_handling_mapper[req.type](req, scenario)
 
-    # check if event occured
+    # check if event occurred
     # check if this event already happened (bool for every event in db -> set 'happened' to true if event happened)
-    if event_triggered(scenario):
-        return
+    event = event_triggered(scenario, tasks)
+    if isinstance(event, Event):
+        scenario_response = EventResponse(
+            event_text=event.text,
+            management=scenario.get_management_goal_dto(),
+            tasks=get_tasks_status(scenario.id),
+            state=get_scenario_state_dto(scenario),
+            members=get_member_report(scenario.team.id),
+            team=scenario.team.stats(),
+        )
+
+        return complete_scenario_step(scenario, req, scenario_response)
 
     # 2. Check if Simulation Fragment ended
     # if fragment ended -> increase counter -> next component will be loaded in next step
@@ -225,11 +244,15 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
             text=next_component.text,
         )
 
+    return complete_scenario_step(scenario, req, scenario_response)
+
+
+def complete_scenario_step(scenario, req, scenario_response):
     write_history(scenario, req, scenario_response.type)
 
     # increase counter
     increase_scenario_step_counter(scenario)
-    if scenario_response.type != "SIMULATION":
+    if scenario_response.type != "SIMULATION" and scenario_response.type != "EVENT":
         increase_scenario_component_counter(scenario)
     scenario.save()
     return scenario_response
