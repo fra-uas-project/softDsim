@@ -27,6 +27,7 @@ from app.models.task import CachedTasks, Task
 from app.models.model_selection import ModelSelection
 from app.src.util.question_util import get_question_collection, handle_question_answers
 from app.src.util.scenario_util import (
+    handle_end_request,
     handle_model_request,
     handle_start_request,
     request_type_matches_previous_response_type,
@@ -163,6 +164,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
         "QUESTION": handle_question_answers,
         "MODEL": handle_model_request,
         "START": handle_start_request,
+        "END": handle_end_request,
     }
     request_handling_mapper[req.type](req, scenario)
 
