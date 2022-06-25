@@ -23,6 +23,9 @@ def find_next_scenario_component(scenario: UserScenario):
     """
     # todo: find better solution
 
+    if end_of_simulation(scenario):
+        scenario.ended = True
+
     # add all components here
     components = [QuestionCollection, SimulationFragment, ModelSelection]
     query = dict(
@@ -33,7 +36,12 @@ def find_next_scenario_component(scenario: UserScenario):
     for component in components:
         if component.objects.filter(**query).exists():
             # return the next component instance -> gets checked with isinstance() in continue_simulation function
-            return component.objects.get(**query)
+            fetched_component = component.objects.get(**query)
+            # if scenario ended, we will skip any simulation fragments
+            if scenario.ended and isinstance(fetched_component, SimulationFragment):
+                scenario.state.component_counter += 1
+                return find_next_scenario_component(scenario)
+            return fetched_component
 
     # send ResultResponse when scenario is finished
 

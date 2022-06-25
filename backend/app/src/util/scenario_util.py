@@ -1,5 +1,6 @@
 from typing import List
 from app.dto.request import (
+    EndRequest,
     ScenarioRequest,
     SimulationRequest,
     QuestionRequest,
@@ -40,6 +41,7 @@ def create_correct_request_model(request) -> ScenarioRequest:
         "QUESTION": QuestionRequest,
         "MODEL": ModelRequest,
         "START": StartRequest,
+        "END": EndRequest,
     }
     for key, value in request_types.items():
         if request.data.get("type") == key:
@@ -54,6 +56,10 @@ def handle_model_request(req, scenario):
 
 def handle_start_request(req, scenario):
     pass
+
+
+def handle_end_request(req, scenario):
+    scenario.ended = True
 
 
 def get_actions_from_fragment(next_component) -> List[ActionDTO]:
@@ -78,4 +84,4 @@ def request_type_matches_previous_response_type(scenario, req) -> bool:
     history = History.objects.get(
         user_scenario_id=scenario.id, step_counter=scenario.state.step_counter - 1
     )
-    return req.type == history.response_type
+    return req.type == history.response_type or req.type == "END"  # END is always ok
