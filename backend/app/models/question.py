@@ -8,6 +8,7 @@ class Question(models.Model):
     text = models.TextField()
     question_index = models.PositiveIntegerField()
     multi = models.BooleanField()
+    explanation = models.TextField(default="", blank=True, null=True)
 
     question_collection = models.ForeignKey(
         QuestionCollection,
