@@ -172,7 +172,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
         "MODEL": handle_model_request,
         "START": handle_start_request,
         "EVENT": handle_event_request,
-        "END": handle_end_request,
+        "END": handle_end_request
     }
     # temp workaround (simulate needs tasks as arguments but other methods do not - haven't found a better way yet_
     if req.type == "SIMULATION":
