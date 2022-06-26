@@ -32,6 +32,7 @@ from app.src.util.scenario_util import (
     handle_model_request,
     handle_start_request,
     request_type_matches_previous_response_type,
+    handle_event_request,
 )
 from app.src.util.task_util import get_tasks_status
 from app.src.util.member_util import get_member_report
@@ -169,7 +170,7 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
         "QUESTION": handle_question_answers,
         "MODEL": handle_model_request,
         "START": handle_start_request,
-        # todo philip: add event handler
+        "EVENT": handle_event_request,
     }
     # temp workaround (simulate needs tasks as arguments but other methods do not - haven't found a better way yet_
     if req.type == "SIMULATION":

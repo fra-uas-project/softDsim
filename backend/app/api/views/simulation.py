@@ -74,7 +74,15 @@ class StartUserScenarioView(APIView):
             user_scenario.save()
 
             # Create ScenarioState
-            state = ScenarioState(user_scenario=user_scenario)
+            state = ScenarioState(
+                user_scenario=user_scenario,
+                budget=template.management_goal.budget,
+                total_tasks=(
+                    template.management_goal.easy_tasks
+                    + template.management_goal.medium_tasks
+                    + template.management_goal.hard_tasks
+                ),
+            )
             state.save()
 
             # Create Team

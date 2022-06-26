@@ -152,26 +152,39 @@ class WorkpackStatus:
 def adjust_team_stress(scenario, event_effect):
     members = Member.objects.filter(team_id=scenario.team.id)
     for member in members:
-        member.stress = min(member.stress + event_effect.change, 1)
+        member.stress = (
+            min(member.stress + event_effect.change, 1)
+            if min(member.stress + event_effect.change, 1) >= 0
+            else 0
+        )
     Member.objects.bulk_update(members, ["stress"])
 
 
 def adjust_team_motivation(scenario, event_effect):
     members = Member.objects.filter(team_id=scenario.team.id)
     for member in members:
-        member.motivation = min(member.motivation + event_effect.change, 1)
+        member.motivation = (
+            min(member.motivation + event_effect.change, 1)
+            if min(member.motivation + event_effect.change, 1) >= 0
+            else 0
+        )
     Member.objects.bulk_update(members, ["motivation"])
 
 
 def adjust_team_familiarity(scenario, event_effect):
     members = Member.objects.filter(team_id=scenario.team.id)
     for member in members:
-        member.familiarity = min(member.familiarity + event_effect.change, 1)
+        member.familiarity = (
+            min(member.familiarity + event_effect.change, 1)
+            if min(member.familiarity + event_effect.change, 1) >= 0
+            else 0
+        )
     Member.objects.bulk_update(members, ["familiarity"])
 
 
 def adjust_budget(scenario, event_effect):
-    pass
+    scenario.state.budget += event_effect.change
+    scenario.state.save()
 
 
 def add_tasks(scenario, event_effect):
@@ -181,6 +194,8 @@ def add_tasks(scenario, event_effect):
         for _ in range(int(event_effect.change))
     ]
     Task.objects.bulk_create(tasks)
+    scenario.state.total_tasks += event_effect.change
+    scenario.state.save()
 
 
 class EventEffectDTO(BaseModel):

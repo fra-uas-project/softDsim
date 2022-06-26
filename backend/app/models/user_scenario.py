@@ -44,6 +44,9 @@ class ScenarioState(models.Model):
     cost = models.FloatField(default=0)
     day = models.IntegerField(default=0)
 
+    budget = models.IntegerField(default=0)
+    total_tasks = models.IntegerField(default=0)
+
     user_scenario = models.OneToOneField(
         UserScenario,
         on_delete=models.CASCADE,

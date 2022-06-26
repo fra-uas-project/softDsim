@@ -42,6 +42,8 @@ class ScenarioStateDTO(BaseModel):
     step_counter: int
     day: int
     cost: float
+    budget: int
+    total_tasks: int
 
 
 class ManagementGoalDTO(BaseModel):

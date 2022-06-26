@@ -5,6 +5,7 @@ from app.dto.request import (
     QuestionRequest,
     ModelRequest,
     StartRequest,
+    EventRequest,
 )
 from app.dto.response import ActionDTO
 from app.models.user_scenario import UserScenario
@@ -40,6 +41,7 @@ def create_correct_request_model(request) -> ScenarioRequest:
         "QUESTION": QuestionRequest,
         "MODEL": ModelRequest,
         "START": StartRequest,
+        "EVENT": EventRequest,
     }
     for key, value in request_types.items():
         if request.data.get("type") == key:
@@ -53,6 +55,10 @@ def handle_model_request(req, scenario):
 
 
 def handle_start_request(req, scenario):
+    pass
+
+
+def handle_event_request(req, scenario):
     pass
 
 
