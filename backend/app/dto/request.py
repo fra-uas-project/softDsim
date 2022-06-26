@@ -70,10 +70,13 @@ class StartRequest(ScenarioRequest):
 
 class EventRequest(ScenarioRequest):
     """
-    Currently StartRequest only needs the fields it inherits from Scenario Request.
+    Currently EventRequest only needs the fields it inherits from Scenario Request.
     In the future we might need more fields.
     """
 
 
 class EndRequest(ScenarioRequest):
-    """not finished, just shell"""
+    """
+    Currently EndRequest only needs the fields it inherits from Scenario Request.
+    In the future we might need more fields.
+    """

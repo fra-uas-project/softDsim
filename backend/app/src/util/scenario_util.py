@@ -43,7 +43,7 @@ def create_correct_request_model(request) -> ScenarioRequest:
         "MODEL": ModelRequest,
         "START": StartRequest,
         "END": EndRequest,
-        "EVENT": EventRequest
+        "EVENT": EventRequest,
     }
     for key, value in request_types.items():
         if request.data.get("type") == key:
