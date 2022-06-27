@@ -17,6 +17,7 @@ import {
     ModalOverlay,
     Skeleton,
     Spacer,
+    Tooltip,
     useDisclosure,
 } from "@chakra-ui/react";
 import { HiChevronRight } from "react-icons/hi";
@@ -491,10 +492,18 @@ const Simulation = () => {
                                             <GridItem colSpan={1}>
                                                 {/* end simulation button */}
                                                 {
-                                                    (!(currentType === 'RESULT') && (tasksMax > 0) && (simValues.tasks.tasks_done / tasksMax >= 0.8)) ?
+                                                    (!(currentType === 'RESULT') && (tasksMax > 0) && (
+                                                        (
+                                                            simValues.tasks.tasks_bug +
+                                                            simValues.tasks.tasks_done +
+                                                            simValues.tasks.tasks_integration_tested +
+                                                            simValues.tasks.tasks_unit_tested
+                                                        ) / tasksMax >= 0.8)) ?
                                                         <Button onClick={() => { manualEndSimulation() }}
                                                             colorScheme='blue' size='lg' mt={3} mr={5} w="35%" isLoading={nextIsLoading}>
-                                                            Finish Early
+                                                            <Tooltip label={'The simulation can be finished early, after completing 80% of tasks. This might be useful, when a project is more time reliant.'} aria-label='A tooltip' placement="top">
+                                                                Finish Early
+                                                            </Tooltip>
                                                         </Button>
                                                         : <></>
                                                 }
