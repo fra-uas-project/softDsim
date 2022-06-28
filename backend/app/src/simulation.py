@@ -10,6 +10,7 @@ from app.dto.response import (
     QuestionResponse,
     ScenarioResponse,
     ResultResponse,
+    EventResponse,
 )
 from app.exceptions import (
     SimulationException,
@@ -18,6 +19,7 @@ from app.exceptions import (
     RequestTypeMismatchException,
     TooManyMeetingsException,
 )
+from app.models.event import Event
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
 from app.models.model_selection import ModelSelection
@@ -27,6 +29,8 @@ from app.src.util.scenario_util import (
     handle_model_request,
     handle_start_request,
     request_type_matches_previous_response_type,
+    handle_event_request,
+    get_effects_from_event,
 )
 from app.src.util.task_util import get_tasks_status
 from app.src.util.member_util import get_member_report
@@ -40,6 +44,7 @@ from app.src.util.simulation_util import (
     end_of_fragment,
     find_next_scenario_component,
     WorkpackStatus,
+    event_triggered,
 )
 from app.models.team import SkillType
 from app.models.team import Member
@@ -166,11 +171,29 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
         "QUESTION": handle_question_answers,
         "MODEL": handle_model_request,
         "START": handle_start_request,
+        "EVENT": handle_event_request,
         "END": handle_end_request,
     }
     start = time.perf_counter()
     request_handling_mapper[req.type](req, session)
     logging.warning(f"Mapper func took {time.perf_counter() - start} seconds.")
+
+    # check if event occurred
+    # check if this event already happened (bool for every event in db -> set 'happened' to true if event happened)
+    event = event_triggered(session)
+    if isinstance(event, Event):
+        scenario_response = EventResponse(
+            event_text=event.text,  # todo philip: don't know which one frontend wants to use, can delete one of the two text fields later
+            text=event.text,
+            effects=get_effects_from_event(event),
+            management=session.scenario.get_management_goal_dto(),
+            tasks=get_tasks_status(session.scenario.id),
+            state=get_scenario_state_dto(session.scenario),
+            members=get_member_report(session.scenario.team.id),
+            team=session.scenario.team.stats(),
+        )
+
+        return complete_scenario_step(session, req, scenario_response)
 
     # 2. Check if Simulation Fragment ended
     # if fragment ended -> increase counter -> next component will be loaded in next step
@@ -224,10 +247,14 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
             text=next_component.text,
         )
 
+    return complete_scenario_step(session, req, scenario_response)
+
+
+def complete_scenario_step(session: CachedScenario, req, scenario_response):
     write_history(session.scenario, req, scenario_response.type)
 
     # increase counter
     increase_scenario_step_counter(session.scenario)
-    if scenario_response.type != "SIMULATION":
+    if scenario_response.type not in ("SIMULATION", "EVENT"):
         increase_scenario_component_counter(session.scenario)
     return scenario_response

@@ -21,3 +21,4 @@ class TemplateScenario(models.Model):
     story = models.TextField(default="", max_length=65536, blank=True)
     # questions: List[Questions] -> ForeignKey Reference in Questions Model
     # simulation = Simulation -> ForeignKey Reference in Simulation Model
+    # events = Event -> FK in Event Model

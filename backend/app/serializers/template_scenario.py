@@ -5,6 +5,7 @@ from rest_framework import serializers
 from app.exceptions import IndexException
 from app.models.action import Action
 from app.models.answer import Answer
+from app.models.event import Event, EventEffect
 from app.models.model_selection import ModelSelection
 from app.models.management_goal import ManagementGoal
 from app.models.question import Question
@@ -13,6 +14,7 @@ from app.models.score_card import ScoreCard
 from app.models.simulation_end import SimulationEnd
 from app.models.simulation_fragment import SimulationFragment
 from app.models.template_scenario import TemplateScenario
+from app.serializers.event import EventSerializer
 from app.serializers.management_goal import ManagementGoalSerializer
 from app.serializers.question_collection import QuestionCollectionSerializer
 from app.serializers.model_selection import ModelSelectionSerializer
@@ -27,6 +29,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
     simulation_fragments = SimulationFragmentSerializer(many=True)
     model_selections = ModelSelectionSerializer(many=True)
     score_card = ScoreCardSerializer()
+    events = EventSerializer(many=True)
 
     class Meta:
         model = TemplateScenario
@@ -39,6 +42,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
             "simulation_fragments",
             "model_selections",
             "score_card",
+            "events",
         )
 
     def create(self, validated_data, _id=None):
@@ -58,6 +62,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
         simulation_fragments_data = validated_data.pop("simulation_fragments")
         model_selections_data = validated_data.pop("model_selections")
         score_card_data = validated_data.pop("score_card")
+        events_data = validated_data.pop("events")
 
         # 0. create template scenario
         # this if is when the create method gets called by the update method
@@ -129,6 +134,16 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
                 **model_selection, template_scenario=template_scenario
             )
 
+        # 6. create event
+        for event in events_data:
+
+            effect_data = event.pop("effects")
+
+            e = Event.objects.create(template_scenario=template_scenario, **event)
+
+            for effect in effect_data:
+                EventEffect.objects.create(event=e, **effect)
+
         return template_scenario
 
     def update(self, instance, validated_data):
@@ -148,4 +163,3 @@ class ReducedTemplateScenarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = TemplateScenario
         fields = ("id", "name", "story")
-

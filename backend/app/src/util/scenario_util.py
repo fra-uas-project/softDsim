@@ -7,8 +7,9 @@ from app.dto.request import (
     QuestionRequest,
     ModelRequest,
     StartRequest,
+    EventRequest,
 )
-from app.dto.response import ActionDTO
+from app.dto.response import ActionDTO, EffectsDto
 from app.models.user_scenario import UserScenario
 from history.models.history import History
 
@@ -43,6 +44,7 @@ def create_correct_request_model(request) -> ScenarioRequest:
         "MODEL": ModelRequest,
         "START": StartRequest,
         "END": EndRequest,
+        "EVENT": EventRequest,
     }
     for key, value in request_types.items():
         if request.data.get("type") == key:
@@ -61,6 +63,14 @@ def handle_start_request(req, session: CachedScenario):
 
 def handle_end_request(req, session: CachedScenario):
     session.scenario.ended = True
+
+
+def handle_event_request(req, scenario):
+    pass
+
+
+def handle_end_request(req, scenario):
+    scenario.ended = True
 
 
 def get_actions_from_fragment(next_component) -> List[ActionDTO]:
@@ -86,3 +96,21 @@ def request_type_matches_previous_response_type(scenario, req) -> bool:
         user_scenario_id=scenario.id, step_counter=scenario.state.step_counter - 1
     )
     return req.type == history.response_type or req.type == "END"  # END is always ok
+
+
+def get_effects_from_event(event):
+    return [
+        EffectsDto(
+            type=e.get("type"),
+            value=e.get("value"),
+            easy_tasks=e.get("easy_tasks"),
+            medium_tasks=e.get("medium_tasks"),
+            hard_tasks=e.get("hard_tasks"),
+        )
+        for e in event.effects.values()
+    ]
+
+    value: float
+    easy_tasks: int
+    medium_tasks: int
+    hard_tasks: int
