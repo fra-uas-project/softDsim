@@ -42,7 +42,7 @@ const TaskLineChart = ({title, data}) => {
         stroke: {
             curve: 'smooth',
         },
-        colors: ['#4299E1', "#63B3ED", "#90CDF4", "#000000"],
+        colors: ["#90CDF4", "#218ADB", '#363999', "#ff9d9d"],
     }
 
 
