@@ -355,7 +355,7 @@ const Simulation = () => {
         // open story only if there is a story and if it is not the same story as before
         if (simValues.text && simValues.text !== simValuesBefore.text) {
             onStoryOpen();
-            setStory(story + "\n" + simValues.text)
+            setStory(story + "\n---\n" + simValues.text)
         }
 
     }, [simValues])
