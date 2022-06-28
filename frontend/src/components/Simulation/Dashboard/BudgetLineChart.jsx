@@ -80,8 +80,8 @@ const LineChart = ({title, data}) => {
         if(data.type === "SIMULATION" || data.type === "RESULT") {
             setSeries(
                 (draft) => {
-                    draft[0].data.push(data.state.cost)
-                    draft[1].data.push(linearCost)
+                    draft[0].data.push(parseFloat(data.state.cost).toFixed(2))
+                    draft[1].data.push(parseFloat(linearCost).toFixed(2))
                 })
             setLinearCost(parseFloat(linearCost) + parseFloat((data.management.budget / (data.management.duration / 5)).toFixed(2)))
         }
