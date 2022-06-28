@@ -223,6 +223,7 @@ def handle_question(data, scenario: TemplateScenario, i):
             question_collection=qc,
             text=question_data.get("text", ""),
             multi=question_data.get("type") == "MULTI",
+            explanation=question_data.get("explanation", ""),
         )
         q.save()
 
