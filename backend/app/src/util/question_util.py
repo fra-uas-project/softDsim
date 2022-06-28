@@ -1,4 +1,5 @@
 import logging
+from app.cache.scenario import CachedScenario
 
 from app.dto.response import QuestionCollectionDTO
 from app.models.answer import Answer
@@ -23,14 +24,16 @@ def get_question_collection(scenario):
     return QuestionCollectionDTO(**data)
 
 
-def handle_question_answers(req, scenario):
+def handle_question_answers(req, session: CachedScenario):
     """Adds points to the user scenario for each question answer."""
     try:
         for q in req.question_collection.questions:
             selected_answers = Answer.objects.filter(
                 id__in=[a.id for a in q.answers if a.answer]
             )
-            scenario.question_points += sum([a.points for a in selected_answers])
+            session.scenario.question_points += sum(
+                [a.points for a in selected_answers]
+            )
     except Exception as e:
         logging.warning(
             f"{e.__class__.__name__} occurred when handling question answers"

@@ -1,4 +1,5 @@
 from typing import List
+from app.cache.scenario import CachedScenario
 from app.dto.request import (
     EndRequest,
     ScenarioRequest,
@@ -49,17 +50,17 @@ def create_correct_request_model(request) -> ScenarioRequest:
             return a
 
 
-def handle_model_request(req, scenario):
+def handle_model_request(req, session: CachedScenario):
     # todo: we could implement a check here to see if the model in the request is actually available in the scenario, but the frontend should only diplay the available options anyway
-    UserScenario.objects.filter(id=scenario.id).update(model=req.model.upper())
+    UserScenario.objects.filter(id=session.scenario.id).update(model=req.model.upper())
 
 
-def handle_start_request(req, scenario):
+def handle_start_request(req, session: CachedScenario):
     pass
 
 
-def handle_end_request(req, scenario):
-    scenario.ended = True
+def handle_end_request(req, session: CachedScenario):
+    session.scenario.ended = True
 
 
 def get_actions_from_fragment(next_component) -> List[ActionDTO]:

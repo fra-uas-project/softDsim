@@ -3,6 +3,7 @@ import math
 
 from deprecated.classic import deprecated
 from numpy import mean
+from app.cache.scenario import CachedScenario
 
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
@@ -15,14 +16,13 @@ from app.models.user_scenario import UserScenario
 from history.util.result import get_result_response
 
 
-def find_next_scenario_component(scenario: UserScenario):
+def find_next_scenario_component(session: CachedScenario):
     """
     Function to find next component in a scenario by component-index depending on the current counter.
     If no next component can be found, it will return a ResultReponse
     This is probably not a fast way of finding the next component and should be replaced by a better system.
     """
-    # todo: find better solution
-
+    scenario = session.scenario
     if end_of_simulation(scenario):
         scenario.ended = True
 
@@ -40,12 +40,12 @@ def find_next_scenario_component(scenario: UserScenario):
             # if scenario ended, we will skip any simulation fragments
             if scenario.ended and isinstance(fetched_component, SimulationFragment):
                 scenario.state.component_counter += 1
-                return find_next_scenario_component(scenario)
+                return find_next_scenario_component(session)
             return fetched_component
 
     # send ResultResponse when scenario is finished
 
-    return get_result_response(scenario)
+    return get_result_response(session)
 
 
 def end_of_fragment(scenario) -> bool:
