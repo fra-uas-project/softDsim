@@ -72,6 +72,14 @@ class TeamStatsDTO(BaseModel):
     stress: float
 
 
+class EffectsDto(BaseModel):
+    type: str
+    value: float
+    easy_tasks: int
+    medium_tasks: int
+    hard_tasks: int
+
+
 class ScenarioResponse(BaseModel, ABC):
     """
     This is the abstract response class that provides all data
@@ -125,3 +133,4 @@ class ModelSelectionResponse(ScenarioResponse):
 class EventResponse(ScenarioResponse):
     type: str = "EVENT"
     event_text: str
+    effects: List[EffectsDto]

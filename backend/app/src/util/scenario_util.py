@@ -8,7 +8,7 @@ from app.dto.request import (
     StartRequest,
     EventRequest,
 )
-from app.dto.response import ActionDTO
+from app.dto.response import ActionDTO, EffectsDto
 from app.models.user_scenario import UserScenario
 from history.models.history import History
 
@@ -95,3 +95,21 @@ def request_type_matches_previous_response_type(scenario, req) -> bool:
         user_scenario_id=scenario.id, step_counter=scenario.state.step_counter - 1
     )
     return req.type == history.response_type or req.type == "END"  # END is always ok
+
+
+def get_effects_from_event(event):
+    return [
+        EffectsDto(
+            type=e.get("type"),
+            value=e.get("value"),
+            easy_tasks=e.get("easy_tasks"),
+            medium_tasks=e.get("medium_tasks"),
+            hard_tasks=e.get("hard_tasks"),
+        )
+        for e in event.effects.values()
+    ]
+
+    value: float
+    easy_tasks: int
+    medium_tasks: int
+    hard_tasks: int

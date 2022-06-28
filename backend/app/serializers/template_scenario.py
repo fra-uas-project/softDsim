@@ -5,7 +5,7 @@ from rest_framework import serializers
 from app.exceptions import IndexException
 from app.models.action import Action
 from app.models.answer import Answer
-from app.models.event import Event
+from app.models.event import Event, EventEffect
 from app.models.model_selection import ModelSelection
 from app.models.management_goal import ManagementGoal
 from app.models.question import Question
@@ -136,7 +136,13 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
 
         # 6. create event
         for event in events_data:
-            Event.objects.create(template_scenario=template_scenario, **event)
+
+            effect_data = event.pop("effects")
+
+            e = Event.objects.create(template_scenario=template_scenario, **event)
+
+            for effect in effect_data:
+                EventEffect.objects.create(event=e, **effect)
 
         return template_scenario
 

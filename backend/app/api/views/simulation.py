@@ -26,7 +26,7 @@ from app.models.scenario import ScenarioConfig
 from app.models.team import Team
 from app.models.template_scenario import TemplateScenario
 
-from app.models.user_scenario import ScenarioState, UserScenario
+from app.models.user_scenario import ScenarioState, UserScenario, EventStatus
 from app.models.task import Task
 from app.serializers.user_scenario import UserScenarioSerializer
 from app.serializers.team import MemberSerializer
@@ -84,6 +84,11 @@ class StartUserScenarioView(APIView):
                 ),
             )
             state.save()
+
+            for event in template.events.all():
+                EventStatus.objects.create(
+                    event_id=event.id, has_happened=False, state_id=state.id
+                )
 
             # Create Team
             team = Team(user_scenario=user_scenario)

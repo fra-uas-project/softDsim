@@ -17,7 +17,6 @@ from app.exceptions import (
     SimulationException,
     RequestTypeException,
     RequestActionException,
-    RequestMembersException,
     RequestTypeMismatchException,
     TooManyMeetingsException,
 )
@@ -34,6 +33,7 @@ from app.src.util.scenario_util import (
     handle_start_request,
     request_type_matches_previous_response_type,
     handle_event_request,
+    get_effects_from_event,
 )
 from app.src.util.task_util import get_tasks_status
 from app.src.util.member_util import get_member_report
@@ -185,7 +185,9 @@ def continue_simulation(scenario: UserScenario, req) -> ScenarioResponse:
     event = event_triggered(scenario, tasks)
     if isinstance(event, Event):
         scenario_response = EventResponse(
-            event_text=event.text,
+            event_text=event.text,  # todo philip: don't know which one frontend wants to use, can delete one of the two text fields later
+            text=event.text,
+            effects=get_effects_from_event(event),
             management=scenario.get_management_goal_dto(),
             tasks=get_tasks_status(scenario.id),
             state=get_scenario_state_dto(scenario),

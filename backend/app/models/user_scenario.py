@@ -55,3 +55,19 @@ class ScenarioState(models.Model):
         null=True,
         blank=True,
     )
+
+    # events_happened = List[EventsHappened]
+
+
+class EventStatus(models.Model):
+
+    event_id = models.IntegerField()
+    has_happened = models.BooleanField(default=False)
+
+    state = models.ForeignKey(
+        ScenarioState,
+        on_delete=models.CASCADE,
+        related_name="event_status",
+        null=True,
+        blank=True,
+    )

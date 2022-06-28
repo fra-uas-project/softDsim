@@ -13,8 +13,7 @@ from app.models.simulation_fragment import SimulationFragment
 from app.models.model_selection import ModelSelection
 from app.models.task import Task, CachedTasks
 from app.models.team import Member, Team
-from app.models.user_scenario import UserScenario
-
+from app.models.user_scenario import UserScenario, EventStatus
 
 from history.util.result import get_result_response
 
@@ -161,8 +160,8 @@ def adjust_team_stress(scenario, event_effect):
     members = Member.objects.filter(team_id=scenario.team.id)
     for member in members:
         member.stress = (
-            min(member.stress + event_effect.change, 1)
-            if min(member.stress + event_effect.change, 1) >= 0
+            min(member.stress + event_effect.value, 1)
+            if min(member.stress + event_effect.value, 1) >= 0
             else 0
         )
     Member.objects.bulk_update(members, ["stress"])
@@ -172,8 +171,8 @@ def adjust_team_motivation(scenario, event_effect):
     members = Member.objects.filter(team_id=scenario.team.id)
     for member in members:
         member.motivation = (
-            min(member.motivation + event_effect.change, 1)
-            if min(member.motivation + event_effect.change, 1) >= 0
+            min(member.motivation + event_effect.value, 1)
+            if min(member.motivation + event_effect.value, 1) >= 0
             else 0
         )
     Member.objects.bulk_update(members, ["motivation"])
@@ -183,32 +182,44 @@ def adjust_team_familiarity(scenario, event_effect):
     members = Member.objects.filter(team_id=scenario.team.id)
     for member in members:
         member.familiarity = (
-            min(member.familiarity + event_effect.change, 1)
-            if min(member.familiarity + event_effect.change, 1) >= 0
+            min(member.familiarity + event_effect.value, 1)
+            if min(member.familiarity + event_effect.value, 1) >= 0
             else 0
         )
     Member.objects.bulk_update(members, ["familiarity"])
 
 
 def adjust_budget(scenario, event_effect):
-    scenario.state.budget += event_effect.change
+    scenario.state.budget += event_effect.value
     scenario.state.save()
 
 
 def add_tasks(scenario, event_effect):
     """Currently we only add tasks via an event effect - we could also add the option to remove tasks through an event in the future"""
     tasks = [
-        Task(difficulty=event_effect.task_difficulty, user_scenario=scenario)
-        for _ in range(int(event_effect.change))
+        Task(difficulty=1, user_scenario=scenario)
+        for _ in range(event_effect.easy_tasks)
+    ]
+    tasks += [
+        Task(difficulty=2, user_scenario=scenario)
+        for _ in range(event_effect.medium_tasks)
+    ]
+    tasks += [
+        Task(difficulty=3, user_scenario=scenario)
+        for _ in range(event_effect.hard_tasks)
     ]
     Task.objects.bulk_create(tasks)
-    scenario.state.total_tasks += event_effect.change
+    scenario.state.total_tasks += (
+        event_effect.easy_tasks + event_effect.medium_tasks + event_effect.hard_tasks
+    )
     scenario.state.save()
 
 
 class EventEffectDTO(BaseModel):
-    change: float
-    task_difficulty: int = 0
+    value: float = 0
+    easy_tasks: int = 0
+    medium_tasks: int = 0
+    hard_tasks: int = 0
 
 
 def event_triggered(scenario, tasks: CachedTasks):
@@ -230,26 +241,35 @@ def event_triggered(scenario, tasks: CachedTasks):
     }
 
     # get all events
-    events = Event.objects.filter(template_scenario_id=scenario.template.id)
+    events = Event.objects.filter(
+        template_scenario_id=scenario.template.id
+    ).prefetch_related("effects")
 
     for event in events:
 
         compare = operator.le if event.trigger_comparator == "le" else operator.ge
 
-        if (
-            compare(trigger_types[event.trigger_type], event.trigger_value)
-            and not event.has_occurred
-        ):
+        if compare(trigger_types[event.trigger_type], event.trigger_value):
             # event condition is triggered
-            event_effect = EventEffectDTO(
-                change=event.effect_value, task_difficulty=event.task_difficulty
+            # check if event already happened in this user scenario
+            event_status = EventStatus.objects.get(
+                event_id=event.id, state_id=scenario.state.id
             )
+            if not event_status.has_happened:
 
-            # handle event effect
-            effect_types[event.effect_type](scenario, event_effect)
+                # handle all event effects
+                for effect in event.effects.all():
+                    event_effect = EventEffectDTO(
+                        value=effect.value,
+                        easy_tasks=effect.easy_tasks,
+                        medium_tasks=effect.medium_tasks,
+                        hard_tasks=effect.hard_tasks,
+                    )
 
-            event.has_occurred = True
-            event.save()
-            return event
+                    effect_types[effect.type](scenario, event_effect)
+
+                event_status.has_happened = True
+                event_status.save()
+                return event
 
     return None
