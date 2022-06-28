@@ -1,4 +1,7 @@
-import {Flex, HStack,} from "@chakra-ui/react";
+
+
+import {Flex, HStack, Tooltip,} from "@chakra-ui/react";
+
 import StatElement from "./StatElement";
 import {HiOutlineCalendar, HiOutlineCash, HiOutlineDocumentText} from "react-icons/hi";
 import OpenStoryButton from "./OpenStoryButton";
