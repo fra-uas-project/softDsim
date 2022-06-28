@@ -502,7 +502,7 @@ const Simulation = () => {
                                                         <Button onClick={() => { manualEndSimulation() }}
                                                             colorScheme='blue' size='lg' mt={3} mr={5} w="35%" isLoading={nextIsLoading}>
                                                             <Tooltip label={'The simulation can be finished early, after completing 80% of tasks. This might be useful, when a project is more time reliant.'} aria-label='A tooltip' placement="top">
-                                                                Finish Early
+                                                                Deliver Project
                                                             </Tooltip>
                                                         </Button>
                                                         : <></>
