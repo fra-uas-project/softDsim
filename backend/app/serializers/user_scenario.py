@@ -10,7 +10,14 @@ from app.serializers.template_scenario import TemplateScenarioSerializer
 class ScenarioStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScenarioState
-        fields = ["component_counter", "step_counter", "cost", "day"]
+        fields = [
+            "component_counter",
+            "step_counter",
+            "cost",
+            "day",
+            "budget",
+            "total_tasks",
+        ]
 
 
 class UserScenarioSerializer(serializers.ModelSerializer):

@@ -45,10 +45,29 @@ class ScenarioState(models.Model):
     cost = models.FloatField(default=0)
     day = models.IntegerField(default=0)
 
+    budget = models.IntegerField(default=0)
+    total_tasks = models.IntegerField(default=0)
+
     user_scenario = models.OneToOneField(
         UserScenario,
         on_delete=models.CASCADE,
         related_name="state",
+        null=True,
+        blank=True,
+    )
+
+    # events_happened = List[EventsHappened]
+
+
+class EventStatus(models.Model):
+
+    event_id = models.IntegerField()
+    has_happened = models.BooleanField(default=False)
+
+    state = models.ForeignKey(
+        ScenarioState,
+        on_delete=models.CASCADE,
+        related_name="event_status",
         null=True,
         blank=True,
     )

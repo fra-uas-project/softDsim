@@ -59,12 +59,24 @@ class QuestionRequest(ScenarioRequest):
 
 class ModelRequest(ScenarioRequest):
     model: str
-    """not finished, just shell"""
 
 
 class StartRequest(ScenarioRequest):
-    """not finished, just shell"""
+    """
+    Currently StartRequest only needs the fields it inherits from Scenario Request.
+    In the future we might need more fields.
+    """
+
+
+class EventRequest(ScenarioRequest):
+    """
+    Currently EventRequest only needs the fields it inherits from Scenario Request.
+    In the future we might need more fields.
+    """
 
 
 class EndRequest(ScenarioRequest):
-    """not finished, just shell"""
+    """
+    Currently EndRequest only needs the fields it inherits from Scenario Request.
+    In the future we might need more fields.
+    """

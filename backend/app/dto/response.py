@@ -42,6 +42,8 @@ class ScenarioStateDTO(BaseModel):
     step_counter: int
     day: int
     cost: float
+    budget: int
+    total_tasks: int
 
 
 class ManagementGoalDTO(BaseModel):
@@ -68,6 +70,14 @@ class TeamStatsDTO(BaseModel):
     motivation: float
     familiarity: float
     stress: float
+
+
+class EffectsDto(BaseModel):
+    type: str
+    value: float
+    easy_tasks: int
+    medium_tasks: int
+    hard_tasks: int
 
 
 class ScenarioResponse(BaseModel, ABC):
@@ -118,3 +128,9 @@ class ResultResponse(ScenarioResponse):
 class ModelSelectionResponse(ScenarioResponse):
     type: str = "MODEL"
     models: List[str]
+
+
+class EventResponse(ScenarioResponse):
+    type: str = "EVENT"
+    event_text: str
+    effects: List[EffectsDto]

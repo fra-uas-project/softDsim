@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0003_skilltype_development_quality_and_more'),
-        ('app', '0003_userscenario_question_points'),
+        ("app", "0003_skilltype_development_quality_and_more"),
+        ("app", "0003_userscenario_question_points"),
     ]
 
-    operations = [
-    ]
+    operations = []
