@@ -1,6 +1,7 @@
+import logging
+import time
 from typing import Set
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import QuerySet
 
 from app.models.user_scenario import UserScenario
@@ -24,7 +25,7 @@ class Task(models.Model):
     # Methods to get tasks by their state
 
 
-class TaskStatus:
+class TaskStatus:  # do not use this anylonger
     def todo(scenario_id) -> QuerySet:
         """Returns all tasks that are not yet done."""
         return Task.objects.filter(user_scenario_id=scenario_id, done=False)
@@ -102,7 +103,9 @@ class CachedTasks:
     """
 
     def __init__(self, scenario_id):
+        start = time.perf_counter()
         self.tasks: Set[Task] = set(Task.objects.filter(user_scenario_id=scenario_id))
+        logging.info(f"Getting Tasks took {time.perf_counter() - start} seconds")
         # todo raise if no scenario exists
 
     def todo(self) -> QuerySet:
@@ -166,7 +169,8 @@ class CachedTasks:
         return {t for t in self.tasks if t not in self.accepted()}
 
     def save(self):
-        """Bulk updates all tasks to databse."""
+        """Bulk updates all tasks to database."""
+        start = time.perf_counter()
         Task.objects.bulk_update(
             self.tasks,
             [
@@ -177,3 +181,4 @@ class CachedTasks:
                 "correct_specification",
             ],
         )
+        logging.warning(f"Saving tasks took {time.perf_counter() - start} seconds")

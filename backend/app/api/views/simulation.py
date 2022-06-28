@@ -30,13 +30,13 @@ from app.models.user_scenario import ScenarioState, UserScenario, EventStatus
 from app.models.task import Task
 from app.serializers.user_scenario import UserScenarioSerializer
 from app.serializers.team import MemberSerializer
-from app.serializers.question import QuestionSerializer
 from app.src.simulation import continue_simulation
-from app.dto.request import SimulationRequest
 
 from rest_framework.views import APIView
 
 from app.src.util.scenario_util import create_correct_request_model
+
+from app.cache.scenario import CachedScenario
 
 
 class StartUserScenarioView(APIView):
@@ -67,9 +67,7 @@ class StartUserScenarioView(APIView):
         try:
             # Craete UserScenario
             user_scenario = UserScenario(
-                user=request.user,
-                template=template,
-                config=config,
+                user=request.user, template=template, config=config,
             )
             user_scenario.save()
 
@@ -130,9 +128,9 @@ class NextStepView(APIView):
 
     @allowed_roles(["all"])
     def post(self, request):
-        scenario = auth_user_scenario(request)
-        if isinstance(scenario, Response):
-            return scenario
+        session: CachedScenario = auth_user_scenario(request)
+        if isinstance(session, Response):
+            return session
 
         # Check if request type is specified
         if request.data.get("type") is None:
@@ -146,7 +144,8 @@ class NextStepView(APIView):
 
         req = create_correct_request_model(request)
         try:
-            response = continue_simulation(scenario, req)
+            response = continue_simulation(session, req)
+            session.save()
             return Response(response.dict(), status=status.HTTP_200_OK)
         except (
             SimulationException,
@@ -156,12 +155,13 @@ class NextStepView(APIView):
             RequestTypeMismatchException,
             TooManyMeetingsException,
         ) as e:
+            logging.error(e, exc_info=True)
             return Response(
                 {"status": "error", "error-message": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
-            logging.error(str(e))
+            logging.error(e, exc_info=True)
             return Response(
                 {"status": "error", "data": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -213,8 +213,7 @@ class AdjustMemberView(APIView):
                 msg = f"Member with id {id} deleted."
                 logging.info(msg)
                 return Response(
-                    data={"status": "success", "data": msg},
-                    status=status.HTTP_200_OK,
+                    data={"status": "success", "data": msg}, status=status.HTTP_200_OK,
                 )
             else:
                 msg = f"Member {id} does not belong to a team in user-scenario {scenario.id}"
@@ -231,7 +230,7 @@ class AdjustMemberView(APIView):
             )
 
 
-def auth_user_scenario(request):
+def auth_user_scenario(request) -> CachedScenario:
     """This functions can be used for each endpoint that deals with UserScenarios during
     a simulation. If the the scenario exists and the user is authorized to use it, the
     function returns the UserScenario object. If something is wrong, the function
@@ -244,15 +243,15 @@ def auth_user_scenario(request):
         return Response({"status": "error", "data": msg}, status.HTTP_404_NOT_FOUND)
 
     try:
-        scenario = UserScenario.objects.get(id=scenario_id)
+        session = CachedScenario(scenario_id=scenario_id)
     except ObjectDoesNotExist:
-        msg = f"No UserScenario with id {scenario_id} found"
+        msg = f"Could not get all data for scenario {scenario_id}"
         logging.error(msg)
         return Response(
             {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
         )
 
-    if user.username == scenario.user.username:
+    if user.username == session.scenario.user.username:
         pass
     else:
         logging.warn(
@@ -266,4 +265,4 @@ def auth_user_scenario(request):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
-    return scenario
+    return session
