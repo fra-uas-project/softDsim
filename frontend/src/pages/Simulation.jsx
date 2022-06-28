@@ -382,7 +382,7 @@ const Simulation = () => {
                             Cancel
                         </Button>
                         <Button colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
-                            Start Simulation
+                        <Tooltip label={ 'Start the Simulation with the given Parameters'}> Start Simulation </Tooltip>
                         </Button>
                     </ModalFooter>
                 </ModalContent>
@@ -512,7 +512,7 @@ const Simulation = () => {
                                                     currentType === 'RESULT' ?
                                                         <>
                                                             <Button colorScheme="blue" size='lg' mt={3}>
-                                                                <Link to={{ pathname: "/" }} >Finish</Link>
+                                                                <Link to={{ pathname: "/" }} ><Tooltip label={'Finish the simulation and go back to the scenario overview.'} aria-label='A tooltip' placement="top">Finish</Tooltip></Link>
                                                             </Button>
                                                         </>
                                                         : <Button onClick={() => { dataValidationStatus ? handleNext(currentSimID, skillTypes) : console.log('data status:', dataValidationStatus) }}
