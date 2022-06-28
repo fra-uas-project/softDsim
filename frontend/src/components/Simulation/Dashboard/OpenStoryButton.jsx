@@ -9,7 +9,7 @@ import {
     Icon,
     Text,
     useDisclosure,
-    VStack
+    VStack, Tooltip,
 } from "@chakra-ui/react";
 import {HiOutlineBookOpen} from "react-icons/hi";
 import MarkdownDisplay from "../../MarkdownDisplay";
@@ -26,7 +26,7 @@ const OpenStoryButton = ({story}) => {
             <Flex borderRadius="100%" backgroundColor="blue.100" p={2}>
                 <Icon w={10} h={10} as={HiOutlineBookOpen} color="blue.600" />
             </Flex>
-            <Text fontWeight="semibold" color="gray.400" fontSize="sm" whiteSpace="nowrap">Open Story</Text>
+            <Text fontWeight="semibold" color="gray.400" fontSize="sm" whiteSpace="nowrap"><Tooltip label={ 'You can check the given story at any time here'}>Open Story</Tooltip></Text>
         </VStack>
 
             <Drawer onClose={onClose} isOpen={isOpen} placement="left" size="lg">
