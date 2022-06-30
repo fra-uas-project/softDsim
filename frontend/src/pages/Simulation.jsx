@@ -63,6 +63,7 @@ const Simulation = () => {
 
     const [scenarioIsLoading, setScenarioIsLoading] = useState(true);
 
+    // loading state while new data is loaded, so react doesnt crash
     const [nextIsLoading, setNextIsLoading] = useState(false);
 
     // rerender function for actions
@@ -228,14 +229,17 @@ const Simulation = () => {
                 },
             })
 
+            // create empty list for skill types in scenario
             var skillTypesList = []
 
             const resSkillReturn = await resSkill.json()
 
+            // create skilltype array
             for (const type of resSkillReturn.data) {
                 skillTypesList.push(type.name)
             }
 
+            // write skilltype array into state
             setSkillTypes(skillTypesList)
             createSkillTypeObject(skillTypesList)
         } catch (err) {
@@ -247,12 +251,15 @@ const Simulation = () => {
         setNextIsLoading(true)
         setDataValidationStatus(false)
         var nextValues = {}
+        // check if return values exist, if not, the project has just started and the type START is required
+        // otherwise the created returnvalues from state should be used
         if (returnValues === undefined) {
             nextValues = { "scenario_id": simID, "type": "START" }
         } else {
             console.log("rv", returnValues)
             nextValues = returnValues
         }
+        // api next call with values required to anvance simulation
         try {
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/sim/next`, {
                 method: 'POST',
@@ -309,6 +316,7 @@ const Simulation = () => {
                 // set action values with default values
                 setSimFragmentActions(tempActions)
 
+                // returnvalues if no user input was registered
                 const tempReturnValues = {
                     scenario_id: simID,
                     type: nextData.type,
@@ -336,9 +344,40 @@ const Simulation = () => {
     }
 
     // end simulation on user request
-    function manualEndSimulation() {
-        // TODO: Implement API call, once available
-        console.log('ending simulation')
+    async function manualEndSimulation() {
+        setNextIsLoading(true)
+
+        // values for ending the project
+        const nextValues = { "scenario_id": currentSimID, "type": "END" }
+
+        try {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/sim/next`, {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify(nextValues),
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+            })
+
+            const nextData = await res.json()
+            console.log('NextData:', nextData)
+
+            // set type
+            setCurrentType(nextData.type)
+
+            // set validation status to true so all buttons are available
+            setDataValidationStatus(true)
+
+            // set sim values to new return values
+            setSimValues(nextData)
+
+            // set loading state to false to show data
+            setNextIsLoading(false)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     useEffect(() => {
@@ -382,7 +421,7 @@ const Simulation = () => {
                             Cancel
                         </Button>
                         <Button colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
-                        <Tooltip label={ 'Start the Simulation with the given Parameters'}> Start Simulation </Tooltip>
+                            <Tooltip label={'Start the Simulation with the given Parameters'}> Start Simulation </Tooltip>
                         </Button>
                     </ModalFooter>
                 </ModalContent>
