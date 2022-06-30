@@ -1,22 +1,29 @@
-from asyncio import tasks
+from __future__ import annotations
+
 import logging
-import random
 from statistics import mean
-from typing import List
+import time
 
 from deprecated.classic import deprecated
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+
 from app.dto.request import Workpack
 from app.dto.response import TeamStatsDTO
-from app.models.task import TaskStatus, CachedTasks, Task
+from app.models.task import CachedTasks, Task
 from app.models.user_scenario import UserScenario
 from app.src.util.util import probability
 
 import numpy as np
 
 import logging
+
+# This prevents circular imports, but allows type hinting.
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.cache.scenario import CachedScenario
 
 
 class Team(models.Model):
@@ -29,16 +36,13 @@ class Team(models.Model):
         related_name="team",
     )
 
-    @property
-    def num_communication_channels(self):
+    def num_communication_channels(self, n):
         """Returns the number of communication channels of the team."""
-        n = Member.objects.filter(team_id=self.id).count()
         return (n * (n - 1)) / 2
 
-    @property
-    def efficiency(self):
+    def efficiency(self, session):
         """Returns the team's efficiency."""
-        c = self.num_communication_channels
+        c = self.num_communication_channels(len(session.members))
         return 1 / (1 + (c / 20 - 0.05))
 
     @property
@@ -46,18 +50,18 @@ class Team(models.Model):
         """Returns the team's management skill."""
         return 0.5  # TODO: implement
 
-    def motivation(self, members=None):
+    def motivation(self, members):
         """Returns the team's motivation."""
         if members is None:
-            members = Member.objects.filter(team_id=self.id)
+            raise TypeError("Attribute members is required")
         if len(members) == 0:
             return 0
         return mean([m.motivation for m in members])
 
-    def familiarity(self, members=None):
+    def familiarity(self, members):
         """Returns the team's familiarity."""
         if members is None:
-            members = Member.objects.filter(team_id=self.id)
+            raise TypeError("Attribute members is required")
         if len(members) == 0:
             return 0
         return mean([m.familiarity for m in members])
@@ -65,12 +69,12 @@ class Team(models.Model):
     def stress(self, members=None):
         """Returns the team's stress."""
         if members is None:
-            members = Member.objects.filter(team_id=self.id)
+            raise TypeError("Attribute members is required")
         if len(members) == 0:
             return 0
         return mean([m.stress for m in members])
 
-    def stats(self, members=None) -> TeamStatsDTO:
+    def stats(self, members) -> TeamStatsDTO:
         """Returns all team stats."""
         return TeamStatsDTO(
             motivation=self.motivation(members),
@@ -79,30 +83,29 @@ class Team(models.Model):
         )
 
     # increases familiarity with the project for each member
-    def meeting(self, scenario, members, work_hours, cached_tasks) -> int:
-        solved_tasks = cached_tasks.solved()
-        for member in members:
-            tasks_in_meeting = scenario.config.done_tasks_per_meeting
+    def meeting(self, session: CachedScenario, work_hours) -> int:
+        solved_tasks = session.tasks.solved()
+        for member in session.members:
+            tasks_in_meeting = session.scenario.config.done_tasks_per_meeting
 
             member.familiar_tasks = min(
                 member.familiar_tasks + tasks_in_meeting, len(solved_tasks)
             )
             # increase familiarity of member
             member.calculate_familiarity(len(solved_tasks))
-        # save members
-        # todo: wir können überlegen ob man member auch in der work methode in einem bulk update mit anderen Sachen speichern kann
-        Member.objects.bulk_update(members, fields=["familiar_tasks", "familiarity"])
 
         return work_hours - 1
 
-    def training(self, scenario, members, work_hours, mean_real_throughput) -> None:
+    def training(
+        self, session: CachedScenario, work_hours, mean_real_throughput
+    ) -> None:
 
-        for member in members:
+        for member in session.members:
             delta = mean_real_throughput - (
                 member.skill_type.throughput * (1 + member.xp)
             )
             if delta > 0:
-                xp = (delta * scenario.config.train_skill_increase_rate) / (
+                xp = (delta * session.scenario.config.train_skill_increase_rate) / (
                     1 + member.xp
                 ) ** 2
                 member.xp += xp
@@ -113,28 +116,21 @@ class Team(models.Model):
 
     # ein tag
     def work(
-        self,
-        workpack: Workpack,
-        scenario,
-        workpack_status,
-        current_day,
-        cached_tasks: CachedTasks,
+        self, session: CachedScenario, workpack: Workpack, workpack_status, current_day,
     ):
 
         # work hours
         NORMAL_WORK_HOUR_DAY: int = 8
         remaining_work_hours = NORMAL_WORK_HOUR_DAY + workpack.overtime
-
-        members = Member.objects.filter(team_id=scenario.team.id)
-        staff_cost = sum([m.skill_type.cost_per_day for m in members])
+        start = time.perf_counter()
+        logging.warn(f"Filter Members took {time.perf_counter() - start} secs")
+        staff_cost = sum([m.skill_type.cost_per_day for m in session.members])
         logging.debug(f"staff cost: {staff_cost}")
-        scenario.state.cost += staff_cost
+        session.scenario.state.cost += staff_cost
 
         # 1. meeting
         for _ in range(workpack_status.meetings_per_day[current_day]):
-            remaining_work_hours = self.meeting(
-                scenario, members, remaining_work_hours, cached_tasks
-            )
+            remaining_work_hours = self.meeting(session, remaining_work_hours)
 
         # 2. training
         remaining_trainings_today = workpack_status.remaining_trainings
@@ -149,19 +145,20 @@ class Team(models.Model):
                 workpack_status.remaining_trainings = 0
 
             mean_real_throughput_of_team = mean(
-                [(member.skill_type.throughput * (1 + member.xp)) for member in members]
+                [
+                    (member.skill_type.throughput * (1 + member.xp))
+                    for member in session.members
+                ]
             )
             for _ in range(remaining_trainings_today):
                 self.training(
-                    scenario,
-                    members,
-                    remaining_work_hours,
-                    mean_real_throughput_of_team,
+                    session, remaining_work_hours, mean_real_throughput_of_team,
                 )
-            Member.objects.bulk_update(members, fields=["xp", "motivation"])
 
         # 3. task work
-        self.task_work(cached_tasks, remaining_work_hours, members, workpack)
+        start = time.perf_counter()
+        self.task_work(session, remaining_work_hours, workpack)
+        logging.warn(f"Task work took {time.perf_counter() - start} secs")
 
     # def work(workpack)
     ## 1. meeting (done)
@@ -172,14 +169,19 @@ class Team(models.Model):
     ## 3. ab hier geht um tasks
     ## self.task_work()
 
-    def task_work(self, tasks, hours, members, workpack):
-        for m in members:
-            n = m.n_tasks(hours)
+    def task_work(self, session: CachedScenario, hours: int, workpack: Workpack):
+        tasks = session.tasks
+        for m in session.members:
+            n = m.n_tasks(hours, session)
             if workpack.integrationtest:
                 tasks_to_integration_test = tasks.unit_tested()
                 while n and len(tasks_to_integration_test):
                     t: Task = tasks_to_integration_test.pop()
-                    t.integration_tested = True
+                    if t.correct_specification:
+                        t.integration_tested = True
+                    else:
+                        t.done = False
+                    m.familiar_tasks -= 1
                     n -= 1
             if workpack.unittest:
                 tasks_to_test = tasks.done()
@@ -197,7 +199,10 @@ class Team(models.Model):
             while n and len(tasks_to_do):
                 t: Task = tasks_to_do.pop()
                 t.done = True
-                t.bug = probability((m.skill_type.error_rate + m.stress) / 2)
+                error_increase = m.solve_task(t)
+                t.bug = probability(
+                    (m.skill_type.error_rate + m.stress + error_increase) / 3
+                )
                 t.correct_specification = probability(self.management_skill)
                 t.unit_tested = False
                 t.integration_tested = False
@@ -284,11 +289,28 @@ class Member(models.Model):
         if solved_tasks > 0:
             self.familiarity = self.familiar_tasks / solved_tasks
 
-    def n_tasks(self, hours) -> int:
+    def n_tasks(self, hours: int, session: CachedTasks) -> int:
         """Returns the number of tasks that the member can do in the given hours"""
         mu = (
             hours
-            * ((self.efficiency + self.team.efficiency) / 2)
+            * ((self.efficiency + self.team.efficiency(session)) / 2)
             * (self.skill_type.throughput + self.xp)
         )
-        return int(np.mean((np.random.poisson(mu), mu)))
+        return int(np.mean((np.random.poisson(mu), mu)) * 0.2)
+
+    def solve_task(self, task: Task) -> float:
+        """Returns the a likelihood of the member doing making a bug caused by lack of
+        development skill. Also adjusts the member's motivation according to the task's
+        difficulty and the member's skill."""
+
+        # Get difference between task difficulty and member's skill
+        diff = self.skill_type.development_quality - (task.difficulty / 3) * 100
+
+        # If the task difficulty fits the skill type's development quality, motivation goes up
+        # If not (too easy or too difficult) motivation goes down
+        self.motivation = min(
+            self.motivation + round(0.005 - ((abs(diff) / 100) * 0.01), 4), 1
+        )
+
+        # If the task is too hard for the member the likelihood of an bug increases
+        return min(0, diff / 100)

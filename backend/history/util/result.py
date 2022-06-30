@@ -2,8 +2,10 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
+from app.cache.scenario import CachedScenario
 
 from app.dto.response import ResultResponse, TasksStatusDTO
+from app.models import scenario
 from app.models.task import CachedTasks, Task, TaskStatus
 from app.models.team import Member, Team
 from app.models.user_scenario import UserScenario
@@ -18,7 +20,8 @@ from app.src.util.user_scenario_util import get_scenario_state_dto
 from history.models.result import Result
 
 
-def get_result_response(scenario: UserScenario) -> ResultResponse:
+def get_result_response(session: CachedScenario) -> ResultResponse:
+    scenario = session.scenario
     try:
         try:
             result: Result = Result.objects.get(user_scenario=scenario)
@@ -35,7 +38,7 @@ def get_result_response(scenario: UserScenario) -> ResultResponse:
                 tasks_integration_tested=result.tasks_integration_tested,
                 tasks_bug=result.tasks_bug_discovered,
             ),
-            team=scenario.team.stats(),
+            team=scenario.team.stats(session.members),
             members=get_member_report(scenario.team.id),
             total_score=result.total_score,
             quality_score=result.quality_score,
