@@ -190,7 +190,7 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
             tasks=get_tasks_status(session.scenario.id),
             state=get_scenario_state_dto(session.scenario),
             members=get_member_report(session.scenario.team.id),
-            team=session.scenario.team.stats(),
+            team=session.scenario.team.stats(session.members),
         )
 
         return complete_scenario_step(session, req, scenario_response)
