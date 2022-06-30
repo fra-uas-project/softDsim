@@ -25,6 +25,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Question from "../components/Simulation/Actions/Question";
 import Action from "../components/Simulation/Actions/Action"
+import Event from "../components/Simulation/Event/Event"
 import ModelSelection from '../components/ModelSelection'
 import Result from "../components/Simulation/Result/Result"
 import { getCookie } from "../utils/utils"
@@ -253,6 +254,7 @@ const Simulation = () => {
             console.log("rv", returnValues)
             nextValues = returnValues
         }
+        console.log('nextValues', nextValues)
         try {
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/sim/next`, {
                 method: 'POST',
@@ -382,7 +384,7 @@ const Simulation = () => {
                             Cancel
                         </Button>
                         <Button colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
-                        <Tooltip label={ 'Start the Simulation with the given Parameters'}> Start Simulation </Tooltip>
+                            <Tooltip label={'Start the Simulation with the given Parameters'}> Start Simulation </Tooltip>
                         </Button>
                     </ModalFooter>
                 </ModalContent>
@@ -479,6 +481,7 @@ const Simulation = () => {
                                             {/* Event */}
                                             {currentType === 'EVENT' ?
                                                 <>
+                                                    <Event eventText={simValues.text} />
                                                 </>
                                                 : <></>
                                             }
