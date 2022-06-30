@@ -28,7 +28,7 @@ const Footer = () => {
                         Imprint
                     </Button>
                     <Button variant='link' as={Link} to="/GDPR">
-                        GDPR
+                        Privacy Policy
                     </Button>
                 </HStack>
             </Flex>
