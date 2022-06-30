@@ -70,15 +70,14 @@ def simulate(req, session: CachedScenario) -> None:
     normal_work_hour_day: int = 8
 
     workpack = req.actions
+    logging.info(f"Workpack: {workpack}")
     days = workpack.days
 
     # you can not do more meetings than hours per day
-    start = time.perf_counter()
     if (workpack.meetings / days) > (normal_work_hour_day + workpack.overtime):
         raise TooManyMeetingsException(
             (workpack.meetings / days), (normal_work_hour_day + workpack.overtime)
         )
-    logging.warning(f"Meetings took {time.perf_counter() - start} seconds")
 
     start = time.perf_counter()
     if req.members and req.members != []:

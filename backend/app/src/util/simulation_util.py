@@ -134,9 +134,8 @@ def end_of_simulation(scenario: UserScenario) -> bool:
 class WorkpackStatus:
     remaining_trainings: int = 0
 
-    meetings_per_day = []
-
     def __init__(self, days, workpack):
+        self.meetings_per_day = []
         self.calculate_meetings_per_day(days, workpack)
         self.remaining_trainings = workpack.training
 
