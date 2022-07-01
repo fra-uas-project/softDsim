@@ -125,9 +125,9 @@ const UserOverview = () => {
             </Breadcrumb>
             <Heading>Users</Heading>
             <Box h={5}></Box>
-            <Box backgroundColor="white" borderRadius="2xl" minH="60vh">
-                <Container maxW='6xl' pt={10}>
-                    <TableContainer>
+            <Box backgroundColor="white" borderRadius="2xl">
+                <Container maxW='6xl' pt={10} h="full" pb={10} minH="70vh" maxH="70vh" >
+                    <TableContainer overflowY="auto" h="full">
                         <Table variant='simple' size="lg">
                             <Thead>
                                 <Tr>
@@ -227,9 +227,9 @@ const UserOverview = () => {
                                 })}
                             </Tbody>
                         </Table>
+                        <Divider />
+                        <AddUser />
                     </TableContainer>
-                   <Divider />
-                   <AddUser />
                 </Container>
             </Box>
 
