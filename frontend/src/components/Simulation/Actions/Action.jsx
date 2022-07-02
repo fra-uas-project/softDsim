@@ -37,12 +37,11 @@ const Action = (props) => {
                             props.action.action === 'integrationtest' ?
                                 <ActionElement title="Integration Testing" secondaryText="Start Integration Testing"
                                     icon={actionIcon.INTEGRATIONTEST} tooltip={"Integration testing should be done after unit testing and bug fixing"}>
-                                    <FormControl display="flex" justifyContent="end">
-                                        <Switch onChange={(event) => props.onSelectAction({
-                                            type: props.action.action,
-                                            value: event.target.checked
-                                        })} size='lg' defaultChecked={props.actionDefaultValues.integrationtest} />
-                                    </FormControl>
+                                    <ActionToggle onEventbutton={(event) => props.onSelectAction({
+                                        type: props.action.action,
+                                        value: event
+                                    })} textTrue="Scheduled"
+                                        textFalse="Not Scheduled" />
                                 </ActionElement>
                                 :
                                 // Meeting
@@ -78,8 +77,8 @@ const Action = (props) => {
                                                 <ActionToggle onEventbutton={(event) => props.onSelectAction({
                                                     type: props.action.action,
                                                     value: event
-                                                })} textTrue="Team Event Scheduled"
-                                                    textFalse="Schedule Team Event" />
+                                                })} textTrue="Scheduled"
+                                                    textFalse="Not Scheduled" />
                                             </ActionElement>
                                             :
                                             // Salary

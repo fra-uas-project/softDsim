@@ -8,9 +8,9 @@ import {
     MdRule, MdSchool,
     MdTimeline
 } from "react-icons/md";
-import {BsLightningCharge} from "react-icons/bs";
-import {v4 as uuidv4} from 'uuid';
-import {HiUserGroup} from "react-icons/hi";
+import { BsLightningCharge } from "react-icons/bs";
+import { v4 as uuidv4 } from 'uuid';
+import { HiUserGroup } from "react-icons/hi";
 
 export const tabIndexEnum = {
     "INSPECTOR": 0,
