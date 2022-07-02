@@ -1,4 +1,5 @@
 from django.urls import path
+from app.api.security.create_users import UserCreationView
 
 from app.api.views.question_collection import QuestionCollectionView
 from app.api.views.user_scenario import UserScenarioViews
@@ -38,6 +39,7 @@ urlpatterns = [
     path("authenticated", CheckAuthenticatedView.as_view(), name="authenticated"),
     path("register", RegisterView.as_view(), name="register"),
     path("user", UserView.as_view()),
+    path("user/create-many", UserCreationView.as_view()),
     path("user/<str:username>", UserView.as_view()),
     # template scenario
     path("template-scenario", TemplateScenarioView.as_view()),
