@@ -48,6 +48,11 @@ class ScenarioState(models.Model):
     budget = models.IntegerField(default=0)
     total_tasks = models.IntegerField(default=0)
 
+    # these are to calculate the average poisson value at the end
+    # is needed to evaluate a score in accordance to the randomness
+    poisson_sum = models.IntegerField(default=0)
+    poison_counter = models.IntegerField(default=0)
+
     user_scenario = models.OneToOneField(
         UserScenario,
         on_delete=models.CASCADE,

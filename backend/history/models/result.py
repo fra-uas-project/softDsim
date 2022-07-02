@@ -52,4 +52,4 @@ class Result(models.Model):
     template_scenario_id = models.PositiveIntegerField(blank=True, null=True)
     template_scenario_name = models.TextField(blank=True, null=True)
     username = models.TextField(blank=True, null=True)
-    avg_mu = models.FloatField(blank=True, null=True)
+    avg_poisson_value = models.FloatField(blank=True, null=True)
