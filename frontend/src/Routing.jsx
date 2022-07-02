@@ -6,7 +6,6 @@ import ScenarioOverview from "./pages/ScenarioOverview";
 import UserOverview from "./pages/UserOverview";
 import Simulation from "./pages/Simulation";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword"
 import Help from "./pages/Help";
 import GDPR from "./pages/GDPR";
@@ -14,6 +13,7 @@ import Imprint from "./pages/Imprint";
 import { getCookie } from "./utils/utils";
 import NotFoundPage from "./components/NotFoundPage";
 import ScenarioStudio from "./pages/ScenarioStudio";
+import AddMultipleUsers from "./pages/AddMultipleUsers";
 
 const Routing = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext)
@@ -66,7 +66,6 @@ const Routing = () => {
                     <Route path="/scenarios" element={<ScenarioOverview />} />
                     <Route path="/scenarios/:scn_id" element={<Simulation />} />
                     <Route path="/help" element={<Help />} />
-                    <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Navigate to="/" replace />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </>
@@ -78,7 +77,6 @@ const Routing = () => {
                         <>
                             <Route path="/" element={<Landing />} />
                             <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
                             <Route path="/reset-password" element={<ResetPassword />} />
                             <Route path="*" element={<Navigate to="/login" replace />} />
                         </>
@@ -98,6 +96,7 @@ const Routing = () => {
                 <>
                     {/* adding routes which are accessible for every logged-in user with role staff */}
                     <Route path="/users" element={<UserOverview />} />
+                    <Route path="/addusers" element={<AddMultipleUsers />} />
                 </>
             }
             {

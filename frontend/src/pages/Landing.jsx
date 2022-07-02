@@ -15,16 +15,16 @@ const Landing = () => {
                     <Flex align="center" justify="center" h="40px">
                     </Flex>
                     <Flex w="full">
-                        <Flex w="50%" align="center" justify="center">
-                            <Button w="60%" as={Link} to="/login" colorScheme="blue">
+                        <Flex w="full" align="center" justify="center">
+                            <Button w="40%" as={Link} to="/login" colorScheme="blue">
                                 Login
                             </Button>
                         </Flex>
-                        <Flex w="50%" align="center" justify="center">
+                        {/* <Flex w="50%" align="center" justify="center">
                             <Button w="60%" as={Link} to="/register" colorScheme="blue">
                                 Register
                             </Button>
-                        </Flex>
+                        </Flex> */}
                     </Flex>
                 </Flex>
             </Box>

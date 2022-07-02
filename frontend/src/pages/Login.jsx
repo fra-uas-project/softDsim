@@ -159,11 +159,11 @@ const Login = () => {
                         Login
                     </Button>
                     {/* Register Link */}
-                    <Flex mt={5}>
+                    {/* <Flex mt={5}>
                         <Text w="full" align="center" justify="center" cursor="pointer" fontWeight="semibold" _hover={{ fontWeight: 'bold' }} onClick={() => { }}>
                             <Link to={{ pathname: "/register" }} >Not registered?</Link>
                         </Text>
-                    </Flex>
+                    </Flex> */}
                 </Flex>
             </Flex>
         </>

@@ -25,10 +25,11 @@ import {
     useToast,
     Divider,
 } from "@chakra-ui/react";
-import {HiChevronRight, HiOutlineCheck, HiOutlineTrash, HiOutlineX} from "react-icons/hi";
-import {useEffect, useRef, useState} from "react";
-import {getCookie, role} from "../utils/utils";
+import { HiChevronRight, HiOutlineCheck, HiOutlineTrash, HiOutlineX } from "react-icons/hi";
+import { useEffect, useRef, useState } from "react";
+import { getCookie, role } from "../utils/utils";
 import AddUser from "../components/AddUser";
+import { Link } from "react-router-dom";
 
 const UserOverview = () => {
     const [users, setUsers] = useState([]);
@@ -37,11 +38,11 @@ const UserOverview = () => {
 
     const toast = useToast()
 
-    const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose:  onRoleClose} = useDisclosure()
-    const { isOpen: isDeleteOpen , onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+    const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose: onRoleClose } = useDisclosure()
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const cancelRef = useRef();
-    
-   
+
+
 
     const fetchUsers = async () => {
         const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user`, {
@@ -82,7 +83,7 @@ const UserOverview = () => {
         }
     };
 
-   
+
 
     const toggleRole = async (username) => {
         try {
@@ -93,7 +94,7 @@ const UserOverview = () => {
                     "X-CSRFToken": getCookie("csrftoken"),
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({[roleToChange.role]: !roleToChange.value})
+                body: JSON.stringify({ [roleToChange.role]: !roleToChange.value })
             })
             await res.json();
             fetchUsers();
@@ -118,7 +119,7 @@ const UserOverview = () => {
 
     return (
         <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-            <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
+            <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500' />}>
                 <BreadcrumbItem>
                     <BreadcrumbLink href=''>Users</BreadcrumbLink>
                 </BreadcrumbItem>
@@ -154,14 +155,15 @@ const UserOverview = () => {
                                                 colorScheme='black'
                                                 aria-label='Toggle admin role'
                                                 fontSize='20px'
-                                                icon={user.admin ? <HiOutlineCheck/> : <HiOutlineX/>}
+                                                icon={user.admin ? <HiOutlineCheck /> : <HiOutlineX />}
                                                 onClick={() => {
                                                     setSelectedUser(user.username)
                                                     onRoleOpen()
                                                     setRoleToChange({
                                                         role: role.ADMIN,
                                                         value: user.admin
-                                                    })}
+                                                    })
+                                                }
                                                 }
                                             />
                                         </Td>
@@ -171,14 +173,15 @@ const UserOverview = () => {
                                                 colorScheme='black'
                                                 aria-label='Toggle admin role'
                                                 fontSize='20px'
-                                                icon={user.staff ? <HiOutlineCheck/> : <HiOutlineX/>}
+                                                icon={user.staff ? <HiOutlineCheck /> : <HiOutlineX />}
                                                 onClick={() => {
                                                     setSelectedUser(user.username)
                                                     onRoleOpen()
                                                     setRoleToChange({
                                                         role: role.STAFF,
                                                         value: user.staff
-                                                    })}
+                                                    })
+                                                }
                                                 }
                                             />
                                         </Td>
@@ -188,14 +191,15 @@ const UserOverview = () => {
                                                 colorScheme='black'
                                                 aria-label='Toggle admin role'
                                                 fontSize='20px'
-                                                icon={user.creator ? <HiOutlineCheck/> : <HiOutlineX/>}
+                                                icon={user.creator ? <HiOutlineCheck /> : <HiOutlineX />}
                                                 onClick={() => {
                                                     setSelectedUser(user.username)
                                                     onRoleOpen()
                                                     setRoleToChange({
                                                         role: role.CREATOR,
                                                         value: user.creator
-                                                    })}
+                                                    })
+                                                }
                                                 }
                                             />
                                         </Td>
@@ -206,7 +210,7 @@ const UserOverview = () => {
                                                 colorScheme='black'
                                                 aria-label='Toggle admin role'
                                                 fontSize='20px'
-                                                icon={user.student ? <HiOutlineCheck/> : <HiOutlineX/>}
+                                                icon={user.student ? <HiOutlineCheck /> : <HiOutlineX />}
                                             />
                                         </Td>
                                         <Td fontWeight="500">
@@ -215,11 +219,11 @@ const UserOverview = () => {
                                                 colorScheme='black'
                                                 aria-label='Delete user'
                                                 fontSize='20px'
-                                                icon={<HiOutlineTrash/>}
+                                                icon={<HiOutlineTrash />}
                                                 onClick={() => {
                                                     onDeleteOpen()
                                                     setSelectedUser(user.username)
-                                                    }
+                                                }
                                                 }
                                             />
                                         </Td>
@@ -229,6 +233,11 @@ const UserOverview = () => {
                         </Table>
                         <Divider />
                         <AddUser />
+                        <Flex align="center" justify="center">
+                            <Link to={{ pathname: "/addusers" }}>
+                                <Button colorScheme='blue'>Add multiple Users</Button>
+                            </Link>
+                        </Flex>
                     </TableContainer>
                 </Container>
             </Box>
