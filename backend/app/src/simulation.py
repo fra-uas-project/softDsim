@@ -113,6 +113,11 @@ def simulate(req, session: CachedScenario) -> None:
         days = days - 1
         # team event will be at the end of the week
 
+    # integration test
+    if req.actions.integrationtest:
+        days = days - 1
+        # integration test will be at the end of the week
+
     workpack_status = WorkpackStatus(days, workpack)
 
     # check if there are members to work
@@ -127,6 +132,13 @@ def simulate(req, session: CachedScenario) -> None:
         logging.info(
             "There are no members in the team, so there is nothing to simulate."
         )
+    if req.actions.integrationtest:
+        tasks_to_integration_test = session.tasks.unit_tested()
+        for t in tasks_to_integration_test:
+            if t.correct_specification:
+                t.integration_tested = True
+            else:
+                t.done = False
 
     # team event
     if req.actions.teamevent:
@@ -196,7 +208,7 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
 
     # 2. Check if Simulation Fragment ended
     # if fragment ended -> increase counter -> next component will be loaded in next step
-    if end_of_fragment(session.scenario):
+    if end_of_fragment(session):
         logging.info(
             f"Fragment with index {session.scenario.state.component_counter} has ended."
         )

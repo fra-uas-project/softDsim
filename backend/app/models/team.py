@@ -173,16 +173,6 @@ class Team(models.Model):
         tasks = session.tasks
         for m in session.members:
             n = m.n_tasks(hours, session)
-            if workpack.integrationtest:
-                tasks_to_integration_test = tasks.unit_tested()
-                while n and len(tasks_to_integration_test):
-                    t: Task = tasks_to_integration_test.pop()
-                    if t.correct_specification:
-                        t.integration_tested = True
-                    else:
-                        t.done = False
-                    m.familiar_tasks -= 1
-                    n -= 1
             if workpack.unittest:
                 tasks_to_test = tasks.done()
                 while n and len(tasks_to_test):
