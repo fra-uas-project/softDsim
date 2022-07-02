@@ -1,17 +1,18 @@
 from typing import Dict
+from app.cache.scenario import CachedScenario
 from app.models.task import Task, TaskStatus
 from app.dto.response import TasksStatusDTO
 
 
-def get_tasks_status(scenario_id: int) -> TasksStatusDTO:
+def get_tasks_status(session: CachedScenario) -> TasksStatusDTO:
     """Returns a TaskStatusDTO for a current scenario with all data allowed to be seen
     by team/user."""
     return TasksStatusDTO(
-        tasks_todo=TaskStatus.todo(scenario_id).count(),
-        tasks_done=TaskStatus.done(scenario_id).count(),
-        tasks_unit_tested=TaskStatus.unit_tested(scenario_id).count(),
-        tasks_integration_tested=TaskStatus.integration_tested(scenario_id).count(),
-        tasks_bug=TaskStatus.bug(scenario_id).count(),
+        tasks_todo=len(session.tasks.todo()),
+        tasks_done=len(session.tasks.done()),
+        tasks_unit_tested=len(session.tasks.unit_tested()),
+        tasks_integration_tested=len(session.tasks.integration_tested()),
+        tasks_bug=len(session.tasks.bug()),
     )
 
 

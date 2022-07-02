@@ -113,6 +113,11 @@ def simulate(req, session: CachedScenario) -> None:
         days = days - 1
         # team event will be at the end of the week
 
+    # integration test
+    if req.actions.integrationtest:
+        days = days - 1
+        # integration test will be at the end of the week
+
     workpack_status = WorkpackStatus(days, workpack)
 
     # check if there are members to work
@@ -127,6 +132,13 @@ def simulate(req, session: CachedScenario) -> None:
         logging.info(
             "There are no members in the team, so there is nothing to simulate."
         )
+    if req.actions.integrationtest:
+        tasks_to_integration_test = session.tasks.unit_tested()
+        for t in tasks_to_integration_test:
+            if t.correct_specification:
+                t.integration_tested = True
+            else:
+                t.done = False
 
     # team event
     if req.actions.teamevent:
@@ -186,9 +198,9 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
             text=event.text,
             effects=get_effects_from_event(event),
             management=session.scenario.get_management_goal_dto(),
-            tasks=get_tasks_status(session.scenario.id),
+            tasks=get_tasks_status(session),
             state=get_scenario_state_dto(session.scenario),
-            members=get_member_report(session.scenario.team.id),
+            members=get_member_report(session.members),
             team=session.scenario.team.stats(session.members),
         )
 
@@ -196,7 +208,7 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
 
     # 2. Check if Simulation Fragment ended
     # if fragment ended -> increase counter -> next component will be loaded in next step
-    if end_of_fragment(session.scenario):
+    if end_of_fragment(session):
         logging.info(
             f"Fragment with index {session.scenario.state.component_counter} has ended."
         )
@@ -217,9 +229,9 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
         scenario_response = SimulationResponse(
             management=session.scenario.get_management_goal_dto(),
             actions=get_actions_from_fragment(next_component),
-            tasks=get_tasks_status(session.scenario.id),
+            tasks=get_tasks_status(session),
             state=get_scenario_state_dto(session.scenario),
-            members=get_member_report(session.scenario.team.id),
+            members=get_member_report(session.members),
             team=session.scenario.team.stats(session.members),
             text=next_component.text,
         )
@@ -229,8 +241,8 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
             management=session.scenario.get_management_goal_dto(),
             question_collection=get_question_collection(session.scenario),
             state=get_scenario_state_dto(session.scenario),
-            tasks=get_tasks_status(session.scenario.id),
-            members=get_member_report(session.scenario.team.id),
+            tasks=get_tasks_status(session),
+            members=get_member_report(session.members),
             team=session.scenario.team.stats(session.members),
             text=next_component.text,
         )
@@ -238,9 +250,9 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
     elif isinstance(next_component, ModelSelection):
         scenario_response = ModelSelectionResponse(
             management=session.scenario.get_management_goal_dto(),
-            tasks=get_tasks_status(session.scenario.id),
+            tasks=get_tasks_status(session),
             state=get_scenario_state_dto(session.scenario),
-            members=get_member_report(session.scenario.team.id),
+            members=get_member_report(session.members),
             models=next_component.models(),
             team=session.scenario.team.stats(session.members),
             text=next_component.text,

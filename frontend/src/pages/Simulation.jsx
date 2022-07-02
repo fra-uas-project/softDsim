@@ -309,7 +309,7 @@ const Simulation = () => {
                     } else if (action.action === 'unittest') {
                         tempActions.unittest = actionDefaultValues.unittest
                     } else if (action.action === 'integrationtest') {
-                        tempActions.integrationtest = actionDefaultValues.integrationtest
+                        tempActions.integrationtest = false
                     } else if (action.action === 'meetings') {
                         tempActions.meetings = action.lower_limit
                     } else if (action.action === 'teamevent') {
