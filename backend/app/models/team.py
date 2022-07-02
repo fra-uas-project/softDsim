@@ -298,7 +298,7 @@ class Member(models.Model):
             * (self.skill_type.throughput + self.xp)
         )
         poisson = np.random.poisson(mu)
-        return int(np.mean((np.random.poisson(mu), mu)) * 0.2), poisson
+        return int(np.mean((poisson, mu)) * 0.2), poisson
 
     def solve_task(self, task: Task) -> float:
         """Returns the a likelihood of the member doing making a bug caused by lack of
