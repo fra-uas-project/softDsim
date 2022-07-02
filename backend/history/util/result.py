@@ -17,6 +17,7 @@ from app.src.util.task_util import (
     get_tasks_status_detailed,
 )
 from app.src.util.user_scenario_util import get_scenario_state_dto
+from history.models.history import History
 from history.models.result import Result
 
 
@@ -77,6 +78,7 @@ def write_result_entry(scenario):
         template_scenario_name=scenario.template.name,
         username=scenario.user.username,
         avg_poisson_value=scenario.state.poisson_sum / scenario.state.poison_counter,
+        time_played=calculate_time_played(scenario),
     )
     logging.info(f"Created result entry for scenario {scenario.id}")
     return result
@@ -86,3 +88,9 @@ def delete_sceanrio_objects(scenario):
     # Delete all objects that wont be used any longer
     n_tasks, _ = Task.objects.filter(user_scenario=scenario).delete()
     logging.info(f"Deleted {n_tasks} tasks for scenario {scenario.id}")
+
+
+def calculate_time_played(scenario):
+    history = History.objects.filter(user_scenario_id=scenario.id).order_by("id")
+    start_time = history.first().timestamp
+    end_time = history.last().timestamp
