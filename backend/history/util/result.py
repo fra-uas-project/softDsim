@@ -76,6 +76,7 @@ def write_result_entry(scenario):
         template_scenario_id=scenario.template_id,
         template_scenario_name=scenario.template.name,
         username=scenario.user.username,
+        avg_poisson_value=scenario.state.poisson_sum / scenario.state.poison_counter,
     )
     logging.info(f"Created result entry for scenario {scenario.id}")
     return result

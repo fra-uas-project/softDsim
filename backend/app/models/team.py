@@ -116,7 +116,11 @@ class Team(models.Model):
 
     # ein tag
     def work(
-        self, session: CachedScenario, workpack: Workpack, workpack_status, current_day,
+        self,
+        session: CachedScenario,
+        workpack: Workpack,
+        workpack_status,
+        current_day,
     ):
 
         # work hours
@@ -152,7 +156,9 @@ class Team(models.Model):
             )
             for _ in range(remaining_trainings_today):
                 self.training(
-                    session, remaining_work_hours, mean_real_throughput_of_team,
+                    session,
+                    remaining_work_hours,
+                    mean_real_throughput_of_team,
                 )
 
         # 3. task work
@@ -172,7 +178,9 @@ class Team(models.Model):
     def task_work(self, session: CachedScenario, hours: int, workpack: Workpack):
         tasks = session.tasks
         for m in session.members:
-            n = m.n_tasks(hours, session)
+            n, poisson_value = m.n_tasks(hours, session)
+            session.scenario.state.poisson_sum += poisson_value
+            session.scenario.state.poison_counter += 1
             if workpack.unittest:
                 tasks_to_test = tasks.done()
                 while n and len(tasks_to_test):
@@ -279,14 +287,18 @@ class Member(models.Model):
         if solved_tasks > 0:
             self.familiarity = self.familiar_tasks / solved_tasks
 
-    def n_tasks(self, hours: int, session: CachedTasks) -> int:
-        """Returns the number of tasks that the member can do in the given hours"""
+    def n_tasks(self, hours: int, session):
+        """
+        Returns the number of tasks that the member can do in the given hours.
+        As a second variable it also returns the poisson value it created.
+        """
         mu = (
             hours
             * ((self.efficiency + self.team.efficiency(session)) / 2)
             * (self.skill_type.throughput + self.xp)
         )
-        return int(np.mean((np.random.poisson(mu), mu)) * 0.2)
+        poisson = np.random.poisson(mu)
+        return int(np.mean((np.random.poisson(mu), mu)) * 0.2), poisson
 
     def solve_task(self, task: Task) -> float:
         """Returns the a likelihood of the member doing making a bug caused by lack of
