@@ -2,7 +2,6 @@ import math
 import operator
 
 
-from deprecated.classic import deprecated
 from numpy import mean
 from app.cache.scenario import CachedScenario
 from pydantic import BaseModel
@@ -26,7 +25,7 @@ def find_next_scenario_component(session: CachedScenario):
     This is probably not a fast way of finding the next component and should be replaced by a better system.
     """
     scenario = session.scenario
-    if end_of_simulation(scenario):
+    if end_of_simulation(session):
         scenario.ended = True
 
     # add all components here
@@ -51,21 +50,21 @@ def find_next_scenario_component(session: CachedScenario):
     return get_result_response(session)
 
 
-def end_of_fragment(scenario) -> bool:
+def end_of_fragment(session: CachedScenario) -> bool:
     """
     This function determines if the end condition of a simulation fragment is reached
     returns: boolean
     """
-
+    scenario = session.scenario
     try:
         fragment = SimulationFragment.objects.get(
-            template_scenario=scenario.template, index=scenario.state.component_counter
+            template_scenario=scenario.template, index=scenario.state.component_counter,
         )
     except:
         return False
 
     if fragment.last:
-        return end_of_simulation(scenario)
+        return end_of_simulation(session)
 
     limit = None
     end_type = fragment.simulation_end.type.lower()
@@ -119,14 +118,16 @@ def end_of_fragment(scenario) -> bool:
     #         # elif fragment.simulation_end.limit_type == "le":
 
 
-def end_of_simulation(scenario: UserScenario) -> bool:
-    tasks = Task.objects.filter(user_scenario=scenario).count()
-    tasks_integration = Task.objects.filter(
-        user_scenario=scenario,
-        unit_tested=True,  # TODO: CAHNGE BACK TO INTEGRATIO TESTED
-        # THIS IS ONLY BECAUSE WE CANNOT INTEGRATION TEST YET
-    ).count()
-    if tasks == tasks_integration:
+def end_of_simulation(session: CachedScenario) -> bool:
+    tasks = session.tasks
+    if not sum(
+        [
+            len(tasks.todo()),
+            len(tasks.done()),
+            len(tasks.bug()),
+            len(tasks.unit_tested()),
+        ]
+    ):
         return True
     return False
 
