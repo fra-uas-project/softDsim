@@ -67,12 +67,12 @@ def handle_end_request(req, session: CachedScenario):
     session.scenario.ended = True
 
 
-def handle_event_request(req, scenario):
+def handle_event_request(req, session: CachedScenario):
     pass
 
 
-def handle_end_request(req, scenario):
-    scenario.ended = True
+def handle_end_request(req, session: CachedScenario):
+    session.scenario.ended = True
 
 
 def get_actions_from_fragment(next_component) -> List[ActionDTO]:

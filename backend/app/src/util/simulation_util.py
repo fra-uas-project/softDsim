@@ -119,6 +119,8 @@ def end_of_fragment(session: CachedScenario) -> bool:
 
 
 def end_of_simulation(session: CachedScenario) -> bool:
+    if session.scenario.ended:
+        return True
     tasks = session.tasks
     if not sum(
         [
