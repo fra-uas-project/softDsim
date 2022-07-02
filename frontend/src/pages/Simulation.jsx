@@ -25,6 +25,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Question from "../components/Simulation/Actions/Question";
 import Action from "../components/Simulation/Actions/Action"
+import Event from "../components/Simulation/Event/Event"
 import ModelSelection from '../components/ModelSelection'
 import Result from "../components/Simulation/Result/Result"
 import { getCookie } from "../utils/utils"
@@ -185,6 +186,15 @@ const Simulation = () => {
 
         // update change value
         tempSkillTypeReturn[skillIndex].change = tempSkillTypeReturn[skillIndex].change + value
+
+        const tempReturnValues = {
+            scenario_id: currentSimID,
+            type: currentType,
+            actions: simFragmentActions,
+            members: tempSkillTypeReturn
+        }
+
+        setReturnValues(tempReturnValues)
 
         // update state
         setSkillTypeReturn(tempSkillTypeReturn)
@@ -518,6 +528,7 @@ const Simulation = () => {
                                             {/* Event */}
                                             {currentType === 'EVENT' ?
                                                 <>
+                                                    <Event eventText={simValues.text} />
                                                 </>
                                                 : <></>
                                             }
