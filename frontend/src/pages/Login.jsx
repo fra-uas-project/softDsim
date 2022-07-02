@@ -1,4 +1,4 @@
-import { Button, Checkbox, Flex, Heading, Input, InputGroup, InputRightElement, Select, Stack, Text } from "@chakra-ui/react"
+import { Button, Checkbox, Flex, Heading, Input, InputGroup, InputRightElement, Stack, Text } from "@chakra-ui/react"
 import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin } from "react-icons/hi";
 import React, { useContext, useState } from "react";
 import { getCookie } from "../utils/utils"
