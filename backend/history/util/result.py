@@ -39,7 +39,7 @@ def get_result_response(session: CachedScenario) -> ResultResponse:
                 tasks_bug=result.tasks_bug_discovered,
             ),
             team=scenario.team.stats(session.members),
-            members=get_member_report(scenario.team.id),
+            members=get_member_report(session.members),
             total_score=result.total_score,
             quality_score=result.quality_score,
             question_score=result.question_score,

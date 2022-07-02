@@ -198,9 +198,9 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
             text=event.text,
             effects=get_effects_from_event(event),
             management=session.scenario.get_management_goal_dto(),
-            tasks=get_tasks_status(session.scenario.id),
+            tasks=get_tasks_status(session),
             state=get_scenario_state_dto(session.scenario),
-            members=get_member_report(session.scenario.team.id),
+            members=get_member_report(session.members),
             team=session.scenario.team.stats(session.members),
         )
 
@@ -229,9 +229,9 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
         scenario_response = SimulationResponse(
             management=session.scenario.get_management_goal_dto(),
             actions=get_actions_from_fragment(next_component),
-            tasks=get_tasks_status(session.scenario.id),
+            tasks=get_tasks_status(session),
             state=get_scenario_state_dto(session.scenario),
-            members=get_member_report(session.scenario.team.id),
+            members=get_member_report(session.members),
             team=session.scenario.team.stats(session.members),
             text=next_component.text,
         )
@@ -241,8 +241,8 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
             management=session.scenario.get_management_goal_dto(),
             question_collection=get_question_collection(session.scenario),
             state=get_scenario_state_dto(session.scenario),
-            tasks=get_tasks_status(session.scenario.id),
-            members=get_member_report(session.scenario.team.id),
+            tasks=get_tasks_status(session),
+            members=get_member_report(session.members),
             team=session.scenario.team.stats(session.members),
             text=next_component.text,
         )
@@ -250,9 +250,9 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
     elif isinstance(next_component, ModelSelection):
         scenario_response = ModelSelectionResponse(
             management=session.scenario.get_management_goal_dto(),
-            tasks=get_tasks_status(session.scenario.id),
+            tasks=get_tasks_status(session),
             state=get_scenario_state_dto(session.scenario),
-            members=get_member_report(session.scenario.team.id),
+            members=get_member_report(session.members),
             models=next_component.models(),
             team=session.scenario.team.stats(session.members),
             text=next_component.text,
