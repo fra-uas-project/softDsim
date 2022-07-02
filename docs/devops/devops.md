@@ -4,6 +4,7 @@ certbot run -n -d uas.bspace.xyz,uas.dev.bspace.xyz,pp.uas.bspace.xyz  -m  bened
 certbot certonly --standalone -n -d uas.bspace.xyz,dev.uas.bspace.xyz,pp.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de --dry-run 
 certbot --expand -n -d uas.bspace.xyz,dev.uas.bspace.xyz,pp.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de 
 certbot certonly --cert-name uas.bspace.xyz -d dev.uas.bspace.xyz,pp.uas.bspace.xyz
+certbot certonly --standalone --cert-name softdsim.pro -d softdsim.pro,pp.softdsim.pro,dev.softdsim.pro
 
 ```
 ```
