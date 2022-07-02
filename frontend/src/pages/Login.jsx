@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, Input, InputGroup, InputRightElement, Stack, Text } from "@chakra-ui/react"
+import { Button, Checkbox, Flex, Heading, Input, InputGroup, InputRightElement, Select, Stack, Text } from "@chakra-ui/react"
 import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin } from "react-icons/hi";
 import React, { useContext, useState } from "react";
 import { getCookie } from "../utils/utils"
@@ -16,6 +16,7 @@ const Login = () => {
     const [logInSuccess, setLogInSuccess] = useState('none')
     const [userID, setUserID] = useState('')
     const [userPassword, setUserPassword] = useState('')
+    const [privacyPolicyAccepted, setPrivacyPolicyAccepted] = useState(false)
 
     // handle login click
     async function handleLogin() {
@@ -104,6 +105,11 @@ const Login = () => {
         setShowPassword(!showPassword)
     }
 
+    // handle event of user clicking privacy policy checkbox
+    function handlePrivacyClicked(event) {
+        setPrivacyPolicyAccepted(event.target.checked)
+    }
+
     return (
         <>
             <Flex align="center" justify="center" flexGrow="1" backgroundImage={landing_bg} backgroundPosition="center" backgroundSize="cover" backgroundRepeat="no-repeat">
@@ -131,16 +137,25 @@ const Login = () => {
                         </Text>
                     </Flex>
                     {/* Failed login message */}
-                    <Flex align="center" justify="center" h="40px">
+                    <Flex align="center" justify="center" h={logInSuccess !== 'none' ? "40px" : "0px"}>
                         {logInSuccess === 'wrongCredentials' ?
                             <Text textColor="red.500">Incorrect user credentials!</Text> : <></>}
                         {logInSuccess === 'unknown' ?
                             <Text textColor="red.500">Unknown Error - Please try again!</Text> : <></>}
                     </Flex>
+                    {/* Privacy Policy checkbox */}
+                    <Flex align="center" justify="center" my={5}>
+                        <Checkbox onChange={(event) => handlePrivacyClicked(event)}>
+                            <Flex gap={2}>
+                                <Text>I accept the </Text>
+                                <Text color="blue"><Link to={{ pathname: "/gdpr" }}>Privacy Policy</Link></Text>
+                            </Flex>
+                        </Checkbox>
+                    </Flex>
                     {/* login button */}
                     <Button rightIcon={<HiOutlineLogin />} isLoading={logInSuccess === 'attempting' ? true : false}
-                        colorScheme={idInputValid && passwortInputValid ? 'blue' : 'blackAlpha'} size='lg'
-                        onClick={handleLogin} isDisabled={!(idInputValid && passwortInputValid)}>
+                        colorScheme={idInputValid && passwortInputValid && privacyPolicyAccepted ? 'blue' : 'blackAlpha'} size='lg'
+                        onClick={handleLogin} isDisabled={!(idInputValid && passwortInputValid && privacyPolicyAccepted)}>
                         Login
                     </Button>
                     {/* Register Link */}
