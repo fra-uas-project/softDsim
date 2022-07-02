@@ -177,7 +177,11 @@ class Team(models.Model):
                 tasks_to_integration_test = tasks.unit_tested()
                 while n and len(tasks_to_integration_test):
                     t: Task = tasks_to_integration_test.pop()
-                    t.integration_tested = True
+                    if t.correct_specification:
+                        t.integration_tested = True
+                    else:
+                        t.done = False
+                    m.familiar_tasks -= 1
                     n -= 1
             if workpack.unittest:
                 tasks_to_test = tasks.done()
@@ -195,7 +199,10 @@ class Team(models.Model):
             while n and len(tasks_to_do):
                 t: Task = tasks_to_do.pop()
                 t.done = True
-                t.bug = probability((m.skill_type.error_rate + m.stress) / 2)
+                error_increase = m.solve_task(t)
+                t.bug = probability(
+                    (m.skill_type.error_rate + m.stress + error_increase) / 3
+                )
                 t.correct_specification = probability(self.management_skill)
                 t.unit_tested = False
                 t.integration_tested = False
@@ -289,4 +296,21 @@ class Member(models.Model):
             * ((self.efficiency + self.team.efficiency(session)) / 2)
             * (self.skill_type.throughput + self.xp)
         )
-        return int(np.mean((np.random.poisson(mu), mu)))
+        return int(np.mean((np.random.poisson(mu), mu)) * 0.2)
+
+    def solve_task(self, task: Task) -> float:
+        """Returns the a likelihood of the member doing making a bug caused by lack of
+        development skill. Also adjusts the member's motivation according to the task's
+        difficulty and the member's skill."""
+
+        # Get difference between task difficulty and member's skill
+        diff = self.skill_type.development_quality - (task.difficulty / 3) * 100
+
+        # If the task difficulty fits the skill type's development quality, motivation goes up
+        # If not (too easy or too difficult) motivation goes down
+        self.motivation = min(
+            self.motivation + round(0.005 - ((abs(diff) / 100) * 0.01), 4), 1
+        )
+
+        # If the task is too hard for the member the likelihood of an bug increases
+        return min(0, diff / 100)

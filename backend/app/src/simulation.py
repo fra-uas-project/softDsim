@@ -70,15 +70,14 @@ def simulate(req, session: CachedScenario) -> None:
     normal_work_hour_day: int = 8
 
     workpack = req.actions
+    logging.info(f"Workpack: {workpack}")
     days = workpack.days
 
     # you can not do more meetings than hours per day
-    start = time.perf_counter()
     if (workpack.meetings / days) > (normal_work_hour_day + workpack.overtime):
         raise TooManyMeetingsException(
             (workpack.meetings / days), (normal_work_hour_day + workpack.overtime)
         )
-    logging.warning(f"Meetings took {time.perf_counter() - start} seconds")
 
     start = time.perf_counter()
     if req.members and req.members != []:
@@ -190,7 +189,7 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
             tasks=get_tasks_status(session.scenario.id),
             state=get_scenario_state_dto(session.scenario),
             members=get_member_report(session.scenario.team.id),
-            team=session.scenario.team.stats(),
+            team=session.scenario.team.stats(session.members),
         )
 
         return complete_scenario_step(session, req, scenario_response)

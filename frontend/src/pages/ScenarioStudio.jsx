@@ -46,8 +46,6 @@ import {
 import {useImmer} from "use-immer";
 
 const ScenarioStudio = () => {
-
-    const HEIGHT = "900px";
     const toast = useToast();
 
     const [tabIndex, setTabIndex] = useState(1);
@@ -258,8 +256,8 @@ const ScenarioStudio = () => {
                 <Button variant="solid" colorScheme="blue" onClick={saveScenarioTemplate}>Save Template</Button>
             </HStack>
             <Box h={5}></Box>
-            <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="70vh">
-                <HStack w="full" h={HEIGHT} overflow="hidden" pt={2} spacing={5}
+            <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="70vh" maxH="73vh">
+                <HStack w="full" h="full" overflow="hidden" pt={2} spacing={5}
                         onClick={((e) => handleEditorBackgroundClick(e))}>
                     <DragDropContext onDragEnd={handleOnDragEnd}>
                         {/*Editor*/}
@@ -384,7 +382,7 @@ const ScenarioStudio = () => {
                                 </TabList>
 
                                 {/* h = full height - tab header */}
-                                <TabPanels minW="350px" h="850px" overflow="auto">
+                                <TabPanels minW="350px" h="650px" overflowY="auto">
                                     <TabPanel height="full">
                                         {/* Inspector Items */}
                                         {selectedObject ?
@@ -463,7 +461,7 @@ const ScenarioStudio = () => {
                                     </TabPanel>
 
                                     {/* Component Tab */}
-                                    <TabPanel>
+                                    <TabPanel pb={0} pt={0}>
                                         <ComponentTab
                                             finalComponentList={finalComponentList}
                                         />

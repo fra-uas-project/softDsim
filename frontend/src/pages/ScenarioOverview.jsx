@@ -85,15 +85,15 @@ const ScenarioOverview = () => {
                 </Breadcrumb>
                 <Heading>Scenarios</Heading>
                 <Box h={5}></Box>
-                <Box backgroundColor="white" borderRadius="2xl" minH="60vh">
-                    <Container maxW='6xl' pt={10}>
+                <Box backgroundColor="white" borderRadius="2xl" >
+                    <Container maxW='6xl' pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
                         {
                             isLoading ?
                                 <Flex w="full" justifyContent="center" alignItems="center">
                                     <Spinner size='xl'/>
                                 </Flex>
                                 :
-                                <TableContainer>
+                                <TableContainer overflowY="auto" h="full">
                                     <Table variant='simple' size="lg">
                                         <Thead>
                                             <Tr>

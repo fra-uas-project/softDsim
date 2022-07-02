@@ -148,19 +148,17 @@ class CachedTasks:
 
     def done_wrong_specification(self) -> Set[Task]:
         """Returns all tasks that were done with a wrong specification unknown to the team/user"""
-        return set(
-            filter(lambda t: t.done and not t.correct_specification, self.tasks,)
-        )
+        return set(filter(lambda t: t.done and not t.correct_specification, self.tasks))
 
     def solved(self) -> Set[Task]:
         """Returns all tasks that are done for the current UserScenario."""
-        return set(filter(lambda t: t.done, self.tasks,))
+        return set(filter(lambda t: t.done, self.tasks))
 
     def accepted(self) -> Set[Task]:
         """Returns all tasks that are accepted by customer."""
         return set(
             filter(
-                lambda t: t.done and not t.bug and t.correct_specification, self.tasks,
+                lambda t: t.done and not t.bug and t.correct_specification, self.tasks
             )
         )
 

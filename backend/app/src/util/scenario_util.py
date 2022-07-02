@@ -1,3 +1,4 @@
+import logging
 from typing import List
 from app.cache.scenario import CachedScenario
 from app.dto.request import (
@@ -49,6 +50,7 @@ def create_correct_request_model(request) -> ScenarioRequest:
     for key, value in request_types.items():
         if request.data.get("type") == key:
             a = value(**request.data)
+            logging.info(a)
             return a
 
 
