@@ -109,37 +109,21 @@ const LineChart = ({title, data}) => {
                 />
                 </Box>
             </VStack>
-            <VStack minW="200px">
+            <VStack minW="200px" alignItems="baseline">
                 <Stat>
-                    <StatLabel color="gray.400">Done</StatLabel>
-                    <StatNumber>1</StatNumber>
+                    <StatLabel color="gray.400">Cost</StatLabel>
+                    <StatNumber>$ {data.state.cost.toFixed(2)}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
-                        1 since last iteration
+                        $ {(series[0].data[series[0].data.length -1] - series[0].data[series[0].data.length -2]).toFixed(2)} since last iteration
                     </StatHelpText>
                 </Stat>
                 <Stat>
-                    <StatLabel color="gray.400">Integration tested</StatLabel>
-                    <StatNumber>1</StatNumber>
+                    <StatLabel color="gray.400">Linear Cost</StatLabel>
+                    <StatNumber>$ {series[1].data[series[1].data.length -1]}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
-                        1 since last iteration
-                    </StatHelpText>
-                </Stat>
-                <Stat>
-                    <StatLabel color="gray.400">Unit tested</StatLabel>
-                    <StatNumber>1</StatNumber>
-                    <StatHelpText>
-                        <StatArrow type="increase" />
-                        1 since last iteration
-                    </StatHelpText>
-                </Stat>
-                <Stat>
-                    <StatLabel color="gray.400">Bugs</StatLabel>
-                    <StatNumber>1</StatNumber>
-                    <StatHelpText>
-                        <StatArrow type="increase" />
-                        1 since last iteration
+                        $ {(series[1].data[series[1].data.length -1] - series[1].data[series[1].data.length -2]).toFixed(2)} since last iteration
                     </StatHelpText>
                 </Stat>
             </VStack>

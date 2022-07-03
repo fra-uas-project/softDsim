@@ -128,7 +128,7 @@ const TaskLineChart = ({title, data}) => {
                 />
                 </Box>
             </VStack>
-            <VStack minW="200px">
+            <VStack minW="200px" alignItems="baseline">
                 <Stat>
                     <StatLabel color="gray.400">Done</StatLabel>
                     <StatNumber>{data.tasks.tasks_done}</StatNumber>
