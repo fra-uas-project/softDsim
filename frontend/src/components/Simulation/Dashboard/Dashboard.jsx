@@ -1,7 +1,4 @@
-
-
-import {Flex, HStack, Tooltip,} from "@chakra-ui/react";
-
+import {Flex, Grid, HStack} from "@chakra-ui/react";
 import StatElement from "./StatElement";
 import {HiOutlineCalendar, HiOutlineCash, HiOutlineDocumentText} from "react-icons/hi";
 import OpenStoryButton from "./OpenStoryButton";
@@ -44,7 +41,7 @@ const Dashboard = ({data, story}) => {
 
     return (
         <>
-            <HStack pb={5} spacing={5} justifyContent="space-between">
+            <Grid pb={5} spacing={5} justifyContent="space-between" gap={5} templateColumns={{md: "1fr 1fr",xl: "1fr 1fr", "2xl": "auto 1fr 1fr 1fr"}}>
                 <OpenStoryButton story={story}/>
                 <StatElement
                     icon={HiOutlineCalendar}
@@ -76,14 +73,12 @@ const Dashboard = ({data, story}) => {
                     indicatorValue={tasks - tasksBefore}
                     indicatorColor={tasks - tasksBefore < 0 ? "green.400" : "red.400"}
                 />
-            </HStack>
-
-            <TaskLineChart title="Tasks" data={data} />
+            </Grid>
+            <TaskLineChart title="Tasks" data={data}/>
             <BudgetLineChart title="Budget" data={data}/>
-
             <Flex>
                 <HStack backgroundColor="white" borderRadius="2xl" p={5} w="full" justifyContent="center">
-                    <CircularChart value={data.team.stress} inverseColors={true} title="Avg. Stress" />
+                    <CircularChart value={data.team.stress} inverseColors={true} title="Avg. Stress"/>
                     <CircularChart value={data.team.motivation} inverseColors={false} title="Avg. Motivation"/>
                     <CircularChart value={data.team.familiarity} inverseColors={false} title="Avg. Familarity"/>
                 </HStack>

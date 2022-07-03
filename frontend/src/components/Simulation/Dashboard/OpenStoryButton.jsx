@@ -19,7 +19,7 @@ const OpenStoryButton = ({story}) => {
 
     return (
         <>
-        <VStack borderRadius="2xl" backgroundColor="white" p={5} cursor="pointer" transition="all 0.2s ease"
+        <VStack borderRadius="2xl" backgroundColor="white" p={5} cursor="pointer" w={{xl: "full", "2xl":"fit-content"}} transition="all 0.2s ease"
                 _hover={{boxShadow: 'xl'}}
                 onClick={onOpen}
         >
