@@ -23,20 +23,21 @@ import DeleteButton from "./DeleteButton";
 const EventInspectorForm = (props) => {
 
     const [displayName, setDisplayName] = useState(props.eventData?.displayName);
-    const [endConditionType, setEndConditionType] = useState(props.eventData?.trigger?.type);
-    const [endConditionLimit, setEndConditionLimit] = useState(props.eventData?.trigger?.limit);
-    const [limitType, setLimitType] = useState(props.eventData?.trigger?.limit_type);
+    const [endConditionType, setEndConditionType] = useState(props.eventData?.trigger_type);
+    const [endConditionLimit, setEndConditionLimit] = useState(props.eventData?.trigger_value);
+    const [limitType, setLimitType] = useState(props.eventData?.trigger_type);
 
     const formatDays = (val) => val + ` days`
     const parseDays = (val) => val.replace(/^\days/, '')
-
-    const [duration, setDuration] = useState(props.eventData.duration);
-    const [budget, setBudget] = useState(props.eventData.budget);
-    const [easyTasks, setEasyTasks] = useState(props.eventData.easy_tasks);
-    const [mediumTasks, setMediumTasks] = useState(props.eventData.medium_tasks);
-    const [hardTasks, setHardTasks] = useState(props.eventData.hard_tasks);
-    const [stress, setStress] = useState(props.eventData.stress);
-    const [motivation, setMotivation] = useState(props.eventData.motivation);
+    
+    const [duration, setDuration] = useState(props.eventData.effects.find((effect) => effect.type === "time")?.value || 0);
+    const [budget, setBudget] = useState(props.eventData.effects.find((effect) => effect.type === "budget")?.value);
+    const [easyTasks, setEasyTasks] = useState(props.eventData.effects.find((effect) => effect.type === "tasks")?.easy_tasks);
+    const [mediumTasks, setMediumTasks] = useState(props.eventData.effects.find((effect) => effect.type === "tasks")?.medium_tasks);
+    const [hardTasks, setHardTasks] = useState(props.eventData.effects.find((effect) => effect.type === "tasks")?.hard_tasks);
+    const [stress, setStress] = useState(props.eventData.effects.find((effect) => effect.type === "stress")?.value);
+    const [motivation, setMotivation] = useState(props.eventData.effects.find((effect) => effect.type === "motivation")?.value);
+    const [familiarity, setFamiliarity] = useState(props.eventData.effects.find((effect) => effect.type === "familiarity")?.value);
 
     const onChangeDisplayName = (value) => {
         setDisplayName(value)
@@ -55,7 +56,7 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.trigger.type = event.target.value;
+                component.trigger_type = event.target.value;
             })
     }
 
@@ -64,7 +65,7 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.trigger.limit = value;
+                component.trigger_value = value;
             })
     }
 
@@ -73,7 +74,7 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.trigger.limit_type = event.target.value;
+                component.trigger_comparator = event.target.value;
             })
     }
 
@@ -82,7 +83,15 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.duration = valueString;
+                const target = component.effects.filter((e) => e.type === "time")
+                if(target.length) {
+                    target.forEach(effect => effect.value = valueString)
+                } else {
+                    component.effects.push({
+                        type: "time",
+                        value: valueString
+                    });
+                }
             })
     };
 
@@ -91,7 +100,15 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.budget = value;
+                const target = component.effects.filter((e) => e.type === "budget")
+                if(target.length) {
+                    target.forEach(effect => effect.value = value)
+                } else {
+                    component.effects.push({
+                        type: "budget",
+                        value: value
+                    });
+                }
             })
     };
 
@@ -100,7 +117,17 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.easy_tasks = value;
+                const target = component.effects.filter((e) => e.type === "tasks")
+                if(target.length) {
+                    target.forEach(effect => effect.easy_tasks = value)
+                } else {
+                    component.effects.push({
+                        type: "tasks",
+                        easy_tasks: value,
+                        medium_tasks: 0,
+                        hard_tasks: 0
+                    });
+                }
             })
     };
 
@@ -109,7 +136,17 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.medium_tasks = value;
+                const target = component.effects.filter((e) => e.type === "tasks")
+                if(target.length) {
+                    target.forEach(effect => effect.medium_tasks = value)
+                } else {
+                    component.effects.push({
+                        type: "tasks",
+                        easy_tasks: 0,
+                        medium_tasks: value,
+                        hard_tasks: 0
+                    });
+                }
             })
     };
 
@@ -118,8 +155,17 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.hard_tasks = value;
-            })
+                const target = component.effects.filter((e) => e.type === "tasks")
+                if(target.length) {
+                    target.forEach(effect => effect.hard_tasks = value)
+                } else {
+                    component.effects.push({
+                        type: "tasks",
+                        easy_tasks: 0,
+                        medium_tasks: 0,
+                        hard_tasks: value
+                    });
+                }            })
     };
 
     const handleChangeStress = (value) => {
@@ -127,7 +173,32 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.stress = value;
+                const target = component.effects.filter((e) => e.type === "stress")
+                if(target.length) {
+                    target.forEach(effect => effect.value = value)
+                } else {
+                    component.effects.push({
+                        type: "stress",
+                        value: value
+                    });
+                }
+            })
+    };
+
+    const handleChangeFamiliarity = (value) => {
+        setFamiliarity(value)
+        props.updateEditorList(
+            (draft) => {
+                const component = draft.find((component) => component.id === props.eventData.id)
+                const target = component.effects.filter((e) => e.type === "familiarity")
+                if(target.length) {
+                    target.forEach(effect => effect.value = value)
+                } else {
+                    component.effects.push({
+                        type: "familiarity",
+                        value: value
+                    });
+                }
             })
     };
 
@@ -136,7 +207,15 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.motivation = value;
+                const target = component.effects.filter((e) => e.type === "motivation")
+                if(target.length) {
+                    target.forEach(effect => effect.value = value)
+                } else {
+                    component.effects.push({
+                        type: "motivation",
+                        value: value
+                    });
+                }
             })
     };
 
@@ -164,10 +243,11 @@ const EventInspectorForm = (props) => {
                 <Select placeholder='Select condition' value={endConditionType}
                         onChange={(event) => onChangeEndConditionType(event)}>
                     <option value='budget'>Budget</option>
-                    <option value='duration'>Duration</option>
+                    <option value='time'>Duration</option>
                     <option value='tasks_done'>Tasks done</option>
                     <option value='stress'>Stress Level</option>
                     <option value='motivation'>Motivation</option>
+                    <option value='familiarity'>Familiarity</option>
                 </Select>
 
                 <Box h={3}/>
@@ -181,8 +261,8 @@ const EventInspectorForm = (props) => {
                     {/* TODO Validate number input*/}
                     <NumberInput
                         min={0}
-                        step={(endConditionType === "motivation" || endConditionType === "stress") ? 0.01 : 1}
-                        max={(endConditionType === "motivation" || endConditionType === "stress") ? 1 : Infinity}
+                        step={(endConditionType === "motivation" || endConditionType === "stress" || endConditionType === "familiarity") ? 0.01 : 1}
+                        max={(endConditionType === "motivation" || endConditionType === "stress" || endConditionType === "familiarity") ? 1 : Infinity}
                         onChange={(value) => onChangeEndConditionLimit(value)}
                         value={endConditionLimit}>
                         <NumberInputField/>
@@ -286,6 +366,21 @@ const EventInspectorForm = (props) => {
                     </NumberInputStepper>
                 </NumberInput>
                 <FormHelperText>Motivation</FormHelperText>
+
+                <Box h={5}/>
+
+                <NumberInput
+                    step={0.01}
+                    max={1}
+                    onChange={(value) => handleChangeFamiliarity(value)}
+                    value={familiarity}>
+                    <NumberInputField/>
+                    <NumberInputStepper>
+                        <NumberIncrementStepper/>
+                        <NumberDecrementStepper/>
+                    </NumberInputStepper>
+                </NumberInput>
+                <FormHelperText>Familiarity</FormHelperText>
 
             </FormControl>
             <DeleteButton
