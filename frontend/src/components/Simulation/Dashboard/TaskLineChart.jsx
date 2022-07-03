@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Chart from "react-apexcharts";
-import {Heading, HStack, Stat, StatArrow, StatHelpText, StatLabel, StatNumber, VStack} from "@chakra-ui/react";
+import {Box, Heading, HStack, Stat, StatArrow, StatHelpText, StatLabel, StatNumber, VStack} from "@chakra-ui/react";
 import {useImmer} from "use-immer";
 
 const TaskLineChart = ({title, data}) => {
@@ -13,7 +13,15 @@ const TaskLineChart = ({title, data}) => {
             },
             zoom: {
                 enabled: false
-            }
+            },
+            responsive: [{
+                breakpoint: 1000,
+                options: {
+                    chart: {
+                        width: "200px"
+                    }
+                },
+            }]
         },
         annotations: {
             // xaxis: [
@@ -107,18 +115,20 @@ const TaskLineChart = ({title, data}) => {
     }, [data])
 
     return (
-        <HStack backgroundColor="white" borderRadius="2xl" p={5} mb={5} spacing={15} >
-            <VStack justifyContent="flex-start" alignItems="start">
+        <HStack backgroundColor="white" borderRadius="2xl" p={5} spacing={15} mb={5} w="full">
+            <VStack justifyContent="flex-start" alignItems="start" w="100%">
                 <Heading size="lg" ml={5}>{title}</Heading>
+                <Box w="100%" h="300px">
                 <Chart
                     options={options}
                     series={series}
                     type="line"
-                    width="700"
-                    height="300"
+                    width="100%"
+                    height="100%"
                 />
+                </Box>
             </VStack>
-            <VStack w="full">
+            <VStack minW="200px">
                 <Stat>
                     <StatLabel color="gray.400">Done</StatLabel>
                     <StatNumber>{data.tasks.tasks_done}</StatNumber>
@@ -152,7 +162,6 @@ const TaskLineChart = ({title, data}) => {
                     </StatHelpText>
                 </Stat>
             </VStack>
-
         </HStack>
     )
 }

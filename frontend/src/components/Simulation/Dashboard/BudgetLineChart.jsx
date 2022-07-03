@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Chart from "react-apexcharts";
-import {Heading, HStack, VStack} from "@chakra-ui/react";
+import {Box, Heading, HStack, Stat, StatArrow, StatHelpText, StatLabel, StatNumber, VStack} from "@chakra-ui/react";
 import {useImmer} from "use-immer";
 
 const LineChart = ({title, data}) => {
@@ -13,7 +13,15 @@ const LineChart = ({title, data}) => {
             },
             zoom: {
                 enabled: false
-            }
+            },
+            responsive: [{
+                breakpoint: 1000,
+                options: {
+                    chart: {
+                        width: "200px"
+                    }
+                },
+            }]
         },
         annotations: {
             yaxis: [
@@ -88,16 +96,52 @@ const LineChart = ({title, data}) => {
     }, [data])
 
     return (
-        <HStack backgroundColor="white" borderRadius="2xl" p={5} mb={5} spacing={15} >
-            <VStack justifyContent="flex-start" alignItems="start">
+        <HStack backgroundColor="white" borderRadius="2xl" p={5} spacing={15} mb={5} w="full">
+            <VStack justifyContent="flex-start" alignItems="start" w="full">
                 <Heading size="lg" ml={5}>{title}</Heading>
+                <Box w="100%" h="300px">
                 <Chart
                     options={options}
                     series={series}
                     type="line"
-                    width="700"
-                    height="300"
+                    width="100%"
+                    height="100%"
                 />
+                </Box>
+            </VStack>
+            <VStack minW="200px">
+                <Stat>
+                    <StatLabel color="gray.400">Done</StatLabel>
+                    <StatNumber>1</StatNumber>
+                    <StatHelpText>
+                        <StatArrow type="increase" />
+                        1 since last iteration
+                    </StatHelpText>
+                </Stat>
+                <Stat>
+                    <StatLabel color="gray.400">Integration tested</StatLabel>
+                    <StatNumber>1</StatNumber>
+                    <StatHelpText>
+                        <StatArrow type="increase" />
+                        1 since last iteration
+                    </StatHelpText>
+                </Stat>
+                <Stat>
+                    <StatLabel color="gray.400">Unit tested</StatLabel>
+                    <StatNumber>1</StatNumber>
+                    <StatHelpText>
+                        <StatArrow type="increase" />
+                        1 since last iteration
+                    </StatHelpText>
+                </Stat>
+                <Stat>
+                    <StatLabel color="gray.400">Bugs</StatLabel>
+                    <StatNumber>1</StatNumber>
+                    <StatHelpText>
+                        <StatArrow type="increase" />
+                        1 since last iteration
+                    </StatHelpText>
+                </Stat>
             </VStack>
         </HStack>
     )
