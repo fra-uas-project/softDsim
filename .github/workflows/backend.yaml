@@ -8,7 +8,7 @@ on:
     paths:
     - 'backend/**'
     - '.github/workflows/backend.yaml'
-    - 'deploy/*'
+    - 'deploy/**'
   workflow_dispatch:
 
 jobs:
