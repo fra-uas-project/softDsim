@@ -101,14 +101,10 @@ export const finalComponentList = [
         content: "Add events that have an impact on the management objectives.",
         text: "",
         icon: MdOutlineAttractions,
-        trigger: {},
-        budget: "0",
-        duration: "0",
-        easy_tasks: "0",
-        medium_tasks: "0",
-        hard_tasks: "0",
-        stress: "0",
-        motivation: "0"
+        trigger_type: "",
+        trigger_value: "",
+        trigger_comparator: "",
+        effects: [],
     },
 ]
 

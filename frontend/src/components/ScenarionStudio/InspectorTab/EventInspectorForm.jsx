@@ -55,7 +55,7 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.trigger.type = event.target.value;
+                component.trigger_type = event.target.value;
             })
     }
 
@@ -64,7 +64,7 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.trigger.limit = value;
+                component.trigger_value = value;
             })
     }
 
@@ -73,7 +73,7 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.trigger.limit_type = event.target.value;
+                component.trigger_comparator = event.target.value;
             })
     }
 
@@ -82,7 +82,15 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.duration = valueString;
+                const target = component.effects.filter((e) => e.type === "time")
+                if(target.length) {
+                    target.forEach(effect => effect.value = valueString)
+                } else {
+                    component.effects.push({
+                        type: "time",
+                        value: valueString
+                    });
+                }
             })
     };
 
@@ -91,7 +99,15 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.budget = value;
+                const target = component.effects.filter((e) => e.type === "budget")
+                if(target.length) {
+                    target.forEach(effect => effect.value = value)
+                } else {
+                    component.effects.push({
+                        type: "budget",
+                        value: value
+                    });
+                }
             })
     };
 
@@ -100,7 +116,17 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.easy_tasks = value;
+                const target = component.effects.filter((e) => e.type === "tasks")
+                if(target.length) {
+                    target.forEach(effect => effect.easy_tasks = value)
+                } else {
+                    component.effects.push({
+                        type: "tasks",
+                        easy_tasks: value,
+                        medium_tasks: 0,
+                        hard_tasks: 0
+                    });
+                }
             })
     };
 
@@ -109,7 +135,17 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.medium_tasks = value;
+                const target = component.effects.filter((e) => e.type === "tasks")
+                if(target.length) {
+                    target.forEach(effect => effect.medium_tasks = value)
+                } else {
+                    component.effects.push({
+                        type: "tasks",
+                        easy_tasks: 0,
+                        medium_tasks: value,
+                        hard_tasks: 0
+                    });
+                }
             })
     };
 
@@ -118,8 +154,17 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.hard_tasks = value;
-            })
+                const target = component.effects.filter((e) => e.type === "tasks")
+                if(target.length) {
+                    target.forEach(effect => effect.hard_tasks = value)
+                } else {
+                    component.effects.push({
+                        type: "tasks",
+                        easy_tasks: 0,
+                        medium_tasks: 0,
+                        hard_tasks: value
+                    });
+                }            })
     };
 
     const handleChangeStress = (value) => {
@@ -127,7 +172,15 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.stress = value;
+                const target = component.effects.filter((e) => e.type === "stress")
+                if(target.length) {
+                    target.forEach(effect => effect.value = value)
+                } else {
+                    component.effects.push({
+                        type: "stress",
+                        value: value
+                    });
+                }
             })
     };
 
@@ -136,7 +189,15 @@ const EventInspectorForm = (props) => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.motivation = value;
+                const target = component.effects.filter((e) => e.type === "motivation")
+                if(target.length) {
+                    target.forEach(effect => effect.value = value)
+                } else {
+                    component.effects.push({
+                        type: "motivation",
+                        value: value
+                    });
+                }
             })
     };
 
@@ -164,7 +225,7 @@ const EventInspectorForm = (props) => {
                 <Select placeholder='Select condition' value={endConditionType}
                         onChange={(event) => onChangeEndConditionType(event)}>
                     <option value='budget'>Budget</option>
-                    <option value='duration'>Duration</option>
+                    <option value='time'>Duration</option>
                     <option value='tasks_done'>Tasks done</option>
                     <option value='stress'>Stress Level</option>
                     <option value='motivation'>Motivation</option>
