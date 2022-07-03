@@ -72,9 +72,9 @@ jobs:
       name: Build and Publish latest service image
       with:
         github-push-secret: ${{secrets.GITHUB_TOKEN}}
-        docker-image-name: dj:
-        docker-image-tag: ${{ needs.version.outputs.vID }} # optional
-        dockerfile-path: ./DockerfileFrontend # optional
+        docker-image-name: dj
+        # docker-image-tag: ${{ needs.version.outputs.vID }} # optional
+        dockerfile-path: ./DockerfileBase # optional
         # build-context: ./backend/ # optional
 
 
@@ -133,11 +133,11 @@ jobs:
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
             cd ${{ secrets.BASE_DIR_APP }}${{ env.DIR }} \
             && ssh docker-agent <<-'EOF2'
-              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_app_${{ env.APP_ENV }} down
+              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_DEV_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_${{ env.APP_ENV }}_app down
             EOF2
             && ln -s ../.env ./prd/.env \
             && ln -sfn ${GITHUB_SHA} prd
             && ssh docker-agent <<-'EOF2'
-              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_app_${{ env.APP_ENV }} up -d
+              docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_DEV_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_${{ env.APP_ENV }}_app up -d
             EOF2
             EOF
