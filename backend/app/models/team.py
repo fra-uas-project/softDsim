@@ -116,11 +116,7 @@ class Team(models.Model):
 
     # ein tag
     def work(
-        self,
-        session: CachedScenario,
-        workpack: Workpack,
-        workpack_status,
-        current_day,
+        self, session: CachedScenario, workpack: Workpack, workpack_status, current_day,
     ):
 
         # work hours
@@ -131,6 +127,13 @@ class Team(models.Model):
         staff_cost = sum([m.skill_type.cost_per_day for m in session.members])
         logging.debug(f"staff cost: {staff_cost}")
         session.scenario.state.cost += staff_cost
+
+        # Every 7th day, the stress is reduces by the weekend reduction
+        if session.scenario.state.day % 7 == 0:
+            for member in session.members:
+                member.stress = max(
+                    0, member.stress - session.scenario.config.stress_weekend_reduction
+                )
 
         # 1. meeting
         for _ in range(workpack_status.meetings_per_day[current_day]):
@@ -156,10 +159,17 @@ class Team(models.Model):
             )
             for _ in range(remaining_trainings_today):
                 self.training(
-                    session,
-                    remaining_work_hours,
-                    mean_real_throughput_of_team,
+                    session, remaining_work_hours, mean_real_throughput_of_team,
                 )
+
+        # If the member has to work overtime hours the extra stress is added
+        # This also works for the negative case
+        for member in session.members:
+            member.stress = min(
+                1,
+                workpack.overtime * session.scenario.config.stress_overtime_increase
+                + member.stress,
+            )
 
         # 3. task work
         start = time.perf_counter()
