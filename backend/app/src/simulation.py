@@ -142,11 +142,10 @@ def simulate(req, session: CachedScenario) -> None:
 
     # team event
     if req.actions.teamevent:
-        members: List[Member] = Member.objects.filter(team_id=session.scenario.team.id)
-        cost = len(members) * session.scenario.config.cost_member_team_event
+        cost = len(session.members) * session.scenario.config.cost_member_team_event
         session.scenario.state.cost += cost
         session.scenario.state.day += 1
-        for member in members:
+        for member in session.members:
             # Stress is reduced by 50% ?
             member.stress = member.stress * 0.5
             # Motivation is increased by 20% ?
