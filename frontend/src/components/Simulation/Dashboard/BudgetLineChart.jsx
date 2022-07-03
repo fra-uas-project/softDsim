@@ -115,7 +115,7 @@ const LineChart = ({title, data}) => {
                     <StatNumber>$ {data.state.cost.toFixed(2)}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
-                        $ {(series[0].data[series[0].data.length -1] - series[0].data[series[0].data.length -2]).toFixed(2)} since last iteration
+                        $ {((series[0].data[series[0].data.length -1] - series[0].data[series[0].data.length -2]) || 0).toFixed(2)} since last iteration
                     </StatHelpText>
                 </Stat>
                 <Stat>
@@ -123,7 +123,7 @@ const LineChart = ({title, data}) => {
                     <StatNumber>$ {series[1].data[series[1].data.length -1]}</StatNumber>
                     <StatHelpText>
                         <StatArrow type="increase" />
-                        $ {(series[1].data[series[1].data.length -1] - series[1].data[series[1].data.length -2]).toFixed(2)} since last iteration
+                        $ {((series[1].data[series[1].data.length -1] - series[1].data[series[1].data.length -2]) || 0).toFixed(2)} since last iteration
                     </StatHelpText>
                 </Stat>
             </VStack>
