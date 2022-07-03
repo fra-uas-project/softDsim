@@ -58,7 +58,8 @@ def end_of_fragment(session: CachedScenario) -> bool:
     scenario = session.scenario
     try:
         fragment = SimulationFragment.objects.get(
-            template_scenario=scenario.template, index=scenario.state.component_counter,
+            template_scenario=scenario.template,
+            index=scenario.state.component_counter,
         )
     except:
         return False
@@ -234,6 +235,7 @@ def event_triggered(session: CachedScenario):
         "time": scenario.state.day,
         "stress": scenario.team.stress(session.members),
         "cost": scenario.state.cost,
+        "familiarity": scenario.team.familiarity(session.members),
     }
 
     effect_types = {
