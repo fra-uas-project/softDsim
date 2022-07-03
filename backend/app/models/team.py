@@ -128,8 +128,9 @@ class Team(models.Model):
         logging.debug(f"staff cost: {staff_cost}")
         session.scenario.state.cost += staff_cost
 
-        # Every 7th day, the stress is reduces by the weekend reduction
-        if session.scenario.state.day % 7 == 0:
+        # Every 5th day, the stress is reduces by the weekend reduction
+        # (5 because we only count workdays)
+        if session.scenario.state.day % 5 == 0:
             for member in session.members:
                 member.stress = max(
                     0, member.stress - session.scenario.config.stress_weekend_reduction
