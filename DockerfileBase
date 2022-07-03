@@ -8,7 +8,7 @@ COPY ./backend/requirements.txt /home/app/webapp/
 RUN pip install -r /home/app/webapp/requirements.txt
 
 # Entrypoint
-COPY ./entrypoint.sh /
+COPY ./deploy/entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 EXPOSE 8000
 CMD /entrypoint.sh
