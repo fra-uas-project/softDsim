@@ -52,6 +52,8 @@ from app.models.team import Member
 
 from django.core.exceptions import ObjectDoesNotExist
 from app.src.util.scenario_util import get_actions_from_fragment
+from history.models.result import Result
+from history.util.result import get_result_response, ResultDTO
 
 from history.write import write_history
 
@@ -256,12 +258,19 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
             team=session.scenario.team.stats(session.members),
             text=next_component.text,
         )
+    # 5.4 Check if next component is a Result -> Scenario is finished
+    elif isinstance(next_component, Result):
+        scenario_response = ResultDTO()
+        # didn't want to rewrite the whole get_result_response function
 
     return complete_scenario_step(session, req, scenario_response)
 
 
 def complete_scenario_step(session: CachedScenario, req, scenario_response):
     write_history(session.scenario, req, scenario_response.type)
+
+    if scenario_response.type == "RESULT":
+        return get_result_response(session)
 
     # increase counter
     increase_scenario_step_counter(session.scenario)
