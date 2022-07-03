@@ -51,6 +51,7 @@ def get_result_response(session: CachedScenario) -> ResultResponse:
             tasks_rejected=result.tasks_rejected,
             total_days=result.total_days,
             total_cost=result.total_cost,
+            play_time=result.time_played,
         )
     except Exception as e:
         msg = f"{e.__class__.__name__} occurred while getting result response for scenario {scenario.id}"
