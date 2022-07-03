@@ -1,8 +1,10 @@
 import Chart from "react-apexcharts";
 import React, {useState} from "react";
-import {Flex, Heading, VStack} from "@chakra-ui/react";
+import {Flex, Heading, useBreakpointValue, VStack} from "@chakra-ui/react";
 
 const CircularChart = ({value, inverseColors, title}) => {
+    const variant = useBreakpointValue({ base: "200", lg: "200", "2xl": "300" })
+
     const tmpOptions = {
         chart: {
             height: 350,
@@ -72,7 +74,7 @@ const CircularChart = ({value, inverseColors, title}) => {
                     options={options}
                     series={[value*100]}
                     type="radialBar"
-                    width="300"
+                    width={variant}
                 />
             </VStack>
         </Flex>
