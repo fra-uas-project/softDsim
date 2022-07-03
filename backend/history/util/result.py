@@ -1,4 +1,5 @@
 import logging
+import math
 
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
@@ -94,3 +95,9 @@ def calculate_time_played(scenario):
     history = History.objects.filter(user_scenario_id=scenario.id).order_by("id")
     start_time = history.first().timestamp
     end_time = history.last().timestamp
+
+    return math.floor((end_time - start_time).total_seconds())
+
+
+class ResultDTO:
+    type = "RESULT"
