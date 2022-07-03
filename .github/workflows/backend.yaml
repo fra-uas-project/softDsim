@@ -131,12 +131,12 @@ jobs:
     - name: Release Backend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
-            cd ${{ secrets.BASE_DIR_APP }}${{ env.DIR }} \
-            && ssh docker-agent <<-'EOF2'
+            ssh docker-agent <<-'EOF2'
               docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_DEV_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_${{ env.APP_ENV }}_app down
             EOF2
-            ln -sfn ${GITHUB_SHA} prd \
-            && ln -s ../env ${{ secrets.BASE_DIR_APP }}${{ env.DIR }}/prd/.env \
+            cd ${{ secrets.BASE_DIR_APP }}${{ env.DIR }} \
+            && ln -sfn ${GITHUB_SHA} ./prd \
+            && ln -s ../env ./prd/.env \
             && ssh docker-agent <<-'EOF2'
               docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_DEV_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_${{ env.APP_ENV }}_app up -d
             EOF2
