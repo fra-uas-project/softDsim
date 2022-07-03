@@ -31,7 +31,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       # with:
-      #   fetch-depth: 2 
+      #   fetch-depth: 2
     # - name: Check / set env Prod
     #   if: ${{ github.ref == 'refs/heads/main' }}
     #   run: |  
@@ -136,7 +136,7 @@ jobs:
             EOF2
             cd ${{ secrets.BASE_DIR_APP }}${{ env.APP_ENV }} \
             && ln -sfn ${GITHUB_SHA} ./prd \
-            && ln -s ../env ./prd/.env \
+            && ln -s ../.env ./prd/.env \
             && ssh docker-agent <<-'EOF2'
               docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_DEV_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}config/.env_${{ env.APP_ENV }}_app_compose up -d
             EOF2
