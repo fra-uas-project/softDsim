@@ -16,7 +16,7 @@ import DeleteButton from "./DeleteButton";
 const ModelSelectionInspectorForm = (props) => {
 
     const [displayName, setDisplayName] = useState(props.modelSelectionData?.displayName);
-    const [models, setModels] = useState([]);
+    const [models, setModels] = useState(props.modelSelectionData?.models);
 
     const allModels = ["Kanban", "Scrum", "Waterfall"];
 
@@ -70,7 +70,7 @@ const ModelSelectionInspectorForm = (props) => {
             <FormControl flexDir="column" display="flex">
                 <FormLabel color="gray.400" htmlFor="">Available Management Models</FormLabel>
                 {allModels.map((value, index) => {
-                    return <Checkbox key={index} spacing='1rem' mb="0.5rem" value={value} onChange={(event) => onChangeModels(event)}>{value}</Checkbox>
+                    return <Checkbox key={index} spacing='1rem' mb="0.5rem" value={value} onChange={(event) => onChangeModels(event)} isChecked={models.includes(value)}>{value}</Checkbox>
                 })}
             </FormControl>
             <DeleteButton
