@@ -1,4 +1,5 @@
 import {
+ AlertDialogBody,AlertDialogOverlay,AlertDialogContent, AlertDialogFooter, AlertDialogHeader,AlertDialog,
     Box,
     Breadcrumb,
     BreadcrumbItem,
@@ -16,12 +17,12 @@ import {
     Text,
     UnorderedList,
     useToast,
-    VStack
+    VStack, useDisclosure,
 } from "@chakra-ui/react";
 import {HiChevronRight} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef,} from "react";
 import {v4 as uuidv4} from 'uuid';
 import EditorListComponent from "../components/ScenarionStudio/Editor/EditorListComponent";
 import ComponentTab from "../components/ScenarionStudio/ComponentTab/ComponentTab";
@@ -49,6 +50,8 @@ const ScenarioStudio = () => {
     const toast = useToast();
 
     const [tabIndex, setTabIndex] = useState(1);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const cancelRef = useRef();
     const [editorList, updateEditorList] = useImmer([]);
     const [selectedObject, setSelectedObject] = useState(null);
 
@@ -85,8 +88,10 @@ const ScenarioStudio = () => {
             console.log(e);
         }
     };
+    
 
     const handleOnDragEnd = (result) => {
+       
         // TODO deconstruct result
 
         // handle moving outside droppables
@@ -251,8 +256,37 @@ const ScenarioStudio = () => {
                     <BreadcrumbLink href=''>Scenarios Studio</BreadcrumbLink>
                 </BreadcrumbItem>
             </Breadcrumb>
-            <HStack justifyContent="space-between" mr={3}>
+            <HStack justifyContent="space-between" mr={5}>
                 <Heading>Scenario Studio</Heading>
+                <Button colorScheme='red' onClick={onOpen}>
+                Important Information!
+                </Button>
+
+                <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                >
+                <AlertDialogOverlay>
+                <AlertDialogContent>
+                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                    Unsaved Content<hr></hr>
+                    </AlertDialogHeader>
+
+                    <AlertDialogBody>
+                    Any unsaved Template will be lost if you leave this Pages without clicking on "Save Teamplate" in the components section on the right.
+                    </AlertDialogBody>
+
+                    <AlertDialogFooter>
+                    <Button ref={cancelRef} onClick={onClose} colorScheme='red'>
+                        Got it!
+                    </Button>
+                    
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+                </AlertDialogOverlay>
+                </AlertDialog>
+                
                 <Button variant="solid" colorScheme="blue" onClick={saveScenarioTemplate}>Save Template</Button>
             </HStack>
             <Box h={5}></Box>
@@ -360,6 +394,7 @@ const ScenarioStudio = () => {
                                                     <Text pointerEvents="none" fontSize="xl" mt="20px">(Create a
                                                         complex
                                                         scenario by drag and dropping different components)</Text>
+                                                        
                                                 </VStack>
                                         }
                                         {provided.placeholder}
