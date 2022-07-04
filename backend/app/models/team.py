@@ -116,7 +116,11 @@ class Team(models.Model):
 
     # ein tag
     def work(
-        self, session: CachedScenario, workpack: Workpack, workpack_status, current_day,
+        self,
+        session: CachedScenario,
+        workpack: Workpack,
+        workpack_status,
+        current_day,
     ):
 
         # work hours
@@ -160,7 +164,9 @@ class Team(models.Model):
             )
             for _ in range(remaining_trainings_today):
                 self.training(
-                    session, remaining_work_hours, mean_real_throughput_of_team,
+                    session,
+                    remaining_work_hours,
+                    mean_real_throughput_of_team,
                 )
 
         # If the member has to work overtime hours the extra stress is added
@@ -308,6 +314,10 @@ class Member(models.Model):
             * ((self.efficiency + self.team.efficiency(session)) / 2)
             * (self.skill_type.throughput + self.xp)
         )
+
+        if session.scenario.config.randomness == "none":
+            return int(mu * 0.2), 0
+
         poisson = np.random.poisson(mu)
         return int(np.mean((poisson, mu)) * 0.2), poisson
 

@@ -13,3 +13,4 @@ class ScenarioConfig(models.Model):
     done_tasks_familiarity_factor = models.FloatField(default=10)
     train_skill_increase_rate = models.FloatField(default=0.1)
     cost_member_team_event = models.FloatField(default=500.0)
+    randomness = models.TextField(default="full")  # 'full', 'semi', 'none'
