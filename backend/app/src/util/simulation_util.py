@@ -14,6 +14,7 @@ from app.models.model_selection import ModelSelection
 from app.models.task import Task, CachedTasks
 from app.models.team import Member, Team
 from app.models.user_scenario import UserScenario, EventStatus
+from history.models.result import Result
 
 from history.util.result import get_result_response
 
@@ -45,9 +46,8 @@ def find_next_scenario_component(session: CachedScenario):
                 return find_next_scenario_component(session)
             return fetched_component
 
-    # send ResultResponse when scenario is finished
-
-    return get_result_response(session)
+    # return an empty Result object if finished -> continue_simulation function will create ResultResponse
+    return Result()
 
 
 def end_of_fragment(session: CachedScenario) -> bool:
@@ -58,7 +58,8 @@ def end_of_fragment(session: CachedScenario) -> bool:
     scenario = session.scenario
     try:
         fragment = SimulationFragment.objects.get(
-            template_scenario=scenario.template, index=scenario.state.component_counter,
+            template_scenario=scenario.template,
+            index=scenario.state.component_counter,
         )
     except:
         return False
@@ -77,8 +78,7 @@ def end_of_fragment(session: CachedScenario) -> bool:
     elif end_type == "budget":
         limit = scenario.state.cost
     elif end_type == "tasks_done":
-        tasks_done = Task.objects.filter(user_scenario=scenario, done=True)
-        limit = len(tasks_done)
+        limit = len(session.tasks.done())
 
     if (
         fragment.simulation_end.limit_type == "ge"

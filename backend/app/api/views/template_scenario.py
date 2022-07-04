@@ -186,6 +186,10 @@ class TemplateScenarioFromStudioView(APIView):
             )
 
         except Exception as e:
+            try:
+                scenario.delete()
+            except Exception:
+                logging.warn("Could not delete scenario after failed creation")
             msg = f"{e.__class__.__name__} occured while creating template scenario from studio"
             logging.error(msg)
             return Response(

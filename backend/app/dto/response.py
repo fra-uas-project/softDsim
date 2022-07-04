@@ -123,6 +123,7 @@ class ResultResponse(ScenarioResponse):
     tasks_rejected: int
     total_days: int
     total_cost: int
+    play_time: int
 
 
 class ModelSelectionResponse(ScenarioResponse):
