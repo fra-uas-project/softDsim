@@ -9,3 +9,8 @@
 
 ### Domain, proposal: own Domain, not via CIT
 > pro: fast adjustable, automatable
+
+### Respository evaluation
+> use ghcr (Github Container Registry)
+> - free 
+> - integrate into github action workflow
