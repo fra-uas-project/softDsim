@@ -315,11 +315,15 @@ class Member(models.Model):
             * (self.skill_type.throughput + self.xp)
         )
 
+        # varying degrees of randomness (none=no randomness, semi=some randomness, full=full randomness)
         if session.scenario.config.randomness == "none":
             return int(mu * 0.2), 0
 
         poisson = np.random.poisson(mu)
-        return int(np.mean((poisson, mu)) * 0.2), poisson
+        if session.scenario.config.randomness == "semi":
+            return int(np.mean((poisson, mu)) * 0.2), poisson
+
+        return int(poisson * 0.2), poisson
 
     def solve_task(self, task: Task) -> float:
         """Returns the a likelihood of the member doing making a bug caused by lack of
