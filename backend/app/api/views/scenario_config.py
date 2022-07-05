@@ -23,7 +23,7 @@ class ScenarioConfigView(APIView):
                 status=status.HTTP_200_OK,
             )
         else:
-            print("Invalid")
+            print("ScenarioConfig is Invalid")
             return Response(
                 {"status": "error", "data": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,

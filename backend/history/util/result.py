@@ -52,6 +52,7 @@ def get_result_response(session: CachedScenario) -> ResultResponse:
             total_days=result.total_days,
             total_cost=result.total_cost,
             play_time=result.time_played,
+            randomness=result.randomness,
         )
     except Exception as e:
         msg = f"{e.__class__.__name__} occurred while getting result response for scenario {scenario.id}"
@@ -81,6 +82,7 @@ def write_result_entry(scenario):
         username=scenario.user.username,
         avg_poisson_value=scenario.state.poisson_sum / scenario.state.poison_counter,
         time_played=calculate_time_played(scenario),
+        randomness=scenario.config.randomness,
     )
     logging.info(f"Created result entry for scenario {scenario.id}")
     return result

@@ -124,6 +124,7 @@ class ResultResponse(ScenarioResponse):
     total_days: int
     total_cost: int
     play_time: int
+    randomness: str
 
 
 class ModelSelectionResponse(ScenarioResponse):

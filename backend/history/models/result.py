@@ -54,3 +54,5 @@ class Result(models.Model):
     username = models.TextField(blank=True, null=True)
     avg_poisson_value = models.FloatField(blank=True, null=True)
     time_played = models.PositiveIntegerField(blank=True, null=True)  # value in seconds
+
+    randomness = models.TextField(blank=True, null=True)
