@@ -50,7 +50,36 @@ const ScenarioStudio = () => {
 
     const [tabIndex, setTabIndex] = useState(1);
     const [editorList, updateEditorList] = useImmer([]);
-    const [selectedObject, setSelectedObject] = useState(null);
+    const [selectedObjectId, setSelectedObjectId] = useState(null);
+
+
+    const selectComponent = (id) => {
+        const component = editorList.find(component => component.id === id)
+
+        const fragmentList = editorList.filter(component => component.type === componentEnum.FRAGMENT)
+        let actions = []
+        for (const fragment of fragmentList) {
+            actions = [...actions, ...fragment.actions]
+        }
+        const action = actions.find(action => action.id === id)
+
+        const questionsList = editorList.filter(component => component.type === componentEnum.QUESTIONS)
+        let questions = []
+        for (const questionsListElement of questionsList) {
+            questions = [...questions, ...questionsListElement.questions]
+        }
+        const question = questions.find(question => question.id === id)
+
+        if (component) {
+            return component
+        } else if (action) {
+            return action
+        } else if (question) {
+            return question
+        }
+    }
+
+    const selectedObject = selectComponent(selectedObjectId)
 
     const saveScenarioTemplate = async () => {
         try {
@@ -117,7 +146,7 @@ const ScenarioStudio = () => {
             editorListItems.splice(result.destination.index, 0, movedItemCopy);
             updateEditorList(editorListItems);
 
-            setSelectedObject(movedItemCopy)
+            setSelectedObjectId(movedItemCopy.id)
 
             // moving from action list to fragment in editor
         } else if (result.source.droppableId === "actionList") {
@@ -211,11 +240,11 @@ const ScenarioStudio = () => {
         const question = questions.find(question => question.id === e.currentTarget.getAttribute("elementid"))
 
         if (component) {
-            setSelectedObject(component)
+            setSelectedObjectId(component.id)
         } else if (action) {
-            setSelectedObject(action)
+            setSelectedObjectId(action.id)
         } else if (question) {
-            setSelectedObject(question)
+            setSelectedObjectId(question.id)
         }
     }
 
@@ -226,7 +255,7 @@ const ScenarioStudio = () => {
     const handleEditorBackgroundClick = (e) => {
         // if (e.target.getAttribute("elementid") === "backgroundList") {
         //     setTabIndex(tabIndexEnum.COMPONENTS)
-        //     setSelectedObject(null)
+        //     setSelectedObjectId(null)
         // }
     };
 
@@ -392,7 +421,7 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         baseData={selectedObject}
                                                         updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObject}
+                                                        setSelectedObject={setSelectedObjectId}
                                                     />
                                                 }
 
@@ -402,7 +431,7 @@ const ScenarioStudio = () => {
                                                         finalQuestionList={finalQuestionList}
                                                         questionsData={selectedObject}
                                                         updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObject}
+                                                        setSelectedObject={setSelectedObjectId}
                                                     />
                                                 }
 
@@ -412,7 +441,7 @@ const ScenarioStudio = () => {
                                                         finalActionList={finalActionList}
                                                         fragmentData={selectedObject}
                                                         updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObject}
+                                                        setSelectedObject={setSelectedObjectId}
                                                     />
                                                 }
 
@@ -421,7 +450,7 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         eventData={selectedObject}
                                                         updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObject}
+                                                        setSelectedObject={setSelectedObjectId}
                                                     />
                                                 }
 
@@ -430,7 +459,7 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         modelSelectionData={selectedObject}
                                                         updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObject}
+                                                        setSelectedObject={setSelectedObjectId}
                                                     />
                                                 }
 
@@ -439,16 +468,17 @@ const ScenarioStudio = () => {
                                                         key={selectedObject.id}
                                                         actionData={selectedObject}
                                                         updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObject}
+                                                        setSelectedObject={setSelectedObjectId}
                                                     />
                                                 }
 
                                                 {(selectedObject?.type === questionEnum.SINGLE || selectedObject?.type === questionEnum.MULTI) &&
                                                     <QuestionInspectorForm
-                                                        key={selectedObject.id}
+                                                        /* key = answers to trigger rerender on answer change*/
+                                                        key={selectedObject.answers + selectedObject.id}
                                                         questionData={selectedObject}
                                                         updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObject}
+                                                        setSelectedObject={setSelectedObjectId}
                                                     />
                                                 }
                                             </VStack>

@@ -71,7 +71,11 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
             points: "0",
             right: false
         }
-        setAnswers([...answers, newAnswer])
+        updateEditorList(
+            (draft) => {
+                const question = findQuestion(questionData.id, draft)
+                question.answers.push(newAnswer);
+            })
     };
 
     const removeAnswer = (id) => {
