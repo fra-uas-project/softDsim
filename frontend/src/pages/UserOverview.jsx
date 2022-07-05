@@ -23,7 +23,7 @@ import {
     Tr,
     useDisclosure,
     useToast,
-    Divider,
+    Divider,HStack,
 } from "@chakra-ui/react";
 import { HiChevronRight, HiOutlineCheck, HiOutlineTrash, HiOutlineX } from "react-icons/hi";
 import { useEffect, useRef, useState } from "react";
@@ -232,12 +232,13 @@ const UserOverview = () => {
                             </Tbody>
                         </Table>
                         <Divider />
+                        <HStack justifyContent="space-between" mr={3}>
                         <AddUser />
                         <Flex align="center" justify="center">
                             <Link to={{ pathname: "/addusers" }}>
                                 <Button colorScheme='blue'>Add multiple Users</Button>
                             </Link>
-                        </Flex>
+                        </Flex></HStack>
                     </TableContainer>
                 </Container>
             </Box>
