@@ -234,6 +234,7 @@ def event_triggered(session: CachedScenario):
         "time": scenario.state.day,
         "stress": scenario.team.stress(session.members),
         "cost": scenario.state.cost,
+        "familiarity": scenario.team.familiarity(session.members),
     }
 
     effect_types = {
