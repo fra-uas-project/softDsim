@@ -27,7 +27,7 @@ const SkilltypeContainer = ({skillTypeReturn, simValues, updateSkillTypeObject})
         <Grid borderRadius="xl">
             <ActionElement title="Employees"
                            secondaryText="Hire employees"
-                           icon={actionIcon.SKILLTYPE} tooltip={"Add tooltip here"}>
+                           icon={actionIcon.SKILLTYPE} tooltip={"Choose the necessary amount of the specific skilltype which is needed for the current project"}>
                 <IconButton aria-label="Expand and collapse actions"
                             icon={actionListExpanded ? <HiOutlineChevronDown/> : <HiOutlineChevronLeft/>}
                             variant="ghost"
