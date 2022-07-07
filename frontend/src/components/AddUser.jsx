@@ -6,13 +6,13 @@ import {
     ModalFooter,
     ModalBody,
     ModalCloseButton,
-    Button, useDisclosure,Box,Stack, Input,InputGroup,InputRightElement, Flex, Heading,
-    Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody 
-  } from '@chakra-ui/react';
-  import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin, HiOutlineInformationCircle } from "react-icons/hi";
-  import React, { useState } from "react";
+    Button, useDisclosure, Box, Stack, Input, InputGroup, InputRightElement, Flex, Heading,
+    Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody
+} from '@chakra-ui/react';
+import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin, HiOutlineInformationCircle } from "react-icons/hi";
+import React, { useState } from "react";
 
-  const AddUser = () => {
+const AddUser = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [showPassword, setShowPassword] = useState(false)
     const [showRepeatPassword, setShowRepeatPassword] = useState(false)
@@ -26,16 +26,15 @@ import {
     // validate user ID input
     function useridInput(event) {
         setUserID(event.target.value)
-        const mailDomain = new RegExp(/^\S+@*.fra-uas.de\s*$/)
-        if (mailDomain.test(String(event.target.value).toLowerCase())) {
+        if (event.target.value !== '') {
             setIdInputValid(true)
         } else {
             setIdInputValid(false)
         }
     }
 
-     // validate user password input
-     function userPasswordInput(event) {
+    // validate user password input
+    function userPasswordInput(event) {
         setUserPassword(event.target.value)
         const numberRegex = new RegExp(/[0-9]/)
         if (event.target.value === '') {
@@ -101,75 +100,66 @@ import {
     }
     return (
         <>
-        <Box align="center" justify="center" p='3'>
-      <Button onClick={onOpen} align="center" justify="center" colorScheme='blue'>Add new User</Button>
+            <Box align="center" justify="center" p='3'>
+                <Button onClick={onOpen} align="center" justify="center" colorScheme='blue'>Add new User</Button>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Adding User</ModalHeader>
-          <Flex align="center" justify="center" mb={5}>
-                        <Flex w="10%"></Flex>
-                        <Heading w="80%" as="h5" textAlign="center">Create New User</Heading>
-                        <Popover w="10%">
-                            <PopoverTrigger>
-                                <Button><HiOutlineInformationCircle /></Button>
-                            </PopoverTrigger>
-                            <PopoverContent>
-                                <PopoverArrow />
-                                <PopoverCloseButton />
-                                <PopoverHeader fontWeight="bold">Email Guideline</PopoverHeader>
-                                <PopoverBody>Email must be within the FRA-UAS domain.</PopoverBody>
-                                <PopoverHeader fontWeight="bold">Password Guideline</PopoverHeader>
-                                <PopoverBody>Password must be at least 6 characters strong and contain at least one number.</PopoverBody>
-                            </PopoverContent>
-                        </Popover>
-                    </Flex>
-          <ModalCloseButton />
-          <ModalBody>
-          
-          <Stack spacing={5}>
-                        <Input type="text" placeholder="User ID" size='lg' bg='#efefef' onChange={useridInput} />
-                        <InputGroup>
-                            <Input type={showPassword ? "text" : "password"} placeholder="Password" size="lg"
-                                bg="#efefef" onChange={userPasswordInput} />
-                            {/* show password */}
-                            <InputRightElement h="full">
-                                <Button size='xl' onClick={showPasswordClicked}>
-                                    {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-                                </Button>
-                            </InputRightElement>
-                        </InputGroup>
-                        <InputGroup>
-                            <Input type={showRepeatPassword ? "text" : "password"} placeholder="Repeat Password" size="lg"
-                                bg="#efefef" onChange={userRepeatPasswordInput} />
-                            {/* show password */}
-                            <InputRightElement h="full">
-                                <Button size='xl' onClick={showPasswordRepeatClicked}>
-                                    {showRepeatPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-                                </Button>
-                            </InputRightElement>
-                        </InputGroup>
-                    </Stack>
+                <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Adding User</ModalHeader>
+                        <Flex align="center" justify="center" p={5}>
+                            <Flex w="10%"></Flex>
+                            <Heading w="80%" as="h5" textAlign="center">Create New User</Heading>
+                            <Popover w="10%">
+                                <PopoverTrigger>
+                                    <Button><HiOutlineInformationCircle /></Button>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                    <PopoverArrow />
+                                    <PopoverCloseButton />
+                                    <PopoverHeader fontWeight="bold">Password Guideline</PopoverHeader>
+                                    <PopoverBody>Password must be at least 6 characters strong and contain at least one number.</PopoverBody>
+                                </PopoverContent>
+                            </Popover>
+                        </Flex>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            <Stack spacing={5}>
+                                <Input type="text" placeholder="User ID" size='lg' bg='#efefef' onChange={useridInput} />
+                                <InputGroup>
+                                    <Input type={showPassword ? "text" : "password"} placeholder="Password" size="lg"
+                                        bg="#efefef" onChange={userPasswordInput} />
+                                    {/* show password */}
+                                    <InputRightElement h="full">
+                                        <Button size='xl' onClick={showPasswordClicked}>
+                                            {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
+                                        </Button>
+                                    </InputRightElement>
+                                </InputGroup>
+                                <InputGroup>
+                                    <Input type={showRepeatPassword ? "text" : "password"} placeholder="Repeat Password" size="lg"
+                                        bg="#efefef" onChange={userRepeatPasswordInput} />
+                                    {/* show password */}
+                                    <InputRightElement h="full">
+                                        <Button size='xl' onClick={showPasswordRepeatClicked}>
+                                            {showRepeatPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
+                                        </Button>
+                                    </InputRightElement>
+                                </InputGroup>
+                            </Stack>
+                        </ModalBody>
+                        <ModalFooter align="center" justifyContent="center" >
+                            <Button rightIcon={<HiOutlineLogin />} isLoading={registerSuccess === 'attempting' ? true : false}
+                                colorScheme={idInputValid && passwortInputValid && passwortRepeatInputValid ? 'blue' : 'blackAlpha'} size='lg'
+                                onClick={register} isDisabled={!(idInputValid && passwortInputValid && passwortRepeatInputValid)}>
+                                Register
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            </Box>
+        </>
+    )
+}
 
-          </ModalBody>
-          
-
-          <ModalFooter>
-          
-          <Button rightIcon={<HiOutlineLogin />} isLoading={registerSuccess === 'attempting' ? true : false}
-                        colorScheme={idInputValid && passwortInputValid && passwortRepeatInputValid ? 'blue' : 'blackAlpha'} size='lg'
-                        onClick={register} isDisabled={!(idInputValid && passwortInputValid && passwortRepeatInputValid)}>
-                        Register
-                    </Button>
-            
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      </Box>
-    </>
-  )
-
-  }
-
-  export default AddUser;
+export default AddUser;
