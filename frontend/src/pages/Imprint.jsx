@@ -17,25 +17,23 @@ const Imprint = () => {
                         <b>Angaben gemäß § 5 TMG</b>
                         <br />
                         <br />
-                        Max Muster
+                        Frankfurt University of Applied Sciences
                         <br />
-                        Musterweg
+                        Nibelungenplatz 1
                         <br />
-                        12345 Musterstadt
-                        <br />
-                        <br />
-                        Vertreten durch:
-                        <br />
-                        Max Mustermann
+                        60318 Frankfurt
                         <br />
                         <br />
-                        Kontakt:
+                        <Text fontWeight="bold">Vertreten durch:</Text>
+                        Michael Hefter
                         <br />
-                        Telefon: 01234-789456
                         <br />
-                        Fax: 1234-56789
+                        <Text fontWeight="bold">Kontakt:</Text>
+                        Telefon: +49 69 1533-2727
                         <br />
-                        E-Mail: max@muster.de
+                        <Flex flexFlow="row">
+                            E-Mail: <Text color="blue" ml="1"><a href="mailto:hefter@fb2.fra-uas.de">hefter@fb2.fra-uas.de</a></Text>
+                        </Flex>
                     </Text>
                 </GridItem>
                 <GridItem rowSpan={2} colSpan={1} p='5' boxShadow='md' rounded='md' bg='gray.200'>
