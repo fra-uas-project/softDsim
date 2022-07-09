@@ -20,15 +20,15 @@ import {
     Tooltip,
     useDisclosure,
 } from "@chakra-ui/react";
-import {HiChevronRight} from "react-icons/hi";
-import {useEffect, useState} from "react";
-import {Link, useLocation} from "react-router-dom";
+import { HiChevronRight } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Question from "../components/Simulation/Actions/Question";
 import Action from "../components/Simulation/Actions/Action"
 import Event from "../components/Simulation/Event/Event"
 import ModelSelection from '../components/ModelSelection'
 import Result from "../components/Simulation/Result/Result"
-import {getCookie} from "../utils/utils"
+import { getCookie } from "../utils/utils"
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 import SkilltypeContainer from "../components/Simulation/Actions/SkilltypeContainer";
@@ -342,6 +342,12 @@ const Simulation = () => {
             } else if (nextData.type === 'EVENT') {
                 setDataValidationStatus(true)
                 setSimValues(nextData)
+
+                const tempReturnValues = {
+                    scenario_id: simID,
+                    type: nextData.type
+                }
+                setReturnValues(tempReturnValues)
             } else if (nextData.type === 'RESULT') {
                 setDataValidationStatus(true)
                 setSimValues(nextData)
@@ -469,7 +475,7 @@ const Simulation = () => {
                         <Flex h='full' flexDir={{ md: "column", lg: "row" }}>
                             {scenarioIsLoading ? <Skeleton height='70vh' w="full" borderRadius="2xl" /> :
                                 <>
-                                    <Box w={{ md: "100%", lg: "62%" }} mb={{md: 5, lg: 0}}>
+                                    <Box w={{ md: "100%", lg: "62%" }} mb={{ md: 5, lg: 0 }}>
                                         <Dashboard data={simValues} story={story} />
                                     </Box>
                                     <Spacer />
