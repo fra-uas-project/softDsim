@@ -1,0 +1,19 @@
+FROM nginx:1.22
+# WORKDIR /home/webapp
+
+# RUN groupadd -r www-data && useradd --no-log-init -r -g www-data www-data
+# Install requirements
+# COPY --chown=nginx:nginx ./frontend/build/ .
+# COPY --chown=nginx:nginx ./deploy/nginx-frontend.conf /etc/nginx/nginx.conf
+COPY ./frontend/build/ /usr/share/nginx/html/
+COPY ./deploy/nginx-frontend.conf /etc/nginx/nginx.conf
+# RUN     chown -R nginx:nginx /var/cache/nginx && \
+#         chown -R nginx:nginx /var/log/nginx && \
+#         chown -R nginx:nginx /etc/nginx/conf.d
+# RUN touch /var/run/nginx.pid && \
+#         chown -R nginx:nginx /var/run/nginx.pid
+# Entrypoint
+# USER nginx
+EXPOSE 80
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/usr/sbin/nginx", "-g", "daemon off;"]

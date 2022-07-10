@@ -1,0 +1,201 @@
+name: CI / CD
+
+on:
+  push:
+    branches:
+    - main
+  workflow_dispatch:
+  
+
+jobs:
+
+  consecutiveness:
+    name: Check running Jobs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: mktcode/consecutive-workflow-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  # snyk:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Build a Docker image
+  #     run: docker build -t softdsim/backend ./Backend
+  #   - name: Run Snyk to check Docker image for vulnerabilities
+  #     id: vulneberalities-backend
+  #     continue-on-error: true
+  #     uses: snyk/actions/docker@master
+  #     env:
+  #       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+  #     with:
+  #       image: softdsim/backend
+  #       args: --file=./Backend/Dockerfile
+  #   - name: Upload result to GitHub Code Scanning
+  #     uses: github/codeql-action/upload-sarif@v1
+  #     with:
+  #       sarif_file: snyk.sarif
+
+  vulnerability:
+    runs-on: ubuntu-latest
+    name: Scan (Placeholder)
+    needs:
+    - consecutiveness
+    steps:
+    - name: Make THINGS
+      run: echo "Hello World"
+
+
+  version:
+    runs-on: ubuntu-latest
+    name: Versioning
+    needs:
+    - consecutiveness
+    - vulnerability
+    outputs:
+      vID: ${{ steps.versionCheck.outputs.vID }}
+      
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Validate Commit Message Content
+      uses: gsactions/commit-message-checker@v1
+      with:
+        pattern: '(#major|#minor|#patch)'
+        # pattern: '^(#\d{3,6}|((Merge|dbeaver|cloudbeaver).+?#\d{3,6})|((DB-|CB-|DVO-)\d+))\s.*$'
+        error: |
+          Each commit message must include one of the following:
+          *  #major -> for changes which breaks the API
+          *  #minor -> for feature changes which NOT breaks the API
+          *  #patch -> for Fixes on current feature
+      
+    - uses: paulhatch/semantic-version@v4.0.2
+      id: versioning
+      with:
+        # major (breaking) change, supports regular expressions wrapped with '/'
+        major_pattern: "#major"
+        # Same as above except indicating a minor change, supports regular expressions wrapped with '/'
+        minor_pattern: "#minor"
+        # A string to determine the format of the version output
+        format: "${major}.${minor}.${patch}"
+        # If this is set to true, *every* commit will be treated as a new version
+        bump_each_commit: true
+
+    - name: Version Check
+      id: versionCheck
+      run: |
+            echo "${{ steps.versioning.outputs.major }}.${{ steps.versioning.outputs.minor }}.${{ steps.versioning.outputs.patch }}"
+            echo "vID=${{ steps.versioning.outputs.major }}.${{ steps.versioning.outputs.minor }}.${{ steps.versioning.outputs.patch }}" >> $GITHUB_ENV
+            echo "::set-output name=vID::$(echo ${{ steps.versioning.outputs.major }}.${{ steps.versioning.outputs.minor }}.${{ steps.versioning.outputs.patch }})"
+
+    - name: Tag commit
+      uses: tvdias/github-tagger@v0.0.1
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        tag: "${{ env.vID }}"
+
+
+  backend:
+    runs-on: ubuntu-latest
+    name: Build Backend
+    needs:
+    - version
+
+    steps:
+    
+    - uses: actions/checkout@v3
+
+    - uses: pmorelli92/github-container-registry-build-push@2.0.0
+      # name: Build and Publish latest service image
+      with:
+        github-push-secret: ${{secrets.GITHUB_TOKEN}}
+        docker-image-name: bmo-test-back
+        docker-image-tag: ${{ needs.version.outputs.vID }} # optional
+        dockerfile-path: ./DockerfileBackend # optional
+
+
+  frontend:
+    runs-on: ubuntu-latest
+    name: Build Frontend
+    needs:
+    - version
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check / set env Dev
+      run: |
+            echo "DIR=DEV" >> $GITHUB_ENV
+            echo "CI=false" >> $GITHUB_ENV
+            echo "REACT_APP_DJANGO_HOST=" >> $GITHUB_ENV
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+    - name: Compile Frontend
+      run: |
+            cd frontend
+            npm ci --legacy-peer-deps
+            npm run build
+
+    - uses: pmorelli92/github-container-registry-build-push@2.0.0
+      name: Build and Publish latest service image
+      with:
+        github-push-secret: ${{secrets.GITHUB_TOKEN}}
+        docker-image-name: bmo-test-front
+        docker-image-tag: ${{ needs.version.outputs.vID }} # optional
+        dockerfile-path: ./DockerfileFrontend # optional
+
+
+  deployPreProd:
+    runs-on: ubuntu-latest
+    name: Deploy PreProd
+    needs:
+    - backend
+    - frontend
+    - version
+
+    steps:
+    - name: Deploy PreProd
+      run: |
+            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
+            ssh docker-agent <<-'EOF2'
+                sed -ir "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ needs.version.outputs.vID }}|" ${{ secrets.BASE_DIR_CONF }}/.env_PREPROD_compose \
+                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_CONF }}/.env_PREPROD_compose up -d
+                echo "returncode: $?"
+            EOF2
+            EOF
+
+
+  tests:
+    runs-on: ubuntu-latest
+    name: Tests (Placeholder)
+    needs:
+    - deployPreProd
+    steps:
+    - name: Make THINGS
+      run: echo "Hello World"
+  
+
+  deployProd:
+    runs-on: ubuntu-latest
+    name: Deploy Production
+    needs:
+    - tests
+    - version
+
+    steps:
+    - name: Deploy Prod
+      run: |
+            sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
+            ssh docker-agent <<-'EOF2'
+                sed -ir "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ needs.version.outputs.vID }}|" ${{ secrets.BASE_DIR_CONF }}/.env_PROD_compose \
+                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_CONF }}/.env_PROD_compose up -d
+                echo "returncode: $?"
+            EOF2
+            EOF

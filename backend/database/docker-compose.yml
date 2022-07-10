@@ -1,0 +1,16 @@
+# THIS IS NOT A PRODUCTION ENVIRONMENT
+version: '3.9'
+
+services:
+   db:
+    image: mariadb
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./maria_store:/data/db
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=demo
+      - MYSQL_USER=demo
+      - MYSQL_DATABASE=sim
