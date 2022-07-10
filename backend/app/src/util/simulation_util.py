@@ -158,63 +158,61 @@ class WorkpackStatus:
     #         self.remaining_trainings = 0
 
 
-def adjust_team_stress(scenario, event_effect):
-    members = Member.objects.filter(team_id=scenario.team.id)
+def adjust_team_stress(session, event_effect):
+    members = session.members
     for member in members:
         member.stress = (
             min(member.stress + event_effect.value, 1)
             if min(member.stress + event_effect.value, 1) >= 0
             else 0
         )
-    Member.objects.bulk_update(members, ["stress"])
 
 
-def adjust_team_motivation(scenario, event_effect):
-    members = Member.objects.filter(team_id=scenario.team.id)
+def adjust_team_motivation(session, event_effect):
+    members = session.members
     for member in members:
         member.motivation = (
             min(member.motivation + event_effect.value, 1)
             if min(member.motivation + event_effect.value, 1) >= 0
             else 0
         )
-    Member.objects.bulk_update(members, ["motivation"])
 
 
-def adjust_team_familiarity(scenario, event_effect):
-    members = Member.objects.filter(team_id=scenario.team.id)
+def adjust_team_familiarity(session, event_effect):
+    members = session.members
     for member in members:
         member.familiarity = (
             min(member.familiarity + event_effect.value, 1)
             if min(member.familiarity + event_effect.value, 1) >= 0
             else 0
         )
-    Member.objects.bulk_update(members, ["familiarity"])
 
 
-def adjust_budget(scenario, event_effect):
-    scenario.state.budget += event_effect.value
-    scenario.state.save()
+def adjust_budget(session, event_effect):
+    session.scenario.state.budget += event_effect.value
 
 
-def add_tasks(scenario, event_effect):
+def add_tasks(session, event_effect):
     """Currently we only add tasks via an event effect - we could also add the option to remove tasks through an event in the future"""
     tasks = [
-        Task(difficulty=1, user_scenario=scenario)
+        Task(difficulty=1, user_scenario=session.scenario)
         for _ in range(event_effect.easy_tasks)
     ]
     tasks += [
-        Task(difficulty=2, user_scenario=scenario)
+        Task(difficulty=2, user_scenario=session.scenario)
         for _ in range(event_effect.medium_tasks)
     ]
     tasks += [
-        Task(difficulty=3, user_scenario=scenario)
+        Task(difficulty=3, user_scenario=session.scenario)
         for _ in range(event_effect.hard_tasks)
     ]
+    # todo: find a way to add tasks to the CachedTasks and save at the end
+    # for task in tasks:
+    #     session.tasks.tasks.add(task)
     Task.objects.bulk_create(tasks)
-    scenario.state.total_tasks += (
+    session.scenario.state.total_tasks += (
         event_effect.easy_tasks + event_effect.medium_tasks + event_effect.hard_tasks
     )
-    scenario.state.save()
 
 
 class EventEffectDTO(BaseModel):
@@ -271,7 +269,7 @@ def event_triggered(session: CachedScenario):
                         hard_tasks=effect.hard_tasks,
                     )
 
-                    effect_types[effect.type](scenario, event_effect)
+                    effect_types[effect.type](session, event_effect)
 
                 event_status.has_happened = True
                 event_status.save()
