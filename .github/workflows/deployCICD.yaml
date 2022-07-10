@@ -165,7 +165,7 @@ jobs:
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
             ssh docker-agent <<-'EOF2'
                 sed -ir "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ needs.version.outputs.vID }}|" ${{ secrets.BASE_DIR_OPS }}/config/.env_PREPROD_compose \
-                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}/config/.env_PREPROD_compose up -d
+                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}/compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}/config/.env_PREPROD_compose up -d
                 echo "returncode: $?"
             EOF2
             EOF
@@ -194,7 +194,7 @@ jobs:
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
             ssh docker-agent <<-'EOF2'
                 sed -ir "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ needs.version.outputs.vID }}|" ${{ secrets.BASE_DIR_OPS }}/config/.env_PROD_compose \
-                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}/config/.env_PROD_compose up -d
+                && docker-compose -f ${{ secrets.BASE_DIR_OPS }}/compose/app_compose.yaml --env-file ${{ secrets.BASE_DIR_OPS }}/config/.env_PROD_compose up -d
                 echo "returncode: $?"
             EOF2
             EOF
