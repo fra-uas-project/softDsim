@@ -113,7 +113,7 @@ jobs:
       # name: Build and Publish latest service image
       with:
         github-push-secret: ${{secrets.GITHUB_TOKEN}}
-        docker-image-name: bmo-test-back
+        docker-image-name: app-backend
         docker-image-tag: ${{ needs.version.outputs.vID }} # optional
         dockerfile-path: ./DockerfileBackend # optional
 
@@ -146,7 +146,7 @@ jobs:
       name: Build and Publish latest service image
       with:
         github-push-secret: ${{secrets.GITHUB_TOKEN}}
-        docker-image-name: bmo-test-front
+        docker-image-name: app-frontend
         docker-image-tag: ${{ needs.version.outputs.vID }} # optional
         dockerfile-path: ./DockerfileFrontend # optional
 
