@@ -36,7 +36,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG =True
+
 
 ALLOWED_HOSTS = []
 
@@ -55,6 +56,12 @@ INSTALLED_APPS = [
     "corsheaders",
     "custom_user",
     "history",
+
+    "health_check",
+    'health_check.db',                          # stock Django health checkers
+    'health_check.cache',
+    'health_check.storage',
+    'health_check.contrib.migrations',
 ]
 
 
