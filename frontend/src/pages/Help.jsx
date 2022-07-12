@@ -29,12 +29,12 @@ const Help = () => {
             <Tabs isFitted variant="enclosed">
   <TabList>
     <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Introduction</Tab>
-    <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Registration/Login</Tab>
+    
     <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Scenarios</Tab>
     <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Scenario Studio</Tab>
-    <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Profile</Tab>
+    
     <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Additional</Tab>
-    <Tab _selected={{ color: 'white', bg: 'blue.500' }}>Contact</Tab>
+    
   </TabList>
   
                 <Container maxW='4xl' pt={10}>
@@ -114,24 +114,7 @@ const Help = () => {
   
   </TabPanel> 
  
-    <TabPanel>
-  <AccordionItem>
-    <h2>
-      <AccordionButton>
-        <Box flex='1' textAlign='left'>
-          Registration/Login
-        </Box>
-        <AccordionIcon />
-      </AccordionButton>
-    </h2>
-    <AccordionPanel pb={4}>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat.
-    </AccordionPanel>
-  </AccordionItem>
-  </TabPanel>
+ 
 
         <TabPanel>
   <AccordionItem>
