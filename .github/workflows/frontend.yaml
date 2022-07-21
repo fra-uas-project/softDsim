@@ -36,6 +36,7 @@ jobs:
       run: |
             echo "DIR=DEV" >> $GITHUB_ENV
             echo "REACT_APP_DJANGO_HOST=" >> $GITHUB_ENV
+            echo "CI=false" >> $GITHUB_ENV
 
     - name: Setup Node
       uses: actions/setup-node@v3
