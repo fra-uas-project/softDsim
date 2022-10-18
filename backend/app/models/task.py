@@ -164,7 +164,8 @@ class CachedTasks:
 
     def rejected(self) -> Set[Task]:
         """Returns all tasks that are rejected by customer."""
-        return {t for t in self.tasks if t not in self.accepted()}
+        acc = self.accepted()
+        return {t for t in self.tasks if t not in acc}
 
     def save(self):
         """Bulk updates all tasks to database."""
