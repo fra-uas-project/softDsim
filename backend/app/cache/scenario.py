@@ -17,9 +17,7 @@ class CachedScenario:
         self.scenario: UserScenario = UserScenario.objects.get(id=scenario_id)
         self.members: List[Member] = Member.objects.filter(team=self.scenario.team)
         self.tasks: CachedTasks = CachedTasks(self.scenario.id)
-        logging.info(
-            f"Initializing CachedScenario took {perf_counter() - start_counter} seconds"
-        )
+
 
     def save(self) -> None:
         start = perf_counter()

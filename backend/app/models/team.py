@@ -116,20 +116,16 @@ class Team(models.Model):
 
     # ein tag
     def work(
-        self,
-        session: CachedScenario,
-        workpack: Workpack,
-        workpack_status,
-        current_day,
+        self, session: CachedScenario, workpack: Workpack, workpack_status, current_day,
     ):
 
         # work hours
         NORMAL_WORK_HOUR_DAY: int = 8
         remaining_work_hours = NORMAL_WORK_HOUR_DAY + workpack.overtime
-        start = time.perf_counter()
-        logging.warn(f"Filter Members took {time.perf_counter() - start} secs")
+        #start = time.perf_counter()
+        #logging.warn(f"Filter Members took {time.perf_counter() - start} secs")
         staff_cost = sum([m.skill_type.cost_per_day for m in session.members])
-        logging.debug(f"staff cost: {staff_cost}")
+        #logging.debug(f"staff cost: {staff_cost}")
         session.scenario.state.cost += staff_cost
 
         # Every 5th day, the stress is reduces by the weekend reduction
@@ -164,9 +160,7 @@ class Team(models.Model):
             )
             for _ in range(remaining_trainings_today):
                 self.training(
-                    session,
-                    remaining_work_hours,
-                    mean_real_throughput_of_team,
+                    session, remaining_work_hours, mean_real_throughput_of_team,
                 )
 
         # If the member has to work overtime hours the extra stress is added
@@ -179,9 +173,9 @@ class Team(models.Model):
             )
 
         # 3. task work
-        start = time.perf_counter()
+        #start = time.perf_counter()
         self.task_work(session, remaining_work_hours, workpack)
-        logging.warn(f"Task work took {time.perf_counter() - start} secs")
+        #logging.warn(f"Task work took {time.perf_counter() - start} secs")
 
     # def work(workpack)
     ## 1. meeting (done)

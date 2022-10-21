@@ -13,6 +13,17 @@
                 "runserver"
             ],
             "django": true
+        },
+        {
+            "name": "Python: Main",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/manage.py",
+            "args": [
+                "runscript",
+                "main.py"
+            ],
+            "django": true
         }
     ]
 }

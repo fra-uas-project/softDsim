@@ -53,4 +53,5 @@ def get_config() -> Configuration:
     Returns:
         Configuration: Instance of Configuration class
     """
+    load_dotenv("backend/.env")
     return Configuration()

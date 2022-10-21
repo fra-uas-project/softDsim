@@ -72,7 +72,7 @@ def simulate(req, session: CachedScenario) -> None:
     normal_work_hour_day: int = 8
 
     workpack = req.actions
-    logging.info(f"Workpack: {workpack}")
+    # logging.info(f"Workpack: {workpack}")
     days = workpack.days
 
     # you can not do more meetings than hours per day
@@ -108,7 +108,7 @@ def simulate(req, session: CachedScenario) -> None:
                     msg = f"Cannot remove {m.change} members of type {s.name}."
                     logging.error(msg)
                     raise SimulationException(msg)
-    logging.info(f"Member change took {time.perf_counter() - start} seconds")
+    # logging.info(f"Member change took {time.perf_counter() - start} seconds")
 
     # team event
     if req.actions.teamevent:
@@ -129,7 +129,7 @@ def simulate(req, session: CachedScenario) -> None:
         for day in range(0, days):
             session.scenario.team.work(session, workpack, workpack_status, day)
             session.scenario.state.day += 1
-        logging.warning(f"Team work took {time.perf_counter() - start} seconds")
+        # logging.warning(f"Team work took {time.perf_counter() - start} seconds")
     else:
         logging.info(
             "There are no members in the team, so there is nothing to simulate."
@@ -174,8 +174,8 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
         raise RequestTypeException()
 
     # 1.2 check if request type matches previous response type
-    if not request_type_matches_previous_response_type(session.scenario, req):
-        raise RequestTypeMismatchException(req.type)
+    # if not request_type_matches_previous_response_type(session.scenario, req):
+    #     raise RequestTypeMismatchException(req.type)
 
     # 1.3 handle the request data
     request_handling_mapper = {
@@ -188,7 +188,7 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
     }
     start = time.perf_counter()
     request_handling_mapper[req.type](req, session)
-    logging.warning(f"Mapper func took {time.perf_counter() - start} seconds.")
+    # {time.perf_counter() - start} seconds.")
 
     # check if event occurred
     # check if this event already happened (bool for every event in db -> set 'happened' to true if event happened)
@@ -267,7 +267,7 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
 
 
 def complete_scenario_step(session: CachedScenario, req, scenario_response):
-    write_history(session.scenario, req, scenario_response.type)
+    # write_history(session.scenario, req, scenario_response.type)
 
     if scenario_response.type == "RESULT":
         return get_result_response(session)
