@@ -8,13 +8,12 @@ from app.models.user_scenario import ScenarioState, UserScenario
 from custom_user.models import User
 from simulation_framework.wrappers import FastSecenario, FastTasks
 
-TEMPLATE_ID = 28
+TEMPLATE_ID = 31
 USERID = 24
 
 
 def _make_config():
     conf = os.environ.get("SIMULATION_CONFIG_NAME", "c1")
-    print("Using config: ", conf)
     return ScenarioConfig.objects.get(name="c1")
 
 

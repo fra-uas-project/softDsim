@@ -85,3 +85,58 @@ class Record:
         self.cost = s.scenario.state.cost
         self.day = s.scenario.state.day
 
+
+class NpParameterRecord:
+    def __init__(self):
+        self.data = None
+
+    def add(self, s: FastSecenario, value):
+        if self.data is None:
+            self.data = np.array([[value, *np_record(s)]])
+        else:
+            self.data = np.vstack((self.data, np.array([[value, *np_record(s)]])))
+
+    def df(self):
+        return DataFrame(
+            self.data,
+            columns=[
+                "VALUE",
+                "Cost",
+                "Day",
+                "Eff",
+                "Fam",
+                "Str",
+                "XP",
+                "Mot",
+                "Acc",
+                "Rej",
+            ],
+        )
+
+class Np2ParameterRecord:
+    def __init__(self):
+        self.data = None
+
+    def add(self, s: FastSecenario, value1, value2):
+        if self.data is None:
+            self.data = np.array([[value1, value2, *np_record(s)]])
+        else:
+            self.data = np.vstack((self.data, np.array([[value1, value2, *np_record(s)]])))
+
+    def df(self):
+        return DataFrame(
+            self.data,
+            columns=[
+                "VALUE1",
+                "VALUE2",
+                "Cost",
+                "Day",
+                "Eff",
+                "Fam",
+                "Str",
+                "XP",
+                "Mot",
+                "Acc",
+                "Rej",
+            ],
+        )
