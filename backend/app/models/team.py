@@ -1,5 +1,4 @@
 from __future__ import annotations
-from email.policy import default
 
 import logging
 from statistics import mean

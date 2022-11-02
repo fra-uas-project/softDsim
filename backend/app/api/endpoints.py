@@ -2,6 +2,8 @@ from django.urls import path
 from app.api.security.create_users import UserCreationView
 
 from app.api.views.question_collection import QuestionCollectionView
+
+# from app.api.views.sim_api import ParameterSimulation
 from app.api.views.user_scenario import UserScenarioViews
 from app.api.views.team import SkillTypeView, TeamViews, MemberView
 from app.api.views.scenario_config import ScenarioConfigView
@@ -81,4 +83,5 @@ urlpatterns = [
     path("history", HistoryView.as_view()),
     path("history/<int:id>", HistoryView.as_view()),
     path("result/<int:id>", ResultView.as_view()),
+    # path("sim/param", ParameterSimulation.as_view()),
 ]

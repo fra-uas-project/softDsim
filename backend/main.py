@@ -9,16 +9,15 @@ from app.models.task import Task
 from app.models.team import Member, SkillType, Team
 from app.models.user_scenario import ScenarioState, UserScenario
 from app.src.simulation import simulate
-from app.dto.request import SimulationRequest
-from simulation_framework.record import (
-    NpRecord,
-    np_record,
-)
+from app.dto.request import SimulationRequest, Workpack
 from simulation_framework.wrappers import FastSecenario, FastTasks
-from userparameter.set1 import UP1
+from userparameter.set1 import USERPARAMETERS
 
 
 DATAPATH = "/Users/anton/XProjects/thesis/data"
+RUNNAME = "run1"
+NRUNS = 500_000
+SAVE_EVERY = 10_000
 
 
 def init_scenario() -> UserScenario:
@@ -33,9 +32,12 @@ def init_config():
 
 
 def init_skill_types():
-    s1 = SkillType.objects.get(name="s1")
-    s2 = SkillType.objects.get(name="s2")
-    s3 = SkillType.objects.get(name="s3")
+    s1 = SkillType.objects.get(name="s1").delete()
+    s2 = SkillType.objects.get(name="s2").delete()
+    s3 = SkillType.objects.get(name="s3").delete()
+    s1 = SkillType.objects.create(name="s1", cost_per_day=200)
+    s2 = SkillType.objects.create(name="s2", cost_per_day=350)
+    s3 = SkillType.objects.create(name="s3", cost_per_day=500)
     return [s1, s2, s3]
 
 
@@ -46,12 +48,12 @@ def init_members(skill_types):
     return members
 
 
-def run_simulation(scenario, config, members, tasks, skill_types, rec):
+def run_simulation(scenario, config, members, tasks, skill_types, rec, UP, UP_n):
     scenario.config = config
     s = FastSecenario(scenario, members, tasks, 1, 1)
-    r = SimulationRequest(scenario_id=0, type="SIMULATION", actions=UP1.next(s))
+    r = SimulationRequest(scenario_id=0, type="SIMULATION", actions=UP)
     simulate(r, s)
-    rec.add(s, config, skill_types)
+    rec.add(s, config, skill_types, UP, UP_n)
 
 
 def set_config(config: ScenarioConfig):
@@ -72,7 +74,7 @@ def set_skill_types(skill_types: List[SkillType]):
 
 
 def set_tasks(u):
-    TOTAL = 160
+    TOTAL = 200
     tasks = set()
     for _ in range(int(TOTAL * 0.25)):
         tasks.add(Task(id=randint(0, 9999999999), difficulty=1, user_scenario=u))
@@ -84,7 +86,11 @@ def set_tasks(u):
 
 
 def np_record(
-    s: FastSecenario, config: ScenarioConfig, skill_types: List[SkillType]
+    s: FastSecenario,
+    config: ScenarioConfig,
+    skill_types: List[SkillType],
+    workpack: Workpack,
+    UP_n,
 ) -> np.array:
     return np.array(
         [
@@ -99,6 +105,16 @@ def np_record(
             skill_types[1].error_rate,
             skill_types[2].throughput,
             skill_types[2].error_rate,
+            UP_n,
+            workpack.days,
+            workpack.bugfix,
+            workpack.unittest,
+            workpack.integrationtest,
+            workpack.meetings,
+            workpack.training,
+            workpack.teamevent,
+            workpack.salary,
+            workpack.overtime,
             s.scenario.state.cost,
             s.scenario.state.day,
             mean([m.efficiency for m in s.members]),
@@ -122,6 +138,9 @@ class NpRecord:
         else:
             self.data = np.vstack((self.data, np.array([np_record(s, *args)])))
 
+    def clear(self):
+        self.data = None
+
     def df(self):
         return DataFrame(
             self.data,
@@ -137,6 +156,16 @@ class NpRecord:
                 "s2_err",
                 "s3_thr",
                 "s3_err",
+                "UP",
+                "days",
+                "bugfix",
+                "unittest",
+                "integrationtest",
+                "meetings",
+                "training",
+                "teamevent",
+                "salary",
+                "overtime",
                 "Cost",
                 "Day",
                 "Eff",
@@ -159,6 +188,11 @@ def set_members(members: List[Member]):
         member.xp = 0
 
 
+def set_scenario(scenario: UserScenario, state: ScenarioState):
+    state.cost = 0
+    state.day = 0
+
+
 def main():
     print("Started")
     rec = NpRecord()
@@ -167,22 +201,21 @@ def main():
     skill_types = init_skill_types()
     members = init_members(skill_types)
 
-    # Somehow recieve the parameters to run the simulation with
-    max_done = 0
-    for x in range(1000):
+    for x in range(1, NRUNS + 1):
         set_config(config)
         set_skill_types(skill_types)
+        for n, UP in enumerate(USERPARAMETERS):
 
-        # set_scenario(scenario, state, situation)
-        set_members(members)
-        tasks = set_tasks(scenario)
-        run_simulation(scenario, config, members, tasks, skill_types, rec)
-        # print(f"{len(tasks.done())} \t {mean([m.efficiency for m in members])}")
-        if len(tasks.done()) > max_done:
-            max_done = len(tasks.done())
-    print(f"max: {max_done}")
+            set_scenario(scenario, state)
+            set_members(members)
+            tasks = set_tasks(scenario)
+            run_simulation(scenario, config, members, tasks, skill_types, rec, UP, n)
+            # print(f"{len(tasks.done())} \t {mean([m.efficiency for m in members])}")
 
-    rec.df().to_csv(f"{DATAPATH}/data_2.csv")
+        if x % SAVE_EVERY == 0:
+            print(f"{x} of {NRUNS}")
+            rec.df().to_csv(f"{DATAPATH}/{RUNNAME}/file{int(x / SAVE_EVERY)}.csv")
+            rec.clear()
 
 
 main()
