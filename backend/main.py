@@ -1,3 +1,4 @@
+print("MAIN SCRIPT")
 from random import randint, random
 from statistics import mean
 from typing import List
@@ -14,10 +15,12 @@ from simulation_framework.wrappers import FastSecenario, FastTasks
 from userparameter.set1 import USERPARAMETERS
 
 
-DATAPATH = "/Users/anton/XProjects/thesis/data"
+DATAPATH = "~/data"
 RUNNAME = "run1"
-NRUNS = 500_000
+NRUNS = 1_000_000
 SAVE_EVERY = 10_000
+
+Team.objects.create()
 
 
 def init_scenario() -> UserScenario:
@@ -28,13 +31,19 @@ def init_scenario() -> UserScenario:
 
 
 def init_config():
-    return ScenarioConfig.objects.get(name="c1")
+    try:
+        return ScenarioConfig.objects.get(name="c1")
+    except:
+        return ScenarioConfig.objects.create(name="c1")
 
 
 def init_skill_types():
-    s1 = SkillType.objects.get(name="s1").delete()
-    s2 = SkillType.objects.get(name="s2").delete()
-    s3 = SkillType.objects.get(name="s3").delete()
+    try:
+        s1 = SkillType.objects.get(name="s1").delete()
+        s2 = SkillType.objects.get(name="s2").delete()
+        s3 = SkillType.objects.get(name="s3").delete()
+    except:
+        pass
     s1 = SkillType.objects.create(name="s1", cost_per_day=200)
     s2 = SkillType.objects.create(name="s2", cost_per_day=350)
     s3 = SkillType.objects.create(name="s3", cost_per_day=500)
@@ -44,7 +53,7 @@ def init_skill_types():
 def init_members(skill_types):
     members = []
     for sk in skill_types:
-        members.append(Member.objects.create(skill_type=sk, team_id=12))
+        members.append(Member.objects.create(skill_type=sk, team_id=1))
     return members
 
 
