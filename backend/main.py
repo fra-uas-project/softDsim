@@ -229,7 +229,7 @@ def main():
         if x % SAVE_EVERY == 0:
             print(f"{x} of {NRUNS}")
             csv_buffer = StringIO()
-            rec.df.to_csv(csv_buffer)
+            rec.df().to_csv(csv_buffer)
             s3_resource = boto3.resource("s3")
             s3_resource.Object(
                 bucket, f"ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv"
