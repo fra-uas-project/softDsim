@@ -2,9 +2,12 @@
 version: '3.9'
 
 services:
-   db:
+  db:
     image: mariadb
+    container_name: database
     restart: always
+    expose:
+      - 3306
     ports:
       - 3306:3306
     volumes:
@@ -14,3 +17,5 @@ services:
       - MYSQL_PASSWORD=demo
       - MYSQL_USER=demo
       - MYSQL_DATABASE=sim
+      - MYSQL_HOST=localhost
+      - MYSQL_POR=3306

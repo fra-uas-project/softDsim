@@ -3,12 +3,16 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 WORKDIR /home/app/webapp
 
+COPY . .  
+
 # Install requirements
-COPY ./backend/requirements.txt /home/app/webapp/
+RUN echo "Install requirements"
+COPY ./requirements.txt /home/app/webapp/
 RUN pip install -r /home/app/webapp/requirements.txt
 
 # Entrypoint
-COPY ./deploy/entrypoint.sh /
+COPY ./entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 EXPOSE 8000
 CMD /entrypoint.sh
+# CMD python manage.py runserver

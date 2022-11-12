@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  
+  db:
+    image: mariadb
+    container_name: database
+    restart: always
+    expose:
+      - 3306
+    ports:
+      - 3306:3306
+    volumes:
+      - ./backend/database/maria_store:/data/db
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=demo
+      - MYSQL_USER=demo
+      - MYSQL_DATABASE=sim
+      - MYSQL_HOST=localhost
+      - MYSQL_POR=3306
+
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    depends_on:
+      - db
+    expose:
+      - 8000
+    # laptop:container
+    ports:
+      - '8000:8000'
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - '3000:3000'
+    # docker run -i
+    stdin_open: true
+    # docker run -t
+    tty: true

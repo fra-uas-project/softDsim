@@ -31,3 +31,6 @@ wrapt
 djangorestframework
 mysqlclient
 colorlog
+codecarbon
+pyRAPL
+django_brotli

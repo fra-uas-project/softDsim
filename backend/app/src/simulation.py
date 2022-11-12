@@ -64,6 +64,11 @@ if TYPE_CHECKING:
     from app.cache.scenario import CachedScenario
 
 
+# from codecarbon import track_emissions
+
+# Results are saved to a `emissions.csv` file
+# in the same directory by default.
+# @track_emissions
 def simulate(req, session: CachedScenario) -> None:
     """This function does the actual simulation of a scenario fragment."""
     if req.actions is None:
