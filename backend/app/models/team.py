@@ -216,7 +216,7 @@ class Team(models.Model):
                 t.done = True
                 error_increase = m.solve_task(t)
                 t.bug = probability(
-                    (m.skill_type.error_rate + m.stress + error_increase) / 3
+                    (m.skill_type.error_rate + m.stress - error_increase) / 3
                 )
                 t.correct_specification = probability(self.management_skill)
                 t.unit_tested = False
@@ -298,7 +298,11 @@ class Member(models.Model):
     @property
     def efficiency(self) -> float:
         """Returns the efficiency of the member"""
-        return sum([self.familiarity, self.motivation, self.stress]) / 3
+        
+        def st(s):
+            return 1 - (abs(s - 0.2))  # 0.2 is the ideal stress level
+
+        return sum([self.familiarity, self.motivation, st(self.stress)]) / 3
 
     def calculate_familiarity(self, solved_tasks):
         if solved_tasks > 0:
