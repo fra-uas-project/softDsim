@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar";
 import {Flex} from "@chakra-ui/react";
 import Footer from "./components/Footer";
 import Routing from "./Routing";
-import {AuthProvider} from "./AuthProvider";
+import {AuthProvider} from "./context/AuthProvider";
 import ScrollToTop from "./components/ScrollToTop";
 
 function App() {

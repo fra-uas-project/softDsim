@@ -109,7 +109,7 @@ const AddUser = () => {
                         <ModalHeader>Adding User</ModalHeader>
                         <Flex align="center" justify="center" p={5}>
                             <Flex w="10%"></Flex>
-                            <Heading w="80%" as="h5" textAlign="center">Create New User</Heading>
+                            <Heading w="80%" as="h5">Create New User</Heading>
                             <Popover w="10%">
                                 <PopoverTrigger>
                                     <Button><HiOutlineInformationCircle /></Button>

@@ -1,11 +1,33 @@
-import { Flex, Heading, Grid, GridItem } from "@chakra-ui/react"
+import {
+    Flex,
+    Heading,
+    Grid,
+    GridItem,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    Box,
+    Container
+} from "@chakra-ui/react"
 import React from "react";
+import {HiChevronRight} from "react-icons/hi";
 
 const GDPR = () => {
 
     return (
-        <Flex flexDir="column" flexGrow={1}>
-            <Heading pl='5'>Privacy Policy</Heading>
+        <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
+            <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500' />}>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href=''>Privacy Policy</BreadcrumbLink>
+                </BreadcrumbItem>
+            </Breadcrumb>
+            <Heading>Privacy Policy</Heading>
+            <Box h={5}></Box>
+            <Box backgroundColor="white" borderRadius="2xl">
+                <Container maxW='6xl' pt={10} h="full" pb={10} >
+
+        {/*<Flex flexDir="column" flexGrow={1}>*/}
+        {/*    <Heading pl='5'>Privacy Policy</Heading>*/}
             <Grid
                 gap={5}
                 color='gray.600'
@@ -102,6 +124,8 @@ const GDPR = () => {
                     </ul>
                 </GridItem>
             </Grid>
+                </Container>
+            </Box>
 
         </Flex >
     )
