@@ -1,0 +1,11 @@
+skilltypes:
+  - 
+    error_rate: 0.1
+    throughput: 1
+  - 
+    error_rate: 0.01
+    throughput: 7
+  - 
+    error_rate: 0.05
+    throughput: 10
+

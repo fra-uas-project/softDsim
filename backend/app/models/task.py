@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Set
+from typing import Set, Tuple
 from django.db import models
 from django.db.models import QuerySet
 
@@ -164,7 +164,12 @@ class CachedTasks:
 
     def rejected(self) -> Set[Task]:
         """Returns all tasks that are rejected by customer."""
-        return {t for t in self.tasks if t not in self.accepted()}
+        acc = self.accepted()
+        return {t for t in self.tasks if t not in acc}
+
+    def acc_rej(self) -> Tuple[int, int]:
+        acc = self.accepted()
+        return len(acc), len(self.tasks) - len(acc)
 
     def save(self):
         """Bulk updates all tasks to database."""
