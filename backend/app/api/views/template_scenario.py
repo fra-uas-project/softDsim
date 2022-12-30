@@ -1,6 +1,6 @@
 import logging
-from unittest import result
-from deprecated.classic import deprecated
+
+from bson import ObjectId
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -9,21 +9,21 @@ from rest_framework.views import APIView
 
 from app.decorators.decorators import allowed_roles
 from app.exceptions import IndexException
+from app.models.action import Action
+from app.models.answer import Answer
+from app.models.management_goal import ManagementGoal
+from app.models.model_selection import ModelSelection
+from app.models.question import Question
+from app.models.question_collection import QuestionCollection
+from app.models.score_card import ScoreCard
+from app.models.simulation_end import SimulationEnd
+from app.models.simulation_fragment import SimulationFragment
 from app.models.template_scenario import TemplateScenario
 from app.serializers.template_scenario import (
     ReducedTemplateScenarioSerializer,
     TemplateScenarioSerializer,
 )
-
-from app.models.question_collection import QuestionCollection
-from app.models.question import Question
-from app.models.answer import Answer
-from app.models.simulation_end import SimulationEnd
-from app.models.simulation_fragment import SimulationFragment
-from app.models.action import Action
-from app.models.model_selection import ModelSelection
-from app.models.score_card import ScoreCard
-from app.models.management_goal import ManagementGoal
+from config import get_config
 from history.models.result import Result
 
 
@@ -145,57 +145,127 @@ class TemplateScenarioFromStudioView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @allowed_roles(["creator"])
-    def post(self, request):
+    def get(self, request, scenario_id=None):
         try:
-            logging.info("Creating template scenario from studio")
-            scenario = TemplateScenario()
-            scenario.save()
+            config = get_config()
+            collection = config.get_mongo_db_scenario_template_collection()
 
-            caller = {
-                "BASE": handle_base,
-                "QUESTIONS": handle_question,
-                "FRAGMENT": handle_simulation,
-                "MODELSELECTION": handle_model,
-                "EVENT": handle_event,
-            }
-            i = 0
-            for component in request.data:
-                try:
-                    i = caller[component.get("type", "not-found")](
-                        component, scenario, i
-                    )
-                except KeyError:
-                    msg = f"Invalid component type {component.get('type')}"
-                    logging.warning(msg)
-                    return Response(
-                        dict(status="error", data=msg,),
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-            scenario.save()
-            set_last_fragement(scenario)
-            logging.info("Template scenario created with id: " + str(scenario.id))
-
-            # Create Scorecard
-            scorecard = ScoreCard(template_scenario=scenario)
-            scorecard.save()  # TODO: this should be set by the creator in studio
+            # find all
+            all_scenario_templates = [dict(id=str(scenario["_id"]), name=scenario["name"])
+                                  for scenario in collection.find({}, {"_id": 1, "name": 1})]
 
             return Response(
-                dict(status="success", data={"id": scenario.id}),
-                status=status.HTTP_200_OK,
+                dict(status="success", data=all_scenario_templates),
+                status=status.HTTP_200_OK
+            )
+        except:
+            return Response(dict(status="error", data="An error occurred while fetching all template scenarios"),
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                            )
+
+    @allowed_roles(["creator", "staff"])
+    def post(self, request):
+
+        try:
+            scenario_template = request.data
+            config = get_config()
+            collection = config.get_mongo_db_scenario_template_collection()
+
+            object_id = collection.insert(scenario_template)
+
+            return Response(
+                {
+                    "status": "save successful",
+                    "data": {"name": scenario_template["name"],
+                             "id": str(object_id)
+                             },
+                }
             )
 
         except Exception as e:
-            try:
-                scenario.delete()
-            except Exception:
-                logging.warn("Could not delete scenario after failed creation")
-            msg = f"{e.__class__.__name__} occured while creating template scenario from studio"
-            logging.error(msg)
+            logging.error(f"{e.__class__.__name__} occurred in POST template-scenario/studio")
+            logging.error(f"{str(e)} occurred in POST template-scenario")
             return Response(
-                dict(status="error", data=msg),
+                {"status": "something went wrong internally", "data": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+    @allowed_roles(["creator"])
+    def delete(self, request, scenario_id=None):
+        try:
+            if scenario_id:
+                config = get_config()
+                collection = config.get_mongo_db_scenario_template_collection()
+
+                collection.delete_one({"_id": ObjectId(scenario_id)})
+
+                return Response(
+                    dict(status="delete successful", data={"id": scenario_id}),
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    dict(status="error", data="Please specify a <scenario_id> as path parameter"),
+                    status=status.HTTP_405_METHOD_NOT_ALLOWED
+                )
+        except:
+            return Response(dict(status="error", data="An error occurred while fetching all template scenarios"),
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                            )
+
+
+    # @allowed_roles(["creator"])
+    # def post(self, request):
+    #     try:
+    #         logging.info("Creating template scenario from studio")
+    #         scenario = TemplateScenario()
+    #         scenario.save()
+    #
+    #         caller = {
+    #             "BASE": handle_base,
+    #             "QUESTIONS": handle_question,
+    #             "FRAGMENT": handle_simulation,
+    #             "MODELSELECTION": handle_model,
+    #             "EVENT": handle_event,
+    #         }
+    #         i = 0
+    #         for component in request.data:
+    #             try:
+    #                 i = caller[component.get("type", "not-found")](
+    #                     component, scenario, i
+    #                 )
+    #             except KeyError:
+    #                 msg = f"Invalid component type {component.get('type')}"
+    #                 logging.warning(msg)
+    #                 return Response(
+    #                     dict(status="error", data=msg,),
+    #                     status=status.HTTP_400_BAD_REQUEST,
+    #                 )
+    #
+    #         scenario.save()
+    #         set_last_fragement(scenario)
+    #         logging.info("Template scenario created with id: " + str(scenario.id))
+    #
+    #         # Create Scorecard
+    #         scorecard = ScoreCard(template_scenario=scenario)
+    #         scorecard.save()  # TODO: this should be set by the creator in studio
+    #
+    #         return Response(
+    #             dict(status="success", data={"id": scenario.id}),
+    #             status=status.HTTP_200_OK,
+    #         )
+    #
+    #     except Exception as e:
+    #         try:
+    #             scenario.delete()
+    #         except Exception:
+    #             logging.warning("Could not delete scenario after failed creation")
+    #         msg = f"{e.__class__.__name__} occured while creating template scenario from studio"
+    #         logging.error(msg)
+    #         return Response(
+    #             dict(status="error", data=msg),
+    #             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    #         )
 
 
 def handle_base(data, scenario: TemplateScenario, i):

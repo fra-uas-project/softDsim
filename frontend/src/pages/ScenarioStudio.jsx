@@ -83,7 +83,7 @@ const ScenarioStudio = () => {
 
     const saveScenarioTemplate = async () => {
         try {
-            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/create-from-studio`, {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

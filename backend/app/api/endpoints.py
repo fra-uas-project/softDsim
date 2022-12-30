@@ -1,38 +1,32 @@
 from django.urls import path
+
 from app.api.security.create_users import UserCreationView
-
-from app.api.views.question_collection import QuestionCollectionView
-
-# from app.api.views.sim_api import ParameterSimulation
-from app.api.views.user_scenario import UserScenarioViews
-from app.api.views.team import SkillTypeView, TeamViews, MemberView
-from app.api.views.scenario_config import ScenarioConfigView
-from app.api.views.question import QuestionView
-from app.api.views.management_goal import ManagementGoalView
 from app.api.security.security import (
     LoginView,
     LogoutView,
     CheckAuthenticatedView,
     RegisterView,
 )
-
-
-# all request with /api/ land here (see softDsim/urls.py)
-from app.api.views.template_scenario import (
-    TemplateScenarioUserListView,
-    TemplateScenarioView,
-    TemplateScenarioFromStudioView,
-)
-from app.api.views.user import UserView
-
+from app.api.views.management_goal import ManagementGoalView
+from app.api.views.question import QuestionView
+from app.api.views.question_collection import QuestionCollectionView
+from app.api.views.scenario_config import ScenarioConfigView
 from app.api.views.simulation import (
     AdjustMemberView,
     StartUserScenarioView,
     NextStepView,
 )
-
+from app.api.views.team import SkillTypeView, TeamViews, MemberView
+# all request with /api/ land here (see softDsim/urls.py)
+from app.api.views.template_scenario import (
+    TemplateScenarioUserListView,
+    TemplateScenarioView,
+    TemplateScenarioFromStudioView
+)
+from app.api.views.user import UserView
+# from app.api.views.sim_api import ParameterSimulation
+from app.api.views.user_scenario import UserScenarioViews
 from history.view import HistoryView, ResultView
-
 
 urlpatterns = [
     # User stuff
@@ -45,12 +39,12 @@ urlpatterns = [
     path("user/<str:username>", UserView.as_view()),
     # template scenario
     path("template-scenario", TemplateScenarioView.as_view()),
+    path("template-scenario/<str:scenario_id>", TemplateScenarioView.as_view()),
     path("template-overview", TemplateScenarioUserListView.as_view()),
     path("template-overview/<int:scenario_id>", TemplateScenarioUserListView.as_view()),
-    path(
-        "template-scenario/create-from-studio", TemplateScenarioFromStudioView.as_view()
-    ),
-    path("template-scenario/<str:scenario_id>", TemplateScenarioView.as_view()),
+    # template scenario studio
+    path("studio/template-scenario", TemplateScenarioFromStudioView.as_view()),
+    path("studio/template-scenario/<str:scenario_id>", TemplateScenarioFromStudioView.as_view()),
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
     path("user-scenario/<int:id>", UserScenarioViews.as_view()),
