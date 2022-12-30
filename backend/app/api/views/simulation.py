@@ -1,9 +1,12 @@
 import logging
 
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from app.cache.scenario import CachedScenario
 from app.decorators.decorators import allowed_roles
 from app.exceptions import (
     SimulationException,
@@ -14,29 +17,15 @@ from app.exceptions import (
     TooManyMeetingsException,
 )
 from app.models.scenario import ScenarioConfig
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.decorators import api_view
-from app.models.team import Member, SkillType, Team
-from app.models.template_scenario import TemplateScenario
-
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.decorators import api_view
-
-from app.models.scenario import ScenarioConfig
+from app.models.task import Task
+from app.models.team import Member, SkillType
 from app.models.team import Team
 from app.models.template_scenario import TemplateScenario
-
 from app.models.user_scenario import ScenarioState, UserScenario, EventStatus
-from app.models.task import Task
-from app.serializers.user_scenario import UserScenarioSerializer
 from app.serializers.team import MemberSerializer
+from app.serializers.user_scenario import UserScenarioSerializer
 from app.src.simulation import continue_simulation
-
-from rest_framework.views import APIView
-
 from app.src.util.scenario_util import create_correct_request_model
-
-from app.cache.scenario import CachedScenario
 
 
 class StartUserScenarioView(APIView):
@@ -65,7 +54,7 @@ class StartUserScenarioView(APIView):
             )
 
         try:
-            # Craete UserScenario
+            # Create UserScenario
             user_scenario = UserScenario(
                 user=request.user, template=template, config=config,
             )
