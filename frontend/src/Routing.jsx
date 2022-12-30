@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "./AuthProvider";
+import { AuthContext } from "./context/AuthProvider";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Landing from "./pages/Landing";
 import ScenarioOverview from "./pages/ScenarioOverview";

@@ -2,7 +2,7 @@ import { Button, Checkbox, Flex, Heading, Input, InputGroup, InputRightElement, 
 import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin } from "react-icons/hi";
 import React, { useContext, useState } from "react";
 import { getCookie } from "../utils/utils"
-import { AuthContext } from "../AuthProvider";
+import { AuthContext } from "../context/AuthProvider";
 import { Link } from 'react-router-dom'
 import landing_bg from "../images/landing_bg.svg"
 

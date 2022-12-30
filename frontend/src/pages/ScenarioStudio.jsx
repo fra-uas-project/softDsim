@@ -333,7 +333,6 @@ const ScenarioStudio = () => {
                                                                     elementid={component.id}
                                                                     onClick={((e) => handleSelect(e))}
                                                                     id={component.id}
-                                                                    title={component.title}
                                                                     index={index}
                                                                     component={component}
                                                                     droppableType="action"

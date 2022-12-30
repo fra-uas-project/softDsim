@@ -437,7 +437,7 @@ const Simulation = () => {
                             Cancel
                         </Button>
                         <Button colorScheme='blue' onClick={() => { onClose(); startScenario() }}>
-                            <Tooltip label={'Start the Simulation with the given Parameters'}> Start Simulation </Tooltip>
+                            Start Simulation
                         </Button>
                     </ModalFooter>
                 </ModalContent>

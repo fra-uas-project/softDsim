@@ -14,7 +14,7 @@ import Logo from "../images/logo-simplify.png"
 import { HiMenu, HiOutlineLogout } from "react-icons/hi";
 import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../AuthProvider";
+import { AuthContext } from "../context/AuthProvider";
 import { useCookies } from 'react-cookie'
 import { getCookie } from "../utils/utils"
 
