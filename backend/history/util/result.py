@@ -96,9 +96,11 @@ def delete_sceanrio_objects(scenario):
 
 def calculate_time_played(scenario):
     history = History.objects.filter(user_scenario_id=scenario.id).order_by("id")
-    start_time = history.first().timestamp
-    end_time = history.last().timestamp
-
+    try:
+        start_time = history.first().timestamp
+        end_time = history.last().timestamp
+    except:
+        return 0
     return math.floor((end_time - start_time).total_seconds())
 
 
