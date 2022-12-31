@@ -129,7 +129,9 @@ def simulate(req, session: CachedScenario) -> None:
         for day in range(0, days):
             session.scenario.team.work(session, workpack, workpack_status, day)
             session.scenario.state.day += 1
-        # logging.warning(f"Team work took {time.perf_counter() - start} seconds")
+            for member in session.members:
+                member.calculate_familiarity(len(session.tasks.solved()))
+        logging.warning(f"Team work took {time.perf_counter() - start} seconds")
     else:
         logging.info(
             "There are no members in the team, so there is nothing to simulate."
