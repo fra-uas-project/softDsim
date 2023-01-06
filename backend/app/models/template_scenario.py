@@ -19,6 +19,7 @@ class TemplateScenario(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField(default="default_scenario_name")
     story = models.TextField(default="", max_length=65536, blank=True)
+    studio_template_id = models.TextField(default="")
     # questions: List[Questions] -> ForeignKey Reference in Questions Model
     # simulation = Simulation -> ForeignKey Reference in Simulation Model
     # events = Event -> FK in Event Model

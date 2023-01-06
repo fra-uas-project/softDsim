@@ -37,6 +37,7 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "story",
+            "studio_template_id",
             "management_goal",
             "question_collections",
             "simulation_fragments",
@@ -162,4 +163,4 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
 class ReducedTemplateScenarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = TemplateScenario
-        fields = ("id", "name", "story")
+        fields = ("id", "name", "story", "studio_template_id")
