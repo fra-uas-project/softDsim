@@ -21,7 +21,8 @@ from app.api.views.team import SkillTypeView, TeamViews, MemberView
 from app.api.views.template_scenario import (
     TemplateScenarioUserListView,
     TemplateScenarioView,
-    TemplateScenarioFromStudioView
+    StudioTemplateScenarioView,
+    TemplateScenarioFromStudioView, StudioTemplateScenarioIsPublishedValidatorView
 )
 from app.api.views.user import UserView
 # from app.api.views.sim_api import ParameterSimulation
@@ -39,12 +40,14 @@ urlpatterns = [
     path("user/<str:username>", UserView.as_view()),
     # template scenario
     path("template-scenario", TemplateScenarioView.as_view()),
-    path("template-scenario/<str:scenario_id>", TemplateScenarioView.as_view()),
+    path("template-scenario/<int:scenario_id>", TemplateScenarioView.as_view()),
     path("template-overview", TemplateScenarioUserListView.as_view()),
     path("template-overview/<int:scenario_id>", TemplateScenarioUserListView.as_view()),
+    path("template-scenario/from-studio", TemplateScenarioFromStudioView.as_view()),
     # template scenario studio
-    path("studio/template-scenario", TemplateScenarioFromStudioView.as_view()),
-    path("studio/template-scenario/<str:scenario_id>", TemplateScenarioFromStudioView.as_view()),
+    path("studio/template-scenario", StudioTemplateScenarioView.as_view()),
+    path("studio/template-scenario/<str:scenario_id>", StudioTemplateScenarioView.as_view()),
+    path("studio/template-scenario-is-published-validator", StudioTemplateScenarioIsPublishedValidatorView.as_view()),
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
     path("user-scenario/<int:id>", UserScenarioViews.as_view()),
