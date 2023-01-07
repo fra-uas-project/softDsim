@@ -1,0 +1,130 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+actor Benutzer
+participant Benutzeroberfläche
+participant Server
+database MongoDB
+database MariaDB
+
+== Lade Template Scenarios ==
+
+Benutzer -> Benutzeroberfläche: Klicke laden
+activate Benutzeroberfläche
+Benutzeroberfläche -> Server: GET /studio/template-scenario
+activate Server
+Server -> MongoDB: Lade Template Scenarios
+activate MongoDB
+MongoDB --> Server: Template Scenarios geladen
+deactivate MongoDB
+Server --> Benutzeroberfläche: Template Szenarios geladen
+Benutzeroberfläche --> Benutzer: Laden erfolgreich
+
+== Speichere neues Template Scenario ==
+
+Benutzer -> Benutzeroberfläche: Klicke speichern
+Benutzeroberfläche -> Server: << POST /studio/template-scenario >>
+Server -> MongoDB: << Persistiere Template Scenario >>
+activate MongoDB
+MongoDB --> Server: Template Scenario persistiert
+deactivate MongoDB
+Server --> Benutzeroberfläche: Template Szenario gespeichert
+Benutzeroberfläche --> Benutzer: Speichern erfolgreich
+
+== Bearbeite Template Scenario ==
+
+Benutzer -> Benutzeroberfläche: Wähle Scenario Template aus
+Benutzeroberfläche -> Server: GET /studio/template-scenario-is-published-validator?scenario_id={scenario_id}
+'Server -> MongoDB: Lade Template Scenario
+'activate MongoDB
+'MongoDB --> Server: Template Scenario geladen
+'deactivate MongoDB
+Server -> MariaDB: Prüfe ob Template Scenario bereits veröffentlicht
+activate MariaDB
+
+alt Template Scenario nicht veröffentlicht
+    MariaDB --> Server: Template Scenario existiert noch nicht
+    Server --> Benutzeroberfläche: Template Scenario bereit zum Bearbeiten
+    Benutzeroberfläche --> Benutzer: Template Scenario kann bearbeitet werden
+
+else Zugehöriges Template Scenario bereits veröffentlicht
+    MariaDB --> Server: Template Scenario bereits veröffentlicht
+    deactivate MariaDB
+    Server --> Benutzeroberfläche: Template Scenario bereits veröffentlicht
+                note left
+                Benutzer kann dupliziertes,
+                Template Scenario bearbeiten
+                oder abbrechen
+                end note
+    Benutzeroberfläche --> Benutzer: Benutzer wird informiert
+    Benutzer -> Benutzeroberfläche: Benutzer bestätigt Duplizierung
+    Benutzeroberfläche -> Server: POST /studio/template-scenario?clone={scenario_id}
+    Server -> MongoDB: << Dupliziere Template Scenario >>
+    activate MongoDB
+    MongoDB --> Server: Template Scenario dupliziert
+    deactivate MongoDB
+    Server --> Benutzeroberfläche: Gebe Duplikat zurück
+    Benutzeroberfläche --> Benutzer: Dupliziertes Template Scenario kann bearbeitet werden
+end
+
+== Speichere bearbeitetes Template Scenario ==
+
+Benutzer -> Benutzeroberfläche: Klicke speichern
+Benutzeroberfläche -> Server: << PUT /studio/template-scenario/{scenario_id} >>
+Server -> MongoDB: << Persistiere Template Scenario >>
+activate MongoDB
+MongoDB --> Server: Template Scenario persistiert
+deactivate MongoDB
+Server --> Benutzeroberfläche: Template Szenario gespeichert
+Benutzeroberfläche --> Benutzer: Speichern erfolgreich
+
+== Lösche Template Scenario ==
+
+Benutzer -> Benutzeroberfläche: Klicke löschen
+Benutzeroberfläche -> Server: DELETE /studio/template-scenario/{scenario_id}
+Server -> MongoDB: Lösche Template Scenario
+activate MongoDB
+MongoDB --> Server: Template Scenario gelöscht
+deactivate MongoDB
+Server --> Benutzeroberfläche: Template Szenario gelöscht
+Benutzeroberfläche --> Benutzer: Löschen erfolgreich
+
+== Veröffentliche Template Scenario ==
+
+Benutzer -> Benutzeroberfläche: Klicke veröffentlichen
+Benutzeroberfläche -> Benutzeroberfläche: Validierung Template Scenario
+alt Template Scenario ist valide
+    Benutzeroberfläche -> Server: << POST /studio/template-scenario/ TODO >>
+    Server -> MongoDB: << Speichere Template Scenario >>
+    activate MongoDB
+    MongoDB --> Server: Template Scenario gespeichert
+    deactivate MongoDB
+    Server --> Benutzeroberfläche: Template Scenario gespeichert
+    Benutzeroberfläche -> Server: << POST /template-scenario/from-studio >>
+    Server -> MariaDB: << Speichere Template Scenario >>
+    activate MariaDB
+    MariaDB -> Server: Template Scenario gespeichert
+    deactivate MariaDB
+    Server --> Benutzeroberfläche: Template Scenario veröffentlicht
+    Benutzeroberfläche --> Benutzer: Veröffentlichung erfolgreich
+else Template Scenario nicht valide
+    Benutzeroberfläche --> Benutzer: Veröffentlichung abgebrochen
+end
+
+== Starte Simulation ==
+
+Benutzer -> Benutzeroberfläche: Starte Simulation
+Benutzeroberfläche -> Server: << POST /sim/start >>
+Server -> MariaDB: Lade veröffentlichtes Template Scenario
+activate MariaDB
+MariaDB --> Server: Veröffentlichtes Template Scenario geladen
+Server -> MariaDB: Lade Konfiguration
+MariaDB -> Server: Konfiguration geladen
+Server -> MariaDB: << Persistiere User Scenario >>
+MariaDB -> Server: User Scenario persistiert
+deactivate MariaDB
+Server --> Benutzeroberfläche: User Scenario erstellt
+Benutzeroberfläche --> Benutzer: Simulation gestartet
+
+@enduml
