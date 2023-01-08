@@ -1,5 +1,4 @@
 import {
-    AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay,
     Box,
     Breadcrumb,
     BreadcrumbItem,
@@ -9,6 +8,7 @@ import {
     Heading,
     HStack,
     Icon,
+    IconButton,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -35,7 +35,7 @@ import {
     useToast,
     VStack
 } from "@chakra-ui/react";
-import {HiChevronRight} from "react-icons/hi";
+import {HiChevronRight, HiOutlineTrash} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import React, {useEffect, useRef, useState} from "react";
@@ -61,6 +61,7 @@ import {
     tabIndexEnum
 } from "../components/ScenarionStudio/scenarioStudioData";
 import {useImmer} from "use-immer";
+import ScenarioStudioAlert from "../components/ScenarionStudio/ScenarioStudioAlert";
 
 const ScenarioStudio = () => {
     const toast = useToast();
@@ -69,12 +70,15 @@ const ScenarioStudio = () => {
     const [editorList, updateEditorList] = useImmer([]);
     const [selectedObjectId, setSelectedObjectId] = useState(null);
     const [currentTemplateId, setCurrentTemplateId] = useState("")
+    const [oldTemplateId, setOldTemplateId] = useState("")
 
     const [templateScenarios, setTemplateScenarios] = useState([])
     const [isLoading, setIsLoading] = useState(false);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
+    const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
+    const { isOpen: isPublishedOpen, onOpen: onPublishedOpen, onClose: onPublishedClose } = useDisclosure();
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
 
     const cancelRef = useRef();
 
@@ -286,6 +290,33 @@ const ScenarioStudio = () => {
 
     const loadScenarioTemplate = async (scenarioId) => {
         try {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario-is-published-validator?scenario_id=${scenarioId}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
+            const isPublished = await res.json();
+
+            setOldTemplateId(currentTemplateId)
+            setCurrentTemplateId(scenarioId)
+
+            if (isPublished.data) {
+                console.log("inside")
+                onPublishedOpen()
+            } else {
+                await loadScenario(scenarioId)
+            }
+        } catch (e) {
+            toast({
+                title: `Could not load scenario template for id '${scenarioId}'. Please try again.`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+        }
+    };
+
+    const loadScenario = async (scenarioId) => {
+        try {
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario/${scenarioId}`, {
                 method: 'GET',
                 credentials: 'include',
@@ -293,10 +324,54 @@ const ScenarioStudio = () => {
             const fetchedScenarioTemplate = await res.json();
 
             updateEditorList(fetchedScenarioTemplate.data.scenario)
-            setCurrentTemplateId(fetchedScenarioTemplate.data.id)
         } catch (e) {
             toast({
                 title: `Could not load selected scenario template. Please try again.`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+        }
+    };
+
+    const duplicateScenario = async (scenarioId) => {
+        try {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario?clone=${scenarioId}`, {
+                method: 'POST',
+                credentials: 'include',
+            })
+            const scenarioTemplateClone = await res.json();
+
+            updateEditorList(scenarioTemplateClone.data.scenario)
+            setOldTemplateId(currentTemplateId)
+            setCurrentTemplateId(scenarioTemplateClone.data.id)
+        } catch (e) {
+            toast({
+                title: `Could not load selected scenario template. Please try again.`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+        }
+    };
+
+    const deleteScenario = async (scenarioId) => {
+        try {
+            await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario/${scenarioId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            })
+
+            await fetchScenarioTemplates()
+
+            toast({
+                title: `Scenario '${getScenarioName(scenarioId)}' has been deleted.`,
+                status: 'success',
+                duration: 5000,
+            });
+        } catch (e) {
+            toast({
+                title: `Could not delete scenario. Please try again.`,
                 status: 'error',
                 duration: 5000,
             });
@@ -337,7 +412,12 @@ const ScenarioStudio = () => {
     const resetScenarioStudio = () => {
         updateEditorList([]);
         setCurrentTemplateId("");
-    }
+    };
+
+    const getScenarioName = (scenarioId) => {
+        const scenario = templateScenarios.find(scenario => scenario.scenarioId === scenarioId)
+        return scenario?.name
+    };
 
     // If item is selected, switch to inspector tab
     useEffect(() => {
@@ -353,13 +433,9 @@ const ScenarioStudio = () => {
         console.log("SO", selectedObject)
     }, [editorList, selectedObject])
 
-    useEffect(() => {
-        console.log(templateScenarios)
-    }, [templateScenarios])
-
     return (
         <>
-            <Modal isOpen={isOpen} onClose={onClose} size="4xl" closeOnOverlayClick={false}>
+            <Modal isOpen={isOpen} onClose={onClose} size="4xl">
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Scenarios</ModalHeader>
@@ -373,8 +449,8 @@ const ScenarioStudio = () => {
                             <Table variant='simple' size="lg">
                                 <Thead>
                                     <Tr>
-                                        <Th color="gray.400">Template Id</Th>
-                                        <Th color="gray.400">Template Name</Th>
+                                        <Th color="gray.400">Scenario Id</Th>
+                                        <Th color="gray.400">scenario Name</Th>
                                         <Th color="gray.400">Actions</Th>
                                     </Tr>
                                 </Thead>
@@ -384,10 +460,11 @@ const ScenarioStudio = () => {
                                             <Td fontWeight="500">{template.scenarioId}</Td>
                                             <Td fontWeight="500">{template.name}</Td>
                                             <Td fontWeight="500">
+                                                <HStack gap={3}>
                                                 <Button
                                                     variant='solid'
                                                     colorScheme='blue'
-                                                    aria-label='Load template'
+                                                    aria-label='Load scenario'
                                                     onClick={() => {
                                                         loadScenarioTemplate(template.scenarioId)
                                                         onClose()
@@ -396,6 +473,19 @@ const ScenarioStudio = () => {
                                                 >
                                                     Load
                                                 </Button>
+                                                <IconButton
+                                                    variant='ghost'
+                                                    colorScheme='black'
+                                                    aria-label='Delete user'
+                                                    fontSize='20px'
+                                                    icon={<HiOutlineTrash />}
+                                                    onClick={() => {
+                                                        onDeleteOpen()
+                                                        setCurrentTemplateId(template.scenarioId)
+                                                    }
+                                                    }
+                                                />
+                                                </HStack>
                                             </Td>
                                         </Tr>
                                     })}
@@ -424,7 +514,7 @@ const ScenarioStudio = () => {
                                     if (editorList.length === 0) {
 
                                     } else {
-                                        onAlertOpen()
+                                        onCreateOpen()
                                     }
                                 }}>
                             Create new
@@ -678,40 +768,60 @@ const ScenarioStudio = () => {
                 </Box>
             </Flex>
 
+            <ScenarioStudioAlert
+                isOpen={isCreateOpen}
+                cancelRef={cancelRef}
+                onClose={onCreateClose}
+                title="Create new scenario"
+                text="All changes are discarded if you haven't saved your scenario.
+                            Are you sure that you want to continue? You can't undo this action afterwards."
+                onCancel={onCreateClose}
+                continueButtonColor="blue"
+                onContinueButtonClick={() => {
+                    resetScenarioStudio()
+                    onCreateClose()
+                    }
+                }
+            />
 
-            {/*Create new scenario*/}
-            <AlertDialog
-                isOpen={isAlertOpen}
-                leastDestructiveRef={cancelRef}
-                onClose={onAlertClose}
-                isCentered
-                motionPreset='slideInBottom'
-            >
-                <AlertDialogOverlay>
-                    <AlertDialogContent>
-                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                            Create new scenario
-                        </AlertDialogHeader>
+            <ScenarioStudioAlert
+                isOpen={isPublishedOpen}
+                cancelRef={cancelRef}
+                onClose={onPublishedClose}
+                title="Duplicate scenario"
+                text="The selected scenario is already published. You cannot edit a published scenario, but you can create a duplicate. Do you want to continue?"
+                onCancel={() => {
+                    setCurrentTemplateId(oldTemplateId)
+                    onPublishedClose()
+                    }
+                }
+                continueButtonColor="blue"
+                onContinueButtonClick={() => {
+                    onPublishedClose()
+                    duplicateScenario(currentTemplateId)
+                    }
+                }
+            />
 
-                        <AlertDialogBody>
-                            All changes are discarded if you haven't saved your scenario.
-                            Are you sure that you want to continue? You can't undo this action afterwards.
-                        </AlertDialogBody>
-
-                        <AlertDialogFooter>
-                            <Button ref={cancelRef} onClick={onAlertClose}>
-                                Cancel
-                            </Button>
-                            <Button colorScheme='blue' onClick={() => {
-                                resetScenarioStudio()
-                                onAlertClose()
-                            }} ml={3}>
-                                Continue
-                            </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
+            <ScenarioStudioAlert
+                isOpen={isDeleteOpen}
+                cancelRef={cancelRef}
+                onClose={onDeleteClose}
+                title="Delete scenario "
+                text={`Do you want to delete scenario '${getScenarioName(currentTemplateId)}'? You can't undo this action afterwards.`}
+                onCancel={() => {
+                    setCurrentTemplateId(oldTemplateId)
+                    onDeleteClose()
+                }
+                }
+                continueButtonColor="red"
+                continueButtonName="Delete"
+                onContinueButtonClick={() => {
+                    onDeleteClose()
+                    deleteScenario(currentTemplateId)
+                }
+                }
+            />
         </>
     )
 };
