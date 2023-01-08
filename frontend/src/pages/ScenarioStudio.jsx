@@ -51,7 +51,7 @@ import ActionInspectorForm from "../components/ScenarionStudio/InspectorTab/Acti
 import InspectorEmtpy from "../components/ScenarionStudio/InspectorTab/InspectorEmtpy";
 import EventInspectorForm from "../components/ScenarionStudio/InspectorTab/EventInspectorForm";
 import ModelSelectionInspectorForm from "../components/ScenarionStudio/InspectorTab/ModelSelectionInspectorForm";
-import {getCookie} from "../utils/utils";
+import {getCookie, iconMap} from "../utils/utils";
 import {
     componentEnum,
     finalActionList,
@@ -116,10 +116,9 @@ const ScenarioStudio = () => {
                 return
             }
 
-            let res
             if (scenarioId === "") {
                 // Save new scenario
-                res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
+                const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
                     method: 'POST',
                     credentials: 'include',
                     headers: {
@@ -127,7 +126,7 @@ const ScenarioStudio = () => {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(editorList)
+                    body: stringify(editorList)
                 })
 
                 const response = await res.json()
@@ -143,7 +142,7 @@ const ScenarioStudio = () => {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(editorList)
+                    body: stringify(editorList)
                 })
             }
 
@@ -340,8 +339,8 @@ const ScenarioStudio = () => {
                 credentials: 'include',
             })
             const fetchedScenarioTemplate = await res.json();
-
-            updateEditorList(fetchedScenarioTemplate.data.scenario)
+            const scenario = loadIcons(fetchedScenarioTemplate.data.scenario)
+            updateEditorList(scenario)
         } catch (e) {
             toast({
                 title: `Could not load selected scenario template. Please try again.`,
@@ -359,8 +358,8 @@ const ScenarioStudio = () => {
                 credentials: 'include',
             })
             const scenarioTemplateClone = await res.json();
-
-            updateEditorList(scenarioTemplateClone.data.scenario)
+            const scenario = loadIcons(scenarioTemplateClone.data.scenario)
+            updateEditorList(scenario)
             setOldTemplateId(currentTemplateId)
             setCurrentTemplateId(scenarioTemplateClone.data.id)
         } catch (e) {
@@ -406,6 +405,8 @@ const ScenarioStudio = () => {
             })
             const fetchedScenarioTemplates = await res.json();
 
+
+
             let templateScenarios = []
 
             for (const templateScenario of fetchedScenarioTemplates.data) {
@@ -435,6 +436,36 @@ const ScenarioStudio = () => {
     const getScenarioName = (scenarioId) => {
         const scenario = templateScenarios.find(scenario => scenario.scenarioId === scenarioId)
         return scenario?.name
+    };
+
+    // Custom stringify to persist icon function as string
+    const stringify = (editorList) => {
+        return JSON.stringify(editorList, (key, value) => {
+            if (key === "icon") {
+                return value.name.toString()
+            }
+            return value
+        })
+    };
+
+    const loadIcons = (editorList) => {
+        for (const component of editorList) {
+            deepSearch(component)
+        }
+        return editorList
+    };
+    const deepSearch = (component) => {
+        if (typeof component === 'object') {
+            for (let key in component) {
+                if (typeof component[key] === 'object') {
+                    deepSearch(component[key]);
+                } else {
+                    if (key === 'icon') {
+                        component[key] = iconMap[component.icon]
+                    }
+                }
+            }
+        }
     };
 
     // If item is selected, switch to inspector tab
@@ -557,13 +588,6 @@ const ScenarioStudio = () => {
                             Save
                         </Button>
                         <Button variant="solid" colorScheme="blue" onClick={() => console.log("")}>Save and Publish</Button>
-                        {/*<IconButton aria-label="More features"*/}
-                        {/*            icon={<HiDotsVertical/>}*/}
-                        {/*            bg="blue.100"*/}
-                        {/*            color="blue.600"*/}
-                        {/*            _hover={{ bg: "blue.200" }}*/}
-                        {/*            _active={{bg: "blue.300"}}*/}
-                        {/*></IconButton>*/}
                     </HStack>
                 </HStack>
                 <Box h={5}></Box>
@@ -598,6 +622,13 @@ const ScenarioStudio = () => {
                                             {
                                                 editorList.length ?
                                                     editorList.map((component, index) => {
+                                                        // console.log(component.icon.name.toString())
+                                                        console.log(JSON.stringify(editorList, (key, value) => {
+                                                            if (typeof value === "function") {
+                                                                return value.name.toString()
+                                                            }
+                                                            return value
+                                                        }))
                                                             if (component.type === componentEnum.BASE) {
                                                                 return (
                                                                     <EditorBaseComponent

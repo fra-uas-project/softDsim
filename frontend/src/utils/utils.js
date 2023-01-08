@@ -1,4 +1,14 @@
 import {componentEnum} from "../components/ScenarionStudio/scenarioStudioData";
+import {
+    MdAlarm,
+    MdIntegrationInstructions, MdLocalBar,
+    MdMiscellaneousServices, MdOutlineAttachMoney, MdOutlineAttractions,
+    MdOutlineBugReport, MdOutlineCheckBox,
+    MdOutlineInfo, MdOutlineRadioButtonChecked, MdRule, MdSchool,
+    MdTimeline
+} from "react-icons/md";
+import {HiUserGroup} from "react-icons/hi";
+import {BsLightningCharge} from "react-icons/bs";
 
 export function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -22,6 +32,24 @@ export const action = {
     TRAINING: "training",
     SALARY: "salary",
     OVERTIME: "overtime"
+}
+
+export const iconMap = {
+    MdOutlineInfo: MdOutlineInfo,
+    MdTimeline: MdTimeline,
+    MdOutlineBugReport: MdOutlineBugReport,
+    MdIntegrationInstructions: MdIntegrationInstructions,
+    MdMiscellaneousServices: MdMiscellaneousServices,
+    HiUserGroup: HiUserGroup,
+    MdLocalBar: MdLocalBar,
+    MdSchool: MdSchool,
+    MdOutlineAttachMoney: MdOutlineAttachMoney,
+    MdAlarm: MdAlarm,
+    BsLightningCharge: BsLightningCharge,
+    MdRule: MdRule,
+    MdOutlineRadioButtonChecked: MdOutlineRadioButtonChecked,
+    MdOutlineCheckBox: MdOutlineCheckBox,
+    MdOutlineAttractions: MdOutlineAttractions
 }
 
 export const findQuestion = (questionId, editorList) => {
