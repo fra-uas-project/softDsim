@@ -126,11 +126,13 @@ const ScenarioStudio = () => {
             if (!res.ok) {
                 console.error(await res.json())
                 throw new Error()
-
             }
 
+            const response = await res.json()
+            setCurrentTemplateId(response.data.id)
+
             toast({
-                title: `Scenario Template has been saved`,
+                title: `Scenario has been saved`,
                 status: 'success',
                 duration: 5000,
             });
@@ -535,7 +537,7 @@ const ScenarioStudio = () => {
                         </Button>
                         <Button variant="outline"
                                 colorScheme="blue"
-                                onClick={() => console.log("saveScenarioTemplate")}>
+                                onClick={() => {saveScenarioTemplate()}}>
                             Save
                         </Button>
                         <Button variant="solid" colorScheme="blue" onClick={() => console.log("")}>Save and Publish</Button>
