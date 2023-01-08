@@ -7,21 +7,21 @@ import {
     Flex,
     Heading,
     HStack,
-    Icon,
-    Tab,
+    Icon, IconButton, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,
+    Tab, Table, TableContainer,
     TabList,
     TabPanel,
     TabPanels,
-    Tabs,
-    Text,
-    UnorderedList,
+    Tabs, Tbody, Td,
+    Text, Th, Thead, Tr,
+    UnorderedList, useDisclosure,
     useToast,
     VStack
 } from "@chakra-ui/react";
-import {HiChevronRight} from "react-icons/hi";
+import {HiChevronRight, HiDotsVertical, HiOutlineCheck, HiOutlineTrash, HiOutlineX} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
 import EditorListComponent from "../components/ScenarionStudio/Editor/EditorListComponent";
 import ComponentTab from "../components/ScenarionStudio/ComponentTab/ComponentTab";
@@ -34,7 +34,7 @@ import ActionInspectorForm from "../components/ScenarionStudio/InspectorTab/Acti
 import InspectorEmtpy from "../components/ScenarionStudio/InspectorTab/InspectorEmtpy";
 import EventInspectorForm from "../components/ScenarionStudio/InspectorTab/EventInspectorForm";
 import ModelSelectionInspectorForm from "../components/ScenarionStudio/InspectorTab/ModelSelectionInspectorForm";
-import {getCookie} from "../utils/utils";
+import {getCookie, role} from "../utils/utils";
 import {
     componentEnum,
     finalActionList,
@@ -52,6 +52,9 @@ const ScenarioStudio = () => {
     const [editorList, updateEditorList] = useImmer([]);
     const [selectedObjectId, setSelectedObjectId] = useState(null);
 
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const [templateScenarios, setTemplateScenarios] = useState([])
 
     const selectComponent = (id) => {
         const component = editorList.find(component => component.id === id)
@@ -94,7 +97,7 @@ const ScenarioStudio = () => {
                 body: JSON.stringify(editorList)
             })
 
-            if(!res.ok) {
+            if (!res.ok) {
                 console.error(await res.json())
                 throw new Error()
 
@@ -138,7 +141,7 @@ const ScenarioStudio = () => {
             // copy because item needs to be unique
             let movedItemCopy = {...movedItem};
             movedItemCopy.id = uuidv4();
-            if(movedItemCopy.type === componentEnum.BASE) {
+            if (movedItemCopy.type === componentEnum.BASE) {
                 movedItemCopy.template_name += ` ${uuidv4().slice(0, 8)}`
             } else {
                 movedItemCopy.displayName += ` ${uuidv4().slice(0, 8)}`
@@ -259,6 +262,29 @@ const ScenarioStudio = () => {
         // }
     };
 
+    const loadScenarioTemplate = (scenarioId) => {
+
+    };
+
+    const fetchScenarioTemplates = async () => {
+        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        const fetchedScenarioTemplates = await res.json();
+
+        let templateScenarios = []
+
+        for (const templateScenario of fetchedScenarioTemplates.data) {
+            const templateDto = {
+                scenarioId: templateScenario.id,
+                name: templateScenario.scenario.find(scenario => scenario.type === "BASE").template_name
+            }
+            templateScenarios.push(templateDto)
+        }
+        setTemplateScenarios(templateScenarios)
+    };
+
     // If item is selected, switch to inspector tab
     useEffect(() => {
         if (selectedObject) {
@@ -273,236 +299,316 @@ const ScenarioStudio = () => {
         console.log("SO", selectedObject)
     }, [editorList, selectedObject])
 
+    useEffect(() => {
+        console.log(templateScenarios)
+    }, [templateScenarios])
+
     return (
-        <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-            <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href=''>Scenarios Studio</BreadcrumbLink>
-                </BreadcrumbItem>
-            </Breadcrumb>
-            <HStack justifyContent="space-between" mr={3}>
-                <Heading>Scenario Studio</Heading>
-                <Button variant="solid" colorScheme="blue" onClick={saveScenarioTemplate}>Save Template</Button>
-            </HStack>
-            <Box h={5}></Box>
-            <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="70vh" maxH="73vh">
-                <HStack w="full" h="full" overflow="hidden" pt={2} spacing={5}
-                        onClick={((e) => handleEditorBackgroundClick(e))}>
-                    <DragDropContext onDragEnd={handleOnDragEnd}>
-                        {/*Editor*/}
-                        <Flex w="full" h="full" justifyContent="center" alignItems="center" backgroundColor="white"
-                              borderRadius="2xl" overflowX="auto" p={10}>
-                            <Droppable droppableId="editor"
-                                       type="component"
-                            >
-                                {(provided, snapshot) => (
-                                    <UnorderedList listStyleType="none"
-                                                   m={0}
-                                                   mt="auto"
-                                                   transition="background-color 0.2s ease"
-                                                   minH="full"
-                                                   minW="90%"
-                                                   {...provided.droppableProps}
-                                                   ref={provided.innerRef}
-                                                   backgroundColor={snapshot.isDraggingOver ? "gray.200" : ""}
-                                                   display="flex"
-                                                   flexDir="column"
-                                                   justifyContent={editorList.length ? "flex-start" : "center"}
-                                                   alignItems="center"
-                                                   borderRadius="2xl"
-                                                   flexGrow="1"
-                                                   elementid="backgroundList"
-                                    >
-                                        {
-                                            editorList.length ?
-                                                editorList.map((component, index) => {
-                                                        if (component.type === componentEnum.BASE) {
-                                                            return (
-                                                                <EditorBaseComponent
-                                                                    key={component.id}
-                                                                    onClick={((e) => handleSelect(e))}
-                                                                    index={index}
-                                                                    component={component}
-                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
-                                                                />
-                                                            )
-                                                        } else if (component.type === componentEnum.FRAGMENT) {
-                                                            return (
-                                                                <EditorListComponent
-                                                                    key={component.id}
-                                                                    elementid={component.id}
-                                                                    onClick={((e) => handleSelect(e))}
-                                                                    id={component.id}
-                                                                    index={index}
-                                                                    component={component}
-                                                                    droppableType="action"
-                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
-                                                                    selectedItem={selectedObject?.id}
-                                                                    actions={component.actions}
-                                                                />
-                                                            )
-                                                        } else if (component.type === componentEnum.QUESTIONS) {
-                                                            return (
-                                                                <EditorListComponent
-                                                                    key={component.id}
-                                                                    elementid={component.id}
-                                                                    onClick={((e) => handleSelect(e))}
-                                                                    id={component.id}
-                                                                    title={component.title}
-                                                                    index={index}
-                                                                    component={component}
-                                                                    droppableType="question"
-                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
-                                                                    selectedItem={selectedObject?.id}
-                                                                    actions={component.questions}
-                                                                />
-                                                            )
-                                                        } else if (component.type === componentEnum.EVENT) {
-                                                            return (
-                                                                <EditorBaseComponent
-                                                                    key={component.id}
-                                                                    onClick={((e) => handleSelect(e))}
-                                                                    index={index}
-                                                                    component={component}
-                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
-                                                                />
-                                                            )
-                                                        } else {
-                                                            return (
-                                                                <EditorBaseComponent
-                                                                    key={component.id}
-                                                                    onClick={((e) => handleSelect(e))}
-                                                                    index={index}
-                                                                    component={component}
-                                                                    isSelected={selectedObject ? selectedObject?.id === component.id : false}
-                                                                />
-                                                            )
-                                                        }
+        <>
+            <Modal isOpen={isOpen} onClose={onClose} size="4xl" closeOnOverlayClick={false}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Load Scenario</ModalHeader>
+                    <ModalCloseButton onClick={() => {setTemplateScenarios([])}}/>
+                    <ModalBody>
+
+                        <TableContainer overflowY="auto" maxH="60vh">
+                            <Table variant='simple' size="lg">
+                                <Thead>
+                                    <Tr>
+                                        <Th color="gray.400">Template Id</Th>
+                                        <Th color="gray.400">Template Name</Th>
+                                        <Th color="gray.400">Actions</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {templateScenarios.map((template, index) => {
+                                        return <Tr key={index}>
+                                            <Td fontWeight="500">{template.scenarioId}</Td>
+                                            <Td fontWeight="500">{template.name}</Td>
+                                            <Td fontWeight="500">
+                                                <Button
+                                                    variant='solid'
+                                                    colorScheme='blue'
+                                                    aria-label='Load template'
+                                                    onClick={() => {
+                                                        ""
                                                     }
-                                                )
-                                                :
-                                                <VStack color="gray.200">
-                                                    <Icon as={RiDragDropLine} w={20} h={20} mb={6}/>
-                                                    <Heading size="lg" pointerEvents="none">Drag a component
-                                                        here</Heading>
-                                                    <Text pointerEvents="none" fontSize="xl" mt="20px">(Create a
-                                                        complex
-                                                        scenario by drag and dropping different components)</Text>
-                                                </VStack>
-                                        }
-                                        {provided.placeholder}
-                                    </UnorderedList>
-                                )}
-                            </Droppable>
-                        </Flex>
+                                                    }
+                                                >
+                                                    Load
+                                                </Button>
+                                            </Td>
+                                        </Tr>
+                                    })}
+                                </Tbody>
+                            </Table>
+                        </TableContainer>
 
+                    </ModalBody>
+                    <ModalFooter gap={5}>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
 
-                        {/*Right Panel*/}
-                        <Box h="full" backgroundColor="white" borderRadius="2xl">
-                            <Tabs
-                                index={tabIndex}
-                                onChange={handleTabsChange}
-                                minH="900px"
-                            >
-                                <TabList>
-                                    <Tab fontWeight="bold" color="gray.400">Inspector</Tab>
-                                    <Tab fontWeight="bold" color="gray.400">Components</Tab>
-                                </TabList>
-
-                                {/* h = full height - tab header */}
-                                <TabPanels minW="350px" h="650px" overflowY="auto">
-                                    <TabPanel height="full">
-                                        {/* Inspector Items */}
-                                        {selectedObject ?
-                                            <VStack alignItems="flex-start" pt={2}>
-                                                {selectedObject?.type === componentEnum.BASE &&
-                                                    <BaseInspectorForm
-                                                        key={selectedObject.id}
-                                                        baseData={selectedObject}
-                                                        updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObjectId}
-                                                    />
-                                                }
-
-                                                {selectedObject?.type === componentEnum.QUESTIONS &&
-                                                    <QuestionsInspectorForm
-                                                        key={selectedObject.id}
-                                                        finalQuestionList={finalQuestionList}
-                                                        questionsData={selectedObject}
-                                                        updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObjectId}
-                                                    />
-                                                }
-
-                                                {selectedObject?.type === componentEnum.FRAGMENT &&
-                                                    <FragmentInspectorForm
-                                                        key={selectedObject.id}
-                                                        finalActionList={finalActionList}
-                                                        fragmentData={selectedObject}
-                                                        updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObjectId}
-                                                    />
-                                                }
-
-                                                {selectedObject?.type === componentEnum.EVENT &&
-                                                    <EventInspectorForm
-                                                        key={selectedObject.id}
-                                                        eventData={selectedObject}
-                                                        updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObjectId}
-                                                    />
-                                                }
-
-                                                {selectedObject?.type === componentEnum.MODELSELECTION &&
-                                                    <ModelSelectionInspectorForm
-                                                        key={selectedObject.id}
-                                                        modelSelectionData={selectedObject}
-                                                        updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObjectId}
-                                                    />
-                                                }
-
-                                                {selectedObject?.type === "ACTION" &&
-                                                    <ActionInspectorForm
-                                                        key={selectedObject.id}
-                                                        actionData={selectedObject}
-                                                        updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObjectId}
-                                                    />
-                                                }
-
-                                                {(selectedObject?.type === questionEnum.SINGLE || selectedObject?.type === questionEnum.MULTI) &&
-                                                    <QuestionInspectorForm
-                                                        /* key = answers to trigger rerender on answer change*/
-                                                        key={selectedObject.answers + selectedObject.id}
-                                                        questionData={selectedObject}
-                                                        updateEditorList={updateEditorList}
-                                                        setSelectedObject={setSelectedObjectId}
-                                                    />
-                                                }
-                                            </VStack>
-                                            :
-                                            <InspectorEmtpy
-                                                content="No components selected. Click on a component to select it."
-                                            />
-                                        }
-
-                                    </TabPanel>
-
-                                    {/* Component Tab */}
-                                    <TabPanel pb={0} pt={0}>
-                                        <ComponentTab
-                                            finalComponentList={finalComponentList}
-                                        />
-                                    </TabPanel>
-
-                                </TabPanels>
-                            </Tabs>
-                        </Box>
-                    </DragDropContext>
+            <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
+                <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href=''>Scenarios Studio</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </Breadcrumb>
+                <HStack justifyContent="space-between" mr={3}>
+                    <Heading>Scenario Studio</Heading>
+                    <HStack gap={2}>
+                        <Button variant="outline"
+                                colorScheme="blue"
+                                onClick={() => {
+                                    fetchScenarioTemplates()
+                                    onOpen()
+                                }
+                                }>
+                            Load
+                        </Button>
+                        <Button variant="outline"
+                                colorScheme="blue"
+                                onClick={""}>
+                            Test
+                        </Button>
+                        <Button variant="outline"
+                                colorScheme="blue"
+                                onClick={"saveScenarioTemplate"}>
+                            Save
+                        </Button>
+                        <Button variant="solid" colorScheme="blue" onClick={""}>Save and Publish</Button>
+                        {/*<IconButton aria-label="More features"*/}
+                        {/*            icon={<HiDotsVertical/>}*/}
+                        {/*            bg="blue.100"*/}
+                        {/*            color="blue.600"*/}
+                        {/*            _hover={{ bg: "blue.200" }}*/}
+                        {/*            _active={{bg: "blue.300"}}*/}
+                        {/*></IconButton>*/}
+                    </HStack>
                 </HStack>
-            </Box>
-        </Flex>
+                <Box h={5}></Box>
+                <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="70vh" maxH="73vh">
+                    <HStack w="full" h="full" overflow="hidden" pt={2} spacing={5}
+                            onClick={((e) => handleEditorBackgroundClick(e))}>
+                        <DragDropContext onDragEnd={handleOnDragEnd}>
+                            {/*Editor*/}
+                            <Flex w="full" h="full" justifyContent="center" alignItems="center" backgroundColor="white"
+                                  borderRadius="2xl" overflowX="auto" p={10}>
+                                <Droppable droppableId="editor"
+                                           type="component"
+                                >
+                                    {(provided, snapshot) => (
+                                        <UnorderedList listStyleType="none"
+                                                       m={0}
+                                                       mt="auto"
+                                                       transition="background-color 0.2s ease"
+                                                       minH="full"
+                                                       minW="90%"
+                                                       {...provided.droppableProps}
+                                                       ref={provided.innerRef}
+                                                       backgroundColor={snapshot.isDraggingOver ? "gray.200" : ""}
+                                                       display="flex"
+                                                       flexDir="column"
+                                                       justifyContent={editorList.length ? "flex-start" : "center"}
+                                                       alignItems="center"
+                                                       borderRadius="2xl"
+                                                       flexGrow="1"
+                                                       elementid="backgroundList"
+                                        >
+                                            {
+                                                editorList.length ?
+                                                    editorList.map((component, index) => {
+                                                            if (component.type === componentEnum.BASE) {
+                                                                return (
+                                                                    <EditorBaseComponent
+                                                                        key={component.id}
+                                                                        onClick={((e) => handleSelect(e))}
+                                                                        index={index}
+                                                                        component={component}
+                                                                        isSelected={selectedObject ? selectedObject?.id === component.id : false}
+                                                                    />
+                                                                )
+                                                            } else if (component.type === componentEnum.FRAGMENT) {
+                                                                return (
+                                                                    <EditorListComponent
+                                                                        key={component.id}
+                                                                        elementid={component.id}
+                                                                        onClick={((e) => handleSelect(e))}
+                                                                        id={component.id}
+                                                                        index={index}
+                                                                        component={component}
+                                                                        droppableType="action"
+                                                                        isSelected={selectedObject ? selectedObject?.id === component.id : false}
+                                                                        selectedItem={selectedObject?.id}
+                                                                        actions={component.actions}
+                                                                    />
+                                                                )
+                                                            } else if (component.type === componentEnum.QUESTIONS) {
+                                                                return (
+                                                                    <EditorListComponent
+                                                                        key={component.id}
+                                                                        elementid={component.id}
+                                                                        onClick={((e) => handleSelect(e))}
+                                                                        id={component.id}
+                                                                        title={component.title}
+                                                                        index={index}
+                                                                        component={component}
+                                                                        droppableType="question"
+                                                                        isSelected={selectedObject ? selectedObject?.id === component.id : false}
+                                                                        selectedItem={selectedObject?.id}
+                                                                        actions={component.questions}
+                                                                    />
+                                                                )
+                                                            } else if (component.type === componentEnum.EVENT) {
+                                                                return (
+                                                                    <EditorBaseComponent
+                                                                        key={component.id}
+                                                                        onClick={((e) => handleSelect(e))}
+                                                                        index={index}
+                                                                        component={component}
+                                                                        isSelected={selectedObject ? selectedObject?.id === component.id : false}
+                                                                    />
+                                                                )
+                                                            } else {
+                                                                return (
+                                                                    <EditorBaseComponent
+                                                                        key={component.id}
+                                                                        onClick={((e) => handleSelect(e))}
+                                                                        index={index}
+                                                                        component={component}
+                                                                        isSelected={selectedObject ? selectedObject?.id === component.id : false}
+                                                                    />
+                                                                )
+                                                            }
+                                                        }
+                                                    )
+                                                    :
+                                                    <VStack color="gray.200">
+                                                        <Icon as={RiDragDropLine} w={20} h={20} mb={6}/>
+                                                        <Heading size="lg" pointerEvents="none">Drag a component
+                                                            here</Heading>
+                                                        <Text pointerEvents="none" fontSize="xl" mt="20px">(Create a
+                                                            complex
+                                                            scenario by drag and dropping different components)</Text>
+                                                    </VStack>
+                                            }
+                                            {provided.placeholder}
+                                        </UnorderedList>
+                                    )}
+                                </Droppable>
+                            </Flex>
+
+
+                            {/*Right Panel*/}
+                            <Box h="full" backgroundColor="white" borderRadius="2xl">
+                                <Tabs
+                                    index={tabIndex}
+                                    onChange={handleTabsChange}
+                                    minH="900px"
+                                >
+                                    <TabList>
+                                        <Tab fontWeight="bold" color="gray.400">Inspector</Tab>
+                                        <Tab fontWeight="bold" color="gray.400">Components</Tab>
+                                    </TabList>
+
+                                    {/* h = full height - tab header */}
+                                    <TabPanels minW="350px" h="650px" overflowY="auto">
+                                        <TabPanel height="full">
+                                            {/* Inspector Items */}
+                                            {selectedObject ?
+                                                <VStack alignItems="flex-start" pt={2}>
+                                                    {selectedObject?.type === componentEnum.BASE &&
+                                                        <BaseInspectorForm
+                                                            key={selectedObject.id}
+                                                            baseData={selectedObject}
+                                                            updateEditorList={updateEditorList}
+                                                            setSelectedObject={setSelectedObjectId}
+                                                        />
+                                                    }
+
+                                                    {selectedObject?.type === componentEnum.QUESTIONS &&
+                                                        <QuestionsInspectorForm
+                                                            key={selectedObject.id}
+                                                            finalQuestionList={finalQuestionList}
+                                                            questionsData={selectedObject}
+                                                            updateEditorList={updateEditorList}
+                                                            setSelectedObject={setSelectedObjectId}
+                                                        />
+                                                    }
+
+                                                    {selectedObject?.type === componentEnum.FRAGMENT &&
+                                                        <FragmentInspectorForm
+                                                            key={selectedObject.id}
+                                                            finalActionList={finalActionList}
+                                                            fragmentData={selectedObject}
+                                                            updateEditorList={updateEditorList}
+                                                            setSelectedObject={setSelectedObjectId}
+                                                        />
+                                                    }
+
+                                                    {selectedObject?.type === componentEnum.EVENT &&
+                                                        <EventInspectorForm
+                                                            key={selectedObject.id}
+                                                            eventData={selectedObject}
+                                                            updateEditorList={updateEditorList}
+                                                            setSelectedObject={setSelectedObjectId}
+                                                        />
+                                                    }
+
+                                                    {selectedObject?.type === componentEnum.MODELSELECTION &&
+                                                        <ModelSelectionInspectorForm
+                                                            key={selectedObject.id}
+                                                            modelSelectionData={selectedObject}
+                                                            updateEditorList={updateEditorList}
+                                                            setSelectedObject={setSelectedObjectId}
+                                                        />
+                                                    }
+
+                                                    {selectedObject?.type === "ACTION" &&
+                                                        <ActionInspectorForm
+                                                            key={selectedObject.id}
+                                                            actionData={selectedObject}
+                                                            updateEditorList={updateEditorList}
+                                                            setSelectedObject={setSelectedObjectId}
+                                                        />
+                                                    }
+
+                                                    {(selectedObject?.type === questionEnum.SINGLE || selectedObject?.type === questionEnum.MULTI) &&
+                                                        <QuestionInspectorForm
+                                                            /* key = answers to trigger rerender on answer change*/
+                                                            key={selectedObject.answers + selectedObject.id}
+                                                            questionData={selectedObject}
+                                                            updateEditorList={updateEditorList}
+                                                            setSelectedObject={setSelectedObjectId}
+                                                        />
+                                                    }
+                                                </VStack>
+                                                :
+                                                <InspectorEmtpy
+                                                    content="No components selected. Click on a component to select it."
+                                                />
+                                            }
+
+                                        </TabPanel>
+
+                                        {/* Component Tab */}
+                                        <TabPanel pb={0} pt={0}>
+                                            <ComponentTab
+                                                finalComponentList={finalComponentList}
+                                            />
+                                        </TabPanel>
+
+                                    </TabPanels>
+                                </Tabs>
+                            </Box>
+                        </DragDropContext>
+                    </HStack>
+                </Box>
+            </Flex>
+        </>
     )
 };
 
