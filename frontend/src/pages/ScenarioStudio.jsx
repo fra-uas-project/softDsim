@@ -1,4 +1,5 @@
 import {
+    AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay,
     Box,
     Breadcrumb,
     BreadcrumbItem,
@@ -37,7 +38,7 @@ import {
 import {HiChevronRight} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
 import EditorListComponent from "../components/ScenarionStudio/Editor/EditorListComponent";
 import ComponentTab from "../components/ScenarionStudio/ComponentTab/ComponentTab";
@@ -73,6 +74,9 @@ const ScenarioStudio = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
+
+    const cancelRef = useRef();
 
     const selectComponent = (id) => {
         const component = editorList.find(component => component.id === id)
@@ -327,8 +331,13 @@ const ScenarioStudio = () => {
             duration: 5000,
         });
         console.log(e);
-    }
+        }
     };
+
+    const resetScenarioStudio = () => {
+        updateEditorList([]);
+        setCurrentTemplateId("");
+    }
 
     // If item is selected, switch to inspector tab
     useEffect(() => {
@@ -409,6 +418,17 @@ const ScenarioStudio = () => {
                 <HStack justifyContent="space-between" mr={3}>
                     <Heading>Scenario Studio</Heading>
                     <HStack gap={2}>
+                        <Button variant="outline"
+                                colorScheme="blue"
+                                onClick={() => {
+                                    if (editorList.length === 0) {
+
+                                    } else {
+                                        onAlertOpen()
+                                    }
+                                }}>
+                            Create new
+                        </Button>
                         <Button variant="outline"
                                 colorScheme="blue"
                                 onClick={() => {
@@ -657,6 +677,41 @@ const ScenarioStudio = () => {
                     </HStack>
                 </Box>
             </Flex>
+
+
+            {/*Create new scenario*/}
+            <AlertDialog
+                isOpen={isAlertOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onAlertClose}
+                isCentered
+                motionPreset='slideInBottom'
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Create new scenario
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            All changes are discarded if you haven't saved your scenario.
+                            Are you sure that you want to continue? You can't undo this action afterwards.
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onAlertClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme='blue' onClick={() => {
+                                resetScenarioStudio()
+                                onAlertClose()
+                            }} ml={3}>
+                                Continue
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </>
     )
 };
