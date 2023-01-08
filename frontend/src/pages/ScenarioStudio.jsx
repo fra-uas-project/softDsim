@@ -7,18 +7,34 @@ import {
     Flex,
     Heading,
     HStack,
-    Icon, IconButton, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,
-    Tab, Table, TableContainer,
+    Icon,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
+    Spinner,
+    Tab,
+    Table,
+    TableContainer,
     TabList,
     TabPanel,
     TabPanels,
-    Tabs, Tbody, Td,
-    Text, Th, Thead, Tr,
-    UnorderedList, useDisclosure,
+    Tabs,
+    Tbody,
+    Td,
+    Text,
+    Th,
+    Thead,
+    Tr,
+    UnorderedList,
+    useDisclosure,
     useToast,
     VStack
 } from "@chakra-ui/react";
-import {HiChevronRight, HiDotsVertical, HiOutlineCheck, HiOutlineTrash, HiOutlineX} from "react-icons/hi";
+import {HiChevronRight} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import React, {useEffect, useState} from "react";
@@ -34,7 +50,7 @@ import ActionInspectorForm from "../components/ScenarionStudio/InspectorTab/Acti
 import InspectorEmtpy from "../components/ScenarionStudio/InspectorTab/InspectorEmtpy";
 import EventInspectorForm from "../components/ScenarionStudio/InspectorTab/EventInspectorForm";
 import ModelSelectionInspectorForm from "../components/ScenarionStudio/InspectorTab/ModelSelectionInspectorForm";
-import {getCookie, role} from "../utils/utils";
+import {getCookie} from "../utils/utils";
 import {
     componentEnum,
     finalActionList,
@@ -51,10 +67,12 @@ const ScenarioStudio = () => {
     const [tabIndex, setTabIndex] = useState(1);
     const [editorList, updateEditorList] = useImmer([]);
     const [selectedObjectId, setSelectedObjectId] = useState(null);
-
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [currentTemplateId, setCurrentTemplateId] = useState("")
 
     const [templateScenarios, setTemplateScenarios] = useState([])
+    const [isLoading, setIsLoading] = useState(false);
+
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const selectComponent = (id) => {
         const component = editorList.find(component => component.id === id)
@@ -262,27 +280,54 @@ const ScenarioStudio = () => {
         // }
     };
 
-    const loadScenarioTemplate = (scenarioId) => {
+    const loadScenarioTemplate = async (scenarioId) => {
+        try {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario/${scenarioId}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
+            const fetchedScenarioTemplate = await res.json();
 
+            updateEditorList(fetchedScenarioTemplate.data.scenario)
+            setCurrentTemplateId(fetchedScenarioTemplate.data.id)
+        } catch (e) {
+            toast({
+                title: `Could not load selected scenario template. Please try again.`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+        }
     };
 
     const fetchScenarioTemplates = async () => {
-        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
-            method: 'GET',
-            credentials: 'include',
-        })
-        const fetchedScenarioTemplates = await res.json();
+        try {
+            setIsLoading(true)
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
+                method: 'GET',
+                credentials: 'include',
+            })
+            const fetchedScenarioTemplates = await res.json();
 
-        let templateScenarios = []
+            let templateScenarios = []
 
-        for (const templateScenario of fetchedScenarioTemplates.data) {
-            const templateDto = {
-                scenarioId: templateScenario.id,
-                name: templateScenario.scenario.find(scenario => scenario.type === "BASE").template_name
+            for (const templateScenario of fetchedScenarioTemplates.data) {
+                const templateDto = {
+                    scenarioId: templateScenario.id,
+                    name: templateScenario.scenario.find(scenario => scenario.type === "BASE").template_name
+                }
+                templateScenarios.push(templateDto)
             }
-            templateScenarios.push(templateDto)
-        }
-        setTemplateScenarios(templateScenarios)
+            setTemplateScenarios(templateScenarios)
+            setIsLoading(false)
+        } catch (e) {
+        toast({
+            title: `Could not fetch scenario templates. Please try again.`,
+            status: 'error',
+            duration: 5000,
+        });
+        console.log(e);
+    }
     };
 
     // If item is selected, switch to inspector tab
@@ -308,10 +353,13 @@ const ScenarioStudio = () => {
             <Modal isOpen={isOpen} onClose={onClose} size="4xl" closeOnOverlayClick={false}>
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Load Scenario</ModalHeader>
+                    <ModalHeader>Scenarios</ModalHeader>
                     <ModalCloseButton onClick={() => {setTemplateScenarios([])}}/>
                     <ModalBody>
-
+                        {isLoading ?
+                            <Flex w="full" justifyContent="center" alignItems="center">
+                                <Spinner size='xl'/>
+                            </Flex> :
                         <TableContainer overflowY="auto" maxH="60vh">
                             <Table variant='simple' size="lg">
                                 <Thead>
@@ -332,7 +380,8 @@ const ScenarioStudio = () => {
                                                     colorScheme='blue'
                                                     aria-label='Load template'
                                                     onClick={() => {
-                                                        ""
+                                                        loadScenarioTemplate(template.scenarioId)
+                                                        onClose()
                                                     }
                                                     }
                                                 >
@@ -344,7 +393,7 @@ const ScenarioStudio = () => {
                                 </Tbody>
                             </Table>
                         </TableContainer>
-
+                        }
                     </ModalBody>
                     <ModalFooter gap={5}>
                     </ModalFooter>
@@ -371,15 +420,15 @@ const ScenarioStudio = () => {
                         </Button>
                         <Button variant="outline"
                                 colorScheme="blue"
-                                onClick={""}>
+                                onClick={() => console.log("")}>
                             Test
                         </Button>
                         <Button variant="outline"
                                 colorScheme="blue"
-                                onClick={"saveScenarioTemplate"}>
+                                onClick={() => console.log("saveScenarioTemplate")}>
                             Save
                         </Button>
-                        <Button variant="solid" colorScheme="blue" onClick={""}>Save and Publish</Button>
+                        <Button variant="solid" colorScheme="blue" onClick={() => console.log("")}>Save and Publish</Button>
                         {/*<IconButton aria-label="More features"*/}
                         {/*            icon={<HiDotsVertical/>}*/}
                         {/*            bg="blue.100"*/}
