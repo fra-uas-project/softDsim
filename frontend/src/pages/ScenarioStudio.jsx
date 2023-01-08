@@ -110,26 +110,42 @@ const ScenarioStudio = () => {
 
     const selectedObject = selectComponent(selectedObjectId)
 
-    const saveScenarioTemplate = async () => {
+    const saveScenarioTemplate = async (scenarioId) => {
         try {
-            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    "X-CSRFToken": getCookie("csrftoken"),
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(editorList)
-            })
-
-            if (!res.ok) {
-                console.error(await res.json())
-                throw new Error()
+            if (editorList.length === 0) {
+                return
             }
 
-            const response = await res.json()
-            setCurrentTemplateId(response.data.id)
+            let res
+            if (scenarioId === "") {
+                // Save new scenario
+                res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken"),
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(editorList)
+                })
+
+                const response = await res.json()
+                setCurrentTemplateId(response.data.id)
+
+            } else {
+                // Overwrite existing scenario
+                await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario/${scenarioId}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken"),
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(editorList)
+                })
+            }
 
             toast({
                 title: `Scenario has been saved`,
@@ -537,7 +553,7 @@ const ScenarioStudio = () => {
                         </Button>
                         <Button variant="outline"
                                 colorScheme="blue"
-                                onClick={() => {saveScenarioTemplate()}}>
+                                onClick={() => {saveScenarioTemplate(currentTemplateId)}}>
                             Save
                         </Button>
                         <Button variant="solid" colorScheme="blue" onClick={() => console.log("")}>Save and Publish</Button>
