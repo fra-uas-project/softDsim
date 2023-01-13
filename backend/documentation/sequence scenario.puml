@@ -95,13 +95,13 @@ Benutzeroberfläche --> Benutzer: Löschen erfolgreich
 Benutzer -> Benutzeroberfläche: Klicke veröffentlichen
 Benutzeroberfläche -> Benutzeroberfläche: Validierung Template Scenario
 alt Template Scenario ist valide
-    Benutzeroberfläche -> Server: << POST /studio/template-scenario/ TODO >>
+    Benutzeroberfläche -> Server: << POST /studio/template-scenario >> oder PUT /studio/template-scenario/{scenario_id}
     Server -> MongoDB: << Speichere Template Scenario >>
     activate MongoDB
     MongoDB --> Server: Template Scenario gespeichert
     deactivate MongoDB
     Server --> Benutzeroberfläche: Template Scenario gespeichert
-    Benutzeroberfläche -> Server: << POST /template-scenario/from-studio >>
+    Benutzeroberfläche -> Server: << POST /template-scenario/from-studio?studio_template_id={scenario_id} >>
     Server -> MariaDB: << Speichere Template Scenario >>
     activate MariaDB
     MariaDB -> Server: Template Scenario gespeichert

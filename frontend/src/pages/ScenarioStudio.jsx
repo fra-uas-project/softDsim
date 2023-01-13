@@ -111,40 +111,12 @@ const ScenarioStudio = () => {
     const selectedObject = selectComponent(selectedObjectId)
 
     const saveScenarioTemplate = async (scenarioId) => {
+        if (editorList.length === 0) {
+            return
+        }
+
         try {
-            if (editorList.length === 0) {
-                return
-            }
-
-            if (scenarioId === "") {
-                // Save new scenario
-                const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        "X-CSRFToken": getCookie("csrftoken"),
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: stringify(editorList)
-                })
-
-                const response = await res.json()
-                setCurrentTemplateId(response.data.id)
-
-            } else {
-                // Overwrite existing scenario
-                await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario/${scenarioId}`, {
-                    method: 'PUT',
-                    credentials: 'include',
-                    headers: {
-                        "X-CSRFToken": getCookie("csrftoken"),
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: stringify(editorList)
-                })
-            }
+            await saveScenarioTemplateApiCall(scenarioId)
 
             toast({
                 title: `Scenario has been saved`,
@@ -160,6 +132,102 @@ const ScenarioStudio = () => {
             console.log(e);
         }
     };
+
+    // TODO create a scenario_template_service and store all the api call logic in methods
+    const saveScenarioTemplateApiCall = async (scenarioId) => {
+        if (scenarioId === "") {
+            // Save new scenario
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: stringify(editorList)
+            })
+
+            const response = await res.json()
+            setCurrentTemplateId(response.data.id)
+            return response.data.id
+
+        } else {
+            // Overwrite existing scenario
+            await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario/${scenarioId}`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: stringify(editorList)
+            })
+            return scenarioId
+        }
+    };
+
+    const publishScenarioTemplate = async (scenarioId) => {
+        await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/from-studio?studio_template_id=${scenarioId}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+    };
+
+    const saveAndPublishScenarioTemplate = async (scenarioId) => {
+        if (editorList.length === 0) {
+            return
+        }
+
+        try {
+            /*
+            // TODO implement
+            // call validateEditorList()
+            */
+        } catch (e) {
+            toast({
+                title: `Could not validate Scenario Template`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+        }
+
+        try {
+            scenarioId = await saveScenarioTemplateApiCall(scenarioId)
+        } catch (e) {
+            toast({
+                title: `Could not save Scenario Template`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+        }
+
+        try {
+             // check if also a new scenario id is published
+             await publishScenarioTemplate(scenarioId)
+
+            toast({
+                title: `Scenario '${scenarioId}' has been published`,
+                status: 'success',
+                duration: 5000,
+            });
+        } catch (e) {
+            toast({
+                title: `Could not publish Scenario Template`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+        }
+    }
 
     const handleOnDragEnd = (result) => {
         // TODO deconstruct result
@@ -405,8 +473,6 @@ const ScenarioStudio = () => {
             })
             const fetchedScenarioTemplates = await res.json();
 
-
-
             let templateScenarios = []
 
             for (const templateScenario of fetchedScenarioTemplates.data) {
@@ -525,13 +591,13 @@ const ScenarioStudio = () => {
                                                 <IconButton
                                                     variant='ghost'
                                                     colorScheme='black'
-                                                    aria-label='Delete user'
+                                                    aria-label='Delete scenario'
                                                     fontSize='20px'
                                                     icon={<HiOutlineTrash />}
                                                     onClick={() => {
                                                         onDeleteOpen()
                                                         setCurrentTemplateId(template.scenarioId)
-                                                    }
+                                                        }
                                                     }
                                                 />
                                                 </HStack>
@@ -587,7 +653,11 @@ const ScenarioStudio = () => {
                                 onClick={() => {saveScenarioTemplate(currentTemplateId)}}>
                             Save
                         </Button>
-                        <Button variant="solid" colorScheme="blue" onClick={() => console.log("")}>Save and Publish</Button>
+                        <Button variant="solid"
+                                colorScheme="blue"
+                                onClick={() => {saveAndPublishScenarioTemplate(currentTemplateId)}}>
+                                    Save and Publish
+                        </Button>
                     </HStack>
                 </HStack>
                 <Box h={5}></Box>
