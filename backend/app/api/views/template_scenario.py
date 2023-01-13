@@ -308,12 +308,13 @@ class TemplateScenarioFromStudioView(APIView):
     @allowed_roles(["creator"])
     def post(self, request):
         try:
-            if not request.data["studio_template_id"]:
-                return Response(dict(status="error", data="<template_studio_id> is missing"),
+
+            if "studio_template_id" not in request.query_params:
+                return Response(dict(status="error", data="Please provide the query parameter <studio_template_id>"),
                                 status=status.HTTP_400_BAD_REQUEST
                                 )
 
-            studio_template_id = request.data["studio_template_id"]
+            studio_template_id = request.query_params["studio_template_id"]
 
             config = get_config()
             collection = config.get_mongo_db_scenario_template_collection()
@@ -389,8 +390,6 @@ class StudioTemplateScenarioIsPublishedValidatorView(APIView):
                         dict(status="success", data=False),
                         status=status.HTTP_200_OK,
                     )
-
-
             else:
                 return Response(
                     dict(status="error", data="Please provide the query parameter <scenario_id>"),
