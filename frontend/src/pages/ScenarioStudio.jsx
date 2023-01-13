@@ -449,6 +449,13 @@ const ScenarioStudio = () => {
 
             await fetchScenarioTemplates()
 
+            // if current scenario template got deleted, clean workspace
+            if (scenarioId === currentTemplateId) {
+                setOldTemplateId(scenarioId)
+                setCurrentTemplateId("")
+                updateEditorList([])
+            }
+
             toast({
                 title: `Scenario '${getScenarioName(scenarioId)}' has been deleted.`,
                 status: 'success',
