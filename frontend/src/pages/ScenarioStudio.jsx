@@ -62,6 +62,7 @@ import {
 } from "../components/ScenarionStudio/scenarioStudioData";
 import {useImmer} from "use-immer";
 import ScenarioStudioAlert from "../components/ScenarionStudio/ScenarioStudioAlert";
+import {editorListSchema} from "../components/ScenarionStudio/scenarioValidation";
 
 const ScenarioStudio = () => {
     const toast = useToast();
@@ -541,6 +542,50 @@ const ScenarioStudio = () => {
         }
     };
 
+    function getComponentByPath(editorList, path) {
+        const pathArr = path.split(".");
+
+        // remove last element if key, because we want to access the object
+        if (pathArr[pathArr.length - 1].indexOf("[") === -1) {
+            pathArr.pop()
+        }
+
+        let currentComponent = editorList;
+        pathArr.forEach(path => {
+            if (path.indexOf("[") > -1 && path.indexOf("[") !== 0) {
+                // access array of an object e.g. questions[0]
+                const pathSplit = path.split("[")
+                const key = pathSplit[0]
+                const indexStr = pathSplit[1]
+                const index = parseInt(indexStr.substring(indexStr.indexOf("[") + 1, indexStr.indexOf("]")));
+                console.log(key, indexStr, index)
+                console.log(currentComponent)
+                currentComponent = currentComponent[key][index]
+            } else if (path.indexOf("[") === 0) {
+                // access array e.g. [3]
+                let pathIndex = parseInt(path.substring(path.indexOf("[") + 1, path.indexOf("]")));
+                currentComponent = currentComponent[pathIndex];
+            } else {
+                // access key of object e.g. text
+                currentComponent = currentComponent[path];
+            }
+        });
+        return currentComponent
+    }
+
+    const validateScenario = async (editorList) => {
+        try {
+            await editorListSchema.validate(editorList, {abortEarly: false})
+        } catch (e) {
+            console.log(e.inner)
+
+
+            const allErrors = e.inner
+            const component = getComponentByPath(editorList);
+
+        }
+    }
+
     // If item is selected, switch to inspector tab
     useEffect(() => {
         if (selectedObject) {
@@ -652,7 +697,10 @@ const ScenarioStudio = () => {
                         </Button>
                         <Button variant="outline"
                                 colorScheme="blue"
-                                onClick={() => console.log("")}>
+                                onClick={() => {
+                                    validateScenario(editorList)
+                                }
+                                }>
                             Test
                         </Button>
                         <Button variant="outline"
@@ -699,13 +747,6 @@ const ScenarioStudio = () => {
                                             {
                                                 editorList.length ?
                                                     editorList.map((component, index) => {
-                                                        // console.log(component.icon.name.toString())
-                                                        console.log(JSON.stringify(editorList, (key, value) => {
-                                                            if (typeof value === "function") {
-                                                                return value.name.toString()
-                                                            }
-                                                            return value
-                                                        }))
                                                             if (component.type === componentEnum.BASE) {
                                                                 return (
                                                                     <EditorBaseComponent
@@ -797,6 +838,7 @@ const ScenarioStudio = () => {
                                     <TabList>
                                         <Tab fontWeight="bold" color="gray.400">Inspector</Tab>
                                         <Tab fontWeight="bold" color="gray.400">Components</Tab>
+                                        <Tab fontWeight="bold" color="gray.400">Validation</Tab>
                                     </TabList>
 
                                     {/* h = full height - tab header */}
