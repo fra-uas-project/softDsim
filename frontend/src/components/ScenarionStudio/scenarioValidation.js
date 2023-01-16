@@ -1,7 +1,7 @@
 import * as yup from "yup"
 import {componentEnum} from "./scenarioStudioData";
 
-const validationErrorTypes = {
+export const validationErrorTypes = {
     INTERNAL_ERROR: "internal-error",
     ERROR: "error",
     WARNING: "warning",

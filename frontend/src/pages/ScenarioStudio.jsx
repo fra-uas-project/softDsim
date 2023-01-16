@@ -63,6 +63,7 @@ import {
 import {useImmer} from "use-immer";
 import ScenarioStudioAlert from "../components/ScenarionStudio/ScenarioStudioAlert";
 import {editorListSchema} from "../components/ScenarionStudio/scenarioValidation";
+import ValidationTab from "../components/ScenarionStudio/ValidationTab/ValidationTab";
 
 const ScenarioStudio = () => {
     const toast = useToast();
@@ -70,11 +71,13 @@ const ScenarioStudio = () => {
     const [tabIndex, setTabIndex] = useState(1);
     const [editorList, updateEditorList] = useImmer([]);
     const [selectedObjectId, setSelectedObjectId] = useState(null);
-    const [currentTemplateId, setCurrentTemplateId] = useState("")
-    const [oldTemplateId, setOldTemplateId] = useState("")
+    const [currentTemplateId, setCurrentTemplateId] = useState("");
+    const [oldTemplateId, setOldTemplateId] = useState("");
 
     const [templateScenarios, setTemplateScenarios] = useState([])
     const [isLoading, setIsLoading] = useState(false);
+
+    const [validationErrors, setValidationErrors] = useState([]);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
@@ -558,8 +561,8 @@ const ScenarioStudio = () => {
                 const key = pathSplit[0]
                 const indexStr = pathSplit[1]
                 const index = parseInt(indexStr.substring(indexStr.indexOf("[") + 1, indexStr.indexOf("]")));
-                console.log(key, indexStr, index)
-                console.log(currentComponent)
+                // console.log(key, indexStr, index)
+                // console.log(currentComponent)
                 currentComponent = currentComponent[key][index]
             } else if (path.indexOf("[") === 0) {
                 // access array e.g. [3]
@@ -577,12 +580,25 @@ const ScenarioStudio = () => {
         try {
             await editorListSchema.validate(editorList, {abortEarly: false})
         } catch (e) {
-            console.log(e.inner)
-
-
+            setValidationErrors([])
             const allErrors = e.inner
-            const component = getComponentByPath(editorList);
+            allErrors.sort((a, b) => a.type.localeCompare(b.type))
+            // console.log(allErrors)
+            // console.log(allErrors[0].message)
+            // console.log(allErrors[0].type)
+            //
+            //
+            // const component = getComponentByPath(editorList, allErrors[0].path);
+            // console.log(component)
 
+            const mappedErrors = []
+
+            for (const error of allErrors) {
+                mappedErrors.push({error: error, component: getComponentByPath(editorList, error.path)})
+            }
+            console.log(mappedErrors)
+
+            setValidationErrors(mappedErrors)
         }
     }
 
@@ -925,6 +941,13 @@ const ScenarioStudio = () => {
                                         <TabPanel pb={0} pt={0}>
                                             <ComponentTab
                                                 finalComponentList={finalComponentList}
+                                            />
+                                        </TabPanel>
+
+                                        <TabPanel pb={0} pt={0}>
+                                            <ValidationTab
+                                                validationErrors={validationErrors}
+                                                handleSelect={handleSelect}
                                             />
                                         </TabPanel>
 
