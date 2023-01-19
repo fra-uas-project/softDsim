@@ -5,10 +5,6 @@ const ValidationItem = (props) => {
     return (
         <HStack w="full" justifyContent="space-between" p={2}>
             <HStack w="50%">
-                {/*<Flex minW={10} minH={10} backgroundColor="gray.200" justifyContent="center" alignItems="center"*/}
-                {/*      borderRadius="xl">*/}
-                {/*    <Icon as={props.componentIcon} w={5} h={5} color="gray.500"/>*/}
-                {/*</Flex>*/}
                 <Flex pl={1} flexDir="column">
                     <Heading size="xs">{props.title}</Heading>
                     <Text fontSize="xs" fontWeight="500" color="gray.400">{props.description}</Text>
@@ -29,7 +25,6 @@ const ValidationItem = (props) => {
                       borderRadius="xl" _groupHover={{backgroundColor: `${props.buttonColor}.500`}}>
                     <Icon as={props.buttonIcon} w={3} h={3} color={`${props.buttonColor}.600`} _groupHover={{color: `${props.buttonColor}.100`}} transition="all 0.2s ease"/>
                 </Flex>
-                {/*    <Tag colorScheme={props.buttonColor}>{props.buttonText}</Tag>*/}
                 </HStack>
                 </Tooltip>
             </HStack>
