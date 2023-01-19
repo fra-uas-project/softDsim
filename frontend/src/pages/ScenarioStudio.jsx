@@ -869,6 +869,7 @@ const ScenarioStudio = () => {
                                                             baseData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
+                                                            validationErrors={validationErrors.filter(error => error.component.type === componentEnum.BASE)}
                                                         />
                                                     }
 

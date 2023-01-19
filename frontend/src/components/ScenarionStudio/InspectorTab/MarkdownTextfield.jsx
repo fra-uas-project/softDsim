@@ -1,4 +1,5 @@
 import {
+    Box,
     Button,
     FormControl,
     FormHelperText,
@@ -78,11 +79,20 @@ const MarkdownTextfield = (props) => {
         <>
             <FormControl w="300px">
                 <FormLabel htmlFor='text' color="gray.400" fontWeight="semibold">Story</FormLabel>
-                <MDE
-                    options={mdeOptionsLess}
-                    value={value}
-                    onChange={onChange}
-                />
+                <Box sx={props.errorBorderColor ?
+                    {
+                        ".EasyMDEContainer .CodeMirror":
+                            {
+                                borderColor: `${props.errorBorderColor}`,
+                                boxShadow: `0 0 0 1px var(--chakra-colors-${props.errorBorderColor.split(".")[0]}-${props.errorBorderColor.split(".")[1]})` // Changing format of color so that it is valid
+                            }
+                    } : undefined}>
+                    <MDE
+                        options={mdeOptionsLess}
+                        value={value}
+                        onChange={onChange}
+                    />
+                </Box>
                 <FormHelperText mt="-20px" mr="5px" display="flex" justifyContent="flex-end">
                     <IconButton icon={<HiOutlineExternalLink />} size="2xs" transform="scaleX(-1)" onClick={onOpen} aria-label="Open editor"/>
                 </FormHelperText>
