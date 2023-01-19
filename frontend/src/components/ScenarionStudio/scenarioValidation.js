@@ -12,7 +12,7 @@ export const validationErrorColors = {
     INTERNAL_ERROR: "purple",
     ERROR: "red",
     WARNING: "yellow",
-    INFO: "green"
+    INFO: "blue"
 }
 
 // export const editorListSchema = yup.array().of(yup.object().shape({
