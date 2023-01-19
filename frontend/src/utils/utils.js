@@ -9,6 +9,7 @@ import {
 } from "react-icons/md";
 import {HiUserGroup} from "react-icons/hi";
 import {BsLightningCharge} from "react-icons/bs";
+import {validationErrorColors, validationErrorTypes} from "../components/ScenarionStudio/scenarioValidation";
 
 export function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -72,4 +73,38 @@ export const findAction = (actionId, editorList) => {
     }
 
     return (actions.find(action => action.id === actionId))
+}
+
+export const isError = (validationErrors, objectKey) => {
+    return validationErrors.some(error => error.error.path.includes(objectKey))
+}
+
+export const getError = (validationErrors, objectKey) => {
+    return validationErrors.filter(error => error.error.path.includes(objectKey))[0]
+}
+
+export const getErrorType = (validationErrors, objectKey) => {
+    return validationErrors.filter(error => error.error.path.includes(objectKey))[0].error.type
+}
+
+export const getErrorMessage = (validationErrors, objectKey) => {
+    return validationErrors.filter(error => error.error.path.includes(objectKey))[0].error.message
+}
+
+export const getErrorColor = (validationErrors, objectKey) => {
+    if (isError(validationErrors, objectKey)) {
+        const errorType = getErrorType(validationErrors, objectKey)
+        if (errorType === validationErrorTypes.WARNING) {
+            return `${validationErrorColors.WARNING}.500`
+        } else if (errorType === validationErrorTypes.INFO) {
+            return `${validationErrorColors.INFO}.500`
+        } else if (errorType === validationErrorTypes.INTERNAL_ERROR) {
+            return `${validationErrorColors.INTERNAL_ERROR}.500`
+        } else if (errorType === validationErrorTypes.ERROR) {
+            return `${validationErrorColors.ERROR}.500`
+        } else {
+            // default red for unknown
+            return undefined
+        }
+    }
 }

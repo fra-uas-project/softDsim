@@ -4,7 +4,8 @@ import {
     Editable,
     EditableInput,
     EditablePreview,
-    FormControl, FormErrorMessage,
+    FormControl,
+    FormErrorMessage,
     FormHelperText,
     FormLabel,
     Input,
@@ -17,7 +18,7 @@ import {
 import {useEffect, useState} from "react";
 import MarkdownTextfield from "./MarkdownTextfield";
 import DeleteButton from "./DeleteButton";
-import {validationErrorColors, validationErrorTypes} from "../scenarioValidation";
+import {getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 
 const BaseInspectorForm = (props) => {
     const formatDays = (val) => val + ` days`
@@ -84,38 +85,7 @@ const BaseInspectorForm = (props) => {
             })
     };
 
-    const isError = (objectKey) => {
-        return props.validationErrors.some(error => error.error.path.includes(objectKey))
-    }
 
-    const getError = (objectKey) => {
-        return props.validationErrors.filter(error => error.error.path.includes(objectKey))[0]
-    }
-
-    const getErrorType = (objectKey) => {
-        return props.validationErrors.filter(error => error.error.path.includes(objectKey))[0].error.type
-    }
-
-    const getErrorMessage = (objectKey) => {
-        return props.validationErrors.filter(error => error.error.path.includes(objectKey))[0].error.message
-    }
-
-    const getErrorColor = (objectKey) => {
-        if (isError(objectKey)) {
-            if (getErrorType(objectKey) === validationErrorTypes.WARNING) {
-                return `${validationErrorColors.WARNING}.500`
-            } else if (getErrorType(objectKey) === validationErrorTypes.INFO) {
-                return `${validationErrorColors.INFO}.500`
-            } else if (getErrorType(objectKey) === validationErrorTypes.INTERNAL_ERROR) {
-                return `${validationErrorColors.INTERNAL_ERROR}.500`
-            } else if (getErrorType(objectKey) === validationErrorTypes.ERROR) {
-                return `${validationErrorColors.ERROR}.500`
-            } else {
-                // default red for unknown
-                return undefined
-            }
-        }
-    }
 
     useEffect(() => {
         console.log("valE")
@@ -132,37 +102,37 @@ const BaseInspectorForm = (props) => {
 
             <Box h={3} />
 
-            <FormControl isInvalid={isError("template_name")} >
+            <FormControl isInvalid={isError(props.validationErrors, "template_name")} >
                 <FormLabel color="gray.400" htmlFor="templateName">Scenario Name</FormLabel>
-                <Input id="templateName" value={templateName} errorBorderColor={getErrorColor("template_name")}
+                <Input id="templateName" value={templateName} errorBorderColor={getErrorColor(props.validationErrors, "template_name")}
                        onChange={(event) => {handleTemplateName(event)}}/>
-                {isError("template_name") ?
-                    <FormErrorMessage color={getErrorColor("template_name")}>
-                        {getErrorMessage("template_name")}
+                {isError(props.validationErrors,"template_name") ?
+                    <FormErrorMessage color={getErrorColor(props.validationErrors, "template_name")}>
+                        {getErrorMessage(props.validationErrors, "template_name")}
                     </FormErrorMessage>
                     : <FormHelperText></FormHelperText>}
             </FormControl>
             <Box h={3}/>
 
-            <FormControl isInvalid={isError("text")}>
+            <FormControl isInvalid={isError(props.validationErrors,"text")}>
                 <MarkdownTextfield
                     key={props.baseData.id}
                     data={props.baseData}
                     updateEditorList={props.updateEditorList}
-                    errorBorderColor={getErrorColor("text")}
+                    errorBorderColor={getErrorColor(props.validationErrors, "text")}
                 />
-                {isError("text") ?
-                    <FormErrorMessage mt={4} color={getErrorColor("text")}>
-                        {getError("text")?.error.message}
+                {isError(props.validationErrors,"text") ?
+                    <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, "text")}>
+                        {getErrorMessage(props.validationErrors, "text")}
                     </FormErrorMessage>
                     : <FormHelperText></FormHelperText>}
             </FormControl>
 
             <Box h={3}/>
 
-            <FormControl isInvalid={isError("budget")} >
+            <FormControl isInvalid={isError(props.validationErrors,"budget")} >
                 <FormLabel color="gray.400" htmlFor="budget">Budget</FormLabel>
-                <NumberInput w="full" min={0} id="budget" value={budget} errorBorderColor={getErrorColor("budget")}
+                <NumberInput w="full" min={0} id="budget" value={budget} errorBorderColor={getErrorColor(props.validationErrors, "budget")}
                              onChange={(value) => handleChangeBudget(value)}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -170,18 +140,18 @@ const BaseInspectorForm = (props) => {
                         <NumberDecrementStepper />
                     </NumberInputStepper>
                 </NumberInput>
-                {isError("budget") ?
-                    <FormErrorMessage color={getErrorColor("budget")}>
-                        {getErrorMessage("budget")}
+                {isError(props.validationErrors,"budget") ?
+                    <FormErrorMessage color={getErrorColor(props.validationErrors, "budget")}>
+                        {getErrorMessage(props.validationErrors, "budget")}
                     </FormErrorMessage>
                     : <FormHelperText></FormHelperText>}
             </FormControl>
 
                 <Box h={3}/>
 
-            <FormControl isInvalid={isError("duration")} >
+            <FormControl isInvalid={isError(props.validationErrors,"duration")} >
                 <FormLabel color="gray.400" htmlFor="duration">Duration</FormLabel>
-                <NumberInput id="duration" w="full" min={0} errorBorderColor={getErrorColor(duration)}
+                <NumberInput id="duration" w="full" min={0} errorBorderColor={getErrorColor(props.validationErrors, "duration")}
                              onChange={(valueString) => handleChangeDuration(valueString)} value={formatDays(duration)}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -189,18 +159,18 @@ const BaseInspectorForm = (props) => {
                         <NumberDecrementStepper />
                     </NumberInputStepper>
                 </NumberInput>
-                {isError("duration") ?
-                    <FormErrorMessage color={getErrorColor("duration")}>
-                        {getErrorMessage("duration")}
+                {isError(props.validationErrors,"duration") ?
+                    <FormErrorMessage color={getErrorColor(props.validationErrors, "duration")}>
+                        {getErrorMessage(props.validationErrors, "duration")}
                     </FormErrorMessage>
                     : <FormHelperText></FormHelperText>}
             </FormControl>
 
                 <Box h={3}/>
 
-            <FormControl isInvalid={isError("easy_tasks")} >
+            <FormControl isInvalid={isError(props.validationErrors,"easy_tasks")} >
                 <FormLabel color="gray.400" htmlFor="easytasks">Easy Tasks</FormLabel>
-                <NumberInput min={0} w="full" id="easytasks" value={easyTasks} errorBorderColor={getErrorColor("easy_tasks")}
+                <NumberInput min={0} w="full" id="easytasks" value={easyTasks} errorBorderColor={getErrorColor(props.validationErrors, "easy_tasks")}
                              onChange={(value) => handleChangeEasyTasks(value)}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -208,18 +178,18 @@ const BaseInspectorForm = (props) => {
                         <NumberDecrementStepper />
                     </NumberInputStepper>
                 </NumberInput>
-                {isError("easy_tasks") ?
-                    <FormErrorMessage color={getErrorColor("easy_tasks")}>
-                        {getErrorMessage("easy_tasks")}
+                {isError(props.validationErrors,"easy_tasks") ?
+                    <FormErrorMessage color={getErrorColor(props.validationErrors, "easy_tasks")}>
+                        {getErrorMessage(props.validationErrors, "easy_tasks")}
                     </FormErrorMessage>
                     : <FormHelperText></FormHelperText>}
             </FormControl>
 
                 <Box h={3}/>
 
-            <FormControl isInvalid={isError("medium_tasks")} >
+            <FormControl isInvalid={isError(props.validationErrors,"medium_tasks")} >
                 <FormLabel color="gray.400" htmlFor="mediumtasks">Medium Tasks</FormLabel>
-                <NumberInput min={0} w="full" id="mediumtasks" value={mediumTasks} errorBorderColor={getErrorColor("medium_tasks")}
+                <NumberInput min={0} w="full" id="mediumtasks" value={mediumTasks} errorBorderColor={getErrorColor(props.validationErrors, "medium_tasks")}
                              onChange={(value) => handleChangeMediumTasks(value)}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -227,18 +197,18 @@ const BaseInspectorForm = (props) => {
                         <NumberDecrementStepper />
                     </NumberInputStepper>
                 </NumberInput>
-                {isError("medium_tasks") ?
-                    <FormErrorMessage color={getErrorColor("medium_tasks")}>
-                        {getErrorMessage("medium_tasks")}
+                {isError(props.validationErrors,"medium_tasks") ?
+                    <FormErrorMessage color={getErrorColor(props.validationErrors, "medium_tasks")}>
+                        {getErrorMessage(props.validationErrors, "medium_tasks")}
                     </FormErrorMessage>
                     : <FormHelperText></FormHelperText>}
             </FormControl>
 
                 <Box h={3}/>
 
-            <FormControl isInvalid={isError("hard_tasks")} >
+            <FormControl isInvalid={isError(props.validationErrors,"hard_tasks")} >
                 <FormLabel color="gray.400" htmlFor="hardtasks">Hard Tasks</FormLabel>
-                <NumberInput w="full" min={0} id="hardtasks" value={hardTasks} errorBorderColor={getErrorColor("hard_tasks")}
+                <NumberInput w="full" min={0} id="hardtasks" value={hardTasks} errorBorderColor={getErrorColor(props.validationErrors, "hard_tasks")}
                              onChange={(value) => handleChangeHardTasks(value)}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -246,9 +216,9 @@ const BaseInspectorForm = (props) => {
                         <NumberDecrementStepper />
                     </NumberInputStepper>
                 </NumberInput>
-                {isError("hard_tasks") ?
-                    <FormErrorMessage color={getErrorColor("hard_tasks")}>
-                        {getErrorMessage("hard_tasks")}
+                {isError(props.validationErrors,"hard_tasks") ?
+                    <FormErrorMessage color={getErrorColor(props.validationErrors, "hard_tasks")}>
+                        {getErrorMessage(props.validationErrors, "hard_tasks")}
                     </FormErrorMessage>
                     : <FormHelperText></FormHelperText>}
             </FormControl>
