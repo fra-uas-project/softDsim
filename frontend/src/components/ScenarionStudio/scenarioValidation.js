@@ -8,6 +8,13 @@ export const validationErrorTypes = {
     INFO: "info"
 }
 
+export const validationErrorColors = {
+    INTERNAL_ERROR: "purple",
+    ERROR: "red",
+    WARNING: "yellow",
+    INFO: "green"
+}
+
 // export const editorListSchema = yup.array().of(yup.object().shape({
 //     type: yup.string().required().test(validationErrorTypes.INTERNAL_ERROR, "Invalid component type", value => Object.values(componentEnum).includes(value))
 // }));
@@ -40,6 +47,7 @@ export const basicSchema = yup.object().shape({
 })
 
 export const baseSchema = basicSchema.shape({
+    template_name: yup.string().test(validationErrorTypes.ERROR, "Scenario name can't be empty", value => value !== ""),
     text: yup.string().test(validationErrorTypes.WARNING, "It is recommended that the story is not empty", value => value !== ""),
     budget: yup.number().required().test(validationErrorTypes.ERROR, "The budget can't be 0", value => value !== 0),
     duration: yup.number().required().test(validationErrorTypes.ERROR, "The duration can't be 0", value => value !== 0),

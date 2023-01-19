@@ -3,7 +3,7 @@ import React from "react";
 import {HiExclamationCircle, HiLightBulb, HiLightningBolt, HiOutlineCheck} from "react-icons/hi";
 import {Link} from "react-router-dom";
 import ValidationItem from "./ValidationItem";
-import {validationErrorTypes} from "../scenarioValidation";
+import {validationErrorColors, validationErrorTypes} from "../scenarioValidation";
 import {findDOMNode} from "react-dom";
 
 const ValidationTab = (props) => {
@@ -44,7 +44,7 @@ const ValidationTab = (props) => {
                         <ValidationItem key={index}
                                         componentIcon={error.component.icon}
                                         buttonIcon={HiLightningBolt}
-                                        buttonColor="purple"
+                                        buttonColor={validationErrorColors.ERROR}
                                         tooltip="Action required"
                                         title={error.component.displayName}
                                         description={error.error.message}
@@ -66,7 +66,7 @@ const ValidationTab = (props) => {
                         <ValidationItem key={index}
                                         componentIcon={error.component.icon}
                                         buttonIcon={HiLightBulb}
-                                        buttonColor="yellow"
+                                        buttonColor={validationErrorColors.WARNING}
                                         tooltip="Action recommended"
                                         title={error.component.displayName}
                                         description={error.error.message}
@@ -84,7 +84,7 @@ const ValidationTab = (props) => {
                         <ValidationItem key={index}
                                         componentIcon={error.component.icon}
                                         buttonIcon={HiOutlineCheck}
-                                        buttonColor="green"
+                                        buttonColor={validationErrorColors.INFO}
                                         tooltip="Action possible"
                                         title={error.component.displayName}
                                         description={error.error.message}
