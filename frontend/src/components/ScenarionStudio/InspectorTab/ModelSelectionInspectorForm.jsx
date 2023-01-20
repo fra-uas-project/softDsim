@@ -5,13 +5,14 @@ import {
     Editable,
     EditableInput,
     EditablePreview,
-    FormControl,
+    FormControl, FormErrorMessage, FormHelperText,
     FormLabel,
     VStack
 } from "@chakra-ui/react";
 import MarkdownTextfield from "./MarkdownTextfield";
 import {useEffect, useState} from "react";
 import DeleteButton from "./DeleteButton";
+import {getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 
 const ModelSelectionInspectorForm = (props) => {
 
@@ -62,10 +63,20 @@ const ModelSelectionInspectorForm = (props) => {
             </Editable>
             <Divider/>
             <Box h={3}/>
-            <MarkdownTextfield
-                data={props.modelSelectionData}
-                updateEditorList={props.updateEditorList}
-            />
+
+            <FormControl isInvalid={isError(props.validationErrors,"text")}>
+                <MarkdownTextfield
+                    data={props.modelSelectionData}
+                    updateEditorList={props.updateEditorList}
+                    errorBorderColor={getErrorColor(props.validationErrors, "text")}
+                />
+                {isError(props.validationErrors,"text") ?
+                    <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, "text")}>
+                        {getErrorMessage(props.validationErrors, "text")}
+                    </FormErrorMessage>
+                    : <FormHelperText></FormHelperText>}
+            </FormControl>
+
             <Box h={3}/>
             <FormControl flexDir="column" display="flex">
                 <FormLabel color="gray.400" htmlFor="">Available Management Models</FormLabel>
