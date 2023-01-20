@@ -15,7 +15,7 @@ import {
     NumberInputField,
     NumberInputStepper
 } from "@chakra-ui/react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import MarkdownTextfield from "./MarkdownTextfield";
 import DeleteButton from "./DeleteButton";
 import {getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
@@ -84,13 +84,6 @@ const BaseInspectorForm = (props) => {
                 component.hard_tasks = value;
             })
     };
-
-
-
-    useEffect(() => {
-        console.log("valE")
-        console.log(props.validationErrors)
-    }, [])
 
     return (
         <>
