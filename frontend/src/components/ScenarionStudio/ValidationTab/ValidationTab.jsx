@@ -47,8 +47,6 @@ const ValidationTab = (props) => {
                                         description={error.error.message}
                                         onClick={() => {
                                             props.handleSelect(createHandleSelectObject(error.component.id));
-                                            // const objectNode = findDOMNode(this) // TODO: reference the dom element to use scrollIntoView
-                                            // console.log("objectNode", objectNode)
                                         }}
                         />
                     )

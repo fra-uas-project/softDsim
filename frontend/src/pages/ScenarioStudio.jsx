@@ -111,7 +111,6 @@ const ScenarioStudio = () => {
             return question
         }
     }
-
     const selectedObject = selectComponent(selectedObjectId)
 
     const saveScenarioTemplate = async (scenarioId) => {
@@ -343,6 +342,8 @@ const ScenarioStudio = () => {
     };
 
     const handleSelect = (e) => {
+        setTabIndex(tabIndexEnum.INSPECTOR)
+
         const component = editorList.find(component => component.id === e.currentTarget.getAttribute("elementid"))
 
         const fragmentList = editorList.filter(component => component.type === componentEnum.FRAGMENT)

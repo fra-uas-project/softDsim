@@ -14,7 +14,8 @@ import { HiUserGroup } from "react-icons/hi";
 
 export const tabIndexEnum = {
     "INSPECTOR": 0,
-    "COMPONENTS": 1
+    "COMPONENTS": 1,
+    "VALIDATION": 2
 };
 
 export const componentEnum = {
