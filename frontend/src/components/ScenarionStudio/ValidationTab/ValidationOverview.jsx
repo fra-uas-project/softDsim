@@ -32,7 +32,6 @@ const ValidationOverview = (props) => {
 
     const scenarioIsValid = () => {
         return !props.validationErrors.some(error => error.error.type === validationErrorTypes.ERROR) &&
-            !props.validationErrors.some(error => error.error.type === validationErrorTypes.WARNING) &&
             !props.validationErrors.some(error => error.error.type === validationErrorTypes.INTERNAL_ERROR);
     }
 
@@ -58,7 +57,6 @@ const ValidationOverview = (props) => {
                         :
                         <></>
                     }
-
                 </VStack>
             </HStack>
         </VStack>
