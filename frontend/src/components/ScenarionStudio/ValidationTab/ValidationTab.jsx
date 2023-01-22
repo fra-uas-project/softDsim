@@ -8,7 +8,15 @@ import ValidationOverview from "./ValidationOverview";
 
 const ValidationTab = (props) => {
 
-    const createHandleSelectObject = (componentId) => {
+    const createHandleSelectObject = (error) => {
+        let componentId = ""
+        if(error.component.parentId) {
+            // Handle question answers
+            componentId = error.component.parentId
+        } else {
+            componentId = error.component.id
+        }
+
         return {currentTarget: {getAttribute: () => {return componentId}}}
     }
 
@@ -29,7 +37,7 @@ const ValidationTab = (props) => {
                                         title={error.component.displayName}
                                         description={error.error.message}
                                         onClick={() => {
-                                            props.handleSelect(createHandleSelectObject(error.component.id));
+                                            props.handleSelect(createHandleSelectObject(error));
                                         }}
                         />
                     )
@@ -50,7 +58,7 @@ const ValidationTab = (props) => {
                                                 tooltip="Action recommended"
                                                 title={error.component.displayName}
                                                 description={error.error.message}
-                                                onClick={() => props.handleSelect(createHandleSelectObject(error.component.id))}
+                                                onClick={() => props.handleSelect(createHandleSelectObject(error))}
                                 />
                             )
                         })
@@ -71,7 +79,7 @@ const ValidationTab = (props) => {
                                             title={error.component.displayName}
                                             description={error.error.message}
                                             onClick={() => {
-                                                props.handleSelect(createHandleSelectObject(error.component.id));
+                                                props.handleSelect(createHandleSelectObject(error));
                                             }}
                             />
                         )

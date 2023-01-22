@@ -19,24 +19,27 @@ import {questionEnum} from "../scenarioStudioData";
 import {findQuestion, getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 import DeleteButton from "./DeleteButton";
 
-const basicAnswers = [
-    {
-        id: uuidv4(),
-        type: "ANSWER",
-        label: "",
-        points: "0",
-        right: true
-    },
-    {
-        id: uuidv4(),
-        type: "ANSWER",
-        label: "",
-        points: "0",
-        right: false
-    },
-]
-
 const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObject, validationErrors}) => {
+    const basicAnswers = [
+        {
+            id: uuidv4(),
+            parentId: questionData.id,
+            displayName: questionData.displayName,
+            type: "ANSWER",
+            label: "",
+            points: "0",
+            right: true
+        },
+        {
+            id: uuidv4(),
+            parentId: questionData.id,
+            displayName: questionData.displayName,
+            type: "ANSWER",
+            label: "",
+            points: "0",
+            right: false
+        },
+    ]
 
     const [answers, setAnswers] = useState(questionData?.answers);
     const [displayName, setDisplayName] = useState(questionData?.displayName);
@@ -69,6 +72,8 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
     const addAnswer = () => {
         const newAnswer = {
             id: uuidv4(),
+            parentId: questionData.id,
+            displayName: questionData.displayName,
             label: "",
             points: "0",
             right: false,
@@ -101,10 +106,6 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
             setAnswers(basicAnswers)
         }
     }, [answers.length])
-
-    useEffect(() => {
-        console.log("qval",validationErrors)
-    })
 
     return(
         <VStack maxW="300px" mb={3}>
