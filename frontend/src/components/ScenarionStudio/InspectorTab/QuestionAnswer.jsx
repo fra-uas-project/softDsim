@@ -65,8 +65,8 @@ const QuestionAnswer = (props) => {
                         : <FormHelperText></FormHelperText>}
                 </FormControl>
 
-                <FormControl isInvalid={isError(props.validationErrors, props.answer.id, "points")}>
-                <NumberInput maxWidth={24} value={points} onChange={handlePointsChange}
+                <FormControl maxWidth={24} isInvalid={isError(props.validationErrors, props.answer.id, "points")}>
+                <NumberInput  value={points} onChange={handlePointsChange}
                              errorBorderColor={getErrorColor(props.validationErrors,  props.answer.id, "points")}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -80,7 +80,9 @@ const QuestionAnswer = (props) => {
                         </FormErrorMessage>
                         : <FormHelperText></FormHelperText>}
                 </FormControl>
-                <IconButton aria-label="Remove Answer" icon={<HiOutlineMinus />} size="xs" variant='ghost' onClick={props.removeAnswer} isDisabled={props.isNotRemovable}/>
+
+                <IconButton aria-label="Remove Answer" icon={<HiOutlineMinus />} size="xs" variant='ghost' mt="8px !important" onClick={props.removeAnswer} isDisabled={props.isNotRemovable}/>
+
             </HStack>
             <FormHelperText>
                 <HStack justify="space-between">
