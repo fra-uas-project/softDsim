@@ -36,7 +36,7 @@ const EventInspectorForm = (props) => {
     const [budget, setBudget] = useState(props.eventData.budget);
     const [easyTasks, setEasyTasks] = useState(props.eventData.easy_tasks);
     const [mediumTasks, setMediumTasks] = useState(props.eventData.medium_tasks);
-    const [hardTasks, setHardTasks] = useState(props.eventData.effects.hard_tasks);
+    const [hardTasks, setHardTasks] = useState(props.eventData.hard_tasks);
     const [stress, setStress] = useState(props.eventData.stress);
     const [motivation, setMotivation] = useState(props.eventData.motivation);
     const [familiarity, setFamiliarity] = useState(props.eventData.familiarity);
