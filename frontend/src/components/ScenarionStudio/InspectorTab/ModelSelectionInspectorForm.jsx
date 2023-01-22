@@ -64,25 +64,30 @@ const ModelSelectionInspectorForm = (props) => {
             <Divider/>
             <Box h={3}/>
 
-            <FormControl isInvalid={isError(props.validationErrors,"text")}>
+            <FormControl isInvalid={isError(props.validationErrors, props.modelSelectionData.id, "text")}>
                 <MarkdownTextfield
                     data={props.modelSelectionData}
                     updateEditorList={props.updateEditorList}
-                    errorBorderColor={getErrorColor(props.validationErrors, "text")}
+                    errorBorderColor={getErrorColor(props.validationErrors, props.modelSelectionData.id, "text")}
                 />
-                {isError(props.validationErrors,"text") ?
-                    <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, "text")}>
-                        {getErrorMessage(props.validationErrors, "text")}
+                {isError(props.validationErrors, props.modelSelectionData.id, "text") ?
+                    <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, props.modelSelectionData.id, "text")}>
+                        {getErrorMessage(props.validationErrors, props.modelSelectionData.id, "text")}
                     </FormErrorMessage>
                     : <FormHelperText></FormHelperText>}
             </FormControl>
 
             <Box h={3}/>
-            <FormControl flexDir="column" display="flex">
+            <FormControl flexDir="column" display="flex" isInvalid={isError(props.validationErrors, props.modelSelectionData.id, "models")}>
                 <FormLabel color="gray.400" htmlFor="">Available Management Models</FormLabel>
                 {allModels.map((value, index) => {
-                    return <Checkbox key={index} spacing='1rem' mb="0.5rem" value={value} onChange={(event) => onChangeModels(event)} isChecked={models.includes(value)}>{value}</Checkbox>
+                    return <Checkbox key={index} spacing='1rem' mb="0.5rem" value={value} onChange={(event) => onChangeModels(event)} isChecked={models.includes(value)}>{value}</Checkbox> // todo add error border color if needed
                 })}
+                {isError(props.validationErrors, props.modelSelectionData.id, "models") ?
+                    <FormErrorMessage color={getErrorColor(props.validationErrors, props.modelSelectionData.id, "models")}>
+                        {getErrorMessage(props.validationErrors, props.modelSelectionData.id, "models")}
+                    </FormErrorMessage>
+                    : <FormHelperText></FormHelperText>}
             </FormControl>
             <DeleteButton
                 component={props.modelSelectionData}

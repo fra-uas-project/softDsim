@@ -5,7 +5,7 @@ import {
     Editable,
     EditableInput,
     EditablePreview,
-    FormControl,
+    FormControl, FormErrorMessage,
     FormHelperText,
     FormLabel,
     Input,
@@ -16,25 +16,27 @@ import QuestionAnswer from "./QuestionAnswer";
 import {v4 as uuidv4} from 'uuid';
 import {HiOutlinePlus} from "react-icons/hi";
 import {questionEnum} from "../scenarioStudioData";
-import {findQuestion} from "../../../utils/utils";
+import {findQuestion, getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 import DeleteButton from "./DeleteButton";
 
 const basicAnswers = [
     {
         id: uuidv4(),
+        type: "ANSWER",
         label: "",
         points: "0",
         right: true
     },
     {
         id: uuidv4(),
+        type: "ANSWER",
         label: "",
         points: "0",
         right: false
     },
 ]
 
-const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObject}) => {
+const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObject, validationErrors}) => {
 
     const [answers, setAnswers] = useState(questionData?.answers);
     const [displayName, setDisplayName] = useState(questionData?.displayName);
@@ -69,7 +71,8 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
             id: uuidv4(),
             label: "",
             points: "0",
-            right: false
+            right: false,
+            type: "ANSWER"
         }
         updateEditorList(
             (draft) => {
@@ -99,6 +102,10 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
         }
     }, [answers.length])
 
+    useEffect(() => {
+        console.log("qval",validationErrors)
+    })
+
     return(
         <VStack maxW="300px" mb={3}>
             <Editable value={displayName} w="full" fontWeight="bold"
@@ -115,14 +122,20 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
                 <EditableInput/>
             </Editable>
             <Divider />
+
             <Box h={3}/>
-            <FormControl>
+
+            <FormControl isInvalid={isError(validationErrors, questionData.id, "text")}>
                 <FormLabel htmlFor='question' color="gray.400" fontWeight="semibold">Question</FormLabel>
-                <Input id="question" value={questionText}
+                <Input id="question" value={questionText} errorBorderColor={getErrorColor(validationErrors, questionData.id, "text")}
                        onChange={(value) => onChangeQuestionText(value)}
                        onBlur={onSubmitQuestionText}
                 />
-                <FormHelperText></FormHelperText>
+                {isError(validationErrors, questionData.id, "text") ?
+                    <FormErrorMessage color={getErrorColor(validationErrors, questionData.id, "text")}>
+                        {getErrorMessage(validationErrors, questionData.id, "text")}
+                    </FormErrorMessage>
+                    : <FormHelperText></FormHelperText>}
             </FormControl>
             <Box h={3}/>
             <FormControl>
@@ -137,6 +150,7 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
                                         removeAnswer={() => {removeAnswer(answer.id)}}
                                         multiRight={questionData.type === questionEnum.MULTI}
                                         isNotRemovable={index < 1} // Minimum one
+                                        validationErrors={validationErrors}
                             />
                         })
                 }

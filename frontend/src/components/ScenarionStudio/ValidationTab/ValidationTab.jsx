@@ -4,15 +4,12 @@ import {HiExclamationCircle, HiLightBulb, HiLightningBolt, HiOutlineCheck} from 
 import {Link} from "react-router-dom";
 import ValidationItem from "./ValidationItem";
 import {validationErrorColors, validationErrorTypes} from "../scenarioValidation";
-import {findDOMNode} from "react-dom";
 
 const ValidationTab = (props) => {
-
 
     const createHandleSelectObject = (componentId) => {
         return {currentTarget: {getAttribute: () => {return componentId}}}
     }
-
 
     return (
         <VStack alignItems="flex-start" pt={2}>
@@ -50,8 +47,8 @@ const ValidationTab = (props) => {
                                         description={error.error.message}
                                         onClick={() => {
                                             props.handleSelect(createHandleSelectObject(error.component.id));
-                                            const objectNode = findDOMNode(this) // TODO: reference the dom element to use scrollIntoView
-                                            console.log("objectNode", objectNode)
+                                            // const objectNode = findDOMNode(this) // TODO: reference the dom element to use scrollIntoView
+                                            // console.log("objectNode", objectNode)
                                         }}
                         />
                     )

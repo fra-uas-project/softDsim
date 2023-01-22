@@ -314,6 +314,8 @@ const ScenarioStudio = () => {
                 const questionsComponent = draft.find(questionsComponent => questionsComponent.id === result.destination.droppableId)
                 questionsComponent.questions.splice(result.destination.index, 0, movedQuestionCopy)
             })
+
+            setSelectedObjectId(movedQuestionCopy.id)
         }
 
         // Reorder questions in same list
@@ -389,7 +391,6 @@ const ScenarioStudio = () => {
             setCurrentTemplateId(scenarioId)
 
             if (isPublished.data) {
-                console.log("inside")
                 onPublishedOpen()
             } else {
                 await loadScenario(scenarioId)
@@ -545,61 +546,27 @@ const ScenarioStudio = () => {
         }
     };
 
-    function getComponentByPath(editorList, path) {
-        const pathArr = path.split(".");
-
-        // remove last element if key, because we want to access the object
-        if (pathArr[pathArr.length - 1].indexOf("[") === -1) {
-            pathArr.pop()
-        }
-
-        let currentComponent = editorList;
-        pathArr.forEach(path => {
-            if (path.indexOf("[") > -1 && path.indexOf("[") !== 0) {
-                // access array of an object e.g. questions[0]
-                const pathSplit = path.split("[")
-                const key = pathSplit[0]
-                const indexStr = pathSplit[1]
-                const index = parseInt(indexStr.substring(indexStr.indexOf("[") + 1, indexStr.indexOf("]")));
-                // console.log(key, indexStr, index)
-                // console.log(currentComponent)
-                currentComponent = currentComponent[key][index]
-            } else if (path.indexOf("[") === 0) {
-                // access array e.g. [3]
-                let pathIndex = parseInt(path.substring(path.indexOf("[") + 1, path.indexOf("]")));
-                currentComponent = currentComponent[pathIndex];
-            } else {
-                // access key of object e.g. text
-                currentComponent = currentComponent[path];
-            }
-        });
-        return currentComponent
-    }
-
     const validateScenario = async (editorList) => {
         try {
             await editorListSchema.validate(editorList, {abortEarly: false})
+            // If no validation errors found, clear all previous
+            setValidationErrors([])
         } catch (e) {
             setValidationErrors([])
             const allErrors = e.inner
-            allErrors.sort((a, b) => a.type.localeCompare(b.type))
-            // console.log(allErrors)
-            // console.log(allErrors[0].message)
-            // console.log(allErrors[0].type)
-            //
-            //
-            // const component = getComponentByPath(editorList, allErrors[0].path);
-            // console.log(component)
+            // allErrors.sort((a, b) => a.type.localeCompare(b.type))
+
+            console.log(allErrors)
 
             const mappedErrors = []
 
             for (const error of allErrors) {
-                mappedErrors.push({error: error, component: getComponentByPath(editorList, error.path)})
+                mappedErrors.push({error: error, component: error.params.component})
             }
-            console.log(mappedErrors)
 
             setValidationErrors(mappedErrors)
         }
+
     }
 
     // If item is selected, switch to inspector tab
@@ -880,6 +847,7 @@ const ScenarioStudio = () => {
                                                             questionsData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
+                                                            validationErrors={validationErrors.filter(error => error.component.type === componentEnum.QUESTIONS)}
                                                         />
                                                     }
 
@@ -900,6 +868,7 @@ const ScenarioStudio = () => {
                                                             eventData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
+                                                            validationErrors={validationErrors.filter(error => error.component.type === componentEnum.EVENT)}
                                                         />
                                                     }
 
@@ -909,6 +878,7 @@ const ScenarioStudio = () => {
                                                             modelSelectionData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
+                                                            validationErrors={validationErrors.filter(error => error.component.type === componentEnum.MODELSELECTION)}
                                                         />
                                                     }
 
@@ -928,6 +898,11 @@ const ScenarioStudio = () => {
                                                             questionData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
+                                                            validationErrors={validationErrors.filter(
+                                                                error => error.component.type === questionEnum.SINGLE ||
+                                                                    error.component.type === questionEnum.MULTI ||
+                                                                    error.component.type === "ANSWER"
+                                                            )}
                                                         />
                                                     }
                                                 </VStack>

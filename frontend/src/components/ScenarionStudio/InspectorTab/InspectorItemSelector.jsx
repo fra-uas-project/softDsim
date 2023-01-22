@@ -41,7 +41,7 @@ const InspectorItemSelector = (props) => {
 
     return (
         <>
-            <FormControl isInvalid={isError(props.validationErrors,"actions")}>
+            <FormControl isInvalid={isError(props.validationErrors, props.parentData.id, props.validationErrorObjectKey)}>
                 <HStack justifyContent="space-between" w="full">
                     <Text color="gray.400" fontWeight="semibold">{props.headline}</Text>
                     {props.addActions &&
@@ -55,9 +55,9 @@ const InspectorItemSelector = (props) => {
                         >Add all</Button>
                     }
                 </HStack>
-                    {isError(props.validationErrors, "actions") ?
-                        <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, "actions")}>
-                            {getErrorMessage(props.validationErrors, "actions")}
+                    {isError(props.validationErrors, props.parentData.id, props.validationErrorObjectKey) ?
+                        <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, props.parentData.id, props.validationErrorObjectKey)}>
+                            {getErrorMessage(props.validationErrors, props.parentData.id, props.validationErrorObjectKey)}
                         </FormErrorMessage>
                         : <FormHelperText></FormHelperText>}
 

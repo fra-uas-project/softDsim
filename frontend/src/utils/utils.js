@@ -75,25 +75,21 @@ export const findAction = (actionId, editorList) => {
     return (actions.find(action => action.id === actionId))
 }
 
-export const isError = (validationErrors, objectKey) => {
-    return validationErrors.some(error => error.error.path.includes(objectKey))
+export const isError = (validationErrors, componentId, objectKey) => {
+    return validationErrors.some(error => error.error.params.component.id === componentId && error.error.path.includes(objectKey))
 }
 
-export const getError = (validationErrors, objectKey) => {
-    return validationErrors.filter(error => error.error.path.includes(objectKey))[0]
+export const getErrorType = (validationErrors, componentId, objectKey) => {
+    return validationErrors.filter(error => error.error.params.component.id === componentId && error.error.path.includes(objectKey))[0].error.type
 }
 
-export const getErrorType = (validationErrors, objectKey) => {
-    return validationErrors.filter(error => error.error.path.includes(objectKey))[0].error.type
+export const getErrorMessage = (validationErrors, componentId, objectKey) => {
+    return validationErrors.filter(error => error.error.params.component.id === componentId && error.error.path.includes(objectKey))[0].error.message
 }
 
-export const getErrorMessage = (validationErrors, objectKey) => {
-    return validationErrors.filter(error => error.error.path.includes(objectKey))[0].error.message
-}
-
-export const getErrorColor = (validationErrors, objectKey) => {
-    if (isError(validationErrors, objectKey)) {
-        const errorType = getErrorType(validationErrors, objectKey)
+export const getErrorColor = (validationErrors, componentId, objectKey) => {
+    if (isError(validationErrors, componentId, objectKey)) {
+        const errorType = getErrorType(validationErrors, componentId, objectKey)
         if (errorType === validationErrorTypes.WARNING) {
             return `${validationErrorColors.WARNING}.500`
         } else if (errorType === validationErrorTypes.INFO) {

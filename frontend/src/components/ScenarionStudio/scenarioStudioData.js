@@ -104,7 +104,14 @@ export const finalComponentList = [
         trigger_type: "",
         trigger_value: "",
         trigger_comparator: "",
-        effects: [],
+        budget: "",
+        duration: "",
+        easy_tasks: "",
+        medium_tasks: "",
+        hard_tasks: "",
+        stress: "",
+        motivation: "",
+        familiarity: "",
     },
 ]
 

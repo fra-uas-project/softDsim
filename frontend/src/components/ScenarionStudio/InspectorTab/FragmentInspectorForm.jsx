@@ -98,15 +98,15 @@ const FragmentInspectorForm = (props) => {
 
             <Box h={3}/>
 
-            <FormControl isInvalid={isError(props.validationErrors,"text")}>
+            <FormControl isInvalid={isError(props.validationErrors, props.fragmentData.id, "text")}>
                 <MarkdownTextfield
                     data={props.fragmentData}
                     updateEditorList={props.updateEditorList}
-                    errorBorderColor={getErrorColor(props.validationErrors, "text")}
+                    errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "text")}
                 />
-                {isError(props.validationErrors,"text") ?
-                    <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, "text")}>
-                        {getErrorMessage(props.validationErrors, "text")}
+                {isError(props.validationErrors, props.fragmentData.id, "text") ?
+                    <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, props.fragmentData.id, "text")}>
+                        {getErrorMessage(props.validationErrors, props.fragmentData.id, "text")}
                     </FormErrorMessage>
                     : <FormHelperText></FormHelperText>}
             </FormControl>
@@ -158,7 +158,9 @@ const FragmentInspectorForm = (props) => {
                 type="action"
                 headline="Actions"
                 addActions={addActions}
+                parentData={props.fragmentData}
                 validationErrors={props.validationErrors}
+                validationErrorObjectKey="actions"
             />
             <DeleteButton
                 component={props.fragmentData}
