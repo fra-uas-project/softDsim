@@ -78,6 +78,7 @@ const ScenarioStudio = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const [validationErrors, setValidationErrors] = useState([]);
+    const [validationEnabled, setValidationEnabled] = useState(false)
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
@@ -374,6 +375,7 @@ const ScenarioStudio = () => {
     };
 
     const handleEditorBackgroundClick = (e) => {
+        // Deactivated because when dropping action in different list it switched to components tab
         // if (e.target.getAttribute("elementid") === "backgroundList") {
         //     setTabIndex(tabIndexEnum.COMPONENTS)
         //     setSelectedObjectId(null)
@@ -926,6 +928,8 @@ const ScenarioStudio = () => {
                                             <ValidationTab
                                                 validationErrors={validationErrors}
                                                 handleSelect={handleSelect}
+                                                validationEnabled={validationEnabled}
+                                                setValidationEnabled={setValidationEnabled}
                                             />
                                         </TabPanel>
 
