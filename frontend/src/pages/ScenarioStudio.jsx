@@ -253,19 +253,28 @@ const ScenarioStudio = () => {
             const componentListItems = Array.from(finalComponentList);
             const [movedItem] = componentListItems.splice(result.source.index, 1);
 
-            const editorListItems = Array.from(editorList);
-            // copy because item needs to be unique
-            let movedItemCopy = {...movedItem};
-            movedItemCopy.id = uuidv4();
-            if (movedItemCopy.type === componentEnum.BASE) {
-                movedItemCopy.template_name += ` ${uuidv4().slice(0, 8)}`
+            if(movedItem.type === componentEnum.BASE && editorList.find(component => component.type === componentEnum.BASE)) {
+            //     Check if already Base Component in editorList
+                toast({
+                    title: `Only 1 Simulation Base Information allowed`,
+                    status: 'warning',
+                    duration: 3000,
+                });
             } else {
-                movedItemCopy.displayName += ` ${uuidv4().slice(0, 8)}`
-            }
-            editorListItems.splice(result.destination.index, 0, movedItemCopy);
-            updateEditorList(editorListItems);
+                const editorListItems = Array.from(editorList);
+                // copy because item needs to be unique
+                let movedItemCopy = {...movedItem};
+                movedItemCopy.id = uuidv4();
+                if (movedItemCopy.type === componentEnum.BASE) {
+                    movedItemCopy.template_name += ` ${uuidv4().slice(0, 8)}`
+                } else {
+                    movedItemCopy.displayName += ` ${uuidv4().slice(0, 8)}`
+                }
+                editorListItems.splice(result.destination.index, 0, movedItemCopy);
+                updateEditorList(editorListItems);
 
-            setSelectedObjectId(movedItemCopy.id)
+                setSelectedObjectId(movedItemCopy.id)
+            }
 
             // moving from action list to fragment in editor
         } else if (result.source.droppableId === "actionList") {
