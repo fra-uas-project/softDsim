@@ -235,7 +235,6 @@ const ScenarioStudio = () => {
     }
 
     const handleOnDragEnd = (result) => {
-        // TODO deconstruct result
 
         // handle moving outside droppables
         if (!result.destination) return;
@@ -254,7 +253,7 @@ const ScenarioStudio = () => {
             const [movedItem] = componentListItems.splice(result.source.index, 1);
 
             if(movedItem.type === componentEnum.BASE && editorList.find(component => component.type === componentEnum.BASE)) {
-            //     Check if already Base Component in editorList
+            //     Check if base component already in editorList
                 toast({
                     title: `Only 1 Simulation Base Information allowed`,
                     status: 'warning',
@@ -281,14 +280,24 @@ const ScenarioStudio = () => {
             const actionListItems = Array.from(finalActionList);
             const [movedAction] = actionListItems.splice(result.source.index, 1);
 
-            // copy because item needs to be unique
-            let movedActionCopy = {...movedAction};
-            movedActionCopy.id = uuidv4();
+            // Check if action already exists in action list of target simulation fragment
+            const fragmentComponent = editorList.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
+            if(fragmentComponent.actions.find(action => action.action === movedAction.action)) {
+                toast({
+                    title: `${movedAction.title} already in action list`,
+                    status: 'warning',
+                    duration: 3000,
+                });
+            } else {
+                // copy because item needs to be unique
+                let movedActionCopy = {...movedAction};
+                movedActionCopy.id = uuidv4();
 
-            updateEditorList((draft) => {
-                const fragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
-                fragmentComponent.actions.splice(result.destination.index, 0, movedActionCopy)
-            })
+                updateEditorList((draft) => {
+                    const fragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
+                    fragmentComponent.actions.splice(result.destination.index, 0, movedActionCopy)
+                })
+            }
 
             // Reorder actions in same list
         } else if (result.type === "action" && result.source.droppableId === result.destination.droppableId) {
@@ -300,15 +309,29 @@ const ScenarioStudio = () => {
 
             // Remove from one action list and add to another
         } else if (result.type === "action" && result.source.droppableId !== result.destination.droppableId) {
-            updateEditorList((draft) => {
-                // Remove from source action list
-                const sourceFragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.source.droppableId)
-                const [reorderedAction] = sourceFragmentComponent.actions.splice(result.source.index, 1);
 
-                // Add to destination action list
-                const destinationFragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
-                destinationFragmentComponent.actions.splice(result.destination.index, 0, reorderedAction);
-            })
+            const sourceFragmentComponent = editorList.find(fragmentComponent => fragmentComponent.id === result.source.droppableId)
+            const [reorderedAction] = sourceFragmentComponent.actions.slice(result.source.index, result.source.index + 1);
+            const destinationFragmentComponent = editorList.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
+
+            // Check if action already exists in action list of target simulation fragment
+            if(destinationFragmentComponent.actions.find(action => action.action === reorderedAction.action)) {
+                toast({
+                    title: `${reorderedAction.title} already in action list`,
+                    status: 'warning',
+                    duration: 3000,
+                });
+            } else {
+                updateEditorList((draft) => {
+                    // Remove from source action list
+                    const sourceFragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.source.droppableId)
+                    const [reorderedAction] = sourceFragmentComponent.actions.splice(result.source.index, 1);
+
+                    // Add to destination action list
+                    const destinationFragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
+                    destinationFragmentComponent.actions.splice(result.destination.index, 0, reorderedAction);
+                })
+            }
         }
 
         // moving from question list to questions component in editor
