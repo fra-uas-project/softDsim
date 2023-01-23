@@ -7,11 +7,11 @@ import {validationErrorColors, validationErrorTypes} from "../scenarioValidation
 const ValidationOverview = (props) => {
 
     const iconColor = () => {
-        if (props.validationErrors.some(error => error.error.type === validationErrorTypes.ERROR)) {
+        if (props.validationErrors.some(error => error.type === validationErrorTypes.ERROR)) {
             return `${validationErrorColors.ERROR}.500`
-        } else if (props.validationErrors.some(error => error.error.type === validationErrorTypes.WARNING)) {
+        } else if (props.validationErrors.some(error => error.type === validationErrorTypes.WARNING)) {
             return `${validationErrorColors.WARNING}.500`
-        } else if (props.validationErrors.some(error => error.error.type === validationErrorTypes.INFO)) {
+        } else if (props.validationErrors.some(error => error.type === validationErrorTypes.INFO)) {
             return `${validationErrorColors.INFO}.500`
         } else {
             return `green.500`
@@ -19,11 +19,11 @@ const ValidationOverview = (props) => {
     }
 
     const overviewContent = () => {
-        if (props.validationErrors.some(error => error.error.type === validationErrorTypes.ERROR)) {
+        if (props.validationErrors.some(error => error.type === validationErrorTypes.ERROR)) {
             return "errors"
-        } else if (props.validationErrors.some(error => error.error.type === validationErrorTypes.WARNING)) {
+        } else if (props.validationErrors.some(error => error.type === validationErrorTypes.WARNING)) {
             return "warnings"
-        } else if (props.validationErrors.some(error => error.error.type === validationErrorTypes.INFO)) {
+        } else if (props.validationErrors.some(error => error.type === validationErrorTypes.INFO)) {
             return "tips"
         } else {
             return ""
@@ -31,8 +31,8 @@ const ValidationOverview = (props) => {
     }
 
     const scenarioIsValid = () => {
-        return !props.validationErrors.some(error => error.error.type === validationErrorTypes.ERROR) &&
-            !props.validationErrors.some(error => error.error.type === validationErrorTypes.INTERNAL_ERROR);
+        return !props.validationErrors.some(error => error.type === validationErrorTypes.ERROR) &&
+            !props.validationErrors.some(error => error.type === validationErrorTypes.INTERNAL_ERROR);
     }
 
     return <>

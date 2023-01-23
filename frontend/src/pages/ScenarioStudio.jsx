@@ -62,13 +62,13 @@ import {
 } from "../components/ScenarionStudio/scenarioStudioData";
 import {useImmer} from "use-immer";
 import ScenarioStudioAlert from "../components/ScenarionStudio/ScenarioStudioAlert";
-import {editorListSchema} from "../components/ScenarionStudio/scenarioValidation";
+import {editorListSchema, validationErrorTypes} from "../components/ScenarionStudio/scenarioValidation";
 import ValidationTab from "../components/ScenarionStudio/ValidationTab/ValidationTab";
 
 const ScenarioStudio = () => {
     const toast = useToast();
 
-    const [tabIndex, setTabIndex] = useState(1);
+    const [tabIndex, setTabIndex] = useState(tabIndexEnum.COMPONENTS);
     const [editorList, updateEditorList] = useImmer([]);
     const [selectedObjectId, setSelectedObjectId] = useState(null);
     const [currentTemplateId, setCurrentTemplateId] = useState("");
@@ -190,10 +190,11 @@ const ScenarioStudio = () => {
         }
 
         try {
-            /*
-            // TODO implement
-            // call validateEditorList()
-            */
+            validateScenario(editorList)
+            if(!validationErrors.some(error => error.error.type === validationErrorTypes.ERROR) &&
+                !validationErrors.some(error => error.error.type === validationErrorTypes.INTERNAL_ERROR)){
+            //     todo implement toast etc if not valid scenario
+            }
         } catch (e) {
             toast({
                 title: `Could not validate Scenario Template`,
@@ -561,13 +562,7 @@ const ScenarioStudio = () => {
 
             console.log(allErrors)
 
-            const mappedErrors = []
-
-            for (const error of allErrors) {
-                mappedErrors.push({error: error, component: error.params.component})
-            }
-
-            setValidationErrors(mappedErrors)
+            setValidationErrors(allErrors)
         }
 
     }
@@ -585,6 +580,18 @@ const ScenarioStudio = () => {
         console.log(editorList)
         console.log("SO", selectedObject)
     }, [editorList, selectedObject])
+
+    useEffect(() => {
+        if(validationEnabled) {
+            validateScenario(editorList)
+        }
+    }, [editorList, validationEnabled])
+
+    useEffect(() => {
+        if(!validationEnabled) {
+            setValidationErrors([])
+        }
+    }, [validationEnabled])
 
     return (
         <>
@@ -675,19 +682,19 @@ const ScenarioStudio = () => {
                         <Button variant="outline"
                                 colorScheme="blue"
                                 onClick={() => {
+                                    validateScenario(editorList)
+                                }
+                                }>
+                            Test
+                        </Button>
+                        <Button variant="outline"
+                                colorScheme="blue"
+                                onClick={() => {
                                     fetchScenarioTemplates()
                                     onOpen()
                                 }
                                 }>
                             Load
-                        </Button>
-                        <Button variant="outline"
-                                colorScheme="blue"
-                                onClick={() => {
-                                    validateScenario(editorList)
-                                }
-                                }>
-                            Test
                         </Button>
                         <Button variant="outline"
                                 colorScheme="blue"
@@ -839,7 +846,7 @@ const ScenarioStudio = () => {
                                                             baseData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
-                                                            validationErrors={validationErrors.filter(error => error.component.type === componentEnum.BASE)}
+                                                            validationErrors={validationErrors.filter(error => error.params.component.type === componentEnum.BASE)}
                                                         />
                                                     }
 
@@ -850,7 +857,7 @@ const ScenarioStudio = () => {
                                                             questionsData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
-                                                            validationErrors={validationErrors.filter(error => error.component.type === componentEnum.QUESTIONS)}
+                                                            validationErrors={validationErrors.filter(error => error.params.component.type === componentEnum.QUESTIONS)}
                                                         />
                                                     }
 
@@ -861,7 +868,7 @@ const ScenarioStudio = () => {
                                                             fragmentData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
-                                                            validationErrors={validationErrors.filter(error => error.component.type === componentEnum.FRAGMENT)}
+                                                            validationErrors={validationErrors.filter(error => error.params.component.type === componentEnum.FRAGMENT)}
                                                         />
                                                     }
 
@@ -871,7 +878,7 @@ const ScenarioStudio = () => {
                                                             eventData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
-                                                            validationErrors={validationErrors.filter(error => error.component.type === componentEnum.EVENT)}
+                                                            validationErrors={validationErrors.filter(error => error.params.component.type === componentEnum.EVENT)}
                                                         />
                                                     }
 
@@ -881,7 +888,7 @@ const ScenarioStudio = () => {
                                                             modelSelectionData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
-                                                            validationErrors={validationErrors.filter(error => error.component.type === componentEnum.MODELSELECTION)}
+                                                            validationErrors={validationErrors.filter(error => error.params.component.type === componentEnum.MODELSELECTION)}
                                                         />
                                                     }
 
@@ -902,9 +909,9 @@ const ScenarioStudio = () => {
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
                                                             validationErrors={validationErrors.filter(
-                                                                error => error.component.type === questionEnum.SINGLE ||
-                                                                    error.component.type === questionEnum.MULTI ||
-                                                                    error.component.type === "ANSWER"
+                                                                error => error.params.component.type === questionEnum.SINGLE ||
+                                                                    error.params.component.type === questionEnum.MULTI ||
+                                                                    error.params.component.type === "ANSWER"
                                                             )}
                                                         />
                                                     }
@@ -930,6 +937,7 @@ const ScenarioStudio = () => {
                                                 handleSelect={handleSelect}
                                                 validationEnabled={validationEnabled}
                                                 setValidationEnabled={setValidationEnabled}
+                                                setTabIndex={setTabIndex}
                                             />
                                         </TabPanel>
 

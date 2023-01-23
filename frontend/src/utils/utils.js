@@ -76,15 +76,15 @@ export const findAction = (actionId, editorList) => {
 }
 
 export const isError = (validationErrors, componentId, objectKey) => {
-    return validationErrors.some(error => error.error.params.component.id === componentId && error.error.path.includes(objectKey))
+    return validationErrors.some(error => error.params.component.id === componentId && error.path.includes(objectKey))
 }
 
 export const getErrorType = (validationErrors, componentId, objectKey) => {
-    return validationErrors.filter(error => error.error.params.component.id === componentId && error.error.path.includes(objectKey))[0].error.type
+    return validationErrors.filter(error => error.params.component.id === componentId && error.path.includes(objectKey))[0].type
 }
 
 export const getErrorMessage = (validationErrors, componentId, objectKey) => {
-    return validationErrors.filter(error => error.error.params.component.id === componentId && error.error.path.includes(objectKey))[0].error.message
+    return validationErrors.filter(error => error.params.component.id === componentId && error.path.includes(objectKey))[0].message
 }
 
 export const getErrorColor = (validationErrors, componentId, objectKey) => {

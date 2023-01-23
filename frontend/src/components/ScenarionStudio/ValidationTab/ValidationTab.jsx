@@ -5,16 +5,17 @@ import ValidationItem from "./ValidationItem";
 import {validationErrorColors, validationErrorTypes} from "../scenarioValidation";
 import InspectorEmtpy from "../InspectorTab/InspectorEmtpy";
 import ValidationOverview from "./ValidationOverview";
+import {tabIndexEnum} from "../scenarioStudioData";
 
 const ValidationTab = (props) => {
 
     const createHandleSelectObject = (error) => {
         let componentId = ""
-        if(error.component.parentId) {
+        if(error.params.component.parentId) {
             // Handle question answers
-            componentId = error.component.parentId
+            componentId = error.params.component.parentId
         } else {
-            componentId = error.component.id
+            componentId = error.params.component.id
         }
 
         return {currentTarget: {getAttribute: () => {return componentId}}}
@@ -26,18 +27,23 @@ const ValidationTab = (props) => {
             <ValidationOverview validationErrors={props.validationErrors} validationEnabled={props.validationEnabled} />
             <Text color="gray.400" fontWeight="semibold">Errors</Text>
             <UnorderedList listStyleType="none" w="full">
-                {props.validationErrors.some(error => error.error.type === validationErrorTypes.ERROR) ?
-                    props.validationErrors.filter(error => error.error.type === validationErrorTypes.ERROR).map((error, index) => {
+                {props.validationErrors.some(error => error.type === validationErrorTypes.ERROR) ?
+                    props.validationErrors.filter(error => error.type === validationErrorTypes.ERROR).map((error, index) => {
                     return (
                         <ValidationItem key={index}
-                                        componentIcon={error.component.icon}
+                                        componentIcon={error.params.component.icon}
                                         buttonIcon={HiFire}
                                         buttonColor={validationErrorColors.ERROR}
                                         tooltip="Action required"
-                                        title={error.component.displayName}
-                                        description={error.error.message}
+                                        title={error.params.component.displayName}
+                                        description={error.message}
                                         onClick={() => {
-                                            props.handleSelect(createHandleSelectObject(error));
+                                            if(error.path === "") {
+                                                // Handle scenario errors
+                                                props.setTabIndex(tabIndexEnum.COMPONENTS)
+                                            } else {
+                                                props.handleSelect(createHandleSelectObject(error));
+                                            }
                                         }}
                         />
                     )
@@ -48,16 +54,16 @@ const ValidationTab = (props) => {
 
             <Text color="gray.400" fontWeight="semibold">Warnings</Text>
             <UnorderedList listStyleType="none" w="full">
-                {props.validationErrors.some(error => error.error.type === validationErrorTypes.WARNING) ?
-                        props.validationErrors.filter(error => error.error.type === validationErrorTypes.WARNING).map((error, index) => {
+                {props.validationErrors.some(error => error.type === validationErrorTypes.WARNING) ?
+                        props.validationErrors.filter(error => error.type === validationErrorTypes.WARNING).map((error, index) => {
                             return (
                                 <ValidationItem key={index}
-                                                componentIcon={error.component.icon}
+                                                componentIcon={error.params.component.icon}
                                                 buttonIcon={HiLightningBolt}
                                                 buttonColor={validationErrorColors.WARNING}
                                                 tooltip="Action recommended"
-                                                title={error.component.displayName}
-                                                description={error.error.message}
+                                                title={error.params.component.displayName}
+                                                description={error.message}
                                                 onClick={() => props.handleSelect(createHandleSelectObject(error))}
                                 />
                             )
@@ -68,16 +74,16 @@ const ValidationTab = (props) => {
 
             <Text color="gray.400" fontWeight="semibold">Tips</Text>
             <UnorderedList listStyleType="none" w="full">
-                {props.validationErrors.some(error => error.error.type === validationErrorTypes.INFO) ?
-                    props.validationErrors.filter(error => error.error.type === validationErrorTypes.INFO).map((error, index) => {
+                {props.validationErrors.some(error => error.type === validationErrorTypes.INFO) ?
+                    props.validationErrors.filter(error => error.type === validationErrorTypes.INFO).map((error, index) => {
                         return (
                             <ValidationItem key={index}
-                                            componentIcon={error.component.icon}
+                                            componentIcon={error.params.component.icon}
                                             buttonIcon={HiLightBulb}
                                             buttonColor={validationErrorColors.INFO}
                                             tooltip="Action possible"
-                                            title={error.component.displayName}
-                                            description={error.error.message}
+                                            title={error.params.component.displayName}
+                                            description={error.message}
                                             onClick={() => {
                                                 props.handleSelect(createHandleSelectObject(error));
                                             }}

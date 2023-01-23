@@ -1,5 +1,6 @@
 import * as yup from "yup"
 import {componentEnum} from "./scenarioStudioData";
+import {HiExclamation} from "react-icons/hi";
 
 export const validationErrorTypes = {
     INTERNAL_ERROR: "internal-error",
@@ -30,7 +31,20 @@ export const editorListSchema = yup.array().of(yup.lazy(component => {
         default:
             return yup.mixed().test((value, ctx) => {  return ctx.createError({type: validationErrorTypes.INTERNAL_ERROR, message: "Invalid component type", params: {component: ctx.parent}})})
     }
-}))
+})).test((value, ctx) => {
+    if(value.filter(component => component.type === componentEnum.BASE).length === 0) {
+        return ctx.createError({
+            type: validationErrorTypes.ERROR,
+            message: "Base Information required",
+            params: {component: {icon: HiExclamation, displayName: "Scenario"}}
+        })
+    } else if(value.filter(component => component.type === componentEnum.FRAGMENT).length === 0) {
+        return ctx.createError({
+            type: validationErrorTypes.ERROR,
+            message: "Simulation Fragment required",
+            params: {component: {icon: HiExclamation, displayName: "Scenario"}}
+        })
+    }else {return true} })
 
 // Validating fields which are not the same for all (basic) components
 const basicSchema = yup.object().shape({
