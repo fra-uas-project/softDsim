@@ -120,13 +120,23 @@ const ScenarioStudio = () => {
         }
 
         try {
-            await saveScenarioTemplateApiCall(scenarioId)
+            const res = await saveScenarioTemplateApiCall(scenarioId)
 
-            toast({
-                title: `Scenario has been saved`,
-                status: 'success',
-                duration: 5000,
-            });
+            if(res) {
+                toast({
+                    title: `Scenario has been saved`,
+                    status: 'success',
+                    duration: 5000,
+                });
+            } else {
+                toast({
+                    title: `An unexpected error occured`,
+                    description: "Please try again or ask for help",
+                    status: 'error',
+                    duration: 5000,
+                });
+            }
+
         } catch (e) {
             toast({
                 title: `Could not save Scenario Template`,
@@ -139,7 +149,7 @@ const ScenarioStudio = () => {
 
     // TODO create a scenario_template_service and store all the api call logic in methods
     const saveScenarioTemplateApiCall = async (scenarioId) => {
-        if (scenarioId === "") {
+        if (!scenarioId) {
             // Save new scenario
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
                 method: 'POST',
@@ -555,7 +565,7 @@ const ScenarioStudio = () => {
             for (const templateScenario of fetchedScenarioTemplates.data) {
                 const templateDto = {
                     scenarioId: templateScenario.id,
-                    name: templateScenario.scenario.find(scenario => scenario.type === "BASE").template_name
+                    name: templateScenario?.scenario?.find(scenario => scenario.type === "BASE")?.template_name
                 }
                 templateScenarios.push(templateDto)
             }
@@ -760,7 +770,9 @@ const ScenarioStudio = () => {
                         </Button>
                         <Button variant="outline"
                                 colorScheme="blue"
-                                onClick={() => {saveScenarioTemplate(currentTemplateId)}}>
+                                onClick={() => {
+                                    saveScenarioTemplate(currentTemplateId)
+                                }}>
                             Save
                         </Button>
                         <Button variant="solid"
