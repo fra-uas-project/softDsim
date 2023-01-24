@@ -173,7 +173,7 @@ const ScenarioStudio = () => {
     };
 
     const publishScenarioTemplate = async (scenarioId) => {
-        await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/from-studio?studio_template_id=${scenarioId}`, {
+        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/from-studio?studio_template_id=${scenarioId}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -182,6 +182,7 @@ const ScenarioStudio = () => {
                 'Content-Type': 'application/json'
             },
         })
+        return res
     };
 
     const saveAndPublishScenarioTemplate = async (scenarioId) => {
@@ -190,43 +191,71 @@ const ScenarioStudio = () => {
         }
 
         try {
-            validateScenario(editorList)
-            if(!validationErrors.some(error => error.error.type === validationErrorTypes.ERROR) &&
-                !validationErrors.some(error => error.error.type === validationErrorTypes.INTERNAL_ERROR)){
-            //     todo implement toast etc if not valid scenario
-            }
-        } catch (e) {
-            toast({
-                title: `Could not validate Scenario Template`,
-                status: 'error',
-                duration: 5000,
-            });
-            console.log(e);
-        }
-
-        try {
             scenarioId = await saveScenarioTemplateApiCall(scenarioId)
         } catch (e) {
             toast({
-                title: `Could not save Scenario Template`,
+                title: `An error occurred`,
+                description: `Could not save scenario. Please try again or ask for help.`,
                 status: 'error',
                 duration: 5000,
             });
             console.log(e);
+            return
+        }
+
+        try {
+            const res = await validateScenario(editorList)
+
+            if(validationErrors.some(error => error.type === validationErrorTypes.ERROR) ||
+                validationErrors.some(error => error.type === validationErrorTypes.INTERNAL_ERROR)){
+                if(!validationEnabled) {
+                    setValidationErrors([])
+                }
+                toast({
+                    title: `Abort publishing`,
+                    description: "Scenario saved, but invalid.",
+                    status: 'error',
+                    duration: 5000,
+                });
+                return
+            } else {
+                if(!validationEnabled) {
+                    setValidationErrors([])
+                }
+            }
+        } catch (e) {
+            toast({
+                title: `An unexpected error occurred`,
+                description: `Please try again or ask for help.`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+            return
         }
 
         try {
              // check if also a new scenario id is published
-             await publishScenarioTemplate(scenarioId)
-
-            toast({
-                title: `Scenario '${scenarioId}' has been published`,
-                status: 'success',
-                duration: 5000,
-            });
+            const res = await publishScenarioTemplate(scenarioId)
+            console.log(res)
+            if(res.status === 200) {
+                toast({
+                    title: `Scenario has been published`,
+                    status: 'success',
+                    duration: 5000,
+                });
+            } else {
+                toast({
+                    title: `Could not publish Scenario`,
+                    description: `Please try again or ask for help.`,
+                    status: 'error',
+                    duration: 5000,
+                });
+            }
         } catch (e) {
             toast({
-                title: `Could not publish Scenario Template`,
+                title: `An unexpected error occurred`,
+                description: `Please try again or ask for help.`,
                 status: 'error',
                 duration: 5000,
             });
@@ -587,6 +616,7 @@ const ScenarioStudio = () => {
             await editorListSchema.validate(editorList, {abortEarly: false})
             // If no validation errors found, clear all previous
             setValidationErrors([])
+            return 0
         } catch (e) {
             setValidationErrors([])
             const allErrors = e.inner
@@ -595,8 +625,8 @@ const ScenarioStudio = () => {
             console.log(allErrors)
 
             setValidationErrors(allErrors)
+            return e
         }
-
     }
 
     // If item is selected, switch to inspector tab
