@@ -71,7 +71,11 @@ export const finalComponentList = [
         icon: MdTimeline,
         displayName: `Simulation`,
         actions: [],
-        simulation_end: {}
+        simulation_end: {
+            type: "",
+            limit: "",
+            limit_type: ""
+        }
     },
     {
         id: uuidv4(),
