@@ -215,9 +215,8 @@ const ScenarioStudio = () => {
 
         try {
             const res = await validateScenario(editorList)
-
-            if(validationErrors.some(error => error.type === validationErrorTypes.ERROR) ||
-                validationErrors.some(error => error.type === validationErrorTypes.INTERNAL_ERROR)){
+            if(res.some(error => error.type === validationErrorTypes.ERROR) ||
+                res.some(error => error.type === validationErrorTypes.INTERNAL_ERROR)){
                 if(!validationEnabled) {
                     setValidationErrors([])
                 }
@@ -229,6 +228,7 @@ const ScenarioStudio = () => {
                 });
                 return
             } else {
+                console.log("not inside", validationErrors)
                 if(!validationEnabled) {
                     setValidationErrors([])
                 }
@@ -247,7 +247,6 @@ const ScenarioStudio = () => {
         try {
              // check if also a new scenario id is published
             const res = await publishScenarioTemplate(scenarioId)
-            console.log(res)
             if(res.status === 200) {
                 toast({
                     title: `Scenario has been published`,
@@ -635,7 +634,7 @@ const ScenarioStudio = () => {
             console.log(allErrors)
 
             setValidationErrors(allErrors)
-            return e
+            return allErrors
         }
     }
 
