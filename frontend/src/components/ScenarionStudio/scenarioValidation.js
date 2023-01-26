@@ -38,13 +38,16 @@ export const editorListSchema = yup.array().of(yup.lazy(component => {
             message: "Base Information required",
             params: {component: {icon: HiExclamation, displayName: "Scenario"}}
         })
-    } else if(value.filter(component => component.type === componentEnum.FRAGMENT).length === 0) {
+    } else {return true} }
+).test((value, ctx) => {
+    if (value.filter(component => component.type === componentEnum.FRAGMENT).length === 0) {
         return ctx.createError({
             type: validationErrorTypes.ERROR,
             message: "Simulation Fragment required",
             params: {component: {icon: HiExclamation, displayName: "Scenario"}}
         })
-    }else {return true} })
+    } else { {return true} }
+})
 
 // Validating fields which are not the same for all (basic) components
 const basicSchema = yup.object().shape({
