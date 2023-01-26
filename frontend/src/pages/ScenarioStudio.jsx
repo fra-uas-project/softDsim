@@ -71,6 +71,7 @@ const ScenarioStudio = () => {
     const [tabIndex, setTabIndex] = useState(tabIndexEnum.COMPONENTS);
     const [editorList, updateEditorList] = useImmer([]);
     const [selectedObjectId, setSelectedObjectId] = useState(null);
+    const [selectedTemplateId, setSelectedTemplateId] = useState(""); // selected template in modals to load and delete template
     const [currentTemplateId, setCurrentTemplateId] = useState("");
     const [oldTemplateId, setOldTemplateId] = useState("");
 
@@ -666,6 +667,7 @@ const ScenarioStudio = () => {
 
     return (
         <>
+            {/* Load Scenarios */}
             <Modal isOpen={isOpen} onClose={onClose} size="4xl">
                 <ModalOverlay />
                 <ModalContent>
@@ -712,7 +714,7 @@ const ScenarioStudio = () => {
                                                     icon={<HiOutlineTrash />}
                                                     onClick={() => {
                                                         onDeleteOpen()
-                                                        setCurrentTemplateId(template.scenarioId)
+                                                        setSelectedTemplateId(template.scenarioId)
                                                         }
                                                     }
                                                 />
@@ -1052,7 +1054,7 @@ const ScenarioStudio = () => {
                 continueButtonColor="blue"
                 onContinueButtonClick={() => {
                     onPublishedClose()
-                    duplicateScenario(currentTemplateId)
+                    duplicateScenario(selectedTemplateId)
                     }
                 }
             />
@@ -1062,7 +1064,7 @@ const ScenarioStudio = () => {
                 cancelRef={cancelRef}
                 onClose={onDeleteClose}
                 title="Delete scenario "
-                text={`Do you want to delete scenario '${getScenarioName(currentTemplateId)}'? You can't undo this action afterwards.`}
+                text={`Do you want to delete scenario '${getScenarioName(selectedTemplateId)}'? You can't undo this action afterwards.`}
                 onCancel={() => {
                     setCurrentTemplateId(oldTemplateId)
                     onDeleteClose()
@@ -1072,7 +1074,7 @@ const ScenarioStudio = () => {
                 continueButtonName="Delete"
                 onContinueButtonClick={() => {
                     onDeleteClose()
-                    deleteScenario(currentTemplateId)
+                    deleteScenario(selectedTemplateId)
                 }
                 }
             />
