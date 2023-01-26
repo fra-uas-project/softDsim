@@ -73,7 +73,7 @@ const ScenarioStudio = () => {
     const [selectedObjectId, setSelectedObjectId] = useState(null);
     const [selectedTemplateId, setSelectedTemplateId] = useState(""); // selected template in modals to load and delete template
     const [currentTemplateId, setCurrentTemplateId] = useState("");
-    const [oldTemplateId, setOldTemplateId] = useState("");
+    const [isSaved, setIsSaved] = useState(null)
 
     const [templateScenarios, setTemplateScenarios] = useState([])
     const [isLoading, setIsLoading] = useState(false);
@@ -165,6 +165,7 @@ const ScenarioStudio = () => {
 
             const response = await res.json()
             setCurrentTemplateId(response.data.id)
+            setIsSaved(true)
             return response.data.id
 
         } else {
@@ -179,6 +180,7 @@ const ScenarioStudio = () => {
                 },
                 body: stringify(editorList)
             })
+            setIsSaved(true)
             return scenarioId
         }
     };
@@ -462,8 +464,8 @@ const ScenarioStudio = () => {
             })
             const isPublished = await res.json();
 
-            setOldTemplateId(currentTemplateId)
             setCurrentTemplateId(scenarioId)
+            setSelectedTemplateId(scenarioId)
 
             if (isPublished.data) {
                 onPublishedOpen()
@@ -508,7 +510,7 @@ const ScenarioStudio = () => {
             const scenarioTemplateClone = await res.json();
             const scenario = loadIcons(scenarioTemplateClone.data.scenario)
             updateEditorList(scenario)
-            setOldTemplateId(currentTemplateId)
+            setSelectedTemplateId("")
             setCurrentTemplateId(scenarioTemplateClone.data.id)
         } catch (e) {
             toast({
@@ -531,8 +533,8 @@ const ScenarioStudio = () => {
 
             // if current scenario template got deleted, clean workspace
             if (scenarioId === currentTemplateId) {
-                setOldTemplateId(scenarioId)
                 setCurrentTemplateId("")
+                setSelectedTemplateId("")
                 updateEditorList([])
             }
 
@@ -664,6 +666,14 @@ const ScenarioStudio = () => {
             setValidationErrors([])
         }
     }, [validationEnabled])
+
+    useEffect(() => {
+        console.log("curr", currentTemplateId)
+    }, [currentTemplateId])
+
+    useEffect(() => {
+        console.log("selected", selectedTemplateId)
+    }, [selectedTemplateId])
 
     return (
         <>
@@ -1047,7 +1057,7 @@ const ScenarioStudio = () => {
                 title="Duplicate scenario"
                 text="The selected scenario is already published. You cannot edit a published scenario, but you can create a duplicate. Do you want to continue?"
                 onCancel={() => {
-                    setCurrentTemplateId(oldTemplateId)
+                    setSelectedTemplateId("")
                     onPublishedClose()
                     }
                 }
@@ -1066,7 +1076,6 @@ const ScenarioStudio = () => {
                 title="Delete scenario "
                 text={`Do you want to delete scenario '${getScenarioName(selectedTemplateId)}'? You can't undo this action afterwards.`}
                 onCancel={() => {
-                    setCurrentTemplateId(oldTemplateId)
                     onDeleteClose()
                 }
                 }
