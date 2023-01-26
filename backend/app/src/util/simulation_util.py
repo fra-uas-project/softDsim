@@ -1,22 +1,18 @@
 import math
 import operator
 
-
 from numpy import mean
-from app.cache.scenario import CachedScenario
 from pydantic import BaseModel
 
-from app.dto.response import EventResponse
+from app.cache.scenario import CachedScenario
 from app.models.event import Event
+from app.models.model_selection import ModelSelection
 from app.models.question_collection import QuestionCollection
 from app.models.simulation_fragment import SimulationFragment
-from app.models.model_selection import ModelSelection
-from app.models.task import Task, CachedTasks
-from app.models.team import Member, Team
-from app.models.user_scenario import UserScenario, EventStatus
+from app.models.task import Task
+from app.models.team import Member
+from app.models.user_scenario import EventStatus
 from history.models.result import Result
-
-from history.util.result import get_result_response
 
 
 def find_next_scenario_component(session: CachedScenario):
@@ -82,13 +78,13 @@ def end_of_fragment(session: CachedScenario) -> bool:
 
     if (
         fragment.simulation_end.limit_type == "ge"
-        and limit >= fragment.simulation_end.limit
+        and limit >= int(fragment.simulation_end.limit)
     ):
         return True
 
     if (
         fragment.simulation_end.limit_type == "le"
-        and limit <= fragment.simulation_end.limit
+        and limit <= int(fragment.simulation_end.limit)
     ):
         return True
 
