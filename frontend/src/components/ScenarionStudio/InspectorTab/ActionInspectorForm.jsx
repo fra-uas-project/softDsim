@@ -1,12 +1,12 @@
 import InspectorEmtpy from "./InspectorEmtpy";
-import {action, findAction} from "../../../utils/utils";
+import {action, findAction, getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 import {
     Box,
     Divider,
     Editable,
     EditableInput,
     EditablePreview,
-    FormControl,
+    FormControl, FormErrorMessage,
     FormHelperText,
     NumberDecrementStepper,
     NumberIncrementStepper,
@@ -77,25 +77,41 @@ const ActionInspectorForm = (props) => {
                     </Editable>
                     <Divider/>
                     <Box h={3}/>
-                    <FormControl>
-                        <NumberInput min={1} value={upperLimit} onChange={(value) => handleChangeUpperLimit(value)}>
+                    <FormControl isInvalid={isError(props.validationErrors, props.actionData.id, "upper_limit")}>
+                        <NumberInput min={1} value={upperLimit} onChange={(value) => handleChangeUpperLimit(value)}
+                                     errorBorderColor={getErrorColor(props.validationErrors, props.actionData.id, "upper_limit")}>
                             <NumberInputField/>
                             <NumberInputStepper>
                                 <NumberIncrementStepper/>
                                 <NumberDecrementStepper/>
                             </NumberInputStepper>
                         </NumberInput>
+                        {isError(props.validationErrors, props.actionData.id, "upper_limit") ?
+                            <FormErrorMessage mt={4}
+                                              color={getErrorColor(props.validationErrors, props.actionData.id, "upper_limit")}>
+                                {getErrorMessage(props.validationErrors, props.actionData.id, "upper_limit")}
+                            </FormErrorMessage>
+                            : <FormHelperText></FormHelperText>}
                         <FormHelperText>Upper Limit</FormHelperText>
+                    </FormControl>
 
-                        <Box h={3}/>
 
-                        <NumberInput min={0} value={lowerLimit} onChange={(value) => handleChangeLowerLimit(value)}>
+                    <Box h={3}/>
+                    <FormControl isInvalid={isError(props.validationErrors, props.actionData.id, "lower_limit")}>
+                        <NumberInput min={0} value={lowerLimit} onChange={(value) => handleChangeLowerLimit(value)}
+                                     errorBorderColor={getErrorColor(props.validationErrors, props.actionData.id, "lower_limit")}>
                             <NumberInputField/>
                             <NumberInputStepper>
                                 <NumberIncrementStepper/>
                                 <NumberDecrementStepper/>
                             </NumberInputStepper>
                         </NumberInput>
+                        {isError(props.validationErrors, props.actionData.id, "lower_limit") ?
+                            <FormErrorMessage mt={4}
+                                              color={getErrorColor(props.validationErrors, props.actionData.id, "lower_limit")}>
+                                {getErrorMessage(props.validationErrors, props.actionData.id, "lower_limit")}
+                            </FormErrorMessage>
+                            : <FormHelperText></FormHelperText>}
                         <FormHelperText>Lower Limit</FormHelperText>
                     </FormControl>
                 </>

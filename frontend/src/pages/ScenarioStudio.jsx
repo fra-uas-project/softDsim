@@ -53,6 +53,7 @@ import EventInspectorForm from "../components/ScenarionStudio/InspectorTab/Event
 import ModelSelectionInspectorForm from "../components/ScenarionStudio/InspectorTab/ModelSelectionInspectorForm";
 import {getCookie, iconMap} from "../utils/utils";
 import {
+    actionEnum,
     componentEnum,
     finalActionList,
     finalComponentList,
@@ -983,6 +984,7 @@ const ScenarioStudio = () => {
                                                             actionData={selectedObject}
                                                             updateEditorList={updateEditorList}
                                                             setSelectedObject={setSelectedObjectId}
+                                                            validationErrors={validationErrors.filter(error => error.params.component.type === actionEnum.ACTION)}
                                                         />
                                                     }
 

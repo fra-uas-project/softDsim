@@ -218,7 +218,7 @@ const EventInspectorForm = (props) => {
                         </FormErrorMessage>
                         : <FormHelperText></FormHelperText>}
                 </FormControl>
-                {/* TODO Validate number input*/}
+
                 <FormControl isInvalid={isError(props.validationErrors, props.eventData.id, "trigger_value")}>
                     <NumberInput
                         min={0}

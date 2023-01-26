@@ -78,8 +78,13 @@ const baseSchema = basicSchema.shape({
     hard_tasks: yup.number().required().test((value, ctx) => { if(value === 0) { return ctx.createError({type: validationErrorTypes.WARNING, message: "It is not recommended to have 0 hard tasks", params: {component: ctx.parent}})} else {return true} }),
 }).test((value, ctx) => { if(value.easy_tasks + value.medium_tasks + value.hard_tasks === 0) {return ctx.createError({type: validationErrorTypes.ERROR, message: "The total number of tasks can't be 0", params: {component: ctx.parent[0]}, path: "empty_tasks"})} else {return true} })
 
+const actionSchema = yup.object().shape({
+    // lower_limit: yup.string().test((value, ctx) => { if(value === "0") { return ctx.createError({type: validationErrorTypes.INFO, message: "Change default value of lower limit", params: {component: ctx.parent}})} else {return true} }), // deactivated, because lower limit tip could lead to confusion
+    upper_limit: yup.string().test((value, ctx) => { if(value === "1") { return ctx.createError({type: validationErrorTypes.INFO, message: "Change default value of upper limit", params: {component: ctx.parent}})} else {return true} }),
+})
+
 const fragmentSchema = basicSchema.shape({
-    actions: yup.array().required().test((value, ctx) => {
+    actions: yup.array().required().of(actionSchema).test((value, ctx) => {
         if(value.length === 0) {
             return ctx.createError({type: validationErrorTypes.ERROR, message: "Actions should not be empty", params: {component: ctx.parent}})
         } else if(value.length < 4) {
@@ -97,7 +102,7 @@ const modelSelectionSchema = basicSchema.shape({
 
 const answerSchema = yup.object().shape({
     label: yup.string().test((value, ctx) => { if(!value) { return ctx.createError({message: "Answer can't be empty", type: validationErrorTypes.ERROR, params: {component: ctx.parent}})} else {return true} }),
-    points: yup.string().test((value, ctx) => { if(value === "0") { return ctx.createError({message: "0 points have no effect", type: validationErrorTypes.ERROR, params: {component: ctx.parent}})} else {return true} }),
+    points: yup.string().test((value, ctx) => { if(value === "0") { return ctx.createError({message: "0 points have no effect", type: validationErrorTypes.WARNING, params: {component: ctx.parent}})} else {return true} }),
 })
 
 const questionSchema = yup.object({
