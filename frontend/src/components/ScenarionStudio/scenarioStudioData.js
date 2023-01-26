@@ -14,7 +14,8 @@ import { HiUserGroup } from "react-icons/hi";
 
 export const tabIndexEnum = {
     "INSPECTOR": 0,
-    "COMPONENTS": 1
+    "COMPONENTS": 1,
+    "VALIDATION": 2
 };
 
 export const componentEnum = {
@@ -70,7 +71,11 @@ export const finalComponentList = [
         icon: MdTimeline,
         displayName: `Simulation`,
         actions: [],
-        simulation_end: {}
+        simulation_end: {
+            type: "",
+            limit: "",
+            limit_type: ""
+        }
     },
     {
         id: uuidv4(),
@@ -104,7 +109,14 @@ export const finalComponentList = [
         trigger_type: "",
         trigger_value: "",
         trigger_comparator: "",
-        effects: [],
+        budget: "",
+        duration: "",
+        easy_tasks: "",
+        medium_tasks: "",
+        hard_tasks: "",
+        stress: "",
+        motivation: "",
+        familiarity: "",
     },
 ]
 

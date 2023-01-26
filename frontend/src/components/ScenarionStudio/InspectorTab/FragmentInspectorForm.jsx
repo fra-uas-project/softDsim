@@ -5,6 +5,7 @@ import {
     EditableInput,
     EditablePreview,
     FormControl,
+    FormErrorMessage,
     FormHelperText,
     FormLabel,
     HStack,
@@ -16,10 +17,11 @@ import {
     Select,
     VStack
 } from "@chakra-ui/react";
-import {useState} from "react";
+import React, {useState} from "react";
 import InspectorItemSelector from "./InspectorItemSelector";
 import MarkdownTextfield from "./MarkdownTextfield";
 import DeleteButton from "./DeleteButton";
+import {getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 
 const FragmentInspectorForm = (props) => {
 
@@ -93,12 +95,24 @@ const FragmentInspectorForm = (props) => {
                 <EditableInput/>
             </Editable>
             <Divider />
+
             <Box h={3}/>
-            <MarkdownTextfield
-                data={props.fragmentData}
-                updateEditorList={props.updateEditorList}
-            />
+
+            <FormControl isInvalid={isError(props.validationErrors, props.fragmentData.id, "text")}>
+                <MarkdownTextfield
+                    data={props.fragmentData}
+                    updateEditorList={props.updateEditorList}
+                    errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "text")}
+                />
+                {isError(props.validationErrors, props.fragmentData.id, "text") ?
+                    <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, props.fragmentData.id, "text")}>
+                        {getErrorMessage(props.validationErrors, props.fragmentData.id, "text")}
+                    </FormErrorMessage>
+                    : <FormHelperText></FormHelperText>}
+            </FormControl>
+
             <Box h={3}/>
+
             <FormControl>
                 <FormLabel color="gray.400" htmlFor="">End Condition</FormLabel>
                 <Select placeholder='Select condition' value={endConditionType} onChange={(event) => onChangeEndConditionType(event)}>
@@ -136,6 +150,7 @@ const FragmentInspectorForm = (props) => {
                 </HStack>
 
                 <Box h={3}/>
+
             </FormControl>
             <InspectorItemSelector
                 droppableId="actionList"
@@ -143,6 +158,9 @@ const FragmentInspectorForm = (props) => {
                 type="action"
                 headline="Actions"
                 addActions={addActions}
+                parentData={props.fragmentData}
+                validationErrors={props.validationErrors}
+                validationErrorObjectKey="actions"
             />
             <DeleteButton
                 component={props.fragmentData}

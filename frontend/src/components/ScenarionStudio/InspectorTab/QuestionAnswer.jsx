@@ -1,5 +1,7 @@
 import {
     Box,
+    FormControl,
+    FormErrorMessage,
     FormHelperText,
     HStack,
     IconButton,
@@ -13,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import {useState} from "react";
 import {HiOutlineMinus} from "react-icons/hi";
-import {findQuestion} from "../../../utils/utils";
+import {findQuestion, getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 
 const QuestionAnswer = (props) => {
     const [label, setLabel] = useState(props.answer.label);
@@ -52,16 +54,35 @@ const QuestionAnswer = (props) => {
 
     return (
         <>
-            <HStack>
-                <Input value={label} onChange={handleLabelChange}/>
-                <NumberInput maxWidth={24} value={points} onChange={handlePointsChange}>
+            <HStack alignItems="flex-start">
+                <FormControl isInvalid={isError(props.validationErrors, props.answer.id, "label")}>
+                    <Input value={label} onChange={handleLabelChange}
+                           errorBorderColor={getErrorColor(props.validationErrors, "label")}/>
+                    {isError(props.validationErrors, props.answer.id, "label") ?
+                        <FormErrorMessage color={getErrorColor(props.validationErrors, props.answer.id,  "label")}>
+                            {getErrorMessage(props.validationErrors, props.answer.id,  "label")}
+                        </FormErrorMessage>
+                        : <FormHelperText></FormHelperText>}
+                </FormControl>
+
+                <FormControl maxWidth={24} isInvalid={isError(props.validationErrors, props.answer.id, "points")}>
+                <NumberInput  value={points} onChange={handlePointsChange}
+                             errorBorderColor={getErrorColor(props.validationErrors,  props.answer.id, "points")}>
                     <NumberInputField />
                     <NumberInputStepper>
                         <NumberIncrementStepper/>
                         <NumberDecrementStepper/>
                     </NumberInputStepper>
                 </NumberInput>
-                <IconButton aria-label="Remove Answer" icon={<HiOutlineMinus />} size="xs" variant='ghost' onClick={props.removeAnswer} isDisabled={props.isNotRemovable}/>
+                    {isError(props.validationErrors, props.answer.id, "points") ?
+                        <FormErrorMessage color={getErrorColor(props.validationErrors, props.answer.id,  "points")}>
+                            {getErrorMessage(props.validationErrors, props.answer.id,  "points")}
+                        </FormErrorMessage>
+                        : <FormHelperText></FormHelperText>}
+                </FormControl>
+
+                <IconButton aria-label="Remove Answer" icon={<HiOutlineMinus />} size="xs" variant='ghost' mt="8px !important" onClick={props.removeAnswer} isDisabled={props.isNotRemovable}/>
+
             </HStack>
             <FormHelperText>
                 <HStack justify="space-between">

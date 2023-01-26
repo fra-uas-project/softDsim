@@ -1,4 +1,15 @@
 import {componentEnum} from "../components/ScenarionStudio/scenarioStudioData";
+import {
+    MdAlarm,
+    MdIntegrationInstructions, MdLocalBar,
+    MdMiscellaneousServices, MdOutlineAttachMoney, MdOutlineAttractions,
+    MdOutlineBugReport, MdOutlineCheckBox,
+    MdOutlineInfo, MdOutlineRadioButtonChecked, MdRule, MdSchool,
+    MdTimeline
+} from "react-icons/md";
+import {HiUserGroup} from "react-icons/hi";
+import {BsLightningCharge} from "react-icons/bs";
+import {validationErrorColors, validationErrorTypes} from "../components/ScenarionStudio/scenarioValidation";
 
 export function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -24,6 +35,24 @@ export const action = {
     OVERTIME: "overtime"
 }
 
+export const iconMap = {
+    MdOutlineInfo: MdOutlineInfo,
+    MdTimeline: MdTimeline,
+    MdOutlineBugReport: MdOutlineBugReport,
+    MdIntegrationInstructions: MdIntegrationInstructions,
+    MdMiscellaneousServices: MdMiscellaneousServices,
+    HiUserGroup: HiUserGroup,
+    MdLocalBar: MdLocalBar,
+    MdSchool: MdSchool,
+    MdOutlineAttachMoney: MdOutlineAttachMoney,
+    MdAlarm: MdAlarm,
+    BsLightningCharge: BsLightningCharge,
+    MdRule: MdRule,
+    MdOutlineRadioButtonChecked: MdOutlineRadioButtonChecked,
+    MdOutlineCheckBox: MdOutlineCheckBox,
+    MdOutlineAttractions: MdOutlineAttractions
+}
+
 export const findQuestion = (questionId, editorList) => {
     const questionsList = editorList.filter(component => component.type === componentEnum.QUESTIONS)
 
@@ -44,4 +73,34 @@ export const findAction = (actionId, editorList) => {
     }
 
     return (actions.find(action => action.id === actionId))
+}
+
+export const isError = (validationErrors, componentId, objectKey) => {
+    return validationErrors.some(error => error.params.component.id === componentId && error.path.includes(objectKey))
+}
+
+export const getErrorType = (validationErrors, componentId, objectKey) => {
+    return validationErrors.filter(error => error.params.component.id === componentId && error.path.includes(objectKey))[0].type
+}
+
+export const getErrorMessage = (validationErrors, componentId, objectKey) => {
+    return validationErrors.filter(error => error.params.component.id === componentId && error.path.includes(objectKey))[0].message
+}
+
+export const getErrorColor = (validationErrors, componentId, objectKey) => {
+    if (isError(validationErrors, componentId, objectKey)) {
+        const errorType = getErrorType(validationErrors, componentId, objectKey)
+        if (errorType === validationErrorTypes.WARNING) {
+            return `${validationErrorColors.WARNING}.500`
+        } else if (errorType === validationErrorTypes.INFO) {
+            return `${validationErrorColors.INFO}.500`
+        } else if (errorType === validationErrorTypes.INTERNAL_ERROR) {
+            return `${validationErrorColors.INTERNAL_ERROR}.500`
+        } else if (errorType === validationErrorTypes.ERROR) {
+            return `${validationErrorColors.ERROR}.500`
+        } else {
+            // default red for unknown
+            return undefined
+        }
+    }
 }

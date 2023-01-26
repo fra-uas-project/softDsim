@@ -1,7 +1,8 @@
 from typing import Optional
-from pydantic import BaseSettings
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
+from pydantic import BaseSettings, Field
+from pymongo import MongoClient
 
 load_dotenv(".env")
 
@@ -20,29 +21,31 @@ class Configuration(BaseSettings):
     database_port: Optional[str]
     database_user: str
     database_pass: str
+    mongo_name: str
+    mongo_host: str = Field(..., env='MONGO_HOST')
+    mongo_port: int
+    mongo_user: str
+    mongo_pass: str
     server: Optional[int] = 0
     logging_level: Optional[str] = "INFO"
 
-    @property
-    def mongo_client(self) -> str:
-        """Created a string that can be used to connect to the mongodb.
+    def get_mongo_client(self) -> MongoClient:
+        config = Configuration()
+        client = MongoClient(
+            host=config.mongo_host,
+            port=config.mongo_port,
+            username=config.mongo_user,
+            password=config.mongo_pass)
+        return client
 
-        Returns:
-            str: MongoDB client connection str
-                 (mongodb://user:pass@host:port/.....)
-        """
-        protocol = "mongodb"
-        if self.cloud_db:
-            protocol += "+srv"
-        host = self.database_host
-        if self.database_port is not None:
-            host += f":{self.database_port}"
+    def get_mongodb(self):
+        config = Configuration()
+        client = self.get_mongo_client()
+        return client[config.mongo_name]
 
-        # if self.database_user == '':
-        #     print('database_user not specified - connecting to database without login credentials')
-        #     return f"{protocol}://{host}/?retryWrites=true&w=majority"
-
-        return f"{protocol}://{self.database_user}:{self.database_pass}@{host}/?retryWrites=true&w=majority"
+    def get_mongo_db_scenario_template_collection(self):
+        mongodb = self.get_mongodb()
+        return mongodb["scenario_templates"]
 
 
 def get_config() -> Configuration:
