@@ -47,6 +47,15 @@ export const editorListSchema = yup.array().of(yup.lazy(component => {
             params: {component: {icon: HiExclamation, displayName: "Scenario"}}
         })
     } else { {return true} }
+}).test((value, ctx) => {
+    const fragments = value.filter(component => component.type === componentEnum.FRAGMENT)
+    if (fragments.length > 1) {
+        const error = simulationEndValidation(fragments, ctx)
+        if(error) {
+            return error
+        }
+    }
+    return true
 })
 
 // Validating fields which are not the same for all (basic) components
@@ -136,3 +145,15 @@ const eventSchema = basicSchema.shape({
         value.stress === "" &&
         value.familiarity === "" )
     {return ctx.createError({type: validationErrorTypes.ERROR, message: "Minimum 1 impact required", params: {component: ctx.parent[0]}, path: "impact"})} else {return true} })
+
+const simulationEndValidation = (fragments, ctx) => {
+
+    for (let i = 0; i < fragments.length - 1; i++) {
+        const currentFragment = fragments[i];
+
+        if (currentFragment.simulation_end.type === "" || currentFragment.simulation_end.limit_type === "" || currentFragment.simulation_end.limit === "") {
+            return ctx.createError({type: validationErrorTypes.ERROR, message: "End condition required", params: {component: currentFragment}, path: "fragment.endCondition"})
+        }
+    }
+    return false
+}

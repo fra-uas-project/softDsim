@@ -9,12 +9,14 @@ import {
     FormHelperText,
     FormLabel,
     HStack,
+    Icon,
     NumberDecrementStepper,
     NumberIncrementStepper,
     NumberInput,
     NumberInputField,
     NumberInputStepper,
     Select,
+    Tooltip,
     VStack
 } from "@chakra-ui/react";
 import React, {useState} from "react";
@@ -22,6 +24,7 @@ import InspectorItemSelector from "./InspectorItemSelector";
 import MarkdownTextfield from "./MarkdownTextfield";
 import DeleteButton from "./DeleteButton";
 import {getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
+import {HiOutlineQuestionMarkCircle} from "react-icons/hi";
 
 const FragmentInspectorForm = (props) => {
 
@@ -113,9 +116,19 @@ const FragmentInspectorForm = (props) => {
 
             <Box h={3}/>
 
-            <FormControl>
-                <FormLabel color="gray.400" htmlFor="">End Condition</FormLabel>
-                <Select placeholder='Select condition' value={endConditionType} onChange={(event) => onChangeEndConditionType(event)}>
+            <FormControl isInvalid={isError(props.validationErrors, props.fragmentData.id, "endCondition")}>
+                <HStack alignItems="flex-start">
+                    <FormLabel color="gray.400" htmlFor="" mr={0}>End Condition</FormLabel>
+
+                        <Tooltip label="It is necessary to define an end condition for each Simulation Fragment, expect the last fragment if multiple fragments are present." placement="top">
+                            <Box>
+                            <Icon w={5} h={5} as={HiOutlineQuestionMarkCircle} color="gray.400" cursor="pointer" />
+                            </Box>
+                        </Tooltip>
+                </HStack>
+                <Select placeholder='Select condition' value={endConditionType}
+                        onChange={(event) => onChangeEndConditionType(event)}
+                        errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "endCondition")}>
                     <option value='budget'>Budget</option>
                     <option value='duration'>Duration</option>
                     <option value='tasks_done'>Tasks done</option>
@@ -126,18 +139,18 @@ const FragmentInspectorForm = (props) => {
                 <Box h={3}/>
 
                 <HStack>
-                    <Select w={20} placeholder="?" value={limitType} onChange={(event) => onChangeLimitType(event)}>
+                    <Select w={20} placeholder="?" value={limitType} onChange={(event) => onChangeLimitType(event)}
+                            errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "endCondition")}>
                         <option value='ge'>{">="}</option>
                         <option value='le'>{"<="}</option>
                     </Select>
-                {/* TODO Validate number input*/}
                 <NumberInput
                     min={0}
                     step={(endConditionType === "motivation" || endConditionType === "stress") ? 0.01 : 1}
                     max={(endConditionType === "motivation" || endConditionType === "stress") ? 1 : Infinity}
                     onChange={(value) => onChangeEndConditionLimit(value)}
                     value={endConditionLimit}>
-                    <NumberInputField />
+                    <NumberInputField errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "endCondition")}/>
                     <NumberInputStepper>
                         <NumberIncrementStepper />
                         <NumberDecrementStepper />
