@@ -419,6 +419,8 @@ const EventInspectorForm = (props) => {
                 <FormHelperText>Familiarity</FormHelperText>
             </FormControl>
 
+            <Box h={3}/>
+
             <DeleteButton
                 component={props.eventData}
                 updateEditorList={props.updateEditorList}

@@ -22,7 +22,7 @@ const ValidationTab = (props) => {
     }
 
     return (
-        <VStack alignItems="flex-start" pt={2}>
+        <VStack alignItems="flex-start" pt={2} height="full" overflowY="auto" pr={4}>
             {props.validationEnabled ?<>
             <ValidationOverview validationErrors={props.validationErrors} validationEnabled={props.validationEnabled} />
             <Text color="gray.400" fontWeight="semibold">Errors</Text>

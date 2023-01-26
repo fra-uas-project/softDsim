@@ -795,12 +795,14 @@ const ScenarioStudio = () => {
                     </HStack>
                 </HStack>
                 <Box h={5}></Box>
-                <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="70vh" maxH="73vh">
-                    <HStack w="full" h="full" overflow="hidden" pt={2} spacing={5}
+
+
+                <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="73vh" maxH="73vh" h="73vh">
+                    <HStack maxH="full" w="full" h="full" pt={2} spacing={5}
                             onClick={((e) => handleEditorBackgroundClick(e))}>
-                        <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <DragDropContext onDragEnd={handleOnDragEnd} >
                             {/*Editor*/}
-                            <Flex w="full" h="full" justifyContent="center" alignItems="center" backgroundColor="white"
+                            <Flex maxH="full" w="full" h="full" justifyContent="center" alignItems="center" backgroundColor="white"
                                   borderRadius="2xl" overflowX="auto" p={10}>
                                 <Droppable droppableId="editor"
                                            type="component"
@@ -908,24 +910,33 @@ const ScenarioStudio = () => {
 
 
                             {/*Right Panel*/}
-                            <Box h="full" backgroundColor="white" borderRadius="2xl">
+                            <Box maxH="full" h="full" backgroundColor="white" borderRadius="2xl">
                                 <Tabs
                                     index={tabIndex}
                                     onChange={handleTabsChange}
-                                    minH="900px"
+                                    // minH="900px"
+                                    h="full"
+                                    maxH="full"
+
+                                    w="350px"
+                                    minW="350px"
+                                    maxW="350px"
                                 >
-                                    <TabList>
-                                        <Tab fontWeight="bold" color="gray.400">Inspector</Tab>
-                                        <Tab fontWeight="bold" color="gray.400">Components</Tab>
-                                        <Tab fontWeight="bold" color="gray.400">Validation</Tab>
+                                    <TabList w="100%" >
+                                        <Tab fontWeight="bold" color="gray.400" w="full">Inspector</Tab>
+                                        <Tab fontWeight="bold" color="gray.400" w="full">Components</Tab>
+                                        <Tab fontWeight="bold" color="gray.400" w="full">Validation</Tab>
                                     </TabList>
 
                                     {/* h = full height - tab header */}
-                                    <TabPanels minW="350px" h="650px" overflowY="auto">
-                                        <TabPanel height="full">
-                                            {/* Inspector Items */}
+                                    {/*<TabPanels minW="350px" h="650px" overflowY="auto">*/}
+                                    {/*<TabPanels overflowY="auto">*/}
+                                    <TabPanels maxH="calc(100% - 42px)"  h="calc(100% - 42px)">
+
+                                        {/* Inspector Items */}
+                                        <TabPanel height="full" maxH="full" overflow="auto">
                                             {selectedObject ?
-                                                <VStack alignItems="flex-start" pt={2}>
+                                                <VStack alignItems="flex-start" pt={2} maxH="full" h="full">
                                                     {selectedObject?.type === componentEnum.BASE &&
                                                         <BaseInspectorForm
                                                             key={selectedObject.id}
@@ -1008,17 +1019,16 @@ const ScenarioStudio = () => {
                                                     content="No components selected. Click on a component to select it."
                                                 />
                                             }
-
                                         </TabPanel>
 
                                         {/* Component Tab */}
-                                        <TabPanel pb={0} pt={0}>
+                                        <TabPanel pb={0} pt={0} pr={0} height="full" >
                                             <ComponentTab
                                                 finalComponentList={finalComponentList}
                                             />
                                         </TabPanel>
 
-                                        <TabPanel pb={0} pt={0}>
+                                        <TabPanel pb={0} pt={0} pr={0} height="full">
                                             <ValidationTab
                                                 validationErrors={validationErrors}
                                                 handleSelect={handleSelect}
