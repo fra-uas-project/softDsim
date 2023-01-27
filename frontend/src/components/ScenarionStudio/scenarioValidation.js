@@ -149,7 +149,7 @@ const eventSchema = basicSchema.shape({
         value.motivation === "" &&
         value.stress === "" &&
         value.familiarity === "" )
-    {return ctx.createError({type: validationErrorTypes.ERROR, message: "Minimum 1 impact required", params: {component: ctx.parent[0]}, path: "impact"})} else {return true} })
+    {return ctx.createError({type: validationErrorTypes.ERROR, message: "Minimum 1 impact required", params: {component: ctx.parent.find(component => component.id === value.id)}, path: "impact"})} else {return true} })
 
 const simulationEndValidation = (fragments, ctx) => {
 
