@@ -32,6 +32,7 @@ const ValidationTab = (props) => {
                     return (
                         <ValidationItem key={index}
                                         componentIcon={error.params.component.icon}
+                                        componentId={error.params.component.hasOwnProperty("parentId") ? error.params.component.parentId : error.params.component.id}
                                         buttonIcon={HiFire}
                                         buttonColor={validationErrorColors.ERROR}
                                         tooltip="Action required"
@@ -59,6 +60,7 @@ const ValidationTab = (props) => {
                             return (
                                 <ValidationItem key={index}
                                                 componentIcon={error.params.component.icon}
+                                                componentId={error.params.component.hasOwnProperty("parentId") ? error.params.component.parentId : error.params.component.id}
                                                 buttonIcon={HiLightningBolt}
                                                 buttonColor={validationErrorColors.WARNING}
                                                 tooltip="Action recommended"
@@ -79,6 +81,7 @@ const ValidationTab = (props) => {
                         return (
                             <ValidationItem key={index}
                                             componentIcon={error.params.component.icon}
+                                            componentId={error.params.component.hasOwnProperty("parentId") ? error.params.component.parentId : error.params.component.id}
                                             buttonIcon={HiLightBulb}
                                             buttonColor={validationErrorColors.INFO}
                                             tooltip="Action possible"

@@ -1,11 +1,12 @@
 import {Box, Flex, Heading, HStack, Icon, ListItem, Text, VStack} from "@chakra-ui/react";
 import {MdDragIndicator} from "react-icons/md";
 import {Draggable} from "react-beautiful-dnd";
+import {scrollToMarginTopValue} from "../scenarioStudioData";
 
 const EditorBaseComponent = (props) => {
 
     return (
-        <Draggable key={props.component.id} draggableId={props.component.id} index={props.index}>
+        <Draggable key={props.component.id} draggableId={props.component.id} index={props.index} style={{height: "100%"}}>
             {(provided) => (
                 <ListItem
                     {...provided.draggableProps}
@@ -18,7 +19,7 @@ const EditorBaseComponent = (props) => {
                             backgroundColor="white" p={3}
                             boxShadow={props.isSelected ? "0 0 0 3px rgba(66, 153, 225, 0.6)" : ""}
                             borderRadius="lg"
-
+                            scrollMarginTop={scrollToMarginTopValue}
                         >
                             <Flex w={20} h={20} backgroundColor="gray.200" justifyContent="center" alignItems="center" borderRadius="xl">
                                 <Icon w={10} h={10} as={props.component.icon} color="gray.500" />

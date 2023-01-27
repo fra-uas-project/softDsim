@@ -1,6 +1,7 @@
 import {Draggable} from "react-beautiful-dnd";
 import {Box, HStack, Icon, ListItem, Text} from "@chakra-ui/react";
 import {MdDragIndicator} from "react-icons/md";
+import {scrollToMarginTopValue} from "../scenarioStudioData";
 
 const EditorActionComponent = (props) => {
   return (
@@ -16,6 +17,7 @@ const EditorActionComponent = (props) => {
                           elementid={props.id}
                           backgroundColor={props.backgroundColor}
                           boxShadow={props.isSelected ? "0 0 0 3px rgba(66, 153, 225, 0.6)" : ""}
+                          scrollMarginTop={scrollToMarginTopValue}
                   >
                       <Text>{props.id}</Text>
                       <Box {...provided.dragHandleProps}>

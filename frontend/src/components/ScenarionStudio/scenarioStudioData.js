@@ -211,3 +211,5 @@ export const finalQuestionList = [
         answers: []
     },
 ];
+
+export const scrollToMarginTopValue = 4;
