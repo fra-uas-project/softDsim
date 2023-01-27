@@ -813,7 +813,7 @@ const ScenarioStudio = () => {
                                                        mt="auto"
                                                        transition="background-color 0.2s ease"
                                                        minH="full"
-                                                       height="full"
+                                                       height="auto"
                                                        minW="90%"
                                                        {...provided.droppableProps}
                                                        ref={provided.innerRef}
