@@ -776,20 +776,27 @@ const ScenarioStudio = () => {
                 </Breadcrumb>
                 <HStack justifyContent="space-between" mr={3}>
                     <Heading>Scenario Studio</Heading>
-                    <HStack gap={2}>
-                        { editorListState === editorListStates.UNCHANGED ? <></> :
+                    <HStack>
+                        <Heading as="h3" size="md" pr={4}>
+                            {editorList.find(component => component.type === componentEnum.BASE) ?
+                                editorList.find(component => component.type === componentEnum.BASE).template_name
+                                : ""}
+                        </Heading>
+                        {editorListState === editorListStates.UNCHANGED ? <></> :
                             editorListState === editorListStates.SAVED ?
-                            <Tag size="md" variant="subtle" colorScheme='green'>
-                                <TagLeftIcon boxSize='12px' as={HiOutlineCheck} />
-                                <TagLabel>Saved</TagLabel>
-                            </Tag> :
-                             editorListState === editorListStates.MODIFIED ?
-                            <Tag size="md" variant="subtle" colorScheme='red'>
-                                <TagLeftIcon boxSize='12px' as={HiOutlineX} />
-                                <TagLabel>Unsaved</TagLabel>
-                            </Tag>
-                            : <></>
+                                <Tag size="md" variant="subtle" colorScheme='green'>
+                                    <TagLeftIcon boxSize='12px' as={HiOutlineCheck}/>
+                                    <TagLabel>Saved</TagLabel>
+                                </Tag> :
+                                editorListState === editorListStates.MODIFIED ?
+                                    <Tag size="md" variant="subtle" colorScheme='red'>
+                                        <TagLeftIcon boxSize='12px' as={HiOutlineX}/>
+                                        <TagLabel>Unsaved</TagLabel>
+                                    </Tag>
+                                    : <></>
                         }
+                    </HStack>
+                    <HStack gap={2}>
                         <Button variant="outline"
                                 colorScheme="blue"
                                 onClick={() => {
@@ -936,9 +943,9 @@ const ScenarioStudio = () => {
                                                         <Icon as={RiDragDropLine} w={20} h={20} mb={6}/>
                                                         <Heading size="lg" pointerEvents="none">Drag a component
                                                             here</Heading>
-                                                        <Text pointerEvents="none" fontSize="xl" mt="20px">(Create a
+                                                        <Text pointerEvents="none" fontSize="xl" mt="20px">Create a
                                                             complex
-                                                            scenario by drag and dropping different components)</Text>
+                                                            scenario by drag and dropping different components</Text>
                                                     </VStack>
                                             }
                                             {provided.placeholder}
