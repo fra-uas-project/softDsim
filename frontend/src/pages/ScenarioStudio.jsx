@@ -91,6 +91,7 @@ const ScenarioStudio = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
     const { isOpen: isPublishedOpen, onOpen: onPublishedOpen, onClose: onPublishedClose } = useDisclosure();
+    const { isOpen: isNotSavedOpen, onOpen: onNotSavedOpen, onClose: onNotSavedClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
 
     const cancelRef = useRef();
@@ -501,6 +502,7 @@ const ScenarioStudio = () => {
             const scenario = loadIcons(fetchedScenarioTemplate.data.scenario)
             updateEditorList(scenario)
             setSavedEditorList(scenario)
+            onClose()
         } catch (e) {
             toast({
                 title: `Could not load selected scenario template. Please try again.`,
@@ -520,8 +522,10 @@ const ScenarioStudio = () => {
             const scenarioTemplateClone = await res.json();
             const scenario = loadIcons(scenarioTemplateClone.data.scenario)
             updateEditorList(scenario)
+            setSavedEditorList(scenario)
             setSelectedTemplateId("")
             setCurrentTemplateId(scenarioTemplateClone.data.id)
+            onClose()
         } catch (e) {
             toast({
                 title: `Could not load selected scenario template. Please try again.`,
@@ -595,6 +599,7 @@ const ScenarioStudio = () => {
 
     const resetScenarioStudio = () => {
         updateEditorList([]);
+        setSavedEditorList([]);
         setCurrentTemplateId("");
     };
 
@@ -619,6 +624,7 @@ const ScenarioStudio = () => {
         }
         return editorList
     };
+
     const deepSearch = (component) => {
         if (typeof component === 'object') {
             for (let key in component) {
@@ -701,6 +707,10 @@ const ScenarioStudio = () => {
         console.log("editorListState", editorListState)
     }, [editorListState])
 
+    useEffect(() => {
+        console.log("editorListIsSaved", editorListIsSaved)
+    }, [editorListIsSaved])
+
     return (
         <>
             {/* Load Scenarios */}
@@ -735,8 +745,12 @@ const ScenarioStudio = () => {
                                                     colorScheme='blue'
                                                     aria-label='Load scenario'
                                                     onClick={() => {
-                                                        loadScenarioTemplate(template.scenarioId)
-                                                        onClose()
+                                                        if(editorListIsSaved) {
+                                                            loadScenarioTemplate(template.scenarioId)
+                                                        } else {
+                                                            setSelectedTemplateId(template.scenarioId)
+                                                            onNotSavedOpen()
+                                                        }
                                                     }
                                                     }
                                                 >
@@ -749,8 +763,8 @@ const ScenarioStudio = () => {
                                                     fontSize='20px'
                                                     icon={<HiOutlineTrash />}
                                                     onClick={() => {
-                                                        onDeleteOpen()
                                                         setSelectedTemplateId(template.scenarioId)
+                                                        onDeleteOpen()
                                                         }
                                                     }
                                                 />
@@ -1109,6 +1123,25 @@ const ScenarioStudio = () => {
             />
 
             <ScenarioStudioAlert
+                isOpen={isNotSavedOpen}
+                cancelRef={cancelRef}
+                onClose={onNotSavedClose}
+                title="Unsaved changes"
+                text="The current scenario is not saved. All unsaved changes are discarded. Do you want to continue?"
+                onCancel={() => {
+                    onNotSavedClose()
+                    onOpen()
+                }
+                }
+                continueButtonColor="blue"
+                onContinueButtonClick={() => {
+                    onNotSavedClose()
+                    loadScenarioTemplate(selectedTemplateId)
+                }
+                }
+            />
+
+            <ScenarioStudioAlert
                 isOpen={isPublishedOpen}
                 cancelRef={cancelRef}
                 onClose={onPublishedClose}
@@ -1117,6 +1150,7 @@ const ScenarioStudio = () => {
                 onCancel={() => {
                     setSelectedTemplateId("")
                     onPublishedClose()
+                    onOpen()
                     }
                 }
                 continueButtonColor="blue"
@@ -1131,7 +1165,7 @@ const ScenarioStudio = () => {
                 isOpen={isDeleteOpen}
                 cancelRef={cancelRef}
                 onClose={onDeleteClose}
-                title="Delete scenario "
+                title="Delete scenario"
                 text={`Do you want to delete scenario '${getScenarioName(selectedTemplateId)}'? You can't undo this action afterwards.`}
                 onCancel={() => {
                     onDeleteClose()
