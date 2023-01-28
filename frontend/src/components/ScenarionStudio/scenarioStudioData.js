@@ -213,3 +213,9 @@ export const finalQuestionList = [
 ];
 
 export const scrollToMarginTopValue = 4;
+
+export const editorListStates = {
+    UNCHANGED: "unchanged",
+    MODIFIED: "modified",
+    SAVED: "saved"
+}

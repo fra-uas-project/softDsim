@@ -24,6 +24,9 @@ import {
     TabPanel,
     TabPanels,
     Tabs,
+    Tag,
+    TagLabel,
+    TagLeftIcon,
     Tbody,
     Td,
     Text,
@@ -35,7 +38,7 @@ import {
     useToast,
     VStack
 } from "@chakra-ui/react";
-import {HiChevronRight, HiOutlineTrash} from "react-icons/hi";
+import {HiChevronRight, HiOutlineCheck, HiOutlineTrash, HiOutlineX} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import React, {useEffect, useRef, useState} from "react";
@@ -54,7 +57,7 @@ import ModelSelectionInspectorForm from "../components/ScenarionStudio/Inspector
 import {getCookie, iconMap} from "../utils/utils";
 import {
     actionEnum,
-    componentEnum,
+    componentEnum, editorListStates,
     finalActionList,
     finalComponentList,
     finalQuestionList,
@@ -65,16 +68,19 @@ import {useImmer} from "use-immer";
 import ScenarioStudioAlert from "../components/ScenarionStudio/ScenarioStudioAlert";
 import {editorListSchema, validationErrorTypes} from "../components/ScenarionStudio/scenarioValidation";
 import ValidationTab from "../components/ScenarionStudio/ValidationTab/ValidationTab";
+import {usePrompt} from "../utils/customHooks";
 
 const ScenarioStudio = () => {
     const toast = useToast();
 
     const [tabIndex, setTabIndex] = useState(tabIndexEnum.COMPONENTS);
     const [editorList, updateEditorList] = useImmer([]);
+    const [savedEditorList, setSavedEditorList] = useState(editorList);
+    const [editorListState, setEditorListState] = useState(editorListStates.UNCHANGED)
+
     const [selectedObjectId, setSelectedObjectId] = useState(null);
     const [selectedTemplateId, setSelectedTemplateId] = useState(""); // selected template in modals to load and delete template
     const [currentTemplateId, setCurrentTemplateId] = useState("");
-    const [isSaved, setIsSaved] = useState(null)
 
     const [templateScenarios, setTemplateScenarios] = useState([])
     const [isLoading, setIsLoading] = useState(false);
@@ -88,6 +94,10 @@ const ScenarioStudio = () => {
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
 
     const cancelRef = useRef();
+
+    const editorListIsSaved = editorList === savedEditorList
+
+    usePrompt( 'You have unsaved changes. Do you really want to leave the Scenario Studio?', editorListState === editorListStates.MODIFIED );
 
     const selectComponent = (id) => {
         const component = editorList.find(component => component.id === id)
@@ -118,19 +128,18 @@ const ScenarioStudio = () => {
 
     const saveScenarioTemplate = async (scenarioId) => {
         if (editorList.length === 0) {
+            toast({
+                title: `Cannot save empty scenario`,
+                status: 'info',
+                duration: 3000,
+            });
             return
         }
 
         try {
             const res = await saveScenarioTemplateApiCall(scenarioId)
 
-            if(res) {
-                toast({
-                    title: `Scenario has been saved`,
-                    status: 'success',
-                    duration: 5000,
-                });
-            } else {
+            if(!res) {
                 toast({
                     title: `An unexpected error occured`,
                     description: "Please try again or ask for help",
@@ -149,7 +158,6 @@ const ScenarioStudio = () => {
         }
     };
 
-    // TODO create a scenario_template_service and store all the api call logic in methods
     const saveScenarioTemplateApiCall = async (scenarioId) => {
         if (!scenarioId) {
             // Save new scenario
@@ -166,7 +174,7 @@ const ScenarioStudio = () => {
 
             const response = await res.json()
             setCurrentTemplateId(response.data.id)
-            setIsSaved(true)
+            setEditorListState(editorListStates.SAVED)
             return response.data.id
 
         } else {
@@ -181,7 +189,7 @@ const ScenarioStudio = () => {
                 },
                 body: stringify(editorList)
             })
-            setIsSaved(true)
+            setEditorListState(editorListStates.SAVED)
             return scenarioId
         }
     };
@@ -492,6 +500,7 @@ const ScenarioStudio = () => {
             const fetchedScenarioTemplate = await res.json();
             const scenario = loadIcons(fetchedScenarioTemplate.data.scenario)
             updateEditorList(scenario)
+            setSavedEditorList(scenario)
         } catch (e) {
             toast({
                 title: `Could not load selected scenario template. Please try again.`,
@@ -641,7 +650,6 @@ const ScenarioStudio = () => {
             return allErrors
         }
     }
-
     // If item is selected, switch to inspector tab
     useEffect(() => {
         if (selectedObject) {
@@ -655,6 +663,19 @@ const ScenarioStudio = () => {
         console.log(editorList)
         console.log("SO", selectedObject)
     }, [editorList, selectedObject])
+
+    useEffect(() => {
+        if (editorList.length === 0) {
+            setEditorListState(editorListStates.UNCHANGED)
+        }
+        else {
+            if(editorListIsSaved) {
+                setEditorListState(editorListStates.SAVED)
+            } else {
+                setEditorListState(editorListStates.MODIFIED)
+            }
+        }
+    }, [editorList, editorListIsSaved])
 
     useEffect(() => {
         if(validationEnabled) {
@@ -675,6 +696,10 @@ const ScenarioStudio = () => {
     useEffect(() => {
         console.log("selected", selectedTemplateId)
     }, [selectedTemplateId])
+
+    useEffect(() => {
+        console.log("editorListState", editorListState)
+    }, [editorListState])
 
     return (
         <>
@@ -752,6 +777,19 @@ const ScenarioStudio = () => {
                 <HStack justifyContent="space-between" mr={3}>
                     <Heading>Scenario Studio</Heading>
                     <HStack gap={2}>
+                        { editorListState === editorListStates.UNCHANGED ? <></> :
+                            editorListState === editorListStates.SAVED ?
+                            <Tag size="md" variant="subtle" colorScheme='green'>
+                                <TagLeftIcon boxSize='12px' as={HiOutlineCheck} />
+                                <TagLabel>Saved</TagLabel>
+                            </Tag> :
+                             editorListState === editorListStates.MODIFIED ?
+                            <Tag size="md" variant="subtle" colorScheme='red'>
+                                <TagLeftIcon boxSize='12px' as={HiOutlineX} />
+                                <TagLabel>Unsaved</TagLabel>
+                            </Tag>
+                            : <></>
+                        }
                         <Button variant="outline"
                                 colorScheme="blue"
                                 onClick={() => {
