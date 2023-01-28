@@ -67,6 +67,7 @@ export const finalComponentList = [
         id: uuidv4(),
         type: "FRAGMENT",
         title: "Simulation Fragment",
+        text: "",
         content: "Control the simulation by defining fragments.",
         icon: MdTimeline,
         displayName: `Simulation`,
