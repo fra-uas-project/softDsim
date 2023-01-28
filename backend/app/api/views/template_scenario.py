@@ -234,6 +234,9 @@ class StudioTemplateScenarioView(APIView):
             if "clone" in request.query_params:
                 template_scenario = collection.find_one({"_id": ObjectId(request.query_params.get("clone"))})
 
+                scenario = next(component for component in template_scenario["scenario"] if component["type"] == "BASE")
+                scenario["template_name"] = f"{scenario['template_name']} (1)"
+
                 template_scenario_dto = dict(scenario=template_scenario["scenario"])
                 template_scenario_result = collection.insert_one(template_scenario_dto)
                 duplicate_template_scenario_id = template_scenario_result.inserted_id
