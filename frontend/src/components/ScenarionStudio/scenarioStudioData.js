@@ -220,3 +220,9 @@ export const editorListStates = {
     MODIFIED: "modified",
     SAVED: "saved"
 }
+
+export const editorListHistoryStates = {
+    UNDO_REDO: "undo_redo",
+    RESET: "reset",
+    LOG_HIST: "log_hist"
+}

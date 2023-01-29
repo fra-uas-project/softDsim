@@ -39,7 +39,7 @@ import {
     VStack
 } from "@chakra-ui/react";
 import {HiChevronRight, HiOutlineCheck, HiOutlineTrash, HiOutlineX} from "react-icons/hi";
-import {RiDragDropLine} from "react-icons/ri";
+import {RiDragDropLine, RiArrowGoBackLine, RiArrowGoForwardLine} from "react-icons/ri";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import React, {useEffect, useRef, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
@@ -57,7 +57,8 @@ import ModelSelectionInspectorForm from "../components/ScenarionStudio/Inspector
 import {getCookie, iconMap} from "../utils/utils";
 import {
     actionEnum,
-    componentEnum, editorListStates,
+    componentEnum, editorListHistoryStates,
+    editorListStates,
     finalActionList,
     finalComponentList,
     finalQuestionList,
@@ -68,7 +69,7 @@ import {useImmer} from "use-immer";
 import ScenarioStudioAlert from "../components/ScenarionStudio/ScenarioStudioAlert";
 import {editorListSchema, validationErrorTypes} from "../components/ScenarionStudio/scenarioValidation";
 import ValidationTab from "../components/ScenarionStudio/ValidationTab/ValidationTab";
-import {usePrompt} from "../utils/customHooks";
+import {useDidMountEffect, usePrompt} from "../utils/customHooks";
 
 const ScenarioStudio = () => {
     const toast = useToast();
@@ -77,6 +78,15 @@ const ScenarioStudio = () => {
     const [editorList, updateEditorList] = useImmer([]);
     const [savedEditorList, setSavedEditorList] = useState(editorList);
     const [editorListState, setEditorListState] = useState(editorListStates.UNCHANGED)
+
+    const [editorListHistory, setEditorListHistory] = useState({
+            past: [],
+            current: editorList,
+            future: []
+        }
+    )
+
+    const [isUndoRedo, setIsUndoRedo] = useState(editorListHistoryStates.LOG_HIST);
 
     const [selectedObjectId, setSelectedObjectId] = useState(null);
     const [selectedTemplateId, setSelectedTemplateId] = useState(""); // selected template in modals to load and delete template
@@ -96,9 +106,37 @@ const ScenarioStudio = () => {
 
     const cancelRef = useRef();
 
-    const editorListIsSaved = editorList === savedEditorList
+    const editorListIsSaved = editorList === savedEditorList;
 
     usePrompt( 'You have unsaved changes. Do you really want to leave the Scenario Studio?', editorListState === editorListStates.MODIFIED );
+
+    const undo = () => {
+        setEditorListHistory(prevEditorListHistory => {
+            setIsUndoRedo(editorListHistoryStates.UNDO_REDO)
+            const {past, current, future} = prevEditorListHistory;
+            const previous = past[past.length - 1]
+            updateEditorList(previous)
+            return {
+                past: past.slice(0, past.length - 1),
+                current: previous,
+                future: [current, ...future]
+            }
+        })
+    }
+
+    const redo = () => {
+        setEditorListHistory(prevEditorListHistory => {
+            setIsUndoRedo(editorListHistoryStates.UNDO_REDO)
+            const {past, current, future} = prevEditorListHistory;
+            const next = future[0]
+            updateEditorList(next)
+            return {
+                past: [...past, current],
+                current: next,
+                future: future.slice(1)
+            }
+        })
+    }
 
     const selectComponent = (id) => {
         const component = editorList.find(component => component.id === id)
@@ -460,6 +498,7 @@ const ScenarioStudio = () => {
 
     const handleEditorBackgroundClick = (e) => {
         // Deactivated because when dropping action in different list it switched to components tab
+        // console.log("e", e)
         // if (e.target.getAttribute("elementid") === "backgroundList") {
         //     setTabIndex(tabIndexEnum.COMPONENTS)
         //     setSelectedObjectId(null)
@@ -500,6 +539,7 @@ const ScenarioStudio = () => {
             })
             const fetchedScenarioTemplate = await res.json();
             const scenario = loadIcons(fetchedScenarioTemplate.data.scenario)
+            setIsUndoRedo(editorListHistoryStates.RESET)
             updateEditorList(scenario)
             setSavedEditorList(scenario)
             onClose()
@@ -598,6 +638,7 @@ const ScenarioStudio = () => {
     };
 
     const resetScenarioStudio = () => {
+        setIsUndoRedo(editorListHistoryStates.RESET)
         updateEditorList([]);
         setSavedEditorList([]);
         setCurrentTemplateId("");
@@ -694,6 +735,37 @@ const ScenarioStudio = () => {
             setValidationErrors([])
         }
     }, [validationEnabled])
+
+    useDidMountEffect(() => {
+        if (isUndoRedo === editorListHistoryStates.LOG_HIST) {
+            console.log("log_past: inside")
+            setEditorListHistory(prevEditorListHistory => (
+                {
+                    past: [...prevEditorListHistory.past, prevEditorListHistory.current],
+                    current: editorList,
+                    future: []
+                }
+            ))
+        } else if (isUndoRedo === editorListHistoryStates.RESET) {
+            console.log("log_past: reset")
+            setEditorListHistory({
+                past: [],
+                current: editorList,
+                future: []
+            })
+            setIsUndoRedo(editorListHistoryStates.LOG_HIST)
+        } else {
+            // when UNDO_REDO
+            console.log("log_past: no")
+            setIsUndoRedo(editorListHistoryStates.LOG_HIST)
+        }
+
+    }, [editorList])
+
+
+    useEffect(() => {
+        console.log("editorLHist", editorListHistory)
+    }, [editorListHistory])
 
     useEffect(() => {
         console.log("curr", currentTemplateId)
@@ -794,7 +866,7 @@ const ScenarioStudio = () => {
                         <Heading as="h3" size="md" pr={4}>
                             {editorList.find(component => component.type === componentEnum.BASE) ?
                                 editorList.find(component => component.type === componentEnum.BASE).template_name
-                                : ""}
+                                : "Empty Scenario"}
                         </Heading>
                         {editorListState === editorListStates.UNCHANGED ? <></> :
                             editorListState === editorListStates.SAVED ?
@@ -811,6 +883,22 @@ const ScenarioStudio = () => {
                         }
                     </HStack>
                     <HStack gap={2}>
+                        <IconButton
+                            variant='outline'
+                            colorScheme='blue'
+                            aria-label='Undo'
+                            icon={<RiArrowGoBackLine />}
+                            onClick={undo}
+                            isDisabled={editorListHistory.past.length === 0}
+                        />
+                        <IconButton
+                            variant='outline'
+                            colorScheme='blue'
+                            aria-label='Redo'
+                            icon={<RiArrowGoForwardLine />}
+                            onClick={redo}
+                            isDisabled={editorListHistory.future.length === 0}
+                        />
                         <Button variant="outline"
                                 colorScheme="blue"
                                 onClick={() => {
@@ -858,7 +946,10 @@ const ScenarioStudio = () => {
 
                 <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="73vh" maxH="73vh" h="73vh">
                     <HStack maxH="full" w="full" h="full" pt={2} spacing={5}
-                            onClick={((e) => handleEditorBackgroundClick(e))}>
+                            onClick={
+                        ((e) => handleEditorBackgroundClick(e))
+                                // () => {setSelectedObjectId(null)}
+                    }>
                         <DragDropContext onDragEnd={handleOnDragEnd} >
                             {/*Editor*/}
                             <Flex maxH="full" w="full" h="full" justifyContent="center" alignItems="center" backgroundColor="white"
@@ -988,9 +1079,6 @@ const ScenarioStudio = () => {
                                         <Tab fontWeight="bold" color="gray.400" w="full">Validation</Tab>
                                     </TabList>
 
-                                    {/* h = full height - tab header */}
-                                    {/*<TabPanels minW="350px" h="650px" overflowY="auto">*/}
-                                    {/*<TabPanels overflowY="auto">*/}
                                     <TabPanels maxH="calc(100% - 42px)"  h="calc(100% - 42px)">
 
                                         {/* Inspector Items */}
