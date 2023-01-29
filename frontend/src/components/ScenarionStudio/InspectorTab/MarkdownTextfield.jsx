@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import SimpleMDE from "react-simplemde-editor";
 import {HiOutlineExternalLink} from "react-icons/hi";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback} from "react";
 import styled from "@emotion/styled";
 import "easymde/dist/easymde.min.css";
 
@@ -61,19 +61,14 @@ const mdeOptionsFull = {
 
 const MarkdownTextfield = (props) => {
     const {isOpen, onOpen, onClose} = useDisclosure();
-    const [value, setValue] = useState(props.data.text);
 
     const onChange = useCallback((value) => {
-        setValue(value);
-    }, []);
-
-    useEffect(() => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.data.id)
                 component.text = value;
             })
-    }, [value])
+    }, [props]);
 
     return (
         <>
@@ -89,7 +84,7 @@ const MarkdownTextfield = (props) => {
                     } : undefined}>
                     <MDE
                         options={mdeOptionsLess}
-                        value={value}
+                        value={props.data.text}
                         onChange={onChange}
                     />
                 </Box>
@@ -106,7 +101,7 @@ const MarkdownTextfield = (props) => {
                     <ModalBody>
                         <MDE
                             options={mdeOptionsFull}
-                            value={value}
+                            value={props.data.text}
                             onChange={onChange}
                         />
                     </ModalBody>
