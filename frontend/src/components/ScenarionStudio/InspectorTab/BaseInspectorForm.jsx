@@ -15,24 +15,14 @@ import {
     NumberInputField,
     NumberInputStepper
 } from "@chakra-ui/react";
-import {useState} from "react";
 import MarkdownTextfield from "./MarkdownTextfield";
 import DeleteButton from "./DeleteButton";
 import {getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 
 const BaseInspectorForm = (props) => {
     const formatDays = (val) => val + ` days`
-    const parseDays = (val) => val.replace(/^\days/, '')
-
-    const [templateName, setTemplateName] = useState(props.baseData.template_name);
-    const [duration, setDuration] = useState(props.baseData.duration);
-    const [budget, setBudget] = useState(props.baseData.budget);
-    const [easyTasks, setEasyTasks] = useState(props.baseData.easy_tasks);
-    const [mediumTasks, setMediumTasks] = useState(props.baseData.medium_tasks);
-    const [hardTasks, setHardTasks] = useState(props.baseData.hard_tasks);
 
     const handleTemplateName = (event) => {
-        setTemplateName(event.target.value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.baseData.id)
@@ -41,7 +31,6 @@ const BaseInspectorForm = (props) => {
     };
 
     const handleChangeDuration = (valueString) => {
-        setDuration(parseDays(valueString))
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.baseData.id)
@@ -50,7 +39,7 @@ const BaseInspectorForm = (props) => {
     };
 
     const handleChangeBudget = (value) => {
-        setBudget(value)
+        // setBudget(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.baseData.id)
@@ -59,7 +48,6 @@ const BaseInspectorForm = (props) => {
     };
 
     const handleChangeEasyTasks = (value) => {
-        setEasyTasks(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.baseData.id)
@@ -68,7 +56,6 @@ const BaseInspectorForm = (props) => {
     };
 
     const handleChangeMediumTasks = (value) => {
-        setMediumTasks(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.baseData.id)
@@ -77,7 +64,6 @@ const BaseInspectorForm = (props) => {
     };
 
     const handleChangeHardTasks = (value) => {
-        setHardTasks(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.baseData.id)
@@ -97,7 +83,7 @@ const BaseInspectorForm = (props) => {
 
             <FormControl isInvalid={isError(props.validationErrors, props.baseData.id, "template_name")} >
                 <FormLabel color="gray.400" htmlFor="templateName">Scenario Name</FormLabel>
-                <Input id="templateName" value={templateName} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "template_name")}
+                <Input id="templateName" value={props.baseData.template_name} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "template_name")}
                        onChange={(event) => {handleTemplateName(event)}}/>
                 {isError(props.validationErrors, props.baseData.id, "template_name") ?
                     <FormErrorMessage color={getErrorColor(props.validationErrors, props.baseData.id, "template_name")}>
@@ -126,7 +112,7 @@ const BaseInspectorForm = (props) => {
 
             <FormControl isInvalid={isError(props.validationErrors, props.baseData.id, "budget")} >
                 <FormLabel color="gray.400" htmlFor="budget">Budget</FormLabel>
-                <NumberInput w="full" min={0} id="budget" value={budget} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "budget")}
+                <NumberInput w="full" min={0} id="budget" value={props.baseData.budget} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "budget")}
                              onChange={(value) => handleChangeBudget(value)}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -146,7 +132,7 @@ const BaseInspectorForm = (props) => {
             <FormControl isInvalid={isError(props.validationErrors, props.baseData.id, "duration")} >
                 <FormLabel color="gray.400" htmlFor="duration">Duration</FormLabel>
                 <NumberInput id="duration" w="full" min={0} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "duration")}
-                             onChange={(valueString) => handleChangeDuration(valueString)} value={formatDays(duration)}>
+                             onChange={(valueString) => handleChangeDuration(valueString)} value={formatDays(props.baseData.duration)}>
                     <NumberInputField />
                     <NumberInputStepper>
                         <NumberIncrementStepper />
@@ -164,7 +150,7 @@ const BaseInspectorForm = (props) => {
 
             <FormControl isInvalid={isError(props.validationErrors, props.baseData.id, "easy_tasks")} >
                 <FormLabel color="gray.400" htmlFor="easytasks">Easy Tasks</FormLabel>
-                <NumberInput min={0} w="full" id="easytasks" value={easyTasks} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "easy_tasks")}
+                <NumberInput min={0} w="full" id="easytasks" value={props.baseData.easy_tasks} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "easy_tasks")}
                              onChange={(value) => handleChangeEasyTasks(value)}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -183,7 +169,7 @@ const BaseInspectorForm = (props) => {
 
             <FormControl isInvalid={isError(props.validationErrors,props.baseData.id, "medium_tasks")} >
                 <FormLabel color="gray.400" htmlFor="mediumtasks">Medium Tasks</FormLabel>
-                <NumberInput min={0} w="full" id="mediumtasks" value={mediumTasks} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "medium_tasks")}
+                <NumberInput min={0} w="full" id="mediumtasks" value={props.baseData.medium_tasks} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "medium_tasks")}
                              onChange={(value) => handleChangeMediumTasks(value)}>
                     <NumberInputField />
                     <NumberInputStepper>
@@ -202,7 +188,7 @@ const BaseInspectorForm = (props) => {
 
             <FormControl isInvalid={isError(props.validationErrors, props.baseData.id, "hard_tasks")}>
                 <FormLabel color="gray.400" htmlFor="hardtasks">Hard Tasks</FormLabel>
-                <NumberInput w="full" min={0} id="hardtasks" value={hardTasks} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "hard_tasks")}
+                <NumberInput w="full" min={0} id="hardtasks" value={props.baseData.hard_tasks} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "hard_tasks")}
                              onChange={(value) => handleChangeHardTasks(value)}>
                     <NumberInputField />
                     <NumberInputStepper>
