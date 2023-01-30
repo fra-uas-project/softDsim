@@ -5,13 +5,13 @@ import {
     Editable,
     EditableInput,
     EditablePreview,
-    FormControl, FormErrorMessage,
+    FormControl,
+    FormErrorMessage,
     FormHelperText,
     FormLabel,
     Input,
     VStack
 } from "@chakra-ui/react";
-import {useEffect, useState} from "react";
 import QuestionAnswer from "./QuestionAnswer";
 import {v4 as uuidv4} from 'uuid';
 import {HiOutlinePlus} from "react-icons/hi";
@@ -41,31 +41,27 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
         },
     ]
 
-    const [answers, setAnswers] = useState(questionData?.answers);
-    const [displayName, setDisplayName] = useState(questionData?.displayName);
-    const [questionText, setQuestionText] = useState(questionData?.text);
-
-    const onChangeDisplayName =  (value) => {
-        setDisplayName(value)
-    }
-
-    const onChangeQuestionText =  (event) => {
-        setQuestionText(event.target.value)
-    }
-
-    const onSubmitDisplayName = () => {
+    if (questionData.answers.length === 0) {
         updateEditorList(
             (draft) => {
                 const question = findQuestion(questionData.id, draft)
-                question.displayName = displayName;
+                question.answers = basicAnswers;
             })
     }
 
-    const onSubmitQuestionText = () => {
+    const onChangeDisplayName =  (value) => {
         updateEditorList(
             (draft) => {
                 const question = findQuestion(questionData.id, draft)
-                question.text = questionText;
+                question.displayName = value;
+            })
+    }
+
+    const onChangeQuestionText =  (event) => {
+        updateEditorList(
+            (draft) => {
+                const question = findQuestion(questionData.id, draft)
+                question.text = event.target.value;
             })
     }
 
@@ -87,31 +83,17 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
     };
 
     const removeAnswer = (id) => {
-        const index = answers.findIndex(answer => answer.id === id)
-        const copyAnswers = Array.from(answers)
-        copyAnswers.splice(index, 1)
-        setAnswers(copyAnswers)
-    };
-
-    useEffect(() => {
         updateEditorList(
             (draft) => {
                 const question = findQuestion(questionData.id, draft)
-                question.answers = answers;
+                question.answers = question.answers.filter((answer) => {return answer.id !== id});
             })
-    }, [answers, updateEditorList, questionData.id])
-
-    useEffect(() => {
-        if (answers.length === 0) {
-            setAnswers(basicAnswers)
-        }
-    }, [answers.length])
+    };
 
     return(
         <VStack maxW="300px" mb={3}>
-            <Editable value={displayName} w="full" fontWeight="bold"
+            <Editable value={questionData.displayName} w="full" fontWeight="bold"
                       onChange={(value) => onChangeDisplayName(value)}
-                      onSubmit={onSubmitDisplayName}
             >
                 <EditablePreview
                     w="full"
@@ -128,9 +110,8 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
 
             <FormControl isInvalid={isError(validationErrors, questionData.id, "text")}>
                 <FormLabel htmlFor='question' color="gray.400" fontWeight="semibold">Question</FormLabel>
-                <Input id="question" value={questionText} errorBorderColor={getErrorColor(validationErrors, questionData.id, "text")}
+                <Input id="question" value={questionData.text} errorBorderColor={getErrorColor(validationErrors, questionData.id, "text")}
                        onChange={(value) => onChangeQuestionText(value)}
-                       onBlur={onSubmitQuestionText}
                 />
                 {isError(validationErrors, questionData.id, "text") ?
                     <FormErrorMessage color={getErrorColor(validationErrors, questionData.id, "text")}>
@@ -142,7 +123,7 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
             <FormControl>
                 <FormLabel color="gray.400" fontWeight="semibold" htmlFor="">Answers</FormLabel>
                 {
-                        answers.map((answer, index) => {
+                    questionData.answers.map((answer, index) => {
                             return <QuestionAnswer
                                         key={answer.id}
                                         questionId={questionData.id}
@@ -156,7 +137,7 @@ const QuestionInspectorForm = ({updateEditorList, questionData, setSelectedObjec
                         })
                 }
                 {
-                    answers.length < 6 ?
+                    questionData.answers.length < 6 ?
                         <Button variant='outline' w="full" leftIcon={<HiOutlinePlus />} onClick={addAnswer}>
                             Answer
                         </Button>
