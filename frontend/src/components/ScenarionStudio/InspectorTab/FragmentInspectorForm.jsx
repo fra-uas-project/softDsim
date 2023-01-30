@@ -19,7 +19,7 @@ import {
     Tooltip,
     VStack
 } from "@chakra-ui/react";
-import React, {useState} from "react";
+import React from "react";
 import InspectorItemSelector from "./InspectorItemSelector";
 import MarkdownTextfield from "./MarkdownTextfield";
 import DeleteButton from "./DeleteButton";
@@ -28,26 +28,15 @@ import {HiOutlineQuestionMarkCircle} from "react-icons/hi";
 
 const FragmentInspectorForm = (props) => {
 
-    const [displayName, setDisplayName] = useState(props.fragmentData?.displayName);
-    const [endConditionType, setEndConditionType] = useState(props.fragmentData?.simulation_end?.type);
-    const [endConditionLimit, setEndConditionLimit] = useState(props.fragmentData?.simulation_end?.limit);
-    const [limitType, setLimitType] = useState(props.fragmentData?.simulation_end?.limit_type);
-    const [actions, setActions] = useState(props.fragmentData?.actions);
-
     const onChangeDisplayName =  (value) => {
-        setDisplayName(value)
-    }
-
-    const onSubmitDisplayName = () => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
-                component.displayName = displayName;
+                component.displayName = value;
             })
     }
 
     const onChangeEndConditionType = (event) => {
-        setEndConditionType(event.target.value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
@@ -56,7 +45,6 @@ const FragmentInspectorForm = (props) => {
     }
 
     const onChangeEndConditionLimit = (value) => {
-        setEndConditionLimit(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
@@ -65,7 +53,6 @@ const FragmentInspectorForm = (props) => {
     }
 
     const onChangeLimitType = (event) => {
-        setLimitType(event.target.value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
@@ -74,7 +61,6 @@ const FragmentInspectorForm = (props) => {
     }
 
     const addActions =  (value) => {
-        setActions(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
@@ -84,9 +70,8 @@ const FragmentInspectorForm = (props) => {
 
     return (
         <VStack maxW="300px" alignItems="flex-start" mb={3}>
-            <Editable value={displayName} w="full" fontWeight="bold"
+            <Editable value={props.fragmentData.displayName} w="full" fontWeight="bold"
                       onChange={(value) => onChangeDisplayName(value)}
-                      onSubmit={onSubmitDisplayName}
             >
                 <EditablePreview
                     w="full"
@@ -126,7 +111,7 @@ const FragmentInspectorForm = (props) => {
                             </Box>
                         </Tooltip>
                 </HStack>
-                <Select placeholder='Select condition' value={endConditionType}
+                <Select placeholder='Select condition' value={props.fragmentData.simulation_end.type}
                         onChange={(event) => onChangeEndConditionType(event)}
                         errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "endCondition")}>
                     <option value='budget'>Budget</option>
@@ -139,17 +124,17 @@ const FragmentInspectorForm = (props) => {
                 <Box h={3}/>
 
                 <HStack>
-                    <Select w={20} placeholder="?" value={limitType} onChange={(event) => onChangeLimitType(event)}
+                    <Select w={20} placeholder="?" value={props.fragmentData?.simulation_end.limit_type} onChange={(event) => onChangeLimitType(event)}
                             errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "endCondition")}>
                         <option value='ge'>{">="}</option>
                         <option value='le'>{"<="}</option>
                     </Select>
                 <NumberInput
                     min={0}
-                    step={(endConditionType === "motivation" || endConditionType === "stress") ? 0.01 : 1}
-                    max={(endConditionType === "motivation" || endConditionType === "stress") ? 1 : Infinity}
+                    step={(props.fragmentData.simulation_end.type === "motivation" || props.fragmentData.simulation_end.type === "stress") ? 0.01 : 1}
+                    max={(props.fragmentData.simulation_end.type === "motivation" || props.fragmentData.simulation_end.type === "stress") ? 1 : Infinity}
                     onChange={(value) => onChangeEndConditionLimit(value)}
-                    value={endConditionLimit}>
+                    value={props.fragmentData.simulation_end.limit}>
                     <NumberInputField errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "endCondition")}/>
                     <NumberInputStepper>
                         <NumberIncrementStepper />
