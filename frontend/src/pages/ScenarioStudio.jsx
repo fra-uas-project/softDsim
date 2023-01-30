@@ -817,7 +817,7 @@ const ScenarioStudio = () => {
                                                     colorScheme='blue'
                                                     aria-label='Load scenario'
                                                     onClick={() => {
-                                                        if(editorListIsSaved) {
+                                                        if(editorListIsSaved || editorList.length === 0) {
                                                             loadScenarioTemplate(template.scenarioId)
                                                         } else {
                                                             setSelectedTemplateId(template.scenarioId)
