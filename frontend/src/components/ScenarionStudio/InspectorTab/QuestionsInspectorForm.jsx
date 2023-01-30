@@ -10,30 +10,23 @@ import {
 } from "@chakra-ui/react";
 import MarkdownTextfield from "./MarkdownTextfield";
 import InspectorItemSelector from "./InspectorItemSelector";
-import {useState} from "react";
 import DeleteButton from "./DeleteButton";
 import {getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 
 const QuestionsInspectorForm = (props) => {
-    const [displayName, setDisplayName] = useState(props.questionsData.displayName);
 
     const onChangeDisplayName =  (value) => {
-        setDisplayName(value)
-    }
-
-    const onSubmitDisplayName = () => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.questionsData.id)
-                component.displayName = displayName;
+                component.displayName = value;
             })
     }
 
     return (
         <>
-            <Editable value={displayName} w="full" fontWeight="bold"
-                      onChange={(value) => onChangeDisplayName(value)}
-                      onSubmit={onSubmitDisplayName}>
+            <Editable value={props.questionsData.displayName} w="full" fontWeight="bold"
+                      onChange={(value) => onChangeDisplayName(value)}>
                 <EditablePreview
                     w="full"
                     _hover={{
