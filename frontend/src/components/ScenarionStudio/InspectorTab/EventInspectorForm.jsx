@@ -18,43 +18,22 @@ import {
     VStack
 } from "@chakra-ui/react";
 import MarkdownTextfield from "./MarkdownTextfield";
-import {useState} from "react";
 import DeleteButton from "./DeleteButton";
 import {getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
 
 const EventInspectorForm = (props) => {
 
-    const [displayName, setDisplayName] = useState(props.eventData?.displayName);
-    const [endConditionType, setEndConditionType] = useState(props.eventData?.trigger_type);
-    const [endConditionLimit, setEndConditionLimit] = useState(props.eventData?.trigger_value);
-    const [limitType, setLimitType] = useState(props.eventData?.trigger_type);
-
     const formatDays = (val) => val + ` days`
-    const parseDays = (val) => val.replace(/^\days/, '')
-
-    const [duration, setDuration] = useState(props.eventData.duration);
-    const [budget, setBudget] = useState(props.eventData.budget);
-    const [easyTasks, setEasyTasks] = useState(props.eventData.easy_tasks);
-    const [mediumTasks, setMediumTasks] = useState(props.eventData.medium_tasks);
-    const [hardTasks, setHardTasks] = useState(props.eventData.hard_tasks);
-    const [stress, setStress] = useState(props.eventData.stress);
-    const [motivation, setMotivation] = useState(props.eventData.motivation);
-    const [familiarity, setFamiliarity] = useState(props.eventData.familiarity);
 
     const onChangeDisplayName = (value) => {
-        setDisplayName(value)
-    }
-
-    const onSubmitDisplayName = () => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
-                component.displayName = displayName;
+                component.displayName = value;
             })
     }
 
     const onChangeEndConditionType = (event) => {
-        setEndConditionType(event.target.value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -63,7 +42,6 @@ const EventInspectorForm = (props) => {
     }
 
     const onChangeEndConditionLimit = (value) => {
-        setEndConditionLimit(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -72,7 +50,6 @@ const EventInspectorForm = (props) => {
     }
 
     const onChangeLimitType = (event) => {
-        setLimitType(event.target.value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -81,7 +58,6 @@ const EventInspectorForm = (props) => {
     }
 
     const handleChangeDuration = (valueString) => {
-        setDuration(parseDays(valueString))
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -90,7 +66,6 @@ const EventInspectorForm = (props) => {
     };
 
     const handleChangeBudget = (value) => {
-        setBudget(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -99,7 +74,6 @@ const EventInspectorForm = (props) => {
     };
 
     const handleChangeEasyTasks = (value) => {
-        setEasyTasks(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -108,7 +82,6 @@ const EventInspectorForm = (props) => {
     };
 
     const handleChangeMediumTasks = (value) => {
-        setMediumTasks(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -117,7 +90,6 @@ const EventInspectorForm = (props) => {
     };
 
     const handleChangeHardTasks = (value) => {
-        setHardTasks(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -126,7 +98,6 @@ const EventInspectorForm = (props) => {
     };
 
     const handleChangeStress = (value) => {
-        setStress(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -135,7 +106,6 @@ const EventInspectorForm = (props) => {
     };
 
     const handleChangeFamiliarity = (value) => {
-        setFamiliarity(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -144,7 +114,6 @@ const EventInspectorForm = (props) => {
     };
 
     const handleChangeMotivation = (value) => {
-        setMotivation(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.eventData.id)
@@ -154,8 +123,8 @@ const EventInspectorForm = (props) => {
 
     return (
         <VStack maxW="300px" alignItems="flex-start" mb={5}>
-            <Editable value={displayName} w="full" fontWeight="bold" onChange={(value) => onChangeDisplayName(value)}
-                      onSubmit={onSubmitDisplayName}>
+            <Editable value={props.eventData.displayName} w="full" fontWeight="bold"
+                      onChange={(value) => onChangeDisplayName(value)}>
                 <EditablePreview
                     w="full"
                     _hover={{
@@ -186,7 +155,7 @@ const EventInspectorForm = (props) => {
 
             <FormControl isInvalid={isError(props.validationErrors, props.eventData.id, "trigger_type")}>
                 <FormLabel color="gray.400" htmlFor="">Trigger</FormLabel>
-                <Select placeholder='Select condition' value={endConditionType}
+                <Select placeholder='Select condition' value={props.eventData.trigger_type}
                         errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "trigger_type")}
                         onChange={(event) => onChangeEndConditionType(event)}>
                     <option value='budget'>Budget</option>
@@ -206,7 +175,7 @@ const EventInspectorForm = (props) => {
             <HStack alignItems="flex-start">
                 <FormControl isInvalid={isError(props.validationErrors, props.eventData.id, "trigger_comparator")}
                              w="auto">
-                    <Select w={20} placeholder="?" value={limitType} onChange={(event) => onChangeLimitType(event)}
+                    <Select w={20} placeholder="?" value={props.eventData.trigger_comparator} onChange={(event) => onChangeLimitType(event)}
                             errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "trigger_comparator")}>
                         <option value='ge'>{">="}</option>
                         <option value='le'>{"<="}</option>
@@ -222,10 +191,10 @@ const EventInspectorForm = (props) => {
                 <FormControl isInvalid={isError(props.validationErrors, props.eventData.id, "trigger_value")}>
                     <NumberInput
                         min={0}
-                        step={(endConditionType === "motivation" || endConditionType === "stress" || endConditionType === "familiarity") ? 0.01 : 1}
-                        max={(endConditionType === "motivation" || endConditionType === "stress" || endConditionType === "familiarity") ? 1 : Infinity}
+                        step={(props.eventData.trigger_type === "motivation" || props.eventData.trigger_type === "stress" || props.eventData.trigger_type === "familiarity") ? 0.01 : 1}
+                        max={(props.eventData.trigger_type === "motivation" || props.eventData.trigger_type === "stress" || props.eventData.trigger_type === "familiarity") ? 1 : Infinity}
                         onChange={(value) => onChangeEndConditionLimit(value)}
-                        value={endConditionLimit}
+                        value={props.eventData.trigger_value}
                         errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "trigger_value")}>
                         <NumberInputField/>
                         <NumberInputStepper>
@@ -258,7 +227,7 @@ const EventInspectorForm = (props) => {
             </FormControl>
 
             <FormControl isInvalid={isError(props.validationErrors, props.eventData.id, "budget")}>
-                <NumberInput id="budget" value={budget} onChange={(value) => handleChangeBudget(value)}
+                <NumberInput id="budget" value={props.eventData.budget} onChange={(value) => handleChangeBudget(value)}
                              errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "budget")}>
                     <NumberInputField/>
                     <NumberInputStepper>
@@ -278,7 +247,7 @@ const EventInspectorForm = (props) => {
 
             <FormControl isInvalid={isError(props.validationErrors, props.eventData.id, "duration")}>
                 <NumberInput id="duration" onChange={(valueString) => handleChangeDuration(valueString)}
-                             value={formatDays(duration)}
+                             value={formatDays(props.eventData.duration)}
                              errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "duration")}>
                     <NumberInputField/>
                     <NumberInputStepper>
@@ -297,7 +266,7 @@ const EventInspectorForm = (props) => {
             <Box h={3}/>
 
             <FormControl isInvalid={isError(props.validationErrors, props.eventData.id, "easy_tasks")}>
-                <NumberInput id="easytasks" value={easyTasks} onChange={(value) => handleChangeEasyTasks(value)}
+                <NumberInput id="easytasks" value={props.eventData.easy_tasks} onChange={(value) => handleChangeEasyTasks(value)}
                              errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "easy_tasks")}>
                     <NumberInputField/>
                     <NumberInputStepper>
@@ -316,7 +285,7 @@ const EventInspectorForm = (props) => {
             <Box h={3}/>
 
             <FormControl isInvalid={isError(props.validationErrors, props.eventData.id, "medium_tasks")}>
-                <NumberInput id="mediumtasks" value={mediumTasks} onChange={(value) => handleChangeMediumTasks(value)}
+                <NumberInput id="mediumtasks" value={props.eventData.medium_tasks} onChange={(value) => handleChangeMediumTasks(value)}
                              errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "medium_tasks")}>
                     <NumberInputField/>
                     <NumberInputStepper>
@@ -335,7 +304,7 @@ const EventInspectorForm = (props) => {
             <Box h={3}/>
 
             <FormControl isInvalid={isError(props.validationErrors, props.eventData.id, "hard_tasks")}>
-                <NumberInput id="hardtasks" value={hardTasks} onChange={(value) => handleChangeHardTasks(value)}
+                <NumberInput id="hardtasks" value={props.eventData.hard_tasks} onChange={(value) => handleChangeHardTasks(value)}
                              errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "hard_tasks")}>
                     <NumberInputField/>
                     <NumberInputStepper>
@@ -358,7 +327,7 @@ const EventInspectorForm = (props) => {
                     step={0.01}
                     max={1}
                     onChange={(value) => handleChangeStress(value)}
-                    value={stress}
+                    value={props.eventData.stress}
                     errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "stress")}>
                     <NumberInputField/>
                     <NumberInputStepper>
@@ -380,7 +349,7 @@ const EventInspectorForm = (props) => {
                     step={0.01}
                     max={1}
                     onChange={(value) => handleChangeMotivation(value)}
-                    value={motivation}
+                    value={props.eventData.motivation}
                     errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "motivation")}>
                     <NumberInputField/>
                     <NumberInputStepper>
@@ -403,7 +372,7 @@ const EventInspectorForm = (props) => {
                     step={0.01}
                     max={1}
                     onChange={(value) => handleChangeFamiliarity(value)}
-                    value={familiarity}
+                    value={props.eventData.familiarity}
                     errorBorderColor={getErrorColor(props.validationErrors, props.eventData.id, "familiarity")}>
                     <NumberInputField/>
                     <NumberInputStepper>
