@@ -689,7 +689,7 @@ const ScenarioStudio = () => {
         } catch (e) {
             setValidationErrors([])
             const allErrors = e.inner
-            // allErrors.sort((a, b) => a.type.localeCompare(b.type))
+            allErrors.sort((a, b) => a.path.localeCompare(b.path))
 
             console.log(allErrors)
 
@@ -910,14 +910,14 @@ const ScenarioStudio = () => {
                                 }}>
                             Create new
                         </Button>
-                        <Button variant="outline"
-                                colorScheme="blue"
-                                onClick={() => {
-                                    validateScenario(editorList)
-                                }
-                                }>
-                            Test
-                        </Button>
+                        {/*<Button variant="outline"*/}
+                        {/*        colorScheme="blue"*/}
+                        {/*        onClick={() => {*/}
+                        {/*            validateScenario(editorList)*/}
+                        {/*        }*/}
+                        {/*        }>*/}
+                        {/*    Test*/}
+                        {/*</Button>*/}
                         <Button variant="outline"
                                 colorScheme="blue"
                                 onClick={() => {

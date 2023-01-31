@@ -46,7 +46,7 @@ export const editorListSchema = yup.array().of(yup.lazy(component => {
             message: "Simulation Fragment required",
             params: {component: {icon: HiExclamation, displayName: "Scenario"}}
         })
-    } else { {return true} }
+    } else { return true }
 }).test((value, ctx) => {
     const fragments = value.filter(component => component.type === componentEnum.FRAGMENT)
     if (fragments.length > 1) {
@@ -76,7 +76,7 @@ const baseSchema = basicSchema.shape({
     easy_tasks: yup.number().required().test((value, ctx) => { if(value === 0) { return ctx.createError({type: validationErrorTypes.WARNING, message: "It is not recommended to have 0 easy tasks", params: {component: ctx.parent}})} else {return true} }),
     medium_tasks: yup.number().required().test((value, ctx) => { if(value === 0) { return ctx.createError({type: validationErrorTypes.WARNING, message: "It is not recommended to have 0 medium tasks", params: {component: ctx.parent}})} else {return true} }),
     hard_tasks: yup.number().required().test((value, ctx) => { if(value === 0) { return ctx.createError({type: validationErrorTypes.WARNING, message: "It is not recommended to have 0 hard tasks", params: {component: ctx.parent}})} else {return true} }),
-}).test((value, ctx) => { if(value.easy_tasks + value.medium_tasks + value.hard_tasks === 0) {return ctx.createError({type: validationErrorTypes.ERROR, message: "The total number of tasks can't be 0", params: {component: ctx.parent[0]}, path: "empty_tasks"})} else {return true} })
+}).test((value, ctx) => { if(value.easy_tasks + value.medium_tasks + value.hard_tasks === 0) {return ctx.createError({type: validationErrorTypes.ERROR, message: "The total number of tasks can't be 0", params: {component: ctx.parent[0]}, path: `${ctx.path}.empty_tasks`})} else {return true} })
 
 const actionSchema = yup.object().shape({
     // lower_limit: yup.string().test((value, ctx) => { if(value === "0") { return ctx.createError({type: validationErrorTypes.INFO, message: "Change default value of lower limit", params: {component: ctx.parent}})} else {return true} }), // deactivated, because lower limit tip could lead to confusion
@@ -93,7 +93,6 @@ const fragmentSchema = basicSchema.shape({
             return true
         }
     })
-//     TODO endCondition
 })
 
 const modelSelectionSchema = basicSchema.shape({
@@ -139,7 +138,6 @@ const eventSchema = basicSchema.shape({
     motivation: yup.string().test((value, ctx) => { if(value === "0.00") { return ctx.createError({type: validationErrorTypes.WARNING, message: "Motivation of 0 has no impact", params: {component: ctx.parent}})} else {return true} }),
     stress: yup.string().test((value, ctx) => { if(value === "0.00") { return ctx.createError({type: validationErrorTypes.WARNING, message: "Stress of 0 has no impact", params: {component: ctx.parent}})} else {return true} }),
     familiarity: yup.string().test((value, ctx) => { if(value === "0.00") { return ctx.createError({type: validationErrorTypes.WARNING, message: "Familiarity of 0 has no impact", params: {component: ctx.parent}})} else {return true} }),
-//     TODO Event will never be reached, because impact is out of scope of base setting
 }).test((value, ctx) => {
     if(value.budget === "" &&
         value.duration === "" &&
@@ -149,7 +147,7 @@ const eventSchema = basicSchema.shape({
         value.motivation === "" &&
         value.stress === "" &&
         value.familiarity === "" )
-    {return ctx.createError({type: validationErrorTypes.ERROR, message: "Minimum 1 impact required", params: {component: ctx.parent.find(component => component.id === value.id)}, path: "impact"})} else {return true} })
+    {return ctx.createError({type: validationErrorTypes.ERROR, message: "Minimum 1 impact required", params: {component: ctx.parent.find(component => component.id === value.id)}, path: `${ctx.path}.impact`})} else {return true} })
 
 const simulationEndValidation = (fragments, ctx) => {
 
@@ -157,7 +155,8 @@ const simulationEndValidation = (fragments, ctx) => {
         const currentFragment = fragments[i];
 
         if (currentFragment.simulation_end.type === "" || currentFragment.simulation_end.limit_type === "" || currentFragment.simulation_end.limit === "") {
-            return ctx.createError({type: validationErrorTypes.ERROR, message: "End condition required", params: {component: currentFragment}, path: "fragment.endCondition"})
+            const index = fragments.findIndex(fragment => fragment.id === currentFragment.id)
+            return ctx.createError({type: validationErrorTypes.ERROR, message: "End condition required", params: {component: currentFragment}, path: `[${index}].fragment.endCondition`})
         }
     }
     return false
