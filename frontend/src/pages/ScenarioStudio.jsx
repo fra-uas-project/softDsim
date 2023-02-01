@@ -386,6 +386,7 @@ const ScenarioStudio = () => {
                     const fragmentComponent = draft.find(fragmentComponent => fragmentComponent.id === result.destination.droppableId)
                     fragmentComponent.actions.splice(result.destination.index, 0, movedActionCopy)
                 })
+                setSelectedObjectId(movedActionCopy.id)
             }
 
             // Reorder actions in same list
@@ -500,7 +501,6 @@ const ScenarioStudio = () => {
         // Deactivated because when dropping action in different list it switched to components tab
         // console.log("e", e)
         // if (e.target.getAttribute("elementid") === "backgroundList") {
-        //     setTabIndex(tabIndexEnum.COMPONENTS)
         //     setSelectedObjectId(null)
         // }
     };
@@ -738,7 +738,6 @@ const ScenarioStudio = () => {
 
     useDidMountEffect(() => {
         if (isUndoRedo === editorListHistoryStates.LOG_HIST) {
-            console.log("log_past: inside")
             setEditorListHistory(prevEditorListHistory => (
                 {
                     past: [...prevEditorListHistory.past, prevEditorListHistory.current],
@@ -747,7 +746,6 @@ const ScenarioStudio = () => {
                 }
             ))
         } else if (isUndoRedo === editorListHistoryStates.RESET) {
-            console.log("log_past: reset")
             setEditorListHistory({
                 past: [],
                 current: editorList,
@@ -756,32 +754,32 @@ const ScenarioStudio = () => {
             setIsUndoRedo(editorListHistoryStates.LOG_HIST)
         } else {
             // when UNDO_REDO
-            console.log("log_past: no")
             setIsUndoRedo(editorListHistoryStates.LOG_HIST)
         }
 
     }, [editorList])
 
 
-    useEffect(() => {
-        console.log("editorLHist", editorListHistory)
-    }, [editorListHistory])
+    // Following useEffects are used only for debugging
+    // useEffect(() => {
+    //     console.log("editorLHist", editorListHistory)
+    // }, [editorListHistory])
+    //
+    // useEffect(() => {
+    //     console.log("curr", currentTemplateId)
+    // }, [currentTemplateId])
+    //
+    // useEffect(() => {
+    //     console.log("selected", selectedTemplateId)
+    // }, [selectedTemplateId])
 
-    useEffect(() => {
-        console.log("curr", currentTemplateId)
-    }, [currentTemplateId])
+    // useEffect(() => {
+    //     console.log("editorListState", editorListState)
+    // }, [editorListState])
 
-    useEffect(() => {
-        console.log("selected", selectedTemplateId)
-    }, [selectedTemplateId])
-
-    useEffect(() => {
-        console.log("editorListState", editorListState)
-    }, [editorListState])
-
-    useEffect(() => {
-        console.log("editorListIsSaved", editorListIsSaved)
-    }, [editorListIsSaved])
+    // useEffect(() => {
+    //     console.log("editorListIsSaved", editorListIsSaved)
+    // }, [editorListIsSaved])
 
     return (
         <>
@@ -946,9 +944,7 @@ const ScenarioStudio = () => {
 
                 <Box backgroundColor="#EDF2F7" borderRadius="2xl" minH="73vh" maxH="73vh" h="73vh">
                     <HStack maxH="full" w="full" h="full" pt={2} spacing={5}
-                            onClick={
-                        ((e) => handleEditorBackgroundClick(e))
-                                // () => {setSelectedObjectId(null)}
+                            onClick={(e) => {handleEditorBackgroundClick(e)}
                     }>
                         <DragDropContext onDragEnd={handleOnDragEnd} >
                             {/*Editor*/}
