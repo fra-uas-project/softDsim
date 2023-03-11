@@ -733,7 +733,7 @@ const ScenarioStudio = () => {
         if (editorListHistoryState === editorListHistoryStates.LOG_HIST) {
             setEditorListHistory(prevEditorListHistory => (
                 {
-                    past: [...prevEditorListHistory.past, prevEditorListHistory.current],
+                    past: [...prevEditorListHistory.past.slice(-500), prevEditorListHistory.current],
                     current: editorList,
                     future: []
                 }
