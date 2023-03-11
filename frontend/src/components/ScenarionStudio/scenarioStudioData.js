@@ -97,7 +97,6 @@ export const finalComponentList = [
         displayName: `Questions`,
         text: "",
         questions: [],
-
     },
     {
         id: uuidv4(),

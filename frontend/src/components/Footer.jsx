@@ -15,7 +15,7 @@ const Footer = () => {
                     p={5}
                 >
                     <Text textalign="center" textColor="gray.500" fontWeight="bold">
-                        2022 Simplify
+                        2023 SoftDSim
                     </Text>
                 </HStack>
                 <HStack
