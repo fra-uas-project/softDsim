@@ -202,6 +202,7 @@ const ScenarioStudio = () => {
             const response = await res.json()
             setCurrentTemplateId(response.data.id)
             setEditorListState(editorListStates.SAVED)
+            setSavedEditorList(editorList)
             return response.data.id
 
         } else {
