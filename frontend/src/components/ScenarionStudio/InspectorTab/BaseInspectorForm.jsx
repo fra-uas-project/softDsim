@@ -110,14 +110,15 @@ const BaseInspectorForm = (props) => {
 
             <Box h={3}/>
 
-            <FormControl isInvalid={isError(props.validationErrors, props.baseData.id, "budget")} >
+            <FormControl isInvalid={isError(props.validationErrors, props.baseData.id, "budget")}>
                 <FormLabel color="gray.400" htmlFor="budget">Budget</FormLabel>
-                <NumberInput w="full" min={0} id="budget" value={props.baseData.budget} errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "budget")}
+                <NumberInput w="full" min={0} id="budget" value={props.baseData.budget}
+                             errorBorderColor={getErrorColor(props.validationErrors, props.baseData.id, "budget")}
                              onChange={(value) => handleChangeBudget(value)}>
-                    <NumberInputField />
+                    <NumberInputField/>
                     <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
+                        <NumberIncrementStepper/>
+                        <NumberDecrementStepper/>
                     </NumberInputStepper>
                 </NumberInput>
                 {isError(props.validationErrors, props.baseData.id, "budget") ?
