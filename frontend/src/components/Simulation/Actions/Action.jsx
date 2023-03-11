@@ -60,7 +60,7 @@ const Action = (props) => {
                                     // Training
                                     props.action.action === 'training' ?
                                         <ActionElement title="Training" secondaryText="Set training for employees"
-                                            icon={actionIcon.TRAINING} tooltip={"Training is important for motivation and fmailiarity"}>
+                                            icon={actionIcon.TRAINING} tooltip={"Training is important for motivation and familiarity"}>
                                             <Flex w="full">
                                                 <ActionSlider onSlide={(event) => props.onSelectAction({
                                                     type: props.action.action,
