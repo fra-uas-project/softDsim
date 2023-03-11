@@ -60,13 +60,83 @@ export const editorListSchema = yup.array().of(yup.lazy(component => {
 
 // Validating fields which are not the same for all (basic) components
 const basicSchema = yup.object().shape({
-    id: yup.string().required().label(validationErrorTypes.INTERNAL_ERROR),
-    content: yup.string().required().label(validationErrorTypes.INTERNAL_ERROR),
-    displayName: yup.string().required().label(validationErrorTypes.INTERNAL_ERROR),
-    icon: yup.mixed().test(validationErrorTypes.INTERNAL_ERROR, "Icon must be a function", value => {if (typeof value === "function") return true}),
-    title: yup.string().required().label(validationErrorTypes.INTERNAL_ERROR),
-    type: yup.string().required().test(validationErrorTypes.INTERNAL_ERROR, "Invalid component type", value => Object.values(componentEnum).includes(value)),
-    text: yup.string().test((value, ctx) => { if(!value) { return ctx.createError({type: validationErrorTypes.WARNING, message: "It is recommended that the story is not empty", params: {component: ctx.parent}})} else {return true} }),
+    id: yup.string().required().test((value, ctx) => {
+        if (!value) {
+            return ctx.createError({
+                type: validationErrorTypes.INTERNAL_ERROR,
+                message: "Id can't be empty",
+                params: {component: ctx.parent}
+            })
+        } else {
+            return true
+        }
+    }),
+    content: yup.string().required().test((value, ctx) => {
+        if (!value) {
+            return ctx.createError({
+                type: validationErrorTypes.INTERNAL_ERROR,
+                message: "Content can't be empty",
+                params: {component: ctx.parent}
+            })
+        } else {
+            return true
+        }
+    }),
+    displayName: yup.string().required().test((value, ctx) => {
+        if (!value) {
+            return ctx.createError({
+                type: validationErrorTypes.INTERNAL_ERROR,
+                message: "Display name can't be empty",
+                params: {component: ctx.parent}
+            })
+        } else {
+            return true
+        }
+    }),
+    icon: yup.mixed().test((value, ctx) => {
+        if (typeof value !== "function") {
+            return ctx.createError({
+                type: validationErrorTypes.INTERNAL_ERROR,
+                message: "Icon must be of type function",
+                params: {component: ctx.parent}
+            })
+        } else {
+            return true
+        }
+    }),
+    title: yup.string().required().test((value, ctx) => {
+        if (!value) {
+            return ctx.createError({
+                type: validationErrorTypes.INTERNAL_ERROR,
+                message: "Title can't be empty",
+                params: {component: ctx.parent}
+            })
+        } else {
+            return true
+        }
+    }),
+    type: yup.string().required().test((value, ctx) => {
+        if (!Object.values(componentEnum).includes(value)) {
+            return ctx.createError({
+                type: validationErrorTypes.INTERNAL_ERROR,
+                message: "Invalid component type",
+                params: {component: ctx.parent}
+            })
+        } else {
+            return true
+        }
+    }),
+    text: yup.string().test((value, ctx) => {
+        if (!value) {
+            return ctx.createError({
+                type: validationErrorTypes.WARNING,
+                message: "It is recommended that the story is not empty",
+                params: {component: ctx.parent}
+            })
+        } else {
+            return true
+        }
+    }),
 })
 
 const baseSchema = basicSchema.shape({
