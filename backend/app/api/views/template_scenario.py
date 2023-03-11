@@ -152,7 +152,6 @@ class StudioTemplateScenarioView(APIView):
 
             if scenario_id:
                 try:
-
                     scenario_template = collection.find_one({"_id": ObjectId(scenario_id)})
 
                     return Response(
@@ -171,10 +170,7 @@ class StudioTemplateScenarioView(APIView):
                 all_scenario_templates = [dict(id=str(document["_id"]), scenario=document["scenario"])
                                           for document in collection.find({})]
 
-                return Response(
-                    dict(status="success", data=all_scenario_templates),
-                    status=status.HTTP_200_OK
-                )
+                return Response(dict(status="success", data=all_scenario_templates), status=status.HTTP_200_OK)
         except:
             return Response(dict(status="error", data="An error occurred while fetching all template scenarios"),
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -279,15 +275,11 @@ class StudioTemplateScenarioView(APIView):
 
                 response = collection.delete_one({"_id": ObjectId(scenario_id)})
 
-                if response.acknowledged and response.deleted_count == 0:
-                    return Response(
-                        dict(status="error", data=f"No template scenario found for <scenario_id> '{scenario_id}'")
-                    )
-
-                if not response.acknowledged:
+                if response.deleted_count == 0:
                     return Response(
                         dict(status="error",
-                             data=f"Template scenario for <scenario_id> '{scenario_id}' could not be deleted")
+                             data=f"Scenario for <scenario_id> '{scenario_id}' could not be found"),
+                        status=status.HTTP_404_NOT_FOUND
                     )
 
                 return Response(
@@ -297,12 +289,13 @@ class StudioTemplateScenarioView(APIView):
             else:
                 return Response(
                     dict(status="error", data="Please specify a <scenario_id> as path parameter"),
-                    status=status.HTTP_405_METHOD_NOT_ALLOWED
+                    status=status.HTTP_400_BAD_REQUEST
                 )
         except:
-            return Response(dict(status="error", data="An error occurred while fetching all template scenarios"),
+            return Response(
+                dict(status="error", data="An error occurred while fetching all scenarios"),
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                            )
+                )
 
 
 class TemplateScenarioFromStudioView(APIView):
