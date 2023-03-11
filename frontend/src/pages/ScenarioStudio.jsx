@@ -39,6 +39,7 @@ import {RiArrowGoBackLine, RiArrowGoForwardLine} from "react-icons/ri";
 import {DragDropContext} from "react-beautiful-dnd";
 import React, {useEffect, useRef, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
+import _ from "lodash";
 import ComponentTab from "../components/ScenarionStudio/ComponentTab/ComponentTab";
 import {getCookie, iconMap} from "../utils/utils";
 import {
@@ -93,7 +94,7 @@ const ScenarioStudio = () => {
 
     const cancelRef = useRef();
 
-    const editorListIsSaved = editorList === savedEditorList;
+    const editorListIsSaved = _.isEqual(editorList, savedEditorList);
 
     usePrompt( 'You have unsaved changes. Do you really want to leave the Scenario Studio?', editorListState === editorListStates.MODIFIED );
 
@@ -768,9 +769,9 @@ const ScenarioStudio = () => {
     //     console.log("editorListState", editorListState)
     // }, [editorListState])
 
-    // useEffect(() => {
-    //     console.log("editorListIsSaved", editorListIsSaved)
-    // }, [editorListIsSaved])
+    useEffect(() => {
+        console.log("editorListIsSaved", editorListIsSaved)
+    }, [editorListIsSaved])
 
     return (
         <>
