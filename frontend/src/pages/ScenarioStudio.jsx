@@ -892,7 +892,13 @@ const ScenarioStudio = () => {
                                 colorScheme="blue"
                                 onClick={() => {
                                     if (editorList.length === 0) {
-
+                                        toast({
+                                            title: `Scenario is already set up and can be edited`,
+                                            status: 'info',
+                                            duration: 3000,
+                                        });
+                                    } else if(editorListState === editorListStates.SAVED) {
+                                        resetScenarioStudio()
                                     } else {
                                         onCreateOpen()
                                     }
@@ -1005,7 +1011,7 @@ const ScenarioStudio = () => {
                 cancelRef={cancelRef}
                 onClose={onCreateClose}
                 title="Create new scenario"
-                text="All changes are discarded if you haven't saved your scenario.
+                text="All unsaved changes are discarded.
                             Are you sure that you want to continue? You can't undo this action afterwards."
                 onCancel={onCreateClose}
                 continueButtonColor="blue"
