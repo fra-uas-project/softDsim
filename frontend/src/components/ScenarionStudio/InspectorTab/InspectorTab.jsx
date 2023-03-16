@@ -22,7 +22,7 @@ const InspectorTab = ({selectedObject, updateEditorList, setSelectedObjectId, va
                             baseData={selectedObject}
                             updateEditorList={updateEditorList}
                             setSelectedObject={setSelectedObjectId}
-                            validationErrors={validationErrors.filter(error => error.params.component.type === componentEnum.BASE)}
+                            validationErrors={validationErrors.filter(error => error.params?.component?.type === componentEnum.BASE)}
                         />
                     }
 
@@ -33,7 +33,7 @@ const InspectorTab = ({selectedObject, updateEditorList, setSelectedObjectId, va
                             questionsData={selectedObject}
                             updateEditorList={updateEditorList}
                             setSelectedObject={setSelectedObjectId}
-                            validationErrors={validationErrors.filter(error => error.params.component.type === componentEnum.QUESTIONS)}
+                            validationErrors={validationErrors.filter(error => error.params?.component?.type === componentEnum.QUESTIONS)}
                         />
                     }
 
@@ -44,7 +44,7 @@ const InspectorTab = ({selectedObject, updateEditorList, setSelectedObjectId, va
                             fragmentData={selectedObject}
                             updateEditorList={updateEditorList}
                             setSelectedObject={setSelectedObjectId}
-                            validationErrors={validationErrors.filter(error => error.params.component.type === componentEnum.FRAGMENT)}
+                            validationErrors={validationErrors.filter(error => error.params?.component?.type === componentEnum.FRAGMENT)}
                         />
                     }
 
