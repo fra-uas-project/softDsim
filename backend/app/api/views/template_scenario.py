@@ -422,7 +422,7 @@ def handle_base(data, scenario: TemplateScenario, i):
 
 
 def handle_question(data, scenario: TemplateScenario, i):
-    qc = QuestionCollection(index=i, template_scenario=scenario)
+    qc = QuestionCollection(index=i, template_scenario=scenario, text=data["text"])
     qc.save()
     qi = 0
     for question_data in data.get("questions", []):
