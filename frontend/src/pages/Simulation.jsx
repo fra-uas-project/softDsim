@@ -257,6 +257,14 @@ const Simulation = () => {
         }
     }
 
+    const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array
+    }
+
     async function handleNext(simID) {
         setNextIsLoading(true)
         setDataValidationStatus(false)
@@ -294,6 +302,11 @@ const Simulation = () => {
             // set data
             if (nextData.type === 'QUESTION') {
                 console.log("Questionsssss")
+                console.log(nextData)
+                for (const question of nextData.question_collection.questions) {
+                    question.answers = shuffleArray(question.answers)
+                }
+                console.log("------")
                 console.log(nextData)
                 setSimValues(nextData)
                 setDataValidationStatus(true)
