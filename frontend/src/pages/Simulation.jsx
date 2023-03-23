@@ -293,6 +293,8 @@ const Simulation = () => {
             setCurrentType(nextData.type)
             // set data
             if (nextData.type === 'QUESTION') {
+                console.log("Questionsssss")
+                console.log(nextData)
                 setSimValues(nextData)
                 setDataValidationStatus(true)
             } else if (nextData.type === 'MODEL') {
@@ -410,7 +412,7 @@ const Simulation = () => {
         // open story only if there is a story and if it is not the same story as before
         if (simValues.text && simValues.text !== simValuesBefore.text) {
             onStoryOpen();
-            setStory(story + "\n---\n" + simValues.text)
+            setStory(story + "\n\n---\n\n" + simValues.text)
         }
 
     }, [simValues])
