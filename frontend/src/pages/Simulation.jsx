@@ -257,6 +257,14 @@ const Simulation = () => {
         }
     }
 
+    const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array
+    }
+
     async function handleNext(simID) {
         setNextIsLoading(true)
         setDataValidationStatus(false)
@@ -293,6 +301,13 @@ const Simulation = () => {
             setCurrentType(nextData.type)
             // set data
             if (nextData.type === 'QUESTION') {
+                console.log("Questionsssss")
+                console.log(nextData)
+                for (const question of nextData.question_collection.questions) {
+                    question.answers = shuffleArray(question.answers)
+                }
+                console.log("------")
+                console.log(nextData)
                 setSimValues(nextData)
                 setDataValidationStatus(true)
             } else if (nextData.type === 'MODEL') {
@@ -410,7 +425,7 @@ const Simulation = () => {
         // open story only if there is a story and if it is not the same story as before
         if (simValues.text && simValues.text !== simValuesBefore.text) {
             onStoryOpen();
-            setStory(story + "\n---\n" + simValues.text)
+            setStory(story + "\n\n---\n\n" + simValues.text)
         }
 
     }, [simValues])

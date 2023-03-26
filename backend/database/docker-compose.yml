@@ -1,8 +1,7 @@
-# THIS IS NOT A PRODUCTION ENVIRONMENT
 version: '3.9'
 
 services:
-   db:
+  application_db:
     image: mariadb
     restart: always
     ports:
@@ -14,3 +13,11 @@ services:
       - MYSQL_PASSWORD=demo
       - MYSQL_USER=demo
       - MYSQL_DATABASE=sim
+
+  template_db:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=demo
+      - MONGO_INITDB_ROOT_PASSWORD=demo

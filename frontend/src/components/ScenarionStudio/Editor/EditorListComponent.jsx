@@ -4,6 +4,7 @@ import {Draggable, Droppable} from "react-beautiful-dnd";
 import EditorSubListComponent from "./EditorSubListComponent";
 import {HiOutlineChevronDown, HiOutlineChevronLeft} from "react-icons/hi";
 import {useState} from "react";
+import {scrollToMarginTopValue} from "../scenarioStudioData";
 
 const EditorListComponent = (props) => {
 
@@ -22,15 +23,16 @@ const EditorListComponent = (props) => {
                 >
                     <VStack>
                         <HStack
-                                justifyContent="space-around" onMouseDown={props.onClick}
-                                elementid={props.id}
-                                backgroundColor="white" p={3}
-                                boxShadow={props.isSelected ? "0 0 0 3px rgba(66, 153, 225, 0.6)" : ""}
-                                borderRadius="lg"
-
+                            justifyContent="space-around" onMouseDown={props.onClick}
+                            elementid={props.id}
+                            backgroundColor="white" p={3}
+                            boxShadow={props.isSelected ? "0 0 0 3px rgba(66, 153, 225, 0.6)" : ""}
+                            borderRadius="lg"
+                            scrollMarginTop={scrollToMarginTopValue}
                         >
-                            <Flex w={20} h={20} backgroundColor="gray.200" justifyContent="center" alignItems="center" borderRadius="xl">
-                                <Icon w={10} h={10} as={props.component.icon} color="gray.500" />
+                            <Flex w={20} h={20} backgroundColor="gray.200" justifyContent="center" alignItems="center"
+                                  borderRadius="xl">
+                                <Icon w={10} h={10} as={props.component.icon} color="gray.500"/>
                             </Flex>
                             <VStack w="200px"
                                     alignItems="flex-start"
@@ -39,9 +41,10 @@ const EditorListComponent = (props) => {
                             >
                                 <Heading size="sm">{props.component.displayName}</Heading>
                                 <HStack>
-                                <Text fontSize="sm" fontWeight="500" color="gray.400">{props.component.title}</Text>
+                                    <Text fontSize="sm" fontWeight="500" color="gray.400">{props.component.title}</Text>
                                     <IconButton aria-label="Expand and collapse actions"
-                                                icon={actionListExpanded ? <HiOutlineChevronDown/> : <HiOutlineChevronLeft/>}
+                                                icon={actionListExpanded ? <HiOutlineChevronDown/> :
+                                                    <HiOutlineChevronLeft/>}
                                                 variant="ghost"
                                                 size="xs"
                                                 onClick={toggleActionList}
@@ -82,7 +85,6 @@ const EditorListComponent = (props) => {
                                                 />
                                             )
                                         })}
-                                    }
                                     {provided.placeholder}
                                 </UnorderedList>
                             )}

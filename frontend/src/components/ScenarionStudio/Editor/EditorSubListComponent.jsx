@@ -1,6 +1,7 @@
 import {Box, Flex, Heading, HStack, Icon, ListItem, Text, VStack} from "@chakra-ui/react";
 import {MdDragIndicator} from "react-icons/md";
 import {Draggable} from "react-beautiful-dnd";
+import {scrollToMarginTopValue} from "../scenarioStudioData";
 
 const EditorSubListComponent = (props) => {
 
@@ -17,6 +18,7 @@ const EditorSubListComponent = (props) => {
                         elementid={props.id}
                         backgroundColor="white" p={3} borderRadius="lg"
                         boxShadow={props.isSelected ? "0 0 0 3px rgba(66, 153, 225, 0.6)" : ""}
+                        scrollMarginTop={scrollToMarginTopValue}
                     >
                         <Flex w={14} h={14} backgroundColor="gray.200" justifyContent="center" alignItems="center" borderRadius="xl">
                             <Icon w={6} h={6} as={props.question.icon} color="gray.500" />

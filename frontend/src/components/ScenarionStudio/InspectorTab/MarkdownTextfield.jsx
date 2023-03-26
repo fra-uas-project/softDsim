@@ -1,4 +1,5 @@
 import {
+    Box,
     Button,
     FormControl,
     FormHelperText,
@@ -14,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import SimpleMDE from "react-simplemde-editor";
 import {HiOutlineExternalLink} from "react-icons/hi";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback} from "react";
 import styled from "@emotion/styled";
 import "easymde/dist/easymde.min.css";
 
@@ -60,29 +61,33 @@ const mdeOptionsFull = {
 
 const MarkdownTextfield = (props) => {
     const {isOpen, onOpen, onClose} = useDisclosure();
-    const [value, setValue] = useState(props.data.text);
 
     const onChange = useCallback((value) => {
-        setValue(value);
-    }, []);
-
-    useEffect(() => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.data.id)
                 component.text = value;
             })
-    }, [value])
+    }, [props]);
 
     return (
         <>
             <FormControl w="300px">
                 <FormLabel htmlFor='text' color="gray.400" fontWeight="semibold">Story</FormLabel>
-                <MDE
-                    options={mdeOptionsLess}
-                    value={value}
-                    onChange={onChange}
-                />
+                <Box sx={props.errorBorderColor ?
+                    {
+                        ".EasyMDEContainer .CodeMirror":
+                            {
+                                borderColor: `${props.errorBorderColor}`,
+                                boxShadow: `0 0 0 1px var(--chakra-colors-${props.errorBorderColor.split(".")[0]}-${props.errorBorderColor.split(".")[1]})` // Changing format of color so that it is valid
+                            }
+                    } : undefined}>
+                    <MDE
+                        options={mdeOptionsLess}
+                        value={props.data.text}
+                        onChange={onChange}
+                    />
+                </Box>
                 <FormHelperText mt="-20px" mr="5px" display="flex" justifyContent="flex-end">
                     <IconButton icon={<HiOutlineExternalLink />} size="2xs" transform="scaleX(-1)" onClick={onOpen} aria-label="Open editor"/>
                 </FormHelperText>
@@ -96,7 +101,7 @@ const MarkdownTextfield = (props) => {
                     <ModalBody>
                         <MDE
                             options={mdeOptionsFull}
-                            value={value}
+                            value={props.data.text}
                             onChange={onChange}
                         />
                     </ModalBody>

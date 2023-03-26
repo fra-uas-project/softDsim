@@ -5,44 +5,38 @@ import {
     EditableInput,
     EditablePreview,
     FormControl,
+    FormErrorMessage,
     FormHelperText,
     FormLabel,
     HStack,
+    Icon,
     NumberDecrementStepper,
     NumberIncrementStepper,
     NumberInput,
     NumberInputField,
     NumberInputStepper,
     Select,
+    Tooltip,
     VStack
 } from "@chakra-ui/react";
-import {useState} from "react";
+import React from "react";
 import InspectorItemSelector from "./InspectorItemSelector";
 import MarkdownTextfield from "./MarkdownTextfield";
 import DeleteButton from "./DeleteButton";
+import {getErrorColor, getErrorMessage, isError} from "../../../utils/utils";
+import {HiOutlineQuestionMarkCircle} from "react-icons/hi";
 
 const FragmentInspectorForm = (props) => {
 
-    const [displayName, setDisplayName] = useState(props.fragmentData?.displayName);
-    const [endConditionType, setEndConditionType] = useState(props.fragmentData?.simulation_end?.type);
-    const [endConditionLimit, setEndConditionLimit] = useState(props.fragmentData?.simulation_end?.limit);
-    const [limitType, setLimitType] = useState(props.fragmentData?.simulation_end?.limit_type);
-    const [actions, setActions] = useState(props.fragmentData?.actions);
-
     const onChangeDisplayName =  (value) => {
-        setDisplayName(value)
-    }
-
-    const onSubmitDisplayName = () => {
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
-                component.displayName = displayName;
+                component.displayName = value;
             })
     }
 
     const onChangeEndConditionType = (event) => {
-        setEndConditionType(event.target.value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
@@ -51,7 +45,6 @@ const FragmentInspectorForm = (props) => {
     }
 
     const onChangeEndConditionLimit = (value) => {
-        setEndConditionLimit(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
@@ -60,7 +53,6 @@ const FragmentInspectorForm = (props) => {
     }
 
     const onChangeLimitType = (event) => {
-        setLimitType(event.target.value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
@@ -69,7 +61,6 @@ const FragmentInspectorForm = (props) => {
     }
 
     const addActions =  (value) => {
-        setActions(value)
         props.updateEditorList(
             (draft) => {
                 const component = draft.find((component) => component.id === props.fragmentData.id)
@@ -79,9 +70,8 @@ const FragmentInspectorForm = (props) => {
 
     return (
         <VStack maxW="300px" alignItems="flex-start" mb={3}>
-            <Editable value={displayName} w="full" fontWeight="bold"
+            <Editable value={props.fragmentData.displayName} w="full" fontWeight="bold"
                       onChange={(value) => onChangeDisplayName(value)}
-                      onSubmit={onSubmitDisplayName}
             >
                 <EditablePreview
                     w="full"
@@ -93,15 +83,37 @@ const FragmentInspectorForm = (props) => {
                 <EditableInput/>
             </Editable>
             <Divider />
+
             <Box h={3}/>
-            <MarkdownTextfield
-                data={props.fragmentData}
-                updateEditorList={props.updateEditorList}
-            />
+
+            <FormControl isInvalid={isError(props.validationErrors, props.fragmentData.id, "text")}>
+                <MarkdownTextfield
+                    data={props.fragmentData}
+                    updateEditorList={props.updateEditorList}
+                    errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "text")}
+                />
+                {isError(props.validationErrors, props.fragmentData.id, "text") ?
+                    <FormErrorMessage mt={4} color={getErrorColor(props.validationErrors, props.fragmentData.id, "text")}>
+                        {getErrorMessage(props.validationErrors, props.fragmentData.id, "text")}
+                    </FormErrorMessage>
+                    : <FormHelperText></FormHelperText>}
+            </FormControl>
+
             <Box h={3}/>
-            <FormControl>
-                <FormLabel color="gray.400" htmlFor="">End Condition</FormLabel>
-                <Select placeholder='Select condition' value={endConditionType} onChange={(event) => onChangeEndConditionType(event)}>
+
+            <FormControl isInvalid={isError(props.validationErrors, props.fragmentData.id, "endCondition")}>
+                <HStack alignItems="flex-start">
+                    <FormLabel color="gray.400" htmlFor="" mr={0}>End Condition</FormLabel>
+
+                        <Tooltip label="It is necessary to define an end condition for each Simulation Fragment, expect the last fragment if multiple fragments are present." placement="top">
+                            <Box>
+                            <Icon w={5} h={5} as={HiOutlineQuestionMarkCircle} color="gray.400" cursor="pointer" />
+                            </Box>
+                        </Tooltip>
+                </HStack>
+                <Select placeholder='Select condition' value={props.fragmentData.simulation_end.type}
+                        onChange={(event) => onChangeEndConditionType(event)}
+                        errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "endCondition")}>
                     <option value='budget'>Budget</option>
                     <option value='duration'>Duration</option>
                     <option value='tasks_done'>Tasks done</option>
@@ -112,18 +124,18 @@ const FragmentInspectorForm = (props) => {
                 <Box h={3}/>
 
                 <HStack>
-                    <Select w={20} placeholder="?" value={limitType} onChange={(event) => onChangeLimitType(event)}>
+                    <Select w={20} placeholder="?" value={props.fragmentData?.simulation_end.limit_type} onChange={(event) => onChangeLimitType(event)}
+                            errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "endCondition")}>
                         <option value='ge'>{">="}</option>
                         <option value='le'>{"<="}</option>
                     </Select>
-                {/* TODO Validate number input*/}
                 <NumberInput
                     min={0}
-                    step={(endConditionType === "motivation" || endConditionType === "stress") ? 0.01 : 1}
-                    max={(endConditionType === "motivation" || endConditionType === "stress") ? 1 : Infinity}
+                    step={(props.fragmentData.simulation_end.type === "motivation" || props.fragmentData.simulation_end.type === "stress") ? 0.01 : 1}
+                    max={(props.fragmentData.simulation_end.type === "motivation" || props.fragmentData.simulation_end.type === "stress") ? 1 : Infinity}
                     onChange={(value) => onChangeEndConditionLimit(value)}
-                    value={endConditionLimit}>
-                    <NumberInputField />
+                    value={props.fragmentData.simulation_end.limit}>
+                    <NumberInputField errorBorderColor={getErrorColor(props.validationErrors, props.fragmentData.id, "endCondition")}/>
                     <NumberInputStepper>
                         <NumberIncrementStepper />
                         <NumberDecrementStepper />
@@ -136,6 +148,7 @@ const FragmentInspectorForm = (props) => {
                 </HStack>
 
                 <Box h={3}/>
+
             </FormControl>
             <InspectorItemSelector
                 droppableId="actionList"
@@ -143,6 +156,9 @@ const FragmentInspectorForm = (props) => {
                 type="action"
                 headline="Actions"
                 addActions={addActions}
+                parentData={props.fragmentData}
+                validationErrors={props.validationErrors}
+                validationErrorObjectKey="actions"
             />
             <DeleteButton
                 component={props.fragmentData}

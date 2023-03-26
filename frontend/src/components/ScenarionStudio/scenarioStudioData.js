@@ -14,7 +14,8 @@ import { HiUserGroup } from "react-icons/hi";
 
 export const tabIndexEnum = {
     "INSPECTOR": 0,
-    "COMPONENTS": 1
+    "COMPONENTS": 1,
+    "VALIDATION": 2
 };
 
 export const componentEnum = {
@@ -66,11 +67,16 @@ export const finalComponentList = [
         id: uuidv4(),
         type: "FRAGMENT",
         title: "Simulation Fragment",
+        text: "",
         content: "Control the simulation by defining fragments.",
         icon: MdTimeline,
         displayName: `Simulation`,
         actions: [],
-        simulation_end: {}
+        simulation_end: {
+            type: "",
+            limit: "",
+            limit_type: ""
+        }
     },
     {
         id: uuidv4(),
@@ -91,7 +97,6 @@ export const finalComponentList = [
         displayName: `Questions`,
         text: "",
         questions: [],
-
     },
     {
         id: uuidv4(),
@@ -104,7 +109,14 @@ export const finalComponentList = [
         trigger_type: "",
         trigger_value: "",
         trigger_comparator: "",
-        effects: [],
+        budget: "",
+        duration: "",
+        easy_tasks: "",
+        medium_tasks: "",
+        hard_tasks: "",
+        stress: "",
+        motivation: "",
+        familiarity: "",
     },
 ]
 
@@ -199,3 +211,17 @@ export const finalQuestionList = [
         answers: []
     },
 ];
+
+export const scrollToMarginTopValue = 4;
+
+export const editorListStates = {
+    UNCHANGED: "unchanged",
+    MODIFIED: "modified",
+    SAVED: "saved"
+}
+
+export const editorListHistoryStates = {
+    UNDO_REDO: "undo_redo",
+    RESET: "reset",
+    LOG_HIST: "log_hist"
+}

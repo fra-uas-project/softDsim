@@ -5,10 +5,10 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogOverlay,
-    Button,
+    Button, Box,
     useDisclosure
 } from "@chakra-ui/react";
-import {useRef} from "react";
+import React, {useRef} from "react";
 import {actionEnum, questionEnum} from "../scenarioStudioData";
 
 const DeleteButton = (props) => {
@@ -42,7 +42,7 @@ const DeleteButton = (props) => {
     };
 
     return (
-        <>
+        <Box w="full" pb={5}>
             <Button
                 w="full"
                 colorScheme="red"
@@ -85,7 +85,7 @@ const DeleteButton = (props) => {
                     </AlertDialogContent>
                 </AlertDialogOverlay>
             </AlertDialog>
-        </>
+        </Box>
     )
 }
 
