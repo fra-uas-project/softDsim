@@ -8,9 +8,9 @@ class User(AbstractUser):
 
     # roles = models.TextField(blank=True, null=True, default="student")
     student = models.BooleanField(default=True)
-    creator = models.BooleanField(default=False)
-    staff = models.BooleanField(default=False)
-    admin = models.BooleanField(default=False)
+    creator = models.BooleanField(default=True)
+    staff = models.BooleanField(default=True)
+    admin = models.BooleanField(default=True)
 
     # WE WILL NEED THIS IF WE WANT TO SWITCH TO EMAIL AS USERNAME
 
