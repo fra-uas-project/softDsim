@@ -15,6 +15,7 @@ import os
 import environ
 from config import get_config
 import logging.config
+from django.apps import AppConfig
 
 
 configuration = get_config()
@@ -55,7 +56,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "custom_user",
     "history",
-]
+    ]
 
 
 # explanation of each middleware
