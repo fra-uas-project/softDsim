@@ -931,13 +931,6 @@ const ScenarioStudio = () => {
                                 }}>
                             Save
                         </Button>
-                        <Button variant="outline"
-                                colorScheme="blue"
-                                onClick={() => {
-                                    duplicateScenario(currentTemplateId)
-                                }}>
-                           Duplicate
-                        </Button>
                         <Button variant="solid"
                                 colorScheme="blue"
                                 onClick={() => {saveAndPublishScenarioTemplate(currentTemplateId)}}>
