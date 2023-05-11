@@ -22,7 +22,6 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault("creator", True)
         extra_fields.setdefault("admin", True)
 
-        print("CREATED")
         return self._create_user(username, email, password, **extra_fields)
 
 
