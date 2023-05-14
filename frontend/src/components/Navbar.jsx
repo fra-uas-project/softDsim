@@ -81,9 +81,18 @@ const Navbar = () => {
                         User Management
                     </Button>
                 }
+
+                {currentUser?.creator &&
+                    <Button variant='link' as={Link} to="/skill-types">
+                        Skill Types
+                    </Button>
+                    }
+
+
                 <Button variant='link' as={Link} to="/help">
                     Help
                 </Button>
+
 
             </HStack>
             <HStack

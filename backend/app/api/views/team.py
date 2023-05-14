@@ -182,16 +182,11 @@ class SkillTypeView(APIView):
         if id:
             item = SkillType.objects.get(id=id)
             serializer = SkillTypeSerializer(item)
-            return Response(
-                {"status": "success", "data": serializer.data},
-                status=status.HTTP_200_OK,
-            )
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         items = SkillType.objects.all()
         serializer = SkillTypeSerializer(items, many=True)
-        return Response(
-            {"status": "success", "data": serializer.data}, status=status.HTTP_200_OK
-        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @allowed_roles(["creator", "staff"])
     def patch(self, request, id=None):

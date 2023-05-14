@@ -239,19 +239,20 @@ const Simulation = () => {
                 },
             })
 
+
             // create empty list for skill types in scenario
             var skillTypesList = []
 
             const resSkillReturn = await resSkill.json()
-
             // create skilltype array
-            for (const type of resSkillReturn.data) {
+            for (const type of resSkillReturn) {
                 skillTypesList.push(type.name)
             }
 
             // write skilltype array into state
             setSkillTypes(skillTypesList)
             createSkillTypeObject(skillTypesList)
+
         } catch (err) {
             console.log(err)
         }
