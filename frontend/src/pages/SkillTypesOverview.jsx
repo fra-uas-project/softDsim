@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -27,7 +26,6 @@ import {
   ModalFooter,
   Popover,
   PopoverTrigger,
-  PopoverContent,
   ButtonGroup,
   AlertDialog,
   AlertDialogBody,
@@ -36,7 +34,7 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
 } from '@chakra-ui/react';
-import { HiChevronRight, HiOutlineInformationCircle, HiOutlineTrash } from 'react-icons/hi';
+import { HiOutlineTrash } from 'react-icons/hi';
 import { FormControl, FormLabel, Input } from "@chakra-ui/react";
 
 const SkilltypesOverview = () => {
@@ -69,7 +67,7 @@ const SkilltypesOverview = () => {
 
   const cancelRef = useRef();
   const toast = useToast();
-  const navigate = useNavigate();
+
 
   const fetchSkillTypes = async () => {
     setIsLoading(true);
@@ -235,7 +233,7 @@ const handleUpdateSkillType = async (e) => {
       setIsModal2Open(false);
       fetchSkillTypes();
       toast({
-        title: `${updatedSkillType.name} has been updated`,
+        title: `Skill Type has been updated`,
         status: 'success',
         duration: 5000,
       });
@@ -377,6 +375,8 @@ const handleUpdateSkillType = async (e) => {
         name="costPerDay"
         value={skillTypeForm.costPerDay}
         onChange={handleInputChange}
+        pattern="[0-9]*[.,]?[0-9]+"
+        title="Please enter a positive number."
       />
     </FormControl>
     <FormControl>
@@ -386,6 +386,8 @@ const handleUpdateSkillType = async (e) => {
         name="errorRate"
         value={skillTypeForm.errorRate}
         onChange={handleInputChange}
+        pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
+        title="Please enter a number between 0 and 1"
       />
     </FormControl>
     <FormControl>
@@ -395,6 +397,8 @@ const handleUpdateSkillType = async (e) => {
         name="throughput"
         value={skillTypeForm.throughput}
         onChange={handleInputChange}
+        pattern="[0-9]*[.,]?[0-9]+"
+        title="Please enter a positive number."
       />
     </FormControl>
     <FormControl>
@@ -404,6 +408,8 @@ const handleUpdateSkillType = async (e) => {
         name="managementQuality"
         value={skillTypeForm.managementQuality}
         onChange={handleInputChange}
+        pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
+        title="Please enter a number between 0 and 100"
       />
     </FormControl>
     <FormControl>
@@ -413,6 +419,8 @@ const handleUpdateSkillType = async (e) => {
         name="developmentQuality"
         value={skillTypeForm.developmentQuality}
         onChange={handleInputChange}
+        pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
+        title="Please enter a number between 0 and 100"
       />
     </FormControl>
     <FormControl>
@@ -422,6 +430,8 @@ const handleUpdateSkillType = async (e) => {
         name="signingBonus"
         value={skillTypeForm.signingBonus}
         onChange={handleInputChange}
+        pattern="[0-9]*[.,]?[0-9]+"
+        title="Please enter a positive number."
       />
     </FormControl>
   </VStack>
@@ -460,6 +470,8 @@ const handleUpdateSkillType = async (e) => {
         name="cost_per_day"
         value={updatedSkillType.costPerDay}
         onChange={handleInputChange}
+        pattern="[0-9]*[.,]?[0-9]+"
+        title="Please enter a positive number."
       />
     </FormControl>
     <FormControl>
@@ -469,6 +481,8 @@ const handleUpdateSkillType = async (e) => {
         name="error_rate"
         value={updatedSkillType.errorRate}
         onChange={handleInputChange}
+        pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
+        title="Please enter a number between 0 and 1"
       />
     </FormControl>
     <FormControl>
@@ -478,6 +492,8 @@ const handleUpdateSkillType = async (e) => {
         name="throughput"
         value={updatedSkillType.throughput}
         onChange={handleInputChange}
+        pattern="[0-9]*[.,]?[0-9]+"
+        title="Please enter a positive number."
       />
     </FormControl>
     <FormControl>
@@ -487,6 +503,8 @@ const handleUpdateSkillType = async (e) => {
         name="management_quality"
         value={updatedSkillType.managementQuality}
         onChange={handleInputChange}
+        pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
+        title="Please enter a number between 0 and 100"
       />
     </FormControl>
     <FormControl>
@@ -496,6 +514,8 @@ const handleUpdateSkillType = async (e) => {
         name="development_quality"
         value={updatedSkillType.developmentQuality}
         onChange={handleInputChange}
+        pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
+        title="Please enter a number between 0 and 100"
       />
     </FormControl>
     <FormControl>
@@ -505,6 +525,8 @@ const handleUpdateSkillType = async (e) => {
         name="signing_bonus"
         value={updatedSkillType.signingBonus}
         onChange={handleInputChange}
+        pattern="[0-9]*[.,]?[0-9]+"
+        title="Please enter a positive number."
       />
     </FormControl>
   </VStack>
