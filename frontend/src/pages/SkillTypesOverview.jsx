@@ -31,7 +31,7 @@ import {
   AlertDialogBody,
   AlertDialogContent,
   AlertDialogFooter,
-  AlertDialogHeader,
+  AlertDialogHeader,FormHelperText,
   AlertDialogOverlay,
 } from '@chakra-ui/react';
 import { HiOutlineTrash } from 'react-icons/hi';
@@ -354,86 +354,145 @@ const handleUpdateSkillType = async (e) => {
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create Skill Type</ModalHeader>
+          <ModalHeader>Create new</ModalHeader>
           <ModalCloseButton />
           <form onSubmit={handleCreateSkillType}>
             <ModalBody>
   <VStack spacing={4}>
+<FormControl>
+  <FormLabel>Name</FormLabel>
+  <Input
+    type="text"
+    name="name"
+    value={skillTypeForm.name}
+    maxLength={255}
+    onChange={handleInputChange}
+  />
+</FormControl>
     <FormControl>
-      <FormLabel>Name</FormLabel>
-      <Input
-        type="text"
-        name="name"
-        value={skillTypeForm.name}
-        onChange={handleInputChange}
-      />
-    </FormControl>
-    <FormControl>
-      <FormLabel>Cost Per Day</FormLabel>
+      <FormLabel style={{ marginBottom: '1px' }}>Cost Per Day</FormLabel>
+      <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
       <Input
         type="text"
         name="costPerDay"
         value={skillTypeForm.costPerDay}
         onChange={handleInputChange}
+        onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (!/^\d*\.?\d*$/.test(newValue)) {
+        event.preventDefault();
+      }
+    }}
         pattern="[0-9]*[.,]?[0-9]+"
         title="Please enter a positive number."
       />
     </FormControl>
+<FormControl>
+  <FormLabel style={{ marginBottom: '1px' }}>Error Rate</FormLabel>
+  <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 1.</FormHelperText>
+  <Input
+    type="text"
+    name="errorRate"
+    value={skillTypeForm.errorRate}
+    onChange={handleInputChange}
+    onKeyPress={(e) => {
+      const charCode = e.which ? e.which : e.keyCode;
+      const inputValue = e.target.value + String.fromCharCode(charCode);
+      const isValid = /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
+
+      if (!isValid) {
+        e.preventDefault();
+      }
+    }}
+  />
+</FormControl>
     <FormControl>
-      <FormLabel>Error Rate</FormLabel>
-      <Input
-        type="text"
-        name="errorRate"
-        value={skillTypeForm.errorRate}
-        onChange={handleInputChange}
-        pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
-        title="Please enter a number between 0 and 1"
-      />
-    </FormControl>
-    <FormControl>
-      <FormLabel>Throughput</FormLabel>
+      <FormLabel style={{ marginBottom: '1px' }}>Throughput</FormLabel>
+      <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
       <Input
         type="text"
         name="throughput"
         value={skillTypeForm.throughput}
         onChange={handleInputChange}
+        onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (!/^\d*\.?\d*$/.test(newValue)) {
+        event.preventDefault();
+      }
+    }}
         pattern="[0-9]*[.,]?[0-9]+"
         title="Please enter a positive number."
       />
     </FormControl>
+<FormControl>
+  <FormLabel style={{ marginBottom: '1px' }}>Management Quality</FormLabel>
+  <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 100.</FormHelperText>
+  <Input
+    type="text"
+    name="managementQuality"
+    value={skillTypeForm.managementQuality}
+    onChange={handleInputChange}
+    onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (isNaN(newValue) || parseFloat(newValue) > 100) {
+        event.preventDefault();
+      }
+    }}
+    pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
+    title="Please enter a number between 0 and 100"
+  />
+</FormControl>
     <FormControl>
-      <FormLabel>Management Quality</FormLabel>
-      <Input
-        type="text"
-        name="managementQuality"
-        value={skillTypeForm.managementQuality}
-        onChange={handleInputChange}
-        pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
-        title="Please enter a number between 0 and 100"
-      />
-    </FormControl>
-    <FormControl>
-      <FormLabel>Development Quality</FormLabel>
+      <FormLabel style={{ marginBottom: '1px' }}>Development Quality</FormLabel>
+      <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 100.</FormHelperText>
       <Input
         type="text"
         name="developmentQuality"
         value={skillTypeForm.developmentQuality}
         onChange={handleInputChange}
+            onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (isNaN(newValue) || parseFloat(newValue) > 100) {
+        event.preventDefault();
+      }
+    }}
         pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
         title="Please enter a number between 0 and 100"
       />
     </FormControl>
-    <FormControl>
-      <FormLabel>Signing Bonus</FormLabel>
-      <Input
-        type="text"
-        name="signingBonus"
-        value={skillTypeForm.signingBonus}
-        onChange={handleInputChange}
-        pattern="[0-9]*[.,]?[0-9]+"
-        title="Please enter a positive number."
-      />
-    </FormControl>
+<FormControl>
+  <FormLabel style={{ marginBottom: '1px' }}>Signing Bonus</FormLabel>
+  <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
+  <Input
+    type="text"
+    name="signingBonus"
+    value={skillTypeForm.signingBonus}
+    onChange={handleInputChange}
+    onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (!/^\d*\.?\d*$/.test(newValue)) {
+        event.preventDefault();
+      }
+    }}
+    pattern="[0-9]*[.,]?[0-9]+"
+    title="Please enter a positive number."
+  />
+</FormControl>
   </VStack>
 </ModalBody>
             <ModalFooter>
@@ -460,71 +519,132 @@ const handleUpdateSkillType = async (e) => {
         type="text"
         name="name"
         value={updatedSkillType.name}
+        maxLength={255}
         onChange={handleInputChange}
       />
     </FormControl>
     <FormControl>
-      <FormLabel>Cost Per Day</FormLabel>
+      <FormLabel style={{ marginBottom: '1px' }}>Cost Per Day</FormLabel>
+      <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
       <Input
         type="text"
         name="cost_per_day"
         value={updatedSkillType.costPerDay}
         onChange={handleInputChange}
+        onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (!/^\d*\.?\d*$/.test(newValue)) {
+        event.preventDefault();
+      }
+    }}
         pattern="[0-9]*[.,]?[0-9]+"
         title="Please enter a positive number."
       />
     </FormControl>
     <FormControl>
-      <FormLabel>Error Rate</FormLabel>
+     <FormLabel style={{ marginBottom: '1px' }}>Error Rate</FormLabel>
+     <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 1.</FormHelperText>
       <Input
         type="text"
         name="error_rate"
         value={updatedSkillType.errorRate}
         onChange={handleInputChange}
+        onKeyPress={(e) => {
+      const charCode = e.which ? e.which : e.keyCode;
+      const inputValue = e.target.value + String.fromCharCode(charCode);
+      const isValid = /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
+
+      if (!isValid) {
+        e.preventDefault();
+      }
+    }}
         pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
         title="Please enter a number between 0 and 1"
       />
     </FormControl>
     <FormControl>
-      <FormLabel>Throughput</FormLabel>
+      <FormLabel style={{ marginBottom: '1px' }}>Throughput</FormLabel>
+      <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
       <Input
         type="text"
         name="throughput"
         value={updatedSkillType.throughput}
         onChange={handleInputChange}
+        onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (!/^\d*\.?\d*$/.test(newValue)) {
+        event.preventDefault();
+      }
+    }}
         pattern="[0-9]*[.,]?[0-9]+"
         title="Please enter a positive number."
       />
     </FormControl>
     <FormControl>
-      <FormLabel>Management Quality</FormLabel>
+      <FormLabel style={{ marginBottom: '1px' }}>Management Quality</FormLabel>
+      <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 100.</FormHelperText>
       <Input
         type="text"
         name="management_quality"
         value={updatedSkillType.managementQuality}
         onChange={handleInputChange}
+        onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (isNaN(newValue) || parseFloat(newValue) > 100) {
+        event.preventDefault();
+      }
+    }}
         pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
         title="Please enter a number between 0 and 100"
       />
     </FormControl>
     <FormControl>
-      <FormLabel>Development Quality</FormLabel>
+      <FormLabel style={{ marginBottom: '1px' }}>Develepoment Quality</FormLabel>
+  <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 100.</FormHelperText>
       <Input
         type="text"
         name="development_quality"
         value={updatedSkillType.developmentQuality}
         onChange={handleInputChange}
+        onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (isNaN(newValue) || parseFloat(newValue) > 100) {
+        event.preventDefault();
+      }
+    }}
         pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
         title="Please enter a number between 0 and 100"
       />
     </FormControl>
     <FormControl>
-      <FormLabel>Signing Bonus</FormLabel>
+      <FormLabel style={{ marginBottom: '1px' }}>Signing Bonus</FormLabel>
+  <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
       <Input
         type="text"
         name="signing_bonus"
         value={updatedSkillType.signingBonus}
         onChange={handleInputChange}
+        onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (!/^\d*\.?\d*$/.test(newValue)) {
+        event.preventDefault();
+      }
+    }}
         pattern="[0-9]*[.,]?[0-9]+"
         title="Please enter a positive number."
       />
