@@ -271,7 +271,7 @@ const handleUpdateSkillType = async (e) => {
           </BreadcrumbItem>
         </Breadcrumb>
         <Button colorScheme="blue" onClick={handleOpenModal}>
-          Create Skill Type
+          Create new
         </Button>
       </Flex>
       <Box p={4} bg="white" boxShadow="base" rounded="md">
@@ -354,7 +354,7 @@ const handleUpdateSkillType = async (e) => {
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create new</ModalHeader>
+          <ModalHeader>New Skill Type</ModalHeader>
           <ModalCloseButton />
           <form onSubmit={handleCreateSkillType}>
             <ModalBody>
