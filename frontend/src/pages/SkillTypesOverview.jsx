@@ -77,7 +77,7 @@ const SkilltypesOverview = () => {
         credentials: 'include',
       });
       const skilltypesData = await res.json();
-      setSkilltypes(skilltypesData);
+      setSkilltypes(skilltypesData.data);
       setIsLoading(false);
     } catch (error) {
       console.log(error);
