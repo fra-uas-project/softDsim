@@ -201,17 +201,8 @@ class SkillTypeView(APIView):
             serializer.save()
             return Response({"status": "success", "data": serializer.data})
         else:
-            return Response({"status": "error", "message": serializer.errors, "data": serializer.data})
+            return Response({"status": "error", "data": serializer.errors})
 
-
-    ## def patch(self, request, id=None):
-    ##    item = SkillType.objects.get(id=id)
-    ##    serializer = SkillTypeSerializer(item, data=request.data, partial=True)
-    ##    if serializer.is_valid():
-    ##        serializer.save()
-    ##        return Response(serializer.data)
-    ##    else:
-    ##        return Response(serializer.data)
 
     @allowed_roles(["creator", "staff"])
     def delete(self, request, id=None):

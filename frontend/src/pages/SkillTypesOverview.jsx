@@ -293,7 +293,6 @@ const SkilltypesOverview = () => {
 
         if (res.ok) {
           const updatedSkillType = await res.json();
-
           // Update the skill type if the name doesn't exist
           const updatedSkillTypes = skilltypes.map((skill) =>
             skill.id === updatedSkillType.id ? updatedSkillType : skill
