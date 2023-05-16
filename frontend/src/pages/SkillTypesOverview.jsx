@@ -124,8 +124,10 @@ const SkilltypesOverview = () => {
 
   const checkSkillTypeNameExists = (name, id) => {
     return skilltypes.some(
-      (skill) => skill.name && skill.name.toLowerCase() === name.toLowerCase() &&
-      skill.id !== id
+      (skill) =>
+        skill.name &&
+        skill.name.toLowerCase() === name.toLowerCase() &&
+        skill.id !== id
     );
   };
 
