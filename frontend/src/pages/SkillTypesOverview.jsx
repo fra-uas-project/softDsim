@@ -43,13 +43,9 @@ const SkilltypesOverview = () => {
   const [selectedSkilltype, setSelectedSkilltype] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [updatedSkillType, setUpdatedSkillType] = useState([]);
 
   const [isModal2Open, setIsModal2Open] = useState(false);
 
-   const openModal2 = () => {
-    setIsModal2Open(true);
-  };
 
   const closeModal2 = () => {
     setIsModal2Open(false);
@@ -80,20 +76,21 @@ const SkilltypesOverview = () => {
       setSkilltypes(skilltypesData.data);
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
       setIsLoading(false);
     }
   };
 
   const deleteSkillType = async (skillType) => {
-    try {
-      const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skillType.id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'X-CSRFToken': getCookie('csrftoken'),
-        },
-      });
+  try {
+    const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skillType.id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+    });
+
+    if (res.ok) {
       await res.json();
       await fetchSkillTypes();
       toast({
@@ -101,22 +98,24 @@ const SkilltypesOverview = () => {
         status: 'success',
         duration: 5000,
       });
-    } catch (e) {
-      toast({
-        title: `Could not delete ${skillType.name}`,
-        status: 'error',
-        duration: 5000,
-      });
-      console.log(e);
+    } else {
+      throw new Error('Deletion failed');
     }
-  };
+  } catch (e) {
+    toast({
+      title: `Could not delete ${skillType.name}`,
+      status: 'error',
+      duration: 5000,
+    });
+  }
+};
 
   const getCookie = (name) => {
   const cookieValue = document.cookie.match(`(^|;)\\s*${name}\\s*=\\s*([^;]+)`);
   return cookieValue ? cookieValue.pop() : '';
 };
 
-const handleCreateSkillType = async (e) => {
+  const handleCreateSkillType = async (e) => {
   e.preventDefault();
 
   const { name, costPerDay, errorRate, throughput, managementQuality, developmentQuality, signingBonus } = skillTypeForm;
@@ -192,7 +191,6 @@ const handleCreateSkillType = async (e) => {
       }
     }
   } catch (error) {
-    console.log(error);
     toast({
       title: "An error occurred",
       status: "error",
@@ -245,40 +243,39 @@ const handleUpdateSkillType = async (e) => {
   e.preventDefault();
 
   try {
-    const res = await fetch(
-      `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skillTypeForm.id}`,
-      {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken'),
-        },
-        body: JSON.stringify(skillTypeForm),
-      }
-    );
-
-    if (res.ok) {
-      const updatedSkillType = await res.json();
-
-      // Check if the name already exists
-      const nameExists = skilltypes.some((skill) => {
-
-  return (
-    skill.name &&
-    updatedSkillType.data.name &&
-    skill.name.toLowerCase() === updatedSkillType.data.name.toLowerCase() &&
-    skill.id !== updatedSkillType.data.id
-  );
-});;
-
-      if (nameExists) {
-        toast({
-      title: `Skill Type with the name "${updatedSkillType.data.name}" already exists`,
-      status: "warning",
-      duration: 5000,
+    // Check if the name already exists
+    const nameExists = skilltypes.some((skill) => {
+      return (
+        skill.name &&
+        skillTypeForm.name &&
+        skill.name.toLowerCase() === skillTypeForm.name.toLowerCase() &&
+        skill.id !== skillTypeForm.id
+      );
     });
-      } else {
+
+    if (nameExists) {
+      toast({
+        title: `Skill Type with the name "${skillTypeForm.name}" already exists`,
+        status: "warning",
+        duration: 5000,
+      });
+    } else {
+      const res = await fetch(
+        `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skillTypeForm.id}`,
+        {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+          },
+          body: JSON.stringify(skillTypeForm),
+        }
+      );
+
+      if (res.ok) {
+        const updatedSkillType = await res.json();
+
         // Update the skill type if the name doesn't exist
         const updatedSkillTypes = skilltypes.map((skill) =>
           skill.id === updatedSkillType.id ? updatedSkillType : skill
@@ -291,9 +288,9 @@ const handleUpdateSkillType = async (e) => {
           status: 'success',
           duration: 5000,
         });
+      } else {
+        throw new Error('Failed to update skill type');
       }
-    } else {
-      throw new Error('Failed to update skill type');
     }
   } catch (error) {
     toast({
@@ -301,7 +298,6 @@ const handleUpdateSkillType = async (e) => {
       status: 'error',
       duration: 5000,
     });
-    console.log(error);
   }
 };
 

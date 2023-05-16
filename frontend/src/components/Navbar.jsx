@@ -21,7 +21,7 @@ import { getCookie } from "../utils/utils"
 
 const Navbar = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext);
-    const [csrfCookie, setCsrfCookie, removeCsrfCookie] = useCookies(['csrftoken']);
+    const [removeCsrfCookie] = useCookies(['csrftoken']);
 
     const menuButton = useRef();
 
@@ -88,25 +88,37 @@ const Navbar = () => {
 
             </HStack>
 
-            <HStack direction="row" spacing={4} justifyContent="flex-end">
-  <HStack borderRadius="full" backgroundColor="white" p={3} boxShadow="xl">
+  <HStack direction="row" spacing={4} justifyContent="flex-end">
+  <HStack
+    borderRadius="full"
+    backgroundColor="white"
+    p={3}
+    boxShadow="xl"
+  >
     <Menu>
       <MenuButton ref={menuButton} size="sm" cursor="pointer">
         <HiOutlineCog />
       </MenuButton>
       <MenuList mt={2}>
         <MenuGroup>
-          {currentUser?.creator && (
-            <MenuItem color="black" as={Link} to="/skill-types">
-              Skill Types
-            </MenuItem>
-          )}
+          <MenuItem color="black" as={Link} to="/skill-types">
+            Skill Types
+          </MenuItem>
         </MenuGroup>
       </MenuList>
     </Menu>
   </HStack>
 
-  <HStack borderRadius="full" backgroundColor="white" p={3} boxShadow="xl">
+  <HStack
+    direction="row"
+    spacing={4}
+    justifyContent="flex-end"
+    borderRadius="full"
+    backgroundColor="white"
+    p={3}
+    boxShadow="xl"
+    marginLeft={4}
+  >
     <Menu>
       <MenuButton ref={menuButton} size="sm" cursor="pointer">
         <HiMenu />
