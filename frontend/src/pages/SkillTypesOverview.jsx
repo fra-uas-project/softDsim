@@ -116,23 +116,41 @@ const SkilltypesOverview = () => {
   return cookieValue ? cookieValue.pop() : '';
 };
 
-   const handleCreateSkillType = async (e) => {
-    e.preventDefault();
+const handleCreateSkillType = async (e) => {
+  e.preventDefault();
 
-    const { name, costPerDay, errorRate, throughput, managementQuality, developmentQuality, signingBonus } = skillTypeForm;
+  const { name, costPerDay, errorRate, throughput, managementQuality, developmentQuality, signingBonus } = skillTypeForm;
 
-    const newSkillType = {
-      name,
-      cost_per_day: costPerDay,
-      error_rate: errorRate,
-      throughput,
-      management_quality: managementQuality,
-      development_quality: developmentQuality,
-      signing_bonus: signingBonus,
-    };
+  const newSkillType = {
+    name,
+    cost_per_day: costPerDay,
+    error_rate: errorRate,
+    throughput,
+    management_quality: managementQuality,
+    development_quality: developmentQuality,
+    signing_bonus: signingBonus,
+  };
 
-    try {
-      const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/skill-type`, {
+  try {
+    // Check if the skill type name already exists
+    const nameExists = skilltypes.some((skill) => {
+      return (
+        skill.name &&
+        skill.name.toLowerCase() === name.toLowerCase()
+      );
+    });
+
+    if (nameExists) {
+      toast({
+        title: "Failed to create skill type",
+        description: "Skill type name already exists. Please provide a different name.",
+        status: "warning",
+        duration: 5000,
+      });
+      return;
+    } else {
+      // Create the skill type if the name is unique
+      const createRes = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/skill-type`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -142,7 +160,7 @@ const SkilltypesOverview = () => {
         body: JSON.stringify(newSkillType),
       });
 
-      if (res.ok) {
+      if (createRes.ok) {
         toast({
           title: `${newSkillType.name} has been created`,
           status: "success",
@@ -168,18 +186,19 @@ const SkilltypesOverview = () => {
       } else {
         toast({
           title: "Failed to create skill type",
-          status:"error",
-duration: 5000,
-});
-}
-} catch (error) {
-console.log(error);
-toast({
-title: "An error occurred",
-status: "error",
-duration: 5000,
-});
-}
+          status: "error",
+          duration: 5000,
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    toast({
+      title: "An error occurred",
+      status: "error",
+      duration: 5000,
+    });
+  }
 };
 
   useEffect(() => {
@@ -201,6 +220,15 @@ duration: 5000,
   };
 
   const handleOpenModal = () => {
+  setSkillTypeForm({
+          name: "",
+          costPerDay: 0,
+          errorRate: 0,
+          throughput: 0,
+          managementQuality: 0,
+          developmentQuality: 0,
+          signingBonus: 0,
+        });
     setIsModalOpen(true);
   };
 
@@ -214,29 +242,56 @@ duration: 5000,
   };
 
 const handleUpdateSkillType = async (e) => {
-  e.preventDefault(); // Prevents the form from submitting normally
+  e.preventDefault();
 
   try {
-    const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skillTypeForm.id}`, {
-      method: 'PATCH',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken'),
-      },
-      body: JSON.stringify(skillTypeForm),
-    });
+    const res = await fetch(
+      `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skillTypeForm.id}`,
+      {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify(skillTypeForm),
+      }
+    );
 
     if (res.ok) {
       const updatedSkillType = await res.json();
-      setSkillTypeForm(updatedSkillType);
-      setIsModal2Open(false);
-      fetchSkillTypes();
-      toast({
-        title: `Skill Type has been updated`,
-        status: 'success',
-        duration: 5000,
-      });
+
+      // Check if the name already exists
+      const nameExists = skilltypes.some((skill) => {
+
+  return (
+    skill.name &&
+    updatedSkillType.data.name &&
+    skill.name.toLowerCase() === updatedSkillType.data.name.toLowerCase() &&
+    skill.id !== updatedSkillType.data.id
+  );
+});;
+
+      if (nameExists) {
+        toast({
+      title: `Skill Type with the name "${updatedSkillType.data.name}" already exists`,
+      status: "warning",
+      duration: 5000,
+    });
+      } else {
+        // Update the skill type if the name doesn't exist
+        const updatedSkillTypes = skilltypes.map((skill) =>
+          skill.id === updatedSkillType.id ? updatedSkillType : skill
+        );
+        setSkilltypes(updatedSkillTypes);
+        fetchSkillTypes();
+        setIsModal2Open(false);
+        toast({
+          title: `Skill Type has been updated`,
+          status: 'success',
+          duration: 5000,
+        });
+      }
     } else {
       throw new Error('Failed to update skill type');
     }
@@ -248,9 +303,7 @@ const handleUpdateSkillType = async (e) => {
     });
     console.log(error);
   }
-}
- ;
-
+};
 
   const handleInputChange = (e) => {
     setSkillTypeForm((prevForm) => ({
@@ -505,138 +558,80 @@ const handleUpdateSkillType = async (e) => {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={isModal2Open} onClose={closeModal2}>
-        <ModalOverlay />
-                <ModalContent>
-          <ModalHeader>Update Skill Type</ModalHeader>
-          <ModalCloseButton />
-          <form onSubmit={handleUpdateSkillType}>
-            <ModalBody>
-  <VStack spacing={4}>
-    <FormControl>
-      <FormLabel>Name</FormLabel>
-      <Input
-        type="text"
-        name="name"
-        value={updatedSkillType.name}
-        maxLength={255}
-        onChange={handleInputChange}
-      />
-    </FormControl>
-    <FormControl>
-      <FormLabel style={{ marginBottom: '1px' }}>Cost Per Day</FormLabel>
-      <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
-      <Input
-        type="text"
-        name="cost_per_day"
-        value={updatedSkillType.costPerDay}
-        onChange={handleInputChange}
-        onKeyPress={(event) => {
-      const keyCode = event.which || event.keyCode;
-      const keyValue = String.fromCharCode(keyCode);
-      const newValue = event.target.value + keyValue;
+ <Modal isOpen={isModal2Open} onClose={closeModal2}>
+  <ModalOverlay />
+  <ModalContent>
+    <ModalHeader>Update Skill Type</ModalHeader>
+    <ModalCloseButton />
+    <form onSubmit={handleUpdateSkillType}>
+      <ModalBody>
+        <VStack spacing={4}>
+          <FormControl>
+            <FormLabel>Name</FormLabel>
+            <Input
+              type="text"
+              name="name"
+              value={skillTypeForm.name}
+              maxLength={255}
+              onChange={handleInputChange}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel style={{ marginBottom: '1px' }}>Cost Per Day</FormLabel>
+            <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
+            <Input
+              type="text"
+              name="cost_per_day"
+              value={skillTypeForm.cost_per_day}
+              onChange={handleInputChange}
+              onKeyPress={(event) => {
+                const keyCode = event.which || event.keyCode;
+                const keyValue = String.fromCharCode(keyCode);
+                const newValue = event.target.value + keyValue;
 
-      if (!/^\d*\.?\d*$/.test(newValue)) {
-        event.preventDefault();
-      }
-    }}
-        pattern="[0-9]*[.,]?[0-9]+"
-        title="Please enter a positive number."
-      />
-    </FormControl>
-    <FormControl>
-     <FormLabel style={{ marginBottom: '1px' }}>Error Rate</FormLabel>
-     <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 1.</FormHelperText>
-      <Input
-        type="text"
-        name="error_rate"
-        value={updatedSkillType.errorRate}
-        onChange={handleInputChange}
-        onKeyPress={(e) => {
-      const charCode = e.which ? e.which : e.keyCode;
-      const inputValue = e.target.value + String.fromCharCode(charCode);
-      const isValid = /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
+                if (!/^\d*\.?\d*$/.test(newValue)) {
+                  event.preventDefault();
+                }
+              }}
+              pattern="[0-9]*[.,]?[0-9]+"
+              title="Please enter a positive number."
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel style={{ marginBottom: '1px' }}>Error Rate</FormLabel>
+            <FormHelperText style={{ marginTop: '1px' }}>
+              Please enter a number between 0 and 1.
+            </FormHelperText>
+            <Input
+              type="text"
+              name="error_rate"
+              value={skillTypeForm.error_rate}
+              onChange={handleInputChange}
+              onKeyPress={(e) => {
+                const charCode = e.which ? e.which : e.keyCode;
+                const inputValue = e.target.value + String.fromCharCode(charCode);
+                const isValid =
+                  /^\d*\.?\d*$/.test(inputValue) &&
+                  parseFloat(inputValue) >= 0 &&
+                  parseFloat(inputValue) <= 1;
 
-      if (!isValid) {
-        e.preventDefault();
-      }
-    }}
-        pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
-        title="Please enter a number between 0 and 1"
-      />
-    </FormControl>
+                if (!isValid) {
+                  e.preventDefault();
+                }
+              }}
+              pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
+              title="Please enter a number between 0 and 1"
+            />
+          </FormControl>
     <FormControl>
-      <FormLabel style={{ marginBottom: '1px' }}>Throughput</FormLabel>
-      <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
-      <Input
-        type="text"
-        name="throughput"
-        value={updatedSkillType.throughput}
-        onChange={handleInputChange}
-        onKeyPress={(event) => {
-      const keyCode = event.which || event.keyCode;
-      const keyValue = String.fromCharCode(keyCode);
-      const newValue = event.target.value + keyValue;
-
-      if (!/^\d*\.?\d*$/.test(newValue)) {
-        event.preventDefault();
-      }
-    }}
-        pattern="[0-9]*[.,]?[0-9]+"
-        title="Please enter a positive number."
-      />
-    </FormControl>
-    <FormControl>
-      <FormLabel style={{ marginBottom: '1px' }}>Management Quality</FormLabel>
-      <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 100.</FormHelperText>
-      <Input
-        type="text"
-        name="management_quality"
-        value={updatedSkillType.managementQuality}
-        onChange={handleInputChange}
-        onKeyPress={(event) => {
-      const keyCode = event.which || event.keyCode;
-      const keyValue = String.fromCharCode(keyCode);
-      const newValue = event.target.value + keyValue;
-
-      if (isNaN(newValue) || parseFloat(newValue) > 100) {
-        event.preventDefault();
-      }
-    }}
-        pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
-        title="Please enter a number between 0 and 100"
-      />
-    </FormControl>
-    <FormControl>
-      <FormLabel style={{ marginBottom: '1px' }}>Develepoment Quality</FormLabel>
-  <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 100.</FormHelperText>
-      <Input
-        type="text"
-        name="development_quality"
-        value={updatedSkillType.developmentQuality}
-        onChange={handleInputChange}
-        onKeyPress={(event) => {
-      const keyCode = event.which || event.keyCode;
-      const keyValue = String.fromCharCode(keyCode);
-      const newValue = event.target.value + keyValue;
-
-      if (isNaN(newValue) || parseFloat(newValue) > 100) {
-        event.preventDefault();
-      }
-    }}
-        pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
-        title="Please enter a number between 0 and 100"
-      />
-    </FormControl>
-    <FormControl>
-      <FormLabel style={{ marginBottom: '1px' }}>Signing Bonus</FormLabel>
+  <FormLabel style={{ marginBottom: '1px' }}>Throughput</FormLabel>
   <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
-      <Input
-        type="text"
-        name="signing_bonus"
-        value={updatedSkillType.signingBonus}
-        onChange={handleInputChange}
-        onKeyPress={(event) => {
+  <Input
+    type="text"
+    name="throughput"
+    value={skillTypeForm.throughput}
+    onChange={handleInputChange}
+    onKeyPress={(event) => {
       const keyCode = event.which || event.keyCode;
       const keyValue = String.fromCharCode(keyCode);
       const newValue = event.target.value + keyValue;
@@ -645,10 +640,73 @@ const handleUpdateSkillType = async (e) => {
         event.preventDefault();
       }
     }}
-        pattern="[0-9]*[.,]?[0-9]+"
-        title="Please enter a positive number."
-      />
-    </FormControl>
+    pattern="[0-9]*[.,]?[0-9]+"
+    title="Please enter a positive number."
+  />
+</FormControl>
+<FormControl>
+  <FormLabel style={{ marginBottom: '1px' }}>Management Quality</FormLabel>
+  <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 100.</FormHelperText>
+  <Input
+    type="text"
+    name="management_quality"
+    value={skillTypeForm.management_quality}
+    onChange={handleInputChange}
+    onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (isNaN(newValue) || parseFloat(newValue) > 100) {
+        event.preventDefault();
+      }
+    }}
+    pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
+    title="Please enter a number between 0 and 100"
+  />
+</FormControl>
+<FormControl>
+  <FormLabel style={{ marginBottom: '1px' }}>Development Quality</FormLabel>
+  <FormHelperText style={{ marginTop: '1px' }}>Please enter a number between 0 and 100.</FormHelperText>
+  <Input
+    type="text"
+    name="development_quality"
+    value={skillTypeForm.development_quality}
+    onChange={handleInputChange}
+    onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (isNaN(newValue) || parseFloat(newValue) > 100) {
+        event.preventDefault();
+      }
+    }}
+    pattern="^(?:\d{1,2}(?:\.\d*)?|100(\.0*)?)$"
+    title="Please enter a number between 0 and 100"
+  />
+</FormControl>
+<FormControl>
+  <FormLabel style={{ marginBottom: '1px' }}>Signing Bonus</FormLabel>
+  <FormHelperText style={{ marginTop: '1px' }}>>0</FormHelperText>
+  <Input
+    type="text"
+    name="signing_bonus"
+    value={skillTypeForm.signing_bonus}
+    onChange={handleInputChange}
+    onKeyPress={(event) => {
+      const keyCode = event.which || event.keyCode;
+      const keyValue = String.fromCharCode(keyCode);
+      const newValue = event.target.value + keyValue;
+
+      if (!/^\d*\.?\d*$/.test(newValue)) {
+        event.preventDefault();
+      }
+    }}
+    pattern="[0-9]*[.,]?[0-9]+"
+    title="Please enter a positive number."
+  />
+</FormControl>
   </VStack>
 </ModalBody>
             <ModalFooter>
