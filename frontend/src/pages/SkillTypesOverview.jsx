@@ -115,7 +115,16 @@ const SkilltypesOverview = () => {
   return cookieValue ? cookieValue.pop() : '';
 };
 
-  const handleCreateSkillType = async (e) => {
+
+  const checkSkillTypeNameExists = (name) => {
+  return skilltypes.some(
+    (skill) =>
+      skill.name &&
+      skill.name.toLowerCase() === name.toLowerCase()
+  );
+};
+
+const handleCreateSkillType = async (e) => {
   e.preventDefault();
 
   const { name, costPerDay, errorRate, throughput, managementQuality, developmentQuality, signingBonus } = skillTypeForm;
@@ -132,12 +141,7 @@ const SkilltypesOverview = () => {
 
   try {
     // Check if the skill type name already exists
-    const nameExists = skilltypes.some((skill) => {
-      return (
-        skill.name &&
-        skill.name.toLowerCase() === name.toLowerCase()
-      );
-    });
+    const nameExists = checkSkillTypeNameExists(name);
 
     if (nameExists) {
       toast({
@@ -243,25 +247,20 @@ const handleUpdateSkillType = async (e) => {
   e.preventDefault();
 
   try {
+    const { id, name } = skillTypeForm;
+
     // Check if the name already exists
-    const nameExists = skilltypes.some((skill) => {
-      return (
-        skill.name &&
-        skillTypeForm.name &&
-        skill.name.toLowerCase() === skillTypeForm.name.toLowerCase() &&
-        skill.id !== skillTypeForm.id
-      );
-    });
+    const nameExists = checkSkillTypeNameExists(name, id);
 
     if (nameExists) {
       toast({
-        title: `Skill Type with the name "${skillTypeForm.name}" already exists`,
+        title: `Skill Type with the name "${name}" already exists`,
         status: "warning",
         duration: 5000,
       });
     } else {
       const res = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skillTypeForm.id}`,
+        `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${id}`,
         {
           method: 'PATCH',
           credentials: 'include',
