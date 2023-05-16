@@ -11,7 +11,7 @@ import {
     MenuList
 } from "@chakra-ui/react"
 import Logo from "../images/logo-simplify.png"
-import { HiMenu, HiOutlineLogout } from "react-icons/hi";
+import { HiMenu, HiOutlineLogout, HiOutlineCog  } from "react-icons/hi";
 import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthProvider";
@@ -82,35 +82,46 @@ const Navbar = () => {
                     </Button>
                 }
 
-                {currentUser?.creator &&
-                    <Button variant='link' as={Link} to="/skill-types">
-                        Skill Types
-                    </Button>
-                    }
-
-
                 <Button variant='link' as={Link} to="/help">
                     Help
                 </Button>
 
+            </HStack>
 
-            </HStack>
-            <HStack
-                justifyContent="flex-end"
-            >
-                <HStack borderRadius="full" backgroundColor="white" p={3} boxShadow='xl'>
-                    <Menu>
-                        <MenuButton ref={menuButton} size="sm" cursor="pointer">
-                            <HiMenu />
-                        </MenuButton>
-                        <MenuList mt={2}>
-                            <MenuGroup>
-                                <MenuItem icon={<HiOutlineLogout />} color="red" onClick={handleLogout}>Logout</MenuItem>
-                            </MenuGroup>
-                        </MenuList>
-                    </Menu>
-                </HStack>
-            </HStack>
+            <HStack direction="row" spacing={4} justifyContent="flex-end">
+  <HStack borderRadius="full" backgroundColor="white" p={3} boxShadow="xl">
+    <Menu>
+      <MenuButton ref={menuButton} size="sm" cursor="pointer">
+        <HiOutlineCog />
+      </MenuButton>
+      <MenuList mt={2}>
+        <MenuGroup>
+          {currentUser?.creator && (
+            <MenuItem color="black" as={Link} to="/skill-types">
+              Skill Types
+            </MenuItem>
+          )}
+        </MenuGroup>
+      </MenuList>
+    </Menu>
+  </HStack>
+
+  <HStack borderRadius="full" backgroundColor="white" p={3} boxShadow="xl">
+    <Menu>
+      <MenuButton ref={menuButton} size="sm" cursor="pointer">
+        <HiMenu />
+      </MenuButton>
+      <MenuList mt={2}>
+        <MenuGroup>
+          <MenuItem icon={<HiOutlineLogout />} color="red" onClick={handleLogout}>
+            Logout
+          </MenuItem>
+        </MenuGroup>
+      </MenuList>
+    </Menu>
+  </HStack>
+</HStack>
+
         </Flex>
     )
 }
