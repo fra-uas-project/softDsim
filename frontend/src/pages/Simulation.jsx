@@ -239,7 +239,8 @@ const Simulation = () => {
                 },
             })
 
-            // create empty list for skill types in scenario
+
+                        // create empty list for skill types in scenario
             var skillTypesList = []
 
             const resSkillReturn = await resSkill.json()

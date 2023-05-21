@@ -14,6 +14,7 @@ import { getCookie } from "./utils/utils";
 import NotFoundPage from "./components/NotFoundPage";
 import ScenarioStudio from "./pages/ScenarioStudio";
 import AddMultipleUsers from "./pages/AddMultipleUsers";
+import SkillTypesOverview from "./pages/SkillTypesOverview";
 
 const Routing = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext)
@@ -68,6 +69,7 @@ const Routing = () => {
                     <Route path="/help" element={<Help />} />
                     <Route path="/login" element={<Navigate to="/" replace />} />
                     <Route path="*" element={<NotFoundPage />} />
+
                 </>
                 :
                 <>
@@ -89,6 +91,9 @@ const Routing = () => {
                 <>
                     {/* adding routes which are accessible for every logged-in user with role creator */}
                     <Route path="/scenario-studio" element={<ScenarioStudio />} />
+                    <Route path="/skill-types" element={<SkillTypesOverview />} />
+
+
                 </>
             }
             {
@@ -97,6 +102,7 @@ const Routing = () => {
                     {/* adding routes which are accessible for every logged-in user with role staff */}
                     <Route path="/users" element={<UserOverview />} />
                     <Route path="/addusers" element={<AddMultipleUsers />} />
+
                 </>
             }
             {

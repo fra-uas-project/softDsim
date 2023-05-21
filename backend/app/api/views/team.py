@@ -203,6 +203,7 @@ class SkillTypeView(APIView):
         else:
             return Response({"status": "error", "data": serializer.errors})
 
+
     @allowed_roles(["creator", "staff"])
     def delete(self, request, id=None):
         item = get_object_or_404(SkillType, id=id)

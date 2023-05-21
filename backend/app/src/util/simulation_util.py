@@ -174,6 +174,7 @@ def adjust_team_motivation(session, event_effect):
         )
 
 
+
 def adjust_team_familiarity(session, event_effect):
     members = session.members
     for member in members:
