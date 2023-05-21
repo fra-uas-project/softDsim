@@ -339,7 +339,7 @@ const ScenarioConfigOverview = () => {
           </BreadcrumbItem>
         </Breadcrumb>
         <Button colorScheme="blue" onClick={handleOpenModal}>
-          Create Scenario Configuration
+          Create new
         </Button>
       </Flex>
       <Box p={4} bg="white" boxShadow="base" rounded="md">
