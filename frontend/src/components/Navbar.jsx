@@ -11,16 +11,19 @@ import {
   MenuList,
 } from "@chakra-ui/react";
 import Logo from "../images/logo-simplify.png";
-import { HiMenu, HiOutlineLogout, HiOutlineCog } from "react-icons/hi";
+import { HiMenu, HiOutlineLogout } from "react-icons/hi";
 import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthProvider";
 import { useCookies } from "react-cookie";
 import { getCookie } from "../utils/utils";
+import { HiOutlineCog } from "react-icons/hi";
 
 const Navbar = () => {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
-  const [removeCsrfCookie] = useCookies(["csrftoken"]);
+  const [csrfCookie, setCsrfCookie, removeCsrfCookie] = useCookies([
+    "csrftoken",
+  ]);
 
   const menuButton = useRef();
 
@@ -74,42 +77,41 @@ const Navbar = () => {
             User Management
           </Button>
         )}
-
         <Button variant="link" as={Link} to="/help">
           Help
         </Button>
       </HStack>
 
-      <HStack direction="row" spacing={4} justifyContent="flex-end">
-        <HStack
-          borderRadius="full"
-          backgroundColor="white"
-          p={3}
-          boxShadow="xl"
-        >
-          <Menu>
-            <MenuButton ref={menuButton} size="sm" cursor="pointer">
-              <HiOutlineCog />
-            </MenuButton>
-            <MenuList mt={2}>
-              <MenuGroup>
-                <MenuItem color="black" as={Link} to="/skill-types">
-                  Skill Types
-                </MenuItem>
-              </MenuGroup>
-            </MenuList>
-          </Menu>
+      {currentUser?.admin && (
+        <HStack direction="row" spacing={4} justifyContent="flex-end">
+          <HStack
+            borderRadius="full"
+            backgroundColor="white"
+            p={3}
+            boxShadow="xl"
+          >
+            <Menu>
+              <MenuButton ref={menuButton} size="sm" cursor="pointer">
+                <HiOutlineCog />
+              </MenuButton>
+              <MenuList mt={2}>
+                <MenuGroup>
+                  <MenuItem color="black" as={Link} to="/skill-types">
+                    Skill Types
+                  </MenuItem>
+                </MenuGroup>
+              </MenuList>
+            </Menu>
+          </HStack>
         </HStack>
+      )}
 
+      <HStack justifyContent="flex-end">
         <HStack
-          direction="row"
-          spacing={4}
-          justifyContent="flex-end"
           borderRadius="full"
           backgroundColor="white"
           p={3}
           boxShadow="xl"
-          marginLeft={4}
         >
           <Menu>
             <MenuButton ref={menuButton} size="sm" cursor="pointer">
