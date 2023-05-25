@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+  application_db:
+    image: mariadb
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./maria_store:/data/db
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=demo
+      - MYSQL_USER=demo
+      - MYSQL_DATABASE=sim
+
+  template_db:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=demo
+      - MONGO_INITDB_ROOT_PASSWORD=demo
+      
+  web-backend:
+    build:
+        context: backend
+        dockerfile: Dockerfile
+    environment:
+        DATABASE_NAME: sim
+        DATABASE_HOST: 127.0.0.1
+        DATABASE_PORT: 3306
+        DATABASE_USER: demo
+        DATABASE_PASS: demo
+        SECRET_KEY: ea2n+r$^@4px1c4gqim+l^m=@ew04hc-lupx^c&p(fy48)ma=0
+        MONGO_NAME: sim
+        MONGO_HOST: 127.0.0.1
+        MONGO_PORT: 27017
+        MONGO_USER: demo
+        MONGO_PASS: demo
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - migration
+      - application_db
+  migration:
+    image: mariadb
+    command: python manage.py migrate
+    volumes:
+      - .:/backend
+    depends_on:
+      - application_db
+  
+  web-frontend:
+    build: 
+        context: frontend
+        dockerfile: Dockerfile
+    environment:
+      PORT: 3000
+      REACT_APP_DJANGO_HOST: http://localhost:8000
+    ports:
+      - 3000:3000
+    links:
+      - web-backend
