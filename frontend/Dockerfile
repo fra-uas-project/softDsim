@@ -14,11 +14,9 @@ RUN npm install --legacy-peer-deps
 # Copy or project directory (locally) in the current directory of our docker image (/app)
 COPY . /frontend
 
+EXPOSE 3000
+
 RUN npm i -f
 
-# Build the app
-RUN npm run build
 
-# Expose $PORT on container.
-# We use a varibale here as the port is something that can differ on the environment.
-EXPOSE 3000
+ENTRYPOINT npm run start

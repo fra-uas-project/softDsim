@@ -22,25 +22,13 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=demo
       - MONGO_INITDB_ROOT_PASSWORD=demo
       
-  web-backend:
+  backend:
     build:
         context: backend
         dockerfile: Dockerfile
-    environment:
-        DATABASE_NAME: sim
-        DATABASE_HOST: 127.0.0.1
-        DATABASE_PORT: 3306
-        DATABASE_USER: demo
-        DATABASE_PASS: demo
-        SECRET_KEY: ea2n+r$^@4px1c4gqim+l^m=@ew04hc-lupx^c&p(fy48)ma=0
-        MONGO_NAME: sim
-        MONGO_HOST: 127.0.0.1
-        MONGO_PORT: 27017
-        MONGO_USER: demo
-        MONGO_PASS: demo
+    env_file:
+        /backend/.env
     command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/backend
     ports:
       - "8000:8000"
     depends_on:
@@ -49,19 +37,16 @@ services:
   migration:
     image: mariadb
     command: python manage.py migrate
-    volumes:
-      - .:/backend
     depends_on:
       - application_db
   
-  web-frontend:
+  frontend:
     build: 
         context: frontend
         dockerfile: Dockerfile
-    environment:
-      PORT: 3000
-      REACT_APP_DJANGO_HOST: http://localhost:8000
+    env_file:
+        /frontend/.env
     ports:
       - 3000:3000
-    links:
-      - web-backend
+    depends_on:
+      - backend
