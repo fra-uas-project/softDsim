@@ -537,31 +537,80 @@ def handle_event(data, scenario: TemplateScenario, i):
     event.template_scenario = scenario
     event.text = data['displayName']
     event.trigger_type = data['trigger_type']
+    event.trigger_comparator = data['trigger_comparator']
 
     try:
         event.trigger_value = float(data['trigger_value'])
     except:
-        event.trigger_type = 0
-
-    event.trigger_comparator = data['trigger_comparator']
+        event.trigger_value = 0
 
     event.save()
 
-    list_of_effect_types = ['budget',
-                            'duration',
-                            'easy_tasks',
-                            'medium_tasks',
-                            'hard_tasks',
-                            'stress',
-                            'motivation',
-                            'familiarity']
+    valued_effect_types = [
+        'budget',
+        'duration',
+        'stress',
+        'motivation',
+        'familiarity'
+    ]
 
-    for effect_type in list_of_effect_types:
-        get_effect(data, event, effect_type)
+    for effect_type in valued_effect_types:
+        get_valued_effect(effect_type, data[effect_type], event)
+
+    get_tasks_effects(data, event)
 
     event.save()
 
-    return i
+    return i + 1
+
+
+def get_valued_effect(effect_type: str, value: str, event: Event) -> EventEffect:
+    effect: EventEffect = EventEffect()
+    effect.event = event
+
+    if effect_type == 'budget':
+        effect.type = 'cost'
+    elif effect_type == 'duration':
+        effect.type = 'time'
+    else:
+        effect.type = effect_type
+
+    effect.easy_tasks = 0
+    effect.medium_tasks = 0
+    effect.hard_tasks = 0
+
+    try:
+        effect.value = float(value)
+    except:
+        effect.value = 0
+
+    effect.save()
+    return effect
+
+
+def get_tasks_effects(data, event: Event) -> EventEffect:
+    effect: EventEffect = EventEffect()
+    effect.event = event
+    effect.type = 'tasks'
+    effect.value = 0
+
+    try:
+        effect.easy_tasks = int(data['easy_tasks'])
+    except:
+        effect.easy_tasks = 0
+
+    try:
+        effect.medium_tasks = int(data['medium_tasks'])
+    except:
+        effect.medium_tasks = 0
+
+    try:
+        effect.hard_tasks = int(data['hard_tasks'])
+    except:
+        effect.hard_tasks = 0
+
+    effect.save()
+    return effect
 
 
 def get_effect(data, event, effect_type) -> EventEffect:
@@ -588,10 +637,14 @@ def get_effect(data, event, effect_type) -> EventEffect:
         event_effect.hard_tasks = int(data['hard_tasks'])
     except:
         event_effect.hard_tasks = 0
+
     try:
         return event_effect.save()
     except Exception as e:
         logging.error(str(e))
+
+    event_effect.save()
+    return event_effect
 
 
 def set_last_fragement(scenario: TemplateScenario):
