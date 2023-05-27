@@ -4,20 +4,19 @@ from rest_framework.response import Response
 
 def allowed_roles(allowed_roles=[]):
     def decorator(view_class):
-        def wrapper_func(request, *args, **kwargs):
-
+        def wrapper_func(self, request, *args, **kwargs):  # Update the parameter list to include 'self'
             if "all" in allowed_roles:
-                return view_class(request, *args, **kwargs)
+                return view_class(self, request, *args, **kwargs)  # Pass 'self' as the first argument
 
-            user = request.request.user
+            user = request.user
 
             # admin user can call any function
             if user.admin:
-                return view_class(request, *args, **kwargs)
+                return view_class(self, request, *args, **kwargs)  # Pass 'self' as the first argument
 
             for role in allowed_roles:
-                if user.__getattr__(role):
-                    return view_class(request, *args, **kwargs)
+                if getattr(user, role, False):
+                    return view_class(self, request, *args, **kwargs)  # Pass 'self' as the first argument
 
             return Response(
                 {

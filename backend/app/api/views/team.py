@@ -177,7 +177,7 @@ class SkillTypeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["student","creator", "staff"])
     def get(self, request, id=None):
         if id:
             item = SkillType.objects.get(id=id)

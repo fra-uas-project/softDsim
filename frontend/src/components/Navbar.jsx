@@ -82,7 +82,7 @@ const Navbar = () => {
         </Button>
       </HStack>
 
-      {currentUser?.admin && (
+      {currentUser?.staff && (
         <HStack direction="row" spacing={4} justifyContent="flex-end">
           <HStack
             borderRadius="full"
