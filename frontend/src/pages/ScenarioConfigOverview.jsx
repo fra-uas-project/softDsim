@@ -338,9 +338,9 @@ const ScenarioConfigOverview = () => {
             <BreadcrumbLink href="#">Scenario Configurations</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <Button colorScheme="blue" onClick={handleOpenModal}>
-          Create new
-        </Button>
+        {scenarioConfigs.length === 0 && (
+        <Button variant="primary">Create New</Button>
+      )}
       </Flex>
       <Box p={4} bg="white" boxShadow="base" rounded="md">
         <Heading size="lg" mb={4}>
@@ -387,7 +387,7 @@ const ScenarioConfigOverview = () => {
                           >
                             Edit
                           </Button>
-                          <Button
+                         {/*<Button
                             size="sm"
                             colorScheme="red"
                             onClick={() =>
@@ -396,6 +396,7 @@ const ScenarioConfigOverview = () => {
                           >
                             <HiOutlineTrash />
                           </Button>
+                          */}
                         </ButtonGroup>
                       </PopoverTrigger>
                       {/* ... */}
