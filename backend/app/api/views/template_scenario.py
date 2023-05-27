@@ -568,12 +568,7 @@ def get_valued_effect(effect_type: str, value: str, event: Event) -> EventEffect
     effect: EventEffect = EventEffect()
     effect.event = event
 
-    if effect_type == 'budget':
-        effect.type = 'cost'
-    elif effect_type == 'duration':
-        effect.type = 'time'
-    else:
-        effect.type = effect_type
+    effect.type = effect_type
 
     effect.easy_tasks = 0
     effect.medium_tasks = 0

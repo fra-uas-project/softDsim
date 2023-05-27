@@ -13,6 +13,14 @@ from app.models.task import Task
 from app.models.team import Member
 from app.models.user_scenario import EventStatus
 from history.models.result import Result
+from app.models.user_scenario import UserScenario
+
+
+class EventEffectDTO(BaseModel):
+    value: float = 0
+    easy_tasks: int = 0
+    medium_tasks: int = 0
+    hard_tasks: int = 0
 
 
 def find_next_scenario_component(session: CachedScenario):
@@ -143,7 +151,8 @@ class WorkpackStatus:
         modulo = workpack.meetings % days
         for day in range(days):
             if day < modulo:
-                self.meetings_per_day.append(meetings_per_day_without_modulo + 1)
+                self.meetings_per_day.append(
+                    meetings_per_day_without_modulo + 1)
             else:
                 self.meetings_per_day.append(meetings_per_day_without_modulo)
 
@@ -172,7 +181,6 @@ def adjust_team_motivation(session, event_effect):
             if min(member.motivation + event_effect.value, 1) >= 0
             else 0
         )
-
 
 
 def adjust_team_familiarity(session, event_effect):
@@ -212,11 +220,9 @@ def add_tasks(session, event_effect):
     )
 
 
-class EventEffectDTO(BaseModel):
-    value: float = 0
-    easy_tasks: int = 0
-    medium_tasks: int = 0
-    hard_tasks: int = 0
+def adjust_duration(session: CachedScenario, event_effect: EventEffectDTO):
+    scenario: UserScenario = session.scenario
+    pass
 
 
 def event_triggered(session: CachedScenario):
@@ -228,7 +234,7 @@ def event_triggered(session: CachedScenario):
         "tasks_done": len(tasks.done()),
         "time": scenario.state.day,
         "stress": scenario.team.stress(session.members),
-        "cost": scenario.state.cost,
+        "budget": scenario.state.cost,
         "familiarity": scenario.team.familiarity(session.members),
     }
 
@@ -238,6 +244,7 @@ def event_triggered(session: CachedScenario):
         "familiarity": adjust_team_familiarity,
         "tasks": add_tasks,
         "budget": adjust_budget,
+        "duration": adjust_duration
     }
 
     # get all events
