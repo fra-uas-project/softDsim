@@ -14,6 +14,7 @@ from app.models.team import Member
 from app.models.user_scenario import EventStatus
 from history.models.result import Result
 from app.models.user_scenario import UserScenario
+from app.models.template_scenario import TemplateScenario
 
 
 class EventEffectDTO(BaseModel):
@@ -221,8 +222,20 @@ def add_tasks(session, event_effect):
 
 
 def adjust_duration(session: CachedScenario, event_effect: EventEffectDTO):
-    scenario: UserScenario = session.scenario
-    pass
+    user_scenario: UserScenario = session.scenario
+    template_scenario: TemplateScenario = user_scenario.template
+
+    print('********** adjusting the duration *******')
+    print('before')
+    print(template_scenario.management_goal.duration)
+    template_scenario.management_goal.duration = template_scenario.management_goal.duration + event_effect.value
+
+    print('after')
+    print(template_scenario.management_goal.duration)
+
+    user_scenario.template = template_scenario
+
+    session.scenario = user_scenario
 
 
 def event_triggered(session: CachedScenario):
