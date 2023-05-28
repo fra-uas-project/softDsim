@@ -72,7 +72,7 @@ const Navbar = () => {
             Scenario Studio
           </Button>
         )}
-        {currentUser?.staff && (
+        {currentUser?.admin && (
           <Button variant="link" as={Link} to="/users">
             User Management
           </Button>
