@@ -484,7 +484,7 @@ const ScenarioConfigOverview = () => {
                         return;
                       }
 
-                      const isValidInput = /^-?\d*$/.test(inputValue);
+                      const isValidInput = /^-?\d*\.?\d*$/.test(inputValue);
                       if (!isValidInput && e.key !== "Backspace") {
                         e.preventDefault();
                       }
@@ -656,7 +656,7 @@ const ScenarioConfigOverview = () => {
                         return;
                       }
 
-                      const isValidInput = /^-?\d*$/.test(inputValue);
+                      const isValidInput = /^-?\d*\.?\d*$/.test(inputValue);
                       if (!isValidInput && e.key !== "Backspace") {
                         e.preventDefault();
                       }
