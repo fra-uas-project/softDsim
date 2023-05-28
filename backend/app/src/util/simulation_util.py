@@ -222,20 +222,7 @@ def add_tasks(session, event_effect):
 
 
 def adjust_duration(session: CachedScenario, event_effect: EventEffectDTO):
-    user_scenario: UserScenario = session.scenario
-    template_scenario: TemplateScenario = user_scenario.template
-
-    print('********** adjusting the duration *******')
-    print('before')
-    print(template_scenario.management_goal.duration)
-    template_scenario.management_goal.duration = template_scenario.management_goal.duration + event_effect.value
-
-    print('after')
-    print(template_scenario.management_goal.duration)
-
-    user_scenario.template = template_scenario
-
-    session.scenario = user_scenario
+    session.scenario.state.day = session.scenario.state.day - event_effect.value
 
 
 def event_triggered(session: CachedScenario):
