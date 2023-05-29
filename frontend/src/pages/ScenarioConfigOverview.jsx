@@ -133,93 +133,93 @@ const ScenarioConfigOverview = () => {
   };
 
   const handleCreateScenarioConfig = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const {
-      name,
-      stressWeekendReduction,
-      stressOvertimeIncrease,
-      stressErrorIncrease,
-      doneTasksPerMeeting,
-      trainSkillIncreaseRate,
-      costMemberTeamEvent,
-      randomness,
-    } = scenarioConfigForm;
+  const {
+    name,
+    stressWeekendReduction,
+    stressOvertimeIncrease,
+    stressErrorIncrease,
+    doneTasksPerMeeting,
+    trainSkillIncreaseRate,
+    costMemberTeamEvent,
+    randomness,
+  } = scenarioConfigForm;
 
-    const newScenarioConfig = {
-      name,
-      stress_weekend_reduction: stressWeekendReduction,
-      stress_overtime_increase: stressOvertimeIncrease,
-      stress_error_increase: stressErrorIncrease,
-      done_tasks_per_meeting: doneTasksPerMeeting,
-      train_skill_increase_rate: trainSkillIncreaseRate,
-      cost_member_team_event: costMemberTeamEvent,
-      randomness,
-    };
+  const newScenarioConfig = {
+    name,
+    stress_weekend_reduction: stressWeekendReduction,
+    stress_overtime_increase: stressOvertimeIncrease,
+    stress_error_increase: stressErrorIncrease,
+    done_tasks_per_meeting: doneTasksPerMeeting,
+    train_skill_increase_rate: trainSkillIncreaseRate,
+    cost_member_team_event: costMemberTeamEvent,
+    randomness,
+  };
 
-    try {
-      const nameExists = checkScenarioConfigNameExists(name);
+  try {
+    const nameExists = checkScenarioConfigNameExists(name);
 
-      if (nameExists) {
-        toast({
-          title: "Failed to create Scenario Configuration",
-          description:
-            "Scenario Configuration name already exists. Please provide a different name.",
-          status: "warning",
-          duration: 5000,
-        });
-        return;
-      } else {
-        const res = await fetch(
-          `${process.env.REACT_APP_DJANGO_HOST}/api/scenario-config`,
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": getCookie("csrftoken"),
-            },
-            body: JSON.stringify(newScenarioConfig),
-          }
-        );
-
-        if (res.ok) {
-          toast({
-            title: `${newScenarioConfig.name} has been created`,
-            status: "success",
-            duration: 5000,
-          });
-
-          setScenarioConfigForm({
-            name: "",
-            stressWeekendReduction: "-",
-            stressOvertimeIncrease: 0,
-            stressErrorIncrease: 0,
-            doneTasksPerMeeting: 0,
-            trainSkillIncreaseRate: 0,
-            costMemberTeamEvent: 0,
-            randomness: 0,
-          });
-
-          fetchScenarioConfigs();
-
-          setIsModalOpen(false);
-        } else {
-          toast({
-            title: "Failed to create scenario configuration",
-            status: "error",
-            duration: 5000,
-          });
-        }
-      }
-    } catch (error) {
+    if (nameExists) {
       toast({
-        title: "An error occurred",
-        status: "error",
+        title: "Failed to create Scenario Configuration",
+        description:
+          "Scenario Configuration name already exists. Please provide a different name.",
+        status: "warning",
         duration: 5000,
       });
+      return;
+    } else {
+      const res = await fetch(
+        `${process.env.REACT_APP_DJANGO_HOST}/api/scenario-config`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify(newScenarioConfig),
+        }
+      );
+
+      if (res.ok) {
+        toast({
+          title: `${newScenarioConfig.name} has been created`,
+          status: "success",
+          duration: 5000,
+        });
+
+        setScenarioConfigForm({
+          name: "",
+          stressWeekendReduction: "-",
+          stressOvertimeIncrease: 0,
+          stressErrorIncrease: 0,
+          doneTasksPerMeeting: 0,
+          trainSkillIncreaseRate: 0,
+          costMemberTeamEvent: 0,
+          randomness: 0,
+        });
+
+        fetchScenarioConfigs();
+
+        setIsModalOpen(false);
+      } else {
+        toast({
+          title: "Failed to create scenario configuration",
+          status: "error",
+          duration: 5000,
+        });
+      }
     }
-  };
+  } catch (error) {
+    toast({
+      title: "An error occurred",
+      status: "error",
+      duration: 5000,
+    });
+  }
+};
 
   useEffect(() => {
     fetchScenarioConfigs();
@@ -339,7 +339,7 @@ const ScenarioConfigOverview = () => {
           </BreadcrumbItem>
         </Breadcrumb>
         {scenarioConfigs.length === 0 && (
-        <Button variant="primary">Create New</Button>
+        <Button onClick={handleOpenModal} colorScheme="blue" >Create New</Button>
       )}
       </Flex>
       <Box p={4} bg="white" boxShadow="base" rounded="md">
@@ -387,7 +387,7 @@ const ScenarioConfigOverview = () => {
                           >
                             Edit
                           </Button>
-                         {/*<Button
+                         {/*{<Button
                             size="sm"
                             colorScheme="red"
                             onClick={() =>
@@ -396,10 +396,10 @@ const ScenarioConfigOverview = () => {
                           >
                             <HiOutlineTrash />
                           </Button>
-                          */}
+                          }*/}
                         </ButtonGroup>
                       </PopoverTrigger>
-                      {/* ... */}
+
                     </Popover>
                   </Td>
                 </Tr>
