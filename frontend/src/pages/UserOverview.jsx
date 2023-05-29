@@ -94,7 +94,10 @@ const UserOverview = () => {
                     "X-CSRFToken": getCookie("csrftoken"),
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ [roleToChange.role]: !roleToChange.value })
+                body: JSON.stringify({
+                [roleToChange.role]: !roleToChange.value,
+                [role.CREATOR]: !roleToChange.value // Update CREATOR role along with STAFF
+            })
             })
             await res.json();
             fetchUsers();

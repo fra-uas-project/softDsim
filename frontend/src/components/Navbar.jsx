@@ -72,7 +72,7 @@ const Navbar = () => {
             Scenario Studio
           </Button>
         )}
-        {currentUser?.staff && (
+        {currentUser?.admin && (
           <Button variant="link" as={Link} to="/users">
             User Management
           </Button>
@@ -82,7 +82,7 @@ const Navbar = () => {
         </Button>
       </HStack>
 
-      {currentUser?.admin && (
+      {currentUser?.staff && (
         <HStack direction="row" spacing={4} justifyContent="flex-end">
           <HStack
             borderRadius="full"
