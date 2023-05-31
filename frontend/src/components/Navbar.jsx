@@ -5,13 +5,14 @@ import {
   HStack,
   Image,
   Menu,
+  Text,
   MenuButton,
   MenuGroup,
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
 import Logo from "../images/logo-simplify.png";
-import { HiMenu, HiOutlineLogout } from "react-icons/hi";
+import { HiMenu, HiOutlineLogout, HiUserCircle  } from "react-icons/hi";
 import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthProvider";
@@ -62,6 +63,15 @@ const Navbar = () => {
       <Box as={Link} to={"/"}>
         <Image src={Logo} alt="logo" w={14} objectFit="contain" />
       </Box>
+
+      {currentUser && (
+        <HStack ml={4} spacing={2} alignItems="center">
+          <HiUserCircle size={20} />
+          <Text fontWeight="bold">{currentUser.username}</Text>
+        </HStack>
+      )}
+
+
       <HStack w="100%" justifyContent="center" gap={14}>
         <Button variant="link" as={Link} to="/scenarios">
           Scenarios
