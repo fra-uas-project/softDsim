@@ -34,6 +34,10 @@ def handle_question_answers(req, session: CachedScenario):
             session.scenario.question_points += sum(
                 [a.points for a in selected_answers]
             )
+
+            if session.scenario.question_points < 0:
+                session.scenario.question_points = 0
+
     except Exception as e:
         logging.warning(
             f"{e.__class__.__name__} occurred when handling question answers"
