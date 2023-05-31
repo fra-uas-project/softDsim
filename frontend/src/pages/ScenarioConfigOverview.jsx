@@ -14,6 +14,7 @@ import {
   VStack,
   Td,
   Spinner,
+  FormHelperText,
   Button,
   Container,
   useToast,
@@ -47,10 +48,6 @@ const ScenarioConfigOverview = () => {
   const [updatedScenarioConfig, setUpdatedScenarioConfig] = useState([]);
 
   const [isModal2Open, setIsModal2Open] = useState(false);
-
-  const openModal2 = () => {
-    setIsModal2Open(true);
-  };
 
   const closeModal2 = () => {
     setIsModal2Open(false);
@@ -225,11 +222,6 @@ const ScenarioConfigOverview = () => {
     fetchScenarioConfigs();
   }, []);
 
-  const handleOpenDeleteDialog = (scenarioConfig) => {
-    setSelectedScenarioConfig(scenarioConfig);
-    setIsDeleteOpen(true);
-  };
-
   const handleCloseDeleteDialog = () => {
     setIsDeleteOpen(false);
   };
@@ -387,16 +379,7 @@ const ScenarioConfigOverview = () => {
                           >
                             Edit
                           </Button>
-                         {/*{<Button
-                            size="sm"
-                            colorScheme="red"
-                            onClick={() =>
-                              handleOpenDeleteDialog(scenarioConfig)
-                            }
-                          >
-                            <HiOutlineTrash />
-                          </Button>
-                          }*/}
+
                         </ButtonGroup>
                       </PopoverTrigger>
 
@@ -629,6 +612,9 @@ const ScenarioConfigOverview = () => {
                 </FormControl>
                 <FormControl>
                   <FormLabel>Stress Weekend Reduction</FormLabel>
+                                    <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a negative number.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="stress_weekend_reduction"
@@ -665,6 +651,9 @@ const ScenarioConfigOverview = () => {
                 </FormControl>
                 <FormControl>
                   <FormLabel>Stress Overtime Increase</FormLabel>
+                                    <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between 0 and 100.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="stress_overtime_increase"
@@ -680,9 +669,13 @@ const ScenarioConfigOverview = () => {
                       }
                     }}
                   />
+
                 </FormControl>
                 <FormControl>
                   <FormLabel>Stress Error Increase</FormLabel>
+                                    <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between 0 and 100.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="stress_error_increase"
@@ -698,9 +691,13 @@ const ScenarioConfigOverview = () => {
                       }
                     }}
                   />
+
                 </FormControl>
                 <FormControl>
                   <FormLabel>Done Tasks Per Meeting</FormLabel>
+                                    <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between 0 and 100.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="done_tasks_per_meeting"
@@ -716,9 +713,13 @@ const ScenarioConfigOverview = () => {
                       }
                     }}
                   />
+
                 </FormControl>
                 <FormControl>
                   <FormLabel>Train Skill Increase Rate</FormLabel>
+                                    <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between 0 and 100.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="train_skill_increase_rate"
@@ -734,9 +735,13 @@ const ScenarioConfigOverview = () => {
                       }
                     }}
                   />
+
                 </FormControl>
                 <FormControl>
                   <FormLabel>Cost Member Team Event</FormLabel>
+                                    <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between 0 and 100.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="cost_member_team_event"
@@ -752,6 +757,7 @@ const ScenarioConfigOverview = () => {
                       }
                     }}
                   />
+
                 </FormControl>
                 <FormControl isRequired>
                   <FormLabel>Randomness</FormLabel>
