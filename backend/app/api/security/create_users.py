@@ -1,5 +1,3 @@
-import copy
-
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,6 +10,8 @@ from custom_user.models import User
 import random
 import string
 import logging
+import copy
+
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
