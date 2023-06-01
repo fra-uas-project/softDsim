@@ -528,8 +528,6 @@ def handle_model(data, scenario: TemplateScenario, i):
         #m.kanban = True
 
     m.save()
-    print(data.get("models"))
-    print("HHHHHHHHHHHHHHHHHHHHHHHHHEEEEEEEEEEEEEEEERRRRRRRRRRRRRRRRRREEEEEEEEEEEEE -------------------")
     return i + 1
 
 
