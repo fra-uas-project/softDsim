@@ -100,14 +100,6 @@ const ScenarioOverview = () => {
     }
   };
 
-  const removeTZFromDateString = (dateString) => {
-  return dateString.replace("T", " ").replace("Z", "");
-};
-
-const formatNumber = (number) => {
-  return Number.isInteger(number) ? number.toString() : number.toFixed(2);
-};
-
 const downloadScenario = async (scenario) => {
   try {
     const queryParams = new URLSearchParams({ template_scenario_id: scenario.id }).toString();
@@ -123,26 +115,18 @@ const downloadScenario = async (scenario) => {
     if (Object.keys(response.data).length > 0) {
       const headers = Object.keys(response.data[0]).map(key => key);
       const values = Object.values(response.data);
-       const rows = values.map(obj => Object.values(obj).map(val => {
-        if (typeof val === 'string' && headers.includes('timestamp')) {
-          return removeTZFromDateString(val);
-        } else if (typeof val === 'number') {
-          return formatNumber(val);
-        }
-        return val.toString();
-      }));
 
-      const tsvContent = [
-        headers.join("\t"),
-        ...rows.map((row) => row.join("\t"))
+      const csvContent = [
+        headers.join(";"),
+        ...values.map(obj => headers.map(key => JSON.stringify(obj[key] || "")).join(";"))
       ].join("\n");
 
-      const encodedTsvContent = encodeURIComponent(tsvContent);
-      const downloadLink = `data:application/vnd.ms-excel;charset=utf-8,${encodedTsvContent}`;
+      const encodedCsvContent = encodeURIComponent(csvContent);
+      const downloadLink = `data:text/csv;charset=utf-8,${encodedCsvContent}`;
 
       const link = document.createElement("a");
       link.href = downloadLink;
-      link.download = `${scenario.name}.xls`;
+      link.download = `${scenario.name.replace(/\s/g, '_')}.csv`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
