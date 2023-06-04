@@ -5,22 +5,26 @@ import {
   HStack,
   Image,
   Menu,
+  Text,
   MenuButton,
   MenuGroup,
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
 import Logo from "../images/logo-simplify.png";
-import { HiMenu, HiOutlineLogout, HiOutlineCog } from "react-icons/hi";
+import { HiMenu, HiOutlineLogout, HiUserCircle  } from "react-icons/hi";
 import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthProvider";
 import { useCookies } from "react-cookie";
 import { getCookie } from "../utils/utils";
+import { HiOutlineCog } from "react-icons/hi";
 
 const Navbar = () => {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
-  const [removeCsrfCookie] = useCookies(["csrftoken"]);
+  const [csrfCookie, setCsrfCookie, removeCsrfCookie] = useCookies([
+    "csrftoken",
+  ]);
 
   const menuButton = useRef();
 
@@ -59,6 +63,15 @@ const Navbar = () => {
       <Box as={Link} to={"/"}>
         <Image src={Logo} alt="logo" w={14} objectFit="contain" />
       </Box>
+
+      {currentUser && (
+        <HStack ml={4} spacing={2} alignItems="center">
+          <HiUserCircle size={20} />
+          <Text fontWeight="bold">{currentUser.username}</Text>
+        </HStack>
+      )}
+
+
       <HStack w="100%" justifyContent="center" gap={14}>
         <Button variant="link" as={Link} to="/scenarios">
           Scenarios
@@ -69,50 +82,46 @@ const Navbar = () => {
             Scenario Studio
           </Button>
         )}
-        {currentUser?.staff && (
+        {currentUser?.admin && (
           <Button variant="link" as={Link} to="/users">
             User Management
           </Button>
         )}
-
         <Button variant="link" as={Link} to="/help">
           Help
         </Button>
       </HStack>
 
-      <HStack direction="row" spacing={4} justifyContent="flex-end">
-        <HStack
-          borderRadius="full"
-          backgroundColor="white"
-          p={3}
-          boxShadow="xl"
-        >
-          <Menu>
-            <MenuButton ref={menuButton} size="sm" cursor="pointer">
-              <HiOutlineCog />
-            </MenuButton>
-            <MenuList mt={2}>
-              <MenuGroup>
-                <MenuItem color="black" as={Link} to="/skill-types">
-                  Skill Types
-                </MenuItem>
-                <MenuItem color="black" as={Link} to="/scenario-config">
-                  Scenario Configurations
-                </MenuItem>
-              </MenuGroup>
-            </MenuList>
-          </Menu>
+      {currentUser?.staff && (
+        <HStack direction="row" spacing={4} justifyContent="flex-end">
+          <HStack
+            borderRadius="full"
+            backgroundColor="white"
+            p={3}
+            boxShadow="xl"
+          >
+            <Menu>
+              <MenuButton ref={menuButton} size="sm" cursor="pointer">
+                <HiOutlineCog />
+              </MenuButton>
+              <MenuList mt={2}>
+                <MenuGroup>
+                  <MenuItem color="black" as={Link} to="/skill-types">
+                    Skill Types
+                  </MenuItem>
+                </MenuGroup>
+              </MenuList>
+            </Menu>
+          </HStack>
         </HStack>
+      )}
 
+      <HStack justifyContent="flex-end">
         <HStack
-          direction="row"
-          spacing={4}
-          justifyContent="flex-end"
           borderRadius="full"
           backgroundColor="white"
           p={3}
           boxShadow="xl"
-          marginLeft={4}
         >
           <Menu>
             <MenuButton ref={menuButton} size="sm" cursor="pointer">

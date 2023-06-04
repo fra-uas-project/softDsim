@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import Routing from "./Routing";
 import {AuthProvider} from "./context/AuthProvider";
 import ScrollToTop from "./components/ScrollToTop";
+import LogoutTimer from "./components/LogoutTimer";
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
                         <Navbar/>
                         <Routing/>
                         <Footer/>
+                        <LogoutTimer />
                     </ScrollToTop>
                 </AuthProvider>
             </BrowserRouter>
