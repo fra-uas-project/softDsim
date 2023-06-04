@@ -27,7 +27,7 @@ from app.api.views.template_scenario import (
 from app.api.views.user import UserView
 # from app.api.views.sim_api import ParameterSimulation
 from app.api.views.user_scenario import UserScenarioViews
-from history.view import HistoryView, ResultView
+from history.view import HistoryView, ResultView, ResultsView
 
 urlpatterns = [
     # User stuff
@@ -42,12 +42,16 @@ urlpatterns = [
     path("template-scenario", TemplateScenarioView.as_view()),
     path("template-scenario/<int:scenario_id>", TemplateScenarioView.as_view()),
     path("template-overview", TemplateScenarioUserListView.as_view()),
-    path("template-overview/<int:scenario_id>", TemplateScenarioUserListView.as_view()),
-    path("template-scenario/from-studio", TemplateScenarioFromStudioView.as_view()),
+    path("template-overview/<int:scenario_id>",
+         TemplateScenarioUserListView.as_view()),
+    path("template-scenario/from-studio",
+         TemplateScenarioFromStudioView.as_view()),
     # template scenario studio
     path("studio/template-scenario", StudioTemplateScenarioView.as_view()),
-    path("studio/template-scenario/<str:scenario_id>", StudioTemplateScenarioView.as_view()),
-    path("studio/template-scenario-is-published-validator", StudioTemplateScenarioIsPublishedValidatorView.as_view()),
+    path("studio/template-scenario/<str:scenario_id>",
+         StudioTemplateScenarioView.as_view()),
+    path("studio/template-scenario-is-published-validator",
+         StudioTemplateScenarioIsPublishedValidatorView.as_view()),
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
     path("user-scenario/<int:id>", UserScenarioViews.as_view()),
@@ -80,5 +84,6 @@ urlpatterns = [
     path("history", HistoryView.as_view()),
     path("history/<int:id>", HistoryView.as_view()),
     path("result/<int:id>", ResultView.as_view()),
+    path("results", ResultsView.as_view()),
     # path("sim/param", ParameterSimulation.as_view()),
 ]
