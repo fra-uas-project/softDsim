@@ -15,6 +15,8 @@ from history.models.history import History
 from history.serializers.result import ResultSerializer
 from app.models.template_scenario import TemplateScenario
 
+import datetime
+
 
 class HistoryView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -101,15 +103,19 @@ class ResultsView(APIView):
     @allowed_roles(["admin"])
     def get(self, request, id=None):
         id = request.GET.get('template_scenario_id')
+        date_str: str = request.GET.get('from', None)
         try:
             template_id = int(id)
             if template_id < 1:
                 raise ObjectDoesNotExist()
 
-            # check if scenario exists
-            TemplateScenario.objects.get(id=template_id)
+            results: Result = []
 
-            results = Result.objects.filter(template_scenario_id=template_id)
+            if is_date_valid(date_str):
+                results = fetch_results_by_scenario_id_and_date(
+                    template_id, date_str)
+            else:
+                results = fetch_results_by_scenario_id(template_id)
 
             data = ResultSerializer(results, many=True).data
 
@@ -128,3 +134,25 @@ class ResultsView(APIView):
                 data={"status": "error", "data": msg},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+def is_date_valid(date_str: str) -> bool:
+    try:
+        datetime.date.fromisoformat(date_str)
+        return True
+    except:
+        return False
+
+
+def fetch_results_by_scenario_id_and_date(scenario_id: int, date_str: str):
+
+    # cant make result in the future
+    if datetime.date.fromisoformat(date_str) > datetime.date.today():
+        return []
+
+    return Result.objects.filter(
+        template_scenario_id=scenario_id).filter(timestamp__gte=date_str)
+
+
+def fetch_results_by_scenario_id(scenario_id: int, date: str):
+    return Result.objects.filter(template_scenario_id=scenario_id)
