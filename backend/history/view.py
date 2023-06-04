@@ -128,30 +128,3 @@ class ResultsView(APIView):
                 data={"status": "error", "data": msg},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
-        """ try:
-            r = Result.objects.get(id=id)
-            s = ResultSerializer(r)
-            if (
-                request.user.admin
-                or request.user.username == r.user_scenario.user.username
-            ):
-                return Response(data=s.data, status=status.HTTP_200_OK)
-            msg = f"User {request.user.username} is not allowed to access result {id}"
-            logging.info(msg)
-            return Response(
-                dict(status="error", data=msg), status=status.HTTP_401_UNAUTHORIZED
-            )
-        except ObjectDoesNotExist:
-            msg = f"Result entry with id {id} does not exist"
-            logging.warn(msg)
-            return Response(
-                data={"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND,
-            )
-        except Exception as e:
-            msg = f"{e.__class__.__name__} occurred when trying to access result entry {id}"
-            logging.warn(msg)
-            return Response(
-                data={"status": "error", "data": msg},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            ) """
