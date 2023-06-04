@@ -13,7 +13,8 @@ class RequestTypeException(BaseException):
 
     def __init__(self):
         super().__init__(
-            "Type of request was not specified. Type has to be one of the following: QUESTION, SIMULATION, MODEL_SELECTION"  # (maybe add more don't know yet)
+            # (maybe add more don't know yet)
+            "Type of request was not specified. Type has to be one of the following: QUESTION, SIMULATION, MODEL_SELECTION"
         )
 
 
@@ -35,7 +36,8 @@ class RequestTypeMismatchException(BaseException):
     """Raised when request type does not match response type of last step in history."""
 
     def __init__(self, type):
-        super().__init__(f"Request type {type} does not match previous response type.")
+        super().__init__(
+            f"Request type {type} does not match previous response type.")
 
 
 class TooManyMeetingsException(BaseException):
@@ -45,3 +47,10 @@ class TooManyMeetingsException(BaseException):
         super().__init__(
             f"Requested {meetings} hours of meetings per day, but only {hours} hours are available per day."
         )
+
+
+class RequestParamException(BaseException):
+    """Raised when request parameter is not valid."""
+
+    def __init__(self, type):
+        super().__init__(f"Query param {type} is not valid.")

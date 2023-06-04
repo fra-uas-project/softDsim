@@ -1,6 +1,8 @@
+from http.client import BAD_REQUEST
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
+from app.exceptions import RequestParamException
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -111,16 +113,23 @@ class ResultsView(APIView):
 
             results: Result = []
 
-            if is_date_valid(date_str):
+            if date_str is None:
+                results = fetch_results_by_scenario_id(template_id)
+            else:
+                is_date_valid(date_str)
                 results = fetch_results_by_scenario_id_and_date(
                     template_id, date_str)
-            else:
-                results = fetch_results_by_scenario_id(template_id)
 
             data = ResultSerializer(results, many=True).data
 
             return Response(
                 data={"status": "success", "data": data}, status=status.HTTP_200_OK,
+            )
+        except RequestParamException as e:
+            msg = f"Date {date_str} is not valid. Only ISO date format is accepted, eg. {datetime.date.today().isoformat()}"
+            return Response(
+                data={"status": "error", "data": msg},
+                status=BAD_REQUEST,
             )
         except ObjectDoesNotExist as e:
             msg = f"Template Scenario with id {id} is not found"
@@ -136,12 +145,11 @@ class ResultsView(APIView):
             )
 
 
-def is_date_valid(date_str: str) -> bool:
+def is_date_valid(date_str: str):
     try:
         datetime.date.fromisoformat(date_str)
-        return True
     except:
-        return False
+        raise RequestParamException('from')
 
 
 def fetch_results_by_scenario_id_and_date(scenario_id: int, date_str: str):
@@ -154,5 +162,5 @@ def fetch_results_by_scenario_id_and_date(scenario_id: int, date_str: str):
         template_scenario_id=scenario_id).filter(timestamp__gte=date_str)
 
 
-def fetch_results_by_scenario_id(scenario_id: int, date: str):
+def fetch_results_by_scenario_id(scenario_id: int):
     return Result.objects.filter(template_scenario_id=scenario_id)
