@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.contrib.auth.hashers import make_password
 
 from app.decorators.decorators import allowed_roles
 
@@ -9,6 +10,8 @@ from custom_user.models import User
 import random
 import string
 import logging
+import copy
+
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
@@ -45,6 +48,13 @@ class UserCreationView(APIView):
             for i in range(start_index, start_index + amount)
         ]
 
+        users_hashedPassword = []
+
+        for user in users:
+            user_copy = copy.copy(user)
+            user_copy["password"] = make_password(user["password"])
+            users_hashedPassword.append(user_copy)
+
         for user in users:
             if User.objects.filter(username=user.get("username")).exists():
                 return Response(
@@ -53,7 +63,7 @@ class UserCreationView(APIView):
                 )
 
         try:
-            for user in users:
+            for user in users_hashedPassword:
                 User.objects.create(**user)
         except Exception as e:
             logging.error(f"{e.__class__.__name__} occured when creating users.")
