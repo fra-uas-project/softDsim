@@ -97,6 +97,8 @@ const SkilltypeContainer = ({
                       <br />
                       <strong>Error rate:</strong> {skillTypeObj.error_rate}
                       <br />
+                      <strong>Throughput:</strong> {skillTypeObj.throughput}
+                      <br />
                       <strong>Management quality:</strong>{" "}
                       {skillTypeObj.management_quality}
                       <br />
