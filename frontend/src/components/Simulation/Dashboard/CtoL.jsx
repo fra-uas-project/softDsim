@@ -1,158 +1,74 @@
-import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
-import {
-  Box,
-  Heading,
-  HStack,
-  Stat,
-  StatArrow,
-  StatHelpText,
-  StatLabel,
-  StatNumber,
-  VStack,
-} from "@chakra-ui/react";
-import { useImmer } from "use-immer";
+import React, { useState } from "react";
+import { Flex, Heading, useBreakpointValue, VStack } from "@chakra-ui/react";
 
-const LineChart = ({ data }) => {
+const CtoL = ({ value, inverseColors, title }) => {
+  const variant = useBreakpointValue({ base: "300px", lg: "300px", "2xl": "300px" });
+
   const tmpOptions = {
     chart: {
-      id: "basic-bar",
+      height: 300,
       toolbar: {
         show: false
-      },
-      zoom: {
-        enabled: false
-      },
-      responsive: [{
-        breakpoint: 1000,
-        options: {
-          chart: {
-            width: "200px"
-          }
-        },
-      }]
-    },
-    annotations: {
-      yaxis: [
-        {
-          y: data["stress"].value,
-          borderColor: data["stress"].color,
-          label: {
-            borderColor: data["stress"].color,
-            style: {
-              color: "#fff",
-              background: data["stress"].color
-            },
-            text: data["stress"].label
-          }
-        },
-        {
-          y: data.motivation.value,
-          borderColor: data.motivation.color,
-          label: {
-            borderColor: data.motivation.color,
-            style: {
-              color: "#fff",
-              background: data.motivation.color
-            },
-            text: data.motivation.label
-          }
-        },
-        {
-          y: data.familiarity.value,
-          borderColor: data.familiarity.color,
-          label: {
-            borderColor: data.familiarity.color,
-            style: {
-              color: "#fff",
-              background: data.familiarity.color
-            },
-            text: data.familiarity.label
-          }
-        }
-      ],
-    },
-    xaxis: {
-      categories: data.categories,
-      tickAmount: 10,
-      labels: {
-        rotate: 0
       }
     },
-    stroke: {
-      curve: 'smooth',
+    xaxis: {
+      categories: ['Stress', 'Motivation', 'Familiarity'] // 设置横轴标签
     },
-    colors: [data.stress.color, data.motivation.color, data.familiarity.color],
+    stroke: {
+      curve: 'smooth' // 设置曲线样式为平滑曲线
+    },
+    colors: ["#F56565"],
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shade: 'dark',
+        type: 'horizontal',
+        shadeIntensity: 0.5,
+        gradientToColors: ['#48a6bb'],
+        inverseColors: inverseColors,
+        opacityFrom: 1,
+        opacityTo: 1,
+        stops: [0, 100]
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    markers: {
+      size: 6,
+      colors: ['#F56565'],
+      strokeColors: '#fff',
+      strokeWidth: 2,
+      hover: {
+        size: 8
+      }
+    }
   };
 
-  const tmpSeries = [
+  const [options, setOptions] = useState(tmpOptions);
+
+  const series = [
     {
-      name: data.stress.label,
-      data: []
-    },
-    {
-      name: data.motivation.label,
-      data: []
-    },
-    {
-      name: data.familiarity.label,
-      data: []
+      name: 'Percentage',
+      data: [value.stress, value.motivation, value.familiarity] // 设置折线图的数据
     }
   ];
 
-  const [options, setOptions] = useState(tmpOptions);
-  const [series, setSeries] = useImmer(tmpSeries);
-
-  useEffect(() => {
-    setSeries(draft => {
-      draft[0].data.push(data.stress.value);
-      draft[1].data.push(data.motivation.value);
-      draft[2].data.push(data.familiarity.value);
-    });
-  }, [data]);
-
   return (
-    <HStack backgroundColor="white" borderRadius="2xl" p={5} spacing={15} mb={5} w="full">
-      <VStack justifyContent="flex-start" alignItems="start" w="full">
-        <Heading size="lg" ml={5}>{data.title}</Heading>
-        <Box w="100%" h="300px">
-          <Chart
-            options={options}
-            series={series}
-            type="line"
-            width="100%"
-            height="100%"
-          />
-        </Box>
+    <Flex>
+      <VStack>
+        <Heading size="md">{title}</Heading>
+        <Chart
+          options={options}
+          series={series}
+          type="line"
+          width={variant}
+          height={300}
+        />
       </VStack>
-      <VStack minW="200px" alignItems="baseline">
-        <Stat>
-          <StatLabel color="gray.400">{data.stress.label}</StatLabel>
-          <StatNumber>{data.stress.value}</StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
-            {data.stress.change} since last iteration
-          </StatHelpText>
-        </Stat>
-        <Stat>
-          <StatLabel color="gray.400">{data.motivation.label}</StatLabel>
-          <StatNumber>{data.motivation.value}</StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
-            {data.motivation.change} since last iteration
-          </StatHelpText>
-        </Stat>
-        <Stat>
-          <StatLabel color="gray.400">{data.familiarity.label}</StatLabel>
-          <StatNumber>{data.familiarity.value}</StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
-            {data.familiarity.change} since last iteration
-          </StatHelpText>
-        </Stat>
-      </VStack>
-    </HStack>
+    </Flex>
   );
 };
 
-export default LineChart;
+export default CtoL;
