@@ -18,11 +18,6 @@ const Help = () => {
     return (
         <>
             <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-            <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href=''>Help</BreadcrumbLink>
-                </BreadcrumbItem>
-            </Breadcrumb>
             <Heading>Help and FAQ</Heading>
             <Box  h={5}></Box>
             <Box backgroundColor="white" borderRadius="2xl" minH="60vh">
