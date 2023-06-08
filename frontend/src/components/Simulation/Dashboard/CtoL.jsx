@@ -13,10 +13,10 @@ const CtoL = ({ value, inverseColors, title }) => {
       }
     },
     xaxis: {
-      categories: ['Stress', 'Motivation', 'Familiarity'] // 设置横轴标签
+      categories: ['Stress', 'Motivation', 'Familiarity']
     },
     stroke: {
-      curve: 'smooth' // 设置曲线样式为平滑曲线
+      curve: 'smooth'
     },
     colors: ["#F56565"],
     fill: {
@@ -43,6 +43,70 @@ const CtoL = ({ value, inverseColors, title }) => {
       hover: {
         size: 8
       }
+    },
+    annotations: {
+      points: [
+        {
+          x: 'Stress',
+          y: value.stress,
+          marker: {
+            size: 6,
+            fillColor: '#FCCB44',
+            strokeWidth: 0,
+            shape: 'circle',
+            radius: 2
+          },
+          label: {
+            borderColor: '#FCCB44',
+            offsetY: 0,
+            style: {
+              color: '#fff',
+              background: '#FCCB44'
+            },
+            text: 'Stress'
+          }
+        },
+        {
+          x: 'Motivation',
+          y: value.motivation,
+          marker: {
+            size: 6,
+            fillColor: '#F56565',
+            strokeWidth: 0,
+            shape: 'circle',
+            radius: 2
+          },
+          label: {
+            borderColor: '#F56565',
+            offsetY: 0,
+            style: {
+              color: '#fff',
+              background: '#F56565'
+            },
+            text: 'Motivation'
+          }
+        },
+        {
+          x: 'Familiarity',
+          y: value.familiarity,
+          marker: {
+            size: 6,
+            fillColor: '#38B2AC',
+            strokeWidth: 0,
+            shape: 'circle',
+            radius: 2
+          },
+          label: {
+            borderColor: '#38B2AC',
+            offsetY: 0,
+            style: {
+              color: '#fff',
+              background: '#38B2AC'
+            },
+            text: 'Familiarity'
+          }
+        }
+      ]
     }
   };
 
@@ -51,7 +115,7 @@ const CtoL = ({ value, inverseColors, title }) => {
   const series = [
     {
       name: 'Percentage',
-      data: [value.stress, value.motivation, value.familiarity] // 设置折线图的数据
+      data: [value.stress, value.motivation, value.familiarity]
     }
   ];
 
