@@ -109,6 +109,9 @@ const Navbar = () => {
                   <MenuItem color="black" as={Link} to="/skill-types">
                     Skill Types
                   </MenuItem>
+                  <MenuItem color="black" as={Link} to="/scenario-config">
+                    Scenario Configurations
+                  </MenuItem>
                 </MenuGroup>
               </MenuList>
             </Menu>
