@@ -131,6 +131,13 @@ const UserOverview = () => {
             <Box h={5}></Box>
             <Box backgroundColor="white" borderRadius="2xl">
                 <Container maxW='6xl' pt={10} h="full" pb={10} minH="70vh" maxH="70vh" >
+                <HStack justifyContent="space-between" mr={3}>
+                        <AddUser />
+                        <Flex align="center" justify="center">
+                            <Link to={{ pathname: "/addusers" }}>
+                                <Button colorScheme='blue'>Add multiple Users</Button>
+                            </Link>
+                        </Flex></HStack>
                     <TableContainer overflowY="auto" h="full">
                         <Table variant='simple' size="lg">
                             <Thead>
@@ -235,13 +242,7 @@ const UserOverview = () => {
                             </Tbody>
                         </Table>
                         <Divider />
-                        <HStack justifyContent="space-between" mr={3}>
-                        <AddUser />
-                        <Flex align="center" justify="center">
-                            <Link to={{ pathname: "/addusers" }}>
-                                <Button colorScheme='blue'>Add multiple Users</Button>
-                            </Link>
-                        </Flex></HStack>
+
                     </TableContainer>
                 </Container>
             </Box>
