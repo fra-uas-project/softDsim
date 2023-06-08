@@ -1,29 +1,29 @@
-print("MAIN SCRIPT")
-from random import randint, random
-from statistics import mean
-from typing import List
-
-import numpy as np
-from pandas import DataFrame
-from app.models.scenario import ScenarioConfig
-from app.models.task import Task
-from app.models.team import Member, SkillType, Team
-from app.models.user_scenario import ScenarioState, UserScenario
-from app.src.simulation import simulate
-from app.dto.request import SimulationRequest, Workpack
-from simulation_framework.wrappers import FastSecenario, FastTasks
-from userparameter.set1 import USERPARAMETERS
-
-from io import StringIO
 import boto3
+from io import StringIO
+from userparameter.set1 import USERPARAMETERS
+from simulation_framework.wrappers import FastSecenario, FastTasks
+from app.dto.request import SimulationRequest, Workpack
+from app.src.simulation import simulate
+from app.models.user_scenario import ScenarioState, UserScenario
+from app.models.team import Member, SkillType, Team
+from app.models.task import Task
+from app.models.scenario import ScenarioConfig
+from pandas import DataFrame
+import numpy as np
+from typing import List
+from statistics import mean
+from random import randint, random
+import os
+print("MAIN SCRIPT")
+
 
 bucket = "softdsim"
 
-
-DATAPATH = "~/data"
+USE_S3 = False
+DATAPATH = "simulation_framework/simulation_data"
 RUNNAME = "run1"
 NRUNS = 1_000_000
-SAVE_EVERY = 10_000
+SAVE_EVERY = 100
 
 Team.objects.create()
 
@@ -91,11 +91,14 @@ def set_tasks(u):
     TOTAL = 200
     tasks = set()
     for _ in range(int(TOTAL * 0.25)):
-        tasks.add(Task(id=randint(0, 9999999999), difficulty=1, user_scenario=u))
+        tasks.add(Task(id=randint(0, 9999999999),
+                  difficulty=1, user_scenario=u))
     for _ in range(int(TOTAL * 0.5)):
-        tasks.add(Task(id=randint(0, 9999999999), difficulty=2, user_scenario=u))
+        tasks.add(Task(id=randint(0, 9999999999),
+                  difficulty=2, user_scenario=u))
     for _ in range(int(TOTAL * 0.25)):
-        tasks.add(Task(id=randint(0, 9999999999), difficulty=3, user_scenario=u))
+        tasks.add(Task(id=randint(0, 9999999999),
+                  difficulty=3, user_scenario=u))
     return FastTasks(tasks)
 
 
@@ -223,17 +226,27 @@ def main():
             set_scenario(scenario, state)
             set_members(members)
             tasks = set_tasks(scenario)
-            run_simulation(scenario, config, members, tasks, skill_types, rec, UP, n)
+            run_simulation(scenario, config, members,
+                           tasks, skill_types, rec, UP, n)
             # print(f"{len(tasks.done())} \t {mean([m.efficiency for m in members])}")
 
         if x % SAVE_EVERY == 0:
             print(f"{x} of {NRUNS}")
-            csv_buffer = StringIO()
-            rec.df().to_csv(csv_buffer)
-            s3_resource = boto3.resource("s3")
-            s3_resource.Object(
-                bucket, f"ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv"
-            ).put(Body=csv_buffer.getvalue())
+            if USE_S3:
+                csv_buffer = StringIO()
+                rec.df().to_csv(csv_buffer)
+                s3_resource = boto3.resource("s3")
+                s3_resource.Object(
+                    bucket, f"ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv"
+                ).put(Body=csv_buffer.getvalue())
+            else:
+                if not os.path.exists(DATAPATH):
+                    os.mkdir(DATAPATH)
+
+                fullname = os.path.join(
+                    DATAPATH, f"ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv")
+
+                rec.df().to_csv(fullname)
             rec.clear()
 
 
