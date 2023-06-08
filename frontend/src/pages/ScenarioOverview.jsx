@@ -24,12 +24,18 @@ import {
   Tr,
   useDisclosure,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+  Input,
 } from "@chakra-ui/react";
-import {
-  HiChevronRight,
-  HiOutlineTrash,
-  HiDownload,
-} from "react-icons/hi";
+import { HiChevronRight, HiOutlineTrash, HiDownload } from "react-icons/hi";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../utils/utils";
@@ -41,8 +47,9 @@ const ScenarioOverview = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { currentUser, setCurrentUser } = useContext(AuthContext);
 
-
   const [selectedScenario, setSelectedScenario] = useState({});
+  const [isDateModalOpen, setIsDateModalOpen] = useState(false);
+  const [startDate, setStartDate] = useState("");
 
   const {
     isOpen: isDeleteOpen,
@@ -100,43 +107,74 @@ const ScenarioOverview = () => {
     }
   };
 
-const downloadScenario = async (scenario) => {
-  try {
-    const queryParams = new URLSearchParams({ template_scenario_id: scenario.id }).toString();
-    const res = await fetch(
-      `${process.env.REACT_APP_DJANGO_HOST}/api/results?${queryParams}`,
-      {
-        method: "GET",
-        credentials: "include",
+  const openDateModal = () => {
+    setIsDateModalOpen(true);
+  };
+
+  const closeDateModal = () => {
+    setIsDateModalOpen(false);
+  };
+
+  const downloadScenario = async (scenario) => {
+    openDateModal();
+    setSelectedScenario(scenario);
+  };
+
+  const handleDownload = async () => {
+    closeDateModal();
+    try {
+      const queryParams = new URLSearchParams();
+      queryParams.append("template_scenario_id", selectedScenario.id);
+
+      if (startDate) {
+        queryParams.append("from", startDate);
       }
-    );
-    const response = await res.json();
 
-    if (Object.keys(response.data).length > 0) {
-      const headers = Object.keys(response.data[0]).map(key => key);
-      const values = Object.values(response.data);
+      const res = await fetch(
+        `${
+          process.env.REACT_APP_DJANGO_HOST
+        }/api/results?${queryParams.toString()}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
-      const csvContent = [
-        headers.join(";"),
-        ...values.map(obj => headers.map(key => JSON.stringify(obj[key] || "")).join(";"))
-      ].join("\n");
+      const response = await res.json();
 
-      const encodedCsvContent = encodeURIComponent(csvContent);
-      const downloadLink = `data:text/csv;charset=utf-8,${encodedCsvContent}`;
+      if (Object.keys(response.data).length > 0) {
+        const headers = Object.keys(response.data[0]).map((key) => key);
+        const values = Object.values(response.data);
 
-      const link = document.createElement("a");
-      link.href = downloadLink;
-      link.download = `${scenario.name.replace(/\s/g, '_')}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      console.log("No data available for scenario");
+        const csvContent = [
+          headers.join(";"),
+          ...values.map((obj) =>
+            headers.map((key) => JSON.stringify(obj[key] || "")).join(";")
+          ),
+        ].join("\n");
+
+        const encodedCsvContent = encodeURIComponent(csvContent);
+        const downloadLink = `data:text/csv;charset=utf-8,${encodedCsvContent}`;
+
+        const link = document.createElement("a");
+        link.href = downloadLink;
+        link.download = `${selectedScenario.name.replace(/\s/g, "_")}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        toast({
+          title: "No data available for this Scenario",
+          status: "error",
+          duration: 5000,
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setStartDate("");
     }
-  } catch (e) {
-    console.log(e);
-  }
-};
+  };
 
   useEffect(() => {
     fetchScenarios();
@@ -145,7 +183,10 @@ const downloadScenario = async (scenario) => {
   return (
     <>
       <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-        <Breadcrumb spacing="8px" separator={<HiChevronRight color="gray.500" />}>
+        <Breadcrumb
+          spacing="8px"
+          separator={<HiChevronRight color="gray.500" />}
+        >
           <BreadcrumbItem>
             <BreadcrumbLink href="">Scenarios</BreadcrumbLink>
           </BreadcrumbItem>
@@ -153,7 +194,14 @@ const downloadScenario = async (scenario) => {
         <Heading>Scenarios</Heading>
         <Box h={5}></Box>
         <Box backgroundColor="white" borderRadius="2xl">
-          <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
+          <Container
+            maxW="6xl"
+            pt={10}
+            minH="70vh"
+            maxH="70vh"
+            h="full"
+            pb={10}
+          >
             {isLoading ? (
               <Flex w="full" justifyContent="center" alignItems="center">
                 <Spinner size="xl" />
@@ -200,16 +248,16 @@ const downloadScenario = async (scenario) => {
                                 setSelectedScenario(scenario);
                               }}
                             />
-                             {currentUser?.admin && (
-        <IconButton
-          variant="ghost"
-          colorScheme="black"
-          aria-label="Download scenario"
-          fontSize="20px"
-          icon={<HiDownload />}
-          onClick={() => downloadScenario(scenario)}
-        />
-        )}
+                            {currentUser?.admin && (
+                              <IconButton
+                                variant="ghost"
+                                colorScheme="black"
+                                aria-label="Download scenario"
+                                fontSize="20px"
+                                icon={<HiDownload />}
+                                onClick={() => downloadScenario(scenario)}
+                              />
+                            )}
                           </Td>
                         </Tr>
                       );
@@ -222,7 +270,6 @@ const downloadScenario = async (scenario) => {
         </Box>
       </Flex>
 
-      {/* Delete scenario alert pop up */}
       <AlertDialog
         isOpen={isDeleteOpen}
         leastDestructiveRef={cancelRef}
@@ -237,7 +284,8 @@ const downloadScenario = async (scenario) => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure that you want to delete {selectedScenario.name}? You can't undo this action afterwards.
+              Are you sure that you want to delete {selectedScenario.name}? You
+              can't undo this action afterwards.
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -258,6 +306,32 @@ const downloadScenario = async (scenario) => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      <Modal isOpen={isDateModalOpen} onClose={closeDateModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Select Date Range</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Start Date</FormLabel>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleDownload}>
+              Download
+            </Button>
+            <Button variant="ghost" onClick={closeDateModal}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
