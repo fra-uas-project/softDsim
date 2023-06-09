@@ -33,6 +33,7 @@ import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 import SkilltypeContainer from "../components/Simulation/Actions/SkilltypeContainer";
 
+
 const Simulation = () => {
     const location = useLocation();
 
@@ -436,8 +437,7 @@ const Simulation = () => {
     const toggleActionList = () => {
         setActionListExpanded(!actionListExpanded)
     }
-
-
+	
     return (
         <>
             <Modal isOpen={isOpen} closeOnOverlayClick={false} isCentered size="3xl">
@@ -571,12 +571,17 @@ const Simulation = () => {
                                                             simValues.tasks.tasks_integration_tested +
                                                             simValues.tasks.tasks_unit_tested
                                                         ) / tasksMax >= 0.8)) ?
-                                                        <Button onClick={() => { manualEndSimulation() }}
-                                                            colorScheme='blue' size='lg' mt={3} mr={5} w="35%" isLoading={nextIsLoading}>
-                                                            <Tooltip label={'The simulation can be finished early, after completing 80% of tasks. This might be useful, when a project is more time reliant.'} aria-label='A tooltip' placement="top">
-                                                                Deliver Project
-                                                            </Tooltip>
-                                                        </Button>
+														//Button to confirm that you want to deliver the project
+                                                         <Button onClick={() => {
+															if (window.confirm("Are you sure you want to deliver the Project?")) {
+																manualEndSimulation();
+															}
+															}}
+																colorScheme='blue' size='lg' mt={3} mr={5} w="35%" isLoading={nextIsLoading}>
+																<Tooltip label={'The simulation can be finished early, after completing 80% of tasks. This might be useful, when a project is more time reliant.'} aria-label='A tooltip' placement="top">
+																Deliver Project
+																</Tooltip>
+														 </Button>
                                                         : <></>
                                                 }
                                                 {/* Finish and Next buttons */}
