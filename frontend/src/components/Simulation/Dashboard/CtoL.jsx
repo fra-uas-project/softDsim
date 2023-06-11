@@ -1,19 +1,47 @@
-import Chart from "react-apexcharts";
 import React, { useState } from "react";
+import Chart from "react-apexcharts";
 import { Flex, Heading, useBreakpointValue, VStack } from "@chakra-ui/react";
 
 const CtoL = ({ value, inverseColors, title }) => {
-  const variant = useBreakpointValue({ base: "300px", lg: "300px", "2xl": "300px" });
+  const variant = useBreakpointValue({ base: "100%", lg: "100%", "2xl": "100%" });
 
   const tmpOptions = {
     chart: {
-      height: 300,
+      id: "basic-bar",
       toolbar: {
         show: false
+      },
+      zoom: {
+        enabled: false
       }
     },
     xaxis: {
-      categories: ['Stress', 'Motivation', 'Familiarity']
+      categories: ['Stress', 'Motivation', 'Familiarity'],
+      axisTicks: {
+        show: false
+      },
+      axisBorder: {
+        show: false
+      },
+      labels: {
+        style: {
+          colors: ['#FCCB44', '#F56565', '#38B2AC'],
+          fontSize: '12px'
+        }
+      }
+    },
+    yaxis: {
+      min: 0,
+      max: 100,
+      tickAmount: 6,
+      labels: {
+        formatter: (value) => {
+          return value.toFixed(0);
+        },
+        style: {
+          fontSize: '12px'
+        }
+      }
     },
     stroke: {
       curve: 'smooth'
@@ -128,7 +156,7 @@ const CtoL = ({ value, inverseColors, title }) => {
           series={series}
           type="line"
           width={variant}
-          height={300}
+          height="300px"
         />
       </VStack>
     </Flex>
