@@ -130,93 +130,93 @@ const ScenarioConfigOverview = () => {
   };
 
   const handleCreateScenarioConfig = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const {
-    name,
-    stressWeekendReduction,
-    stressOvertimeIncrease,
-    stressErrorIncrease,
-    doneTasksPerMeeting,
-    trainSkillIncreaseRate,
-    costMemberTeamEvent,
-    randomness,
-  } = scenarioConfigForm;
+    const {
+      name,
+      stressWeekendReduction,
+      stressOvertimeIncrease,
+      stressErrorIncrease,
+      doneTasksPerMeeting,
+      trainSkillIncreaseRate,
+      costMemberTeamEvent,
+      randomness,
+    } = scenarioConfigForm;
 
-  const newScenarioConfig = {
-    name,
-    stress_weekend_reduction: stressWeekendReduction,
-    stress_overtime_increase: stressOvertimeIncrease,
-    stress_error_increase: stressErrorIncrease,
-    done_tasks_per_meeting: doneTasksPerMeeting,
-    train_skill_increase_rate: trainSkillIncreaseRate,
-    cost_member_team_event: costMemberTeamEvent,
-    randomness,
-  };
+    const newScenarioConfig = {
+      name,
+      stress_weekend_reduction: stressWeekendReduction,
+      stress_overtime_increase: stressOvertimeIncrease,
+      stress_error_increase: stressErrorIncrease,
+      done_tasks_per_meeting: doneTasksPerMeeting,
+      train_skill_increase_rate: trainSkillIncreaseRate,
+      cost_member_team_event: costMemberTeamEvent,
+      randomness,
+    };
 
-  try {
-    const nameExists = checkScenarioConfigNameExists(name);
+    try {
+      const nameExists = checkScenarioConfigNameExists(name);
 
-    if (nameExists) {
+      if (nameExists) {
+        toast({
+          title: "Failed to create Scenario Configuration",
+          description:
+            "Scenario Configuration name already exists. Please provide a different name.",
+          status: "warning",
+          duration: 5000,
+        });
+        return;
+      } else {
+        const res = await fetch(
+          `${process.env.REACT_APP_DJANGO_HOST}/api/scenario-config`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCookie("csrftoken"),
+            },
+            body: JSON.stringify(newScenarioConfig),
+          }
+        );
+
+        if (res.ok) {
+          toast({
+            title: `${newScenarioConfig.name} has been created`,
+            status: "success",
+            duration: 5000,
+          });
+
+          setScenarioConfigForm({
+            name: "",
+            stressWeekendReduction: "-",
+            stressOvertimeIncrease: 0,
+            stressErrorIncrease: 0,
+            doneTasksPerMeeting: 0,
+            trainSkillIncreaseRate: 0,
+            costMemberTeamEvent: 0,
+            randomness: 0,
+          });
+
+          fetchScenarioConfigs();
+
+          setIsModalOpen(false);
+        } else {
+          toast({
+            title: "Failed to create scenario configuration",
+            status: "error",
+            duration: 5000,
+          });
+        }
+      }
+    } catch (error) {
       toast({
-        title: "Failed to create Scenario Configuration",
-        description:
-          "Scenario Configuration name already exists. Please provide a different name.",
-        status: "warning",
+        title: "An error occurred",
+        status: "error",
         duration: 5000,
       });
-      return;
-    } else {
-      const res = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/scenario-config`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": getCookie("csrftoken"),
-          },
-          body: JSON.stringify(newScenarioConfig),
-        }
-      );
-
-      if (res.ok) {
-        toast({
-          title: `${newScenarioConfig.name} has been created`,
-          status: "success",
-          duration: 5000,
-        });
-
-        setScenarioConfigForm({
-          name: "",
-          stressWeekendReduction: "-",
-          stressOvertimeIncrease: 0,
-          stressErrorIncrease: 0,
-          doneTasksPerMeeting: 0,
-          trainSkillIncreaseRate: 0,
-          costMemberTeamEvent: 0,
-          randomness: 0,
-        });
-
-        fetchScenarioConfigs();
-
-        setIsModalOpen(false);
-      } else {
-        toast({
-          title: "Failed to create scenario configuration",
-          status: "error",
-          duration: 5000,
-        });
-      }
     }
-  } catch (error) {
-    toast({
-      title: "An error occurred",
-      status: "error",
-      duration: 5000,
-    });
-  }
-};
+  };
 
   useEffect(() => {
     fetchScenarioConfigs();
@@ -331,8 +331,10 @@ const ScenarioConfigOverview = () => {
           </BreadcrumbItem>
         </Breadcrumb>
         {scenarioConfigs.length === 0 && (
-        <Button onClick={handleOpenModal} colorScheme="blue" >Create New</Button>
-      )}
+          <Button onClick={handleOpenModal} colorScheme="blue">
+            Create New
+          </Button>
+        )}
       </Flex>
       <Box p={4} bg="white" boxShadow="base" rounded="md">
         <Heading size="lg" mb={4}>
@@ -379,10 +381,8 @@ const ScenarioConfigOverview = () => {
                           >
                             Edit
                           </Button>
-
                         </ButtonGroup>
                       </PopoverTrigger>
-
                     </Popover>
                   </Td>
                 </Tr>
@@ -440,78 +440,86 @@ const ScenarioConfigOverview = () => {
                 </FormControl>
                 <FormControl>
                   <FormLabel>Stress Weekend Reduction</FormLabel>
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between -1 and 1.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="stressWeekendReduction"
                     defaultValue={scenarioConfigForm.stressWeekendReduction}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      const inputValue = e.target.value;
+                      if (
+                        inputValue === "" ||
+                        (/^-?\d*\.?\d*$/.test(inputValue) &&
+                          (inputValue === "-" ||
+                            (inputValue >= -1 && inputValue <= 1)))
+                      ) {
+                        handleInputChange(e);
+                      }
+                    }}
                     onKeyDown={(e) => {
                       const inputValue = e.target.value;
                       const caretPosition = e.target.selectionStart;
-
-                      if (
-                        caretPosition === 0 &&
-                        e.key !== "-" &&
-                        e.key !== "Backspace"
-                      ) {
-                        e.preventDefault();
-                        return;
-                      }
-
-                      if (
-                        inputValue.startsWith("-") &&
-                        caretPosition === 1 &&
-                        e.key === "Backspace"
-                      ) {
-                        e.preventDefault();
-                        return;
-                      }
-
-                      const isValidInput = /^-?\d*\.?\d*$/.test(inputValue);
-                      if (!isValidInput && e.key !== "Backspace") {
-                        e.preventDefault();
-                      }
                     }}
                   />
                 </FormControl>
                 <FormControl>
                   <FormLabel>Stress Overtime Increase</FormLabel>
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between 0 and 1.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="stressOvertimeIncrease"
                     value={scenarioConfigForm.stressOvertimeIncrease}
                     onChange={handleInputChange}
-                    onKeyPress={(event) => {
-                      const keyCode = event.which || event.keyCode;
-                      const keyValue = String.fromCharCode(keyCode);
-                      const newValue = event.target.value + keyValue;
+                    onKeyPress={(e) => {
+                      const charCode = e.which ? e.which : e.keyCode;
+                      const inputValue =
+                        e.target.value + String.fromCharCode(charCode);
+                      const isValid =
+                        /^\d*\.?\d*$/.test(inputValue) &&
+                        parseFloat(inputValue) >= 0 &&
+                        parseFloat(inputValue) <= 1;
 
-                      if (!/^\d*\.?\d*$/.test(newValue)) {
-                        event.preventDefault();
+                      if (!isValid) {
+                        e.preventDefault();
                       }
                     }}
                   />
                 </FormControl>
                 <FormControl>
                   <FormLabel>Stress Error Increase</FormLabel>
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between 0 and 1.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="stressErrorIncrease"
                     value={scenarioConfigForm.stressErrorIncrease}
                     onChange={handleInputChange}
-                    onKeyPress={(event) => {
-                      const keyCode = event.which || event.keyCode;
-                      const keyValue = String.fromCharCode(keyCode);
-                      const newValue = event.target.value + keyValue;
+                    onKeyPress={(e) => {
+                      const charCode = e.which ? e.which : e.keyCode;
+                      const inputValue =
+                        e.target.value + String.fromCharCode(charCode);
+                      const isValid =
+                        /^\d*\.?\d*$/.test(inputValue) &&
+                        parseFloat(inputValue) >= 0 &&
+                        parseFloat(inputValue) <= 1;
 
-                      if (!/^\d*\.?\d*$/.test(newValue)) {
-                        event.preventDefault();
+                      if (!isValid) {
+                        e.preventDefault();
                       }
                     }}
                   />
                 </FormControl>
                 <FormControl>
                   <FormLabel>Done Tasks Per Meeting</FormLabel>
+                  <FormLabel>Done Tasks Per Meeting</FormLabel>
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a positive number.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="doneTasksPerMeeting"
@@ -530,6 +538,10 @@ const ScenarioConfigOverview = () => {
                 </FormControl>
                 <FormControl>
                   <FormLabel>Train Skill Increase Rate</FormLabel>
+                  <FormLabel>Done Tasks Per Meeting</FormLabel>
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a positive number.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="trainSkillIncreaseRate"
@@ -548,6 +560,10 @@ const ScenarioConfigOverview = () => {
                 </FormControl>
                 <FormControl>
                   <FormLabel>Cost Member Team Event</FormLabel>
+                  <FormLabel>Done Tasks Per Meeting</FormLabel>
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a positive number.
+                  </FormHelperText>
                   <Input
                     type="text"
                     name="costMemberTeamEvent"
@@ -612,91 +628,84 @@ const ScenarioConfigOverview = () => {
                 </FormControl>
                 <FormControl>
                   <FormLabel>Stress Weekend Reduction</FormLabel>
-                                    <FormHelperText style={{ marginTop: "1px" }}>
-                    Please enter a negative number.
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between -1 and 1.
                   </FormHelperText>
                   <Input
                     type="text"
                     name="stress_weekend_reduction"
                     value={scenarioConfigForm.stress_weekend_reduction}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      const inputValue = e.target.value;
+                      if (
+                        inputValue === "" ||
+                        (/^-?\d*\.?\d*$/.test(inputValue) &&
+                          (inputValue === "-" ||
+                            (inputValue >= -1 && inputValue <= 1)))
+                      ) {
+                        handleInputChange(e);
+                      }
+                    }}
                     onKeyDown={(e) => {
                       const inputValue = e.target.value;
                       const caretPosition = e.target.selectionStart;
-
-                      if (
-                        caretPosition === 0 &&
-                        e.key !== "-" &&
-                        e.key !== "Backspace"
-                      ) {
-                        e.preventDefault();
-                        return;
-                      }
-
-                      if (
-                        inputValue.startsWith("-") &&
-                        caretPosition === 1 &&
-                        e.key === "Backspace"
-                      ) {
-                        e.preventDefault();
-                        return;
-                      }
-
-                      const isValidInput = /^-?\d*\.?\d*$/.test(inputValue);
-                      if (!isValidInput && e.key !== "Backspace") {
-                        e.preventDefault();
-                      }
                     }}
                   />
                 </FormControl>
                 <FormControl>
                   <FormLabel>Stress Overtime Increase</FormLabel>
-                                    <FormHelperText style={{ marginTop: "1px" }}>
-                    Please enter a number between 0 and 100.
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between 0 and 1.
                   </FormHelperText>
                   <Input
                     type="text"
                     name="stress_overtime_increase"
                     value={scenarioConfigForm.stress_overtime_increase}
                     onChange={handleInputChange}
-                    onKeyPress={(event) => {
-                      const keyCode = event.which || event.keyCode;
-                      const keyValue = String.fromCharCode(keyCode);
-                      const newValue = event.target.value + keyValue;
+                    onKeyPress={(e) => {
+                      const charCode = e.which ? e.which : e.keyCode;
+                      const inputValue =
+                        e.target.value + String.fromCharCode(charCode);
+                      const isValid =
+                        /^\d*\.?\d*$/.test(inputValue) &&
+                        parseFloat(inputValue) >= 0 &&
+                        parseFloat(inputValue) <= 1;
 
-                      if (!/^\d*\.?\d*$/.test(newValue)) {
-                        event.preventDefault();
+                      if (!isValid) {
+                        e.preventDefault();
                       }
                     }}
                   />
-
                 </FormControl>
                 <FormControl>
                   <FormLabel>Stress Error Increase</FormLabel>
-                                    <FormHelperText style={{ marginTop: "1px" }}>
-                    Please enter a number between 0 and 100.
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a number between 0 and 1.
                   </FormHelperText>
                   <Input
                     type="text"
                     name="stress_error_increase"
                     value={scenarioConfigForm.stress_error_increase}
                     onChange={handleInputChange}
-                    onKeyPress={(event) => {
-                      const keyCode = event.which || event.keyCode;
-                      const keyValue = String.fromCharCode(keyCode);
-                      const newValue = event.target.value + keyValue;
+                    onKeyPress={(e) => {
+                      const charCode = e.which ? e.which : e.keyCode;
+                      const inputValue =
+                        e.target.value + String.fromCharCode(charCode);
+                      const isValid =
+                        /^\d*\.?\d*$/.test(inputValue) &&
+                        parseFloat(inputValue) >= 0 &&
+                        parseFloat(inputValue) <= 1;
 
-                      if (!/^\d*\.?\d*$/.test(newValue)) {
-                        event.preventDefault();
+                      if (!isValid) {
+                        e.preventDefault();
                       }
                     }}
                   />
-
                 </FormControl>
                 <FormControl>
                   <FormLabel>Done Tasks Per Meeting</FormLabel>
-                                    <FormHelperText style={{ marginTop: "1px" }}>
-                    Please enter a number between 0 and 100.
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a positive number.
                   </FormHelperText>
                   <Input
                     type="text"
@@ -713,12 +722,11 @@ const ScenarioConfigOverview = () => {
                       }
                     }}
                   />
-
                 </FormControl>
                 <FormControl>
                   <FormLabel>Train Skill Increase Rate</FormLabel>
-                                    <FormHelperText style={{ marginTop: "1px" }}>
-                    Please enter a number between 0 and 100.
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a positive number.
                   </FormHelperText>
                   <Input
                     type="text"
@@ -735,12 +743,11 @@ const ScenarioConfigOverview = () => {
                       }
                     }}
                   />
-
                 </FormControl>
                 <FormControl>
                   <FormLabel>Cost Member Team Event</FormLabel>
-                                    <FormHelperText style={{ marginTop: "1px" }}>
-                    Please enter a number between 0 and 100.
+                  <FormHelperText style={{ marginTop: "1px" }}>
+                    Please enter a positive number.
                   </FormHelperText>
                   <Input
                     type="text"
@@ -757,7 +764,6 @@ const ScenarioConfigOverview = () => {
                       }
                     }}
                   />
-
                 </FormControl>
                 <FormControl isRequired>
                   <FormLabel>Randomness</FormLabel>
