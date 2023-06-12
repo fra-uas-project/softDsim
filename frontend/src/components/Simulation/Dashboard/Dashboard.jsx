@@ -80,8 +80,7 @@ const Dashboard = ({data, story}) => {
             <BudgetLineChart title="Budget" data={data}/>
             <Flex>
                 <HStack backgroundColor="white" borderRadius="2xl" p={5} w="full" justifyContent="center">
-                    <CtoL value={data.team} inverseColors={true} title="Avg"/>
-
+                    <CtoL value={data} inverseColors={true} title="Avg"/>
                 </HStack>
             </Flex>
         </>

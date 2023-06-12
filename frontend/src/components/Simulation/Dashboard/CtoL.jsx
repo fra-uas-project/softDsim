@@ -1,59 +1,47 @@
-import React, { useState } from "react";
 import Chart from "react-apexcharts";
+import React, { useEffect, useState } from "react";
 import { Flex, Heading, useBreakpointValue, VStack } from "@chakra-ui/react";
+import { useImmer } from "use-immer";
 
 const CtoL = ({ value, inverseColors, title }) => {
   const variant = useBreakpointValue({ base: "100%", lg: "100%", "2xl": "100%" });
 
+
   const tmpOptions = {
     chart: {
-      id: "basic-bar",
+      height: 300,
       toolbar: {
         show: false
-      },
-      zoom: {
-        enabled: false
-      }
-    },
-    xaxis: {
-      categories: ['Stress', 'Motivation', 'Familiarity'],
-      axisTicks: {
-        show: false
-      },
-      axisBorder: {
-        show: false
-      },
-      labels: {
-        style: {
-          colors: ['#FCCB44', '#F56565', '#38B2AC'],
-          fontSize: '12px'
-        }
       }
     },
     yaxis: {
       min: 0,
       max: 100,
-      tickAmount: 6,
+      tickAmount: 10,
       labels: {
-        formatter: (value) => {
-          return value.toFixed(0);
-        },
-        style: {
-          fontSize: '12px'
-        }
+        formatter: (value) => Math.floor(value)
       }
     },
-    stroke: {
-      curve: 'smooth'
+    xaxis: {
+      categories: Array.from(Array(100).keys(), item => item * 5),
+      tickAmount: 10,
+      labels: {
+        rotate: 0
+      },
+      min: null
     },
-    colors: ["#F56565"],
+    stroke: {
+      curve: "smooth",
+      width: 2,
+    },
+    colors: ["#F56565", "#38B2AC", "#FCCB44"],
     fill: {
-      type: 'gradient',
+      type: "gradient",
       gradient: {
-        shade: 'dark',
-        type: 'horizontal',
+        shade: "dark",
+        type: "horizontal",
         shadeIntensity: 0.5,
-        gradientToColors: ['#48a6bb'],
+        gradientToColors: ["#48a6bb"],
         inverseColors: inverseColors,
         opacityFrom: 1,
         opacityTo: 1,
@@ -64,74 +52,50 @@ const CtoL = ({ value, inverseColors, title }) => {
       enabled: false
     },
     markers: {
-      size: 6,
-      colors: ['#F56565'],
-      strokeColors: '#fff',
-      strokeWidth: 2,
+      size: 0,
       hover: {
-        size: 8
+        sizeOffset: 6
       }
     },
     annotations: {
       points: [
         {
-          x: 'Stress',
-          y: value.stress,
-          marker: {
-            size: 6,
-            fillColor: '#FCCB44',
-            strokeWidth: 0,
-            shape: 'circle',
-            radius: 2
-          },
+          x: "Stress",
+          y: value.team.stress * 100,
           label: {
-            borderColor: '#FCCB44',
+            borderColor: "#FCCB44",
             offsetY: 0,
             style: {
-              color: '#fff',
-              background: '#FCCB44'
+              color: "#fff",
+              background: "#FCCB44"
             },
-            text: 'Stress'
+            text: "Stress"
           }
         },
         {
-          x: 'Motivation',
-          y: value.motivation,
-          marker: {
-            size: 6,
-            fillColor: '#F56565',
-            strokeWidth: 0,
-            shape: 'circle',
-            radius: 2
-          },
+          x: "Motivation",
+          y: value.team.motivation * 100,
           label: {
-            borderColor: '#F56565',
+            borderColor: "#F56565",
             offsetY: 0,
             style: {
-              color: '#fff',
-              background: '#F56565'
+              color: "#fff",
+              background: "#F56565"
             },
-            text: 'Motivation'
+            text: "Motivation"
           }
         },
         {
-          x: 'Familiarity',
-          y: value.familiarity,
-          marker: {
-            size: 6,
-            fillColor: '#38B2AC',
-            strokeWidth: 0,
-            shape: 'circle',
-            radius: 2
-          },
+          x: "Familiarity",
+          y: value.team.familiarity * 100,
           label: {
-            borderColor: '#38B2AC',
+            borderColor: "#38B2AC",
             offsetY: 0,
             style: {
-              color: '#fff',
-              background: '#38B2AC'
+              color: "#fff",
+              background: "#38B2AC"
             },
-            text: 'Familiarity'
+            text: "Familiarity"
           }
         }
       ]
@@ -140,24 +104,37 @@ const CtoL = ({ value, inverseColors, title }) => {
 
   const [options, setOptions] = useState(tmpOptions);
 
-  const series = [
+  const tmpSeries = [
     {
-      name: 'Percentage',
-      data: [value.stress, value.motivation, value.familiarity]
+      name: "Stress",
+      data: []
+    },
+    {
+      name: "Motivation",
+      data: []
+    },
+    {
+      name: "Familiarity",
+      data: []
     }
   ];
+  const [series, setSeries] = useImmer(tmpSeries);
+
+  useEffect(() => {
+    if (value.type === "SIMULATION" || value.type === "RESULT") {
+      setSeries((draft) => {
+        draft[0].data.push(value.team.stress * 100);
+        draft[1].data.push(value.team.motivation * 100);
+        draft[2].data.push(value.team.familiarity * 100);
+      });
+    }
+  }, [value]);
 
   return (
     <Flex>
       <VStack>
         <Heading size="md">{title}</Heading>
-        <Chart
-          options={options}
-          series={series}
-          type="line"
-          width={variant}
-          height="300px"
-        />
+        <Chart options={options} series={series} type="line" width={variant} height={300} />
       </VStack>
     </Flex>
   );
