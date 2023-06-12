@@ -160,6 +160,9 @@ const TaskLineChart = ({title, data}) => {
                         <StatArrow type="increase" />
                         {tasksBug - tasksBugBefore} since last iteration
                     </StatHelpText>
+                    <StatHelpText>
+                        * Bugs are noticed as soon as you do unit tests
+                    </StatHelpText>
                 </Stat>
             </VStack>
         </HStack>
