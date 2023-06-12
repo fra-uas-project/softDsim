@@ -5,7 +5,7 @@ import OpenStoryButton from "./OpenStoryButton";
 import TaskLineChart from "./TaskLineChart";
 import CircularChart from "./CircularChart";
 import BudgetLineChart from "./BudgetLineChart";
-import CtoL from "./CtoL"
+import MentalstatusChart from "./MentalstatusChart"
 import {useEffect, useState} from "react";
 
 const Dashboard = ({data, story}) => {
@@ -80,7 +80,7 @@ const Dashboard = ({data, story}) => {
             <BudgetLineChart title="Budget" data={data}/>
             <Flex>
                 <HStack backgroundColor="white" borderRadius="2xl" p={5} w="full" justifyContent="center">
-                    <CtoL value={data} inverseColors={true} title="Avg"/>
+                    <MentalstatusChart value={data} inverseColors={true} title="Employee Status"/>
                 </HStack>
             </Flex>
         </>

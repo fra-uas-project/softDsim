@@ -1,11 +1,10 @@
 import Chart from "react-apexcharts";
 import React, { useEffect, useState } from "react";
-import { Flex, Heading, useBreakpointValue, VStack } from "@chakra-ui/react";
+import { Box, Flex, Heading, useBreakpointValue, VStack, HStack } from "@chakra-ui/react";
 import { useImmer } from "use-immer";
 
-const CtoL = ({ value, inverseColors, title }) => {
+const MentalstatusChart = ({ value, inverseColors, title }) => {
   const variant = useBreakpointValue({ base: "100%", lg: "100%", "2xl": "100%" });
-
 
   const tmpOptions = {
     chart: {
@@ -23,7 +22,7 @@ const CtoL = ({ value, inverseColors, title }) => {
       }
     },
     xaxis: {
-      categories: Array.from(Array(100).keys(), item => item * 5),
+      categories: Array.from(Array(100).keys(), (item) => item * 5),
       tickAmount: 10,
       labels: {
         rotate: 0
@@ -32,7 +31,7 @@ const CtoL = ({ value, inverseColors, title }) => {
     },
     stroke: {
       curve: "smooth",
-      width: 2,
+      width: 2
     },
     colors: ["#F56565", "#38B2AC", "#FCCB44"],
     fill: {
@@ -131,13 +130,17 @@ const CtoL = ({ value, inverseColors, title }) => {
   }, [value]);
 
   return (
-    <Flex>
-      <VStack>
-        <Heading size="md">{title}</Heading>
-        <Chart options={options} series={series} type="line" width={variant} height={300} />
+    <HStack backgroundColor="white" borderRadius="2xl" p={5} spacing={15} mb={5} w="full">
+      <VStack justifyContent="flex-start" alignItems="start" w="full">
+        <Heading size="lg" ml={5}>
+          {title}
+        </Heading>
+        <Box w="100%" h="300px">
+          <Chart options={options} series={series} type="line" width="100%" height="100%" />
+        </Box>
       </VStack>
-    </Flex>
+    </HStack>
   );
 };
 
-export default CtoL;
+export default MentalstatusChart;
