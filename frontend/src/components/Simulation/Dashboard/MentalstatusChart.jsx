@@ -141,7 +141,7 @@ const MentalstatusChart = ({ value, inverseColors, title }) => {
     <VStack spacing={5}>
       <Stat>
         <StatLabel color="gray.400">Stress</StatLabel>
-        <StatNumber>$ {value.team.stress.toFixed(2)*100}%</StatNumber>
+        <StatNumber>{value.team.stress.toFixed(2)*100}%</StatNumber>
         <StatHelpText>
           <StatArrow type="increase" />
           {((series[0].data[series[0].data.length -1] - series[0].data[series[0].data.length -2]) || 0).toFixed(2)}% since last iteration
@@ -149,7 +149,7 @@ const MentalstatusChart = ({ value, inverseColors, title }) => {
       </Stat>
       <Stat>
         <StatLabel color="gray.400">Motivation</StatLabel>
-        <StatNumber>$ {value.team.motivation.toFixed(2)*100}%</StatNumber>
+        <StatNumber>{value.team.motivation.toFixed(2)*100}%</StatNumber>
         <StatHelpText>
           <StatArrow type="increase" />
           {((series[1].data[series[1].data.length -1] - series[1].data[series[1].data.length -2]) || 0).toFixed(2)}% since last iteration
@@ -157,7 +157,7 @@ const MentalstatusChart = ({ value, inverseColors, title }) => {
       </Stat>
       <Stat>
         <StatLabel color="gray.400">Familiarity</StatLabel>
-        <StatNumber>$ {value.team.familiarity.toFixed(2)*100}%</StatNumber>
+        <StatNumber>{value.team.familiarity.toFixed(2)*100}%</StatNumber>
         <StatHelpText>
           <StatArrow type="increase" />
           {((series[2].data[series[2].data.length -1] - series[2].data[series[2].data.length -2]) || 0).toFixed(2)}% since last iteration
