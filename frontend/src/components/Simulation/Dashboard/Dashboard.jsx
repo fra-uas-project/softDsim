@@ -6,6 +6,7 @@ import OpenHelpButton from "./OpenHelpButton";
 import TaskLineChart from "./TaskLineChart";
 import CircularChart from "./CircularChart";
 import BudgetLineChart from "./BudgetLineChart";
+import MentalstatusChart from "./MentalstatusChart"
 import {useEffect, useState} from "react";
 import Help from "../../../pages/Help";
 
@@ -40,6 +41,7 @@ const Dashboard = ({data, story}) => {
 
         setTasksBefore(tasks)
         setTasks(data.tasks.tasks_todo)
+
     }, [data])
 
     return (
@@ -91,9 +93,7 @@ const Dashboard = ({data, story}) => {
             <BudgetLineChart title="Budget" data={data}/>
             <Flex>
                 <HStack backgroundColor="white" borderRadius="2xl" p={5} w="full" justifyContent="center">
-                    <CircularChart value={data.team.stress} inverseColors={true} title="Avg. Stress"/>
-                    <CircularChart value={data.team.motivation} inverseColors={false} title="Avg. Motivation"/>
-                    <CircularChart value={data.team.familiarity > 1 ? 1 : data.team.familiarity} inverseColors={false} title="Avg. Familarity"/>
+                    <MentalstatusChart value={data} inverseColors={true} title="Employee Status"/>
                 </HStack>
             </Flex>
         </>
