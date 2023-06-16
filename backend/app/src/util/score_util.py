@@ -20,12 +20,6 @@ def calc_scores(scenario: UserScenario, tasks: CachedTasks) -> dict:
         scenario.state.cost, goal.budget, score.budget_limit, score.budget_p
     )
 
-    #print("quality_score", quality_score)
-    #print("time_score", time_score)
-    #print("budget_score", budget_score)
-    #print("question_score", scenario.question_points)
-   # print("total_score", (quality_score + time_score + budget_score + scenario.question_points) /(300 + max(quality_score, 0)))
-
 
     return {
         "quality_score": quality_score,
