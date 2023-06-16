@@ -104,7 +104,6 @@ const SkilltypeContainer = ({
                       <br />
                       <strong>Development quality:</strong>{" "}
                       {skillTypeObj.development_quality}
-                      <br />
                     </div>
                   }
                 >
