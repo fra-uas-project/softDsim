@@ -12,8 +12,9 @@ from pandas import DataFrame
 import numpy as np
 from typing import List
 from statistics import mean
-from random import randint, random
+from random import randint
 import os
+import json
 print("MAIN SCRIPT")
 
 
@@ -26,6 +27,54 @@ NRUNS = 1_000_000
 SAVE_EVERY = 100
 
 Team.objects.create()
+
+def retrieve_skill_types_from_json():
+    with open("skilltypes.json", 'r') as json_file:
+        data = json.load(json_file)
+
+    skill_types = []
+    for skill_type_data in data:
+        name = skill_type_data['name']
+        cost_per_day = skill_type_data['cost_per_day']
+        error_rate = skill_type_data['error_rate']
+        throughput = skill_type_data['throughput']
+        management_quality = skill_type_data['management_quality']
+        development_quality = skill_type_data['development_quality']
+        signing_bonus = skill_type_data['signing_bonus']
+
+        skill_type = {
+            'name': name,
+            'cost_per_day': cost_per_day,
+            'error_rate': error_rate,
+            'throughput': throughput,
+            'management_quality': management_quality,
+            'development_quality': development_quality,
+            'signing_bonus': signing_bonus
+        }
+        skill_types.append(skill_type)
+
+    return skill_types
+
+def retrieve_scenario_config_from_json():
+    with open("scenario_config.json", 'r') as json_file:
+        data = json.load(json_file)
+
+    name = data['name']
+    stress_weekend_reduction = data['stress_weekend_reduction']
+    stress_overtime_increase = data['stress_overtime_increase']
+    stress_error_increase = data['stress_error_increase']
+    done_tasks_per_meeting = data['done_tasks_per_meeting']
+    train_skill_increase_rate = data['train_skill_increase_rate']
+
+    scenario_config = ScenarioConfig(
+        name=name,
+        stress_weekend_reduction=stress_weekend_reduction,
+        stress_overtime_increase=stress_overtime_increase,
+        stress_error_increase=stress_error_increase,
+        done_tasks_per_meeting=done_tasks_per_meeting,
+        train_skill_increase_rate=train_skill_increase_rate
+    )
+    return scenario_config
 
 
 def init_scenario() -> UserScenario:
@@ -43,16 +92,19 @@ def init_config():
 
 
 def init_skill_types():
-    try:
-        s1 = SkillType.objects.get(name="s1").delete()
-        s2 = SkillType.objects.get(name="s2").delete()
-        s3 = SkillType.objects.get(name="s3").delete()
-    except:
-        pass
-    s1 = SkillType.objects.create(name="s1", cost_per_day=200)
-    s2 = SkillType.objects.create(name="s2", cost_per_day=350)
-    s3 = SkillType.objects.create(name="s3", cost_per_day=500)
-    return [s1, s2, s3]
+    skill_types_data = retrieve_skill_types_from_json()
+
+    SkillType.objects.all().delete()
+
+    created_skill_types = []
+    for skill_type_data in skill_types_data:
+        name = skill_type_data['name']
+        cost_per_day = skill_type_data['cost_per_day']
+
+        skill_type = SkillType.objects.create(name=name, cost_per_day=cost_per_day)
+        created_skill_types.append(skill_type)
+
+    return created_skill_types
 
 
 def init_members(skill_types):
@@ -71,20 +123,20 @@ def run_simulation(scenario, config, members, tasks, skill_types, rec, UP, UP_n)
 
 
 def set_config(config: ScenarioConfig):
-    config.stress_weekend_reduction = round(random() * 0.8, 2)
-    config.stress_overtime_increase = round(random() * 0.25, 2)
-    config.stress_error_increase = round(random() * 0.33, 2)
-    config.done_tasks_per_meeting = randint(0, 5) * 20
-    config.train_skill_increase_rate = round(random() * 0.5, 2)
+    scenario_config = retrieve_scenario_config_from_json()
+
+    config.stress_weekend_reduction = scenario_config.stress_weekend_reduction
+    config.stress_overtime_increase = scenario_config.stress_overtime_increase
+    config.stress_error_increase = scenario_config.stress_error_increase
+    config.done_tasks_per_meeting = scenario_config.done_tasks_per_meeting
+    config.train_skill_increase_rate = scenario_config.train_skill_increase_rate
 
 
 def set_skill_types(skill_types: List[SkillType]):
-    skill_types[0].throughput = randint(1, 5)
-    skill_types[0].error_rate = round(random() * 0.23 + 0.1, 2)
-    skill_types[1].throughput = randint(3, 8)
-    skill_types[1].error_rate = round(random() * 0.3 + 0.03, 2)
-    skill_types[2].throughput = randint(5, 10)
-    skill_types[2].error_rate = round(random() * 0.25, 2)
+    skill_types_data = retrieve_skill_types_from_json()
+    for i in range(len(skill_types)):
+        skill_types[i].throughput = skill_types_data[i]['throughput']
+        skill_types[i].error_rate = skill_types_data[i]['error_rate']
 
 
 def set_tasks(u):

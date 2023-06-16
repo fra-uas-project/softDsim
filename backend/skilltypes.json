@@ -1,0 +1,29 @@
+[
+  {
+    "name": "s1",
+    "cost_per_day": 200,
+    "error_rate": 0.15,
+    "throughput": 3,
+    "management_quality": 4,
+    "development_quality": 3,
+    "signing_bonus": 5000
+  },
+  {
+    "name": "s2",
+    "cost_per_day": 350,
+    "error_rate": 0.12,
+    "throughput": 5,
+    "management_quality": 3,
+    "development_quality": 4,
+    "signing_bonus": 6000
+  },
+  {
+    "name": "s3",
+    "cost_per_day": 500,
+    "error_rate": 0.1,
+    "throughput": 4,
+    "management_quality": 5,
+    "development_quality": 5,
+    "signing_bonus": 4000
+  }
+]
