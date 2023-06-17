@@ -14,26 +14,90 @@ from typing import List
 from statistics import mean
 from random import randint
 import os
+from dotenv import load_dotenv
 import json
 print("MAIN SCRIPT")
 
+def check_file_exists(file_path):
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"The file '{file_path}' does not exist.")
 
-bucket = "softdsim"
+def validate_env_file(file_path):
+    required_attributes = ["bucket", "USE_S3", "DATAPATH", "RUNNAME", "NRUNS", "SAVE_EVERY"]
+    load_dotenv(file_path)
+    missing_attributes = [attr for attr in required_attributes if os.getenv(attr) is None]
+    if missing_attributes:
+        raise ValueError(f"Missing attributes in the .env file: {', '.join(missing_attributes)}")
 
-USE_S3 = False
-DATAPATH = "simulation_framework/simulation_data"
-RUNNAME = "run1"
-NRUNS = 1_000_000
-SAVE_EVERY = 100
+check_file_exists("testparams.env")
+validate_env_file("testparams.env")
+
+load_dotenv("testparams.env")
+
+bucket = os.getenv("bucket")
+USE_S3 = os.getenv("USE_S3")
+DATAPATH = os.getenv("DATAPATH")
+RUNNAME = os.getenv("RUNNAME")
+NRUNS = int(os.getenv("NRUNS"))
+SAVE_EVERY = int(os.getenv("SAVE_EVERY"))
 
 Team.objects.create()
 
+
+def validate_skill_type_data(skill_type_data):
+    required_attributes = ['name', 'cost_per_day', 'error_rate', 'throughput', 'management_quality',
+                           'development_quality', 'signing_bonus']
+    for attribute in required_attributes:
+        if attribute not in skill_type_data:
+            raise ValueError(f"Missing attribute '{attribute}' in skill type data.")
+
+        value = skill_type_data[attribute]
+
+        if attribute == 'name' and not isinstance(value, str):
+            raise ValueError(f"Invalid value for attribute 'name'. It should be a string.")
+
+        if attribute == 'cost_per_day' and value <= 0:
+            raise ValueError("Invalid value for attribute 'cost_per_day'. It should be greater than 0.")
+
+        if attribute == 'error_rate' and (value < 0 or value > 1):
+                raise ValueError(f"Invalid value for attribute 'error_rate'. It should be a value between 0 and 1.")
+
+        if attribute in ['throughput', 'management_quality', 'development_quality']:
+            if value < 0:
+                raise ValueError(f"Invalid value for attribute '{attribute}'. It should be greater than or equal to 0.")
+
+        if attribute == 'signing_bonus' and value < 0:
+            raise ValueError("Invalid value for attribute 'signing_bonus'. It should be greater than or equal to 0.")
+
+
+def validate_scenario_config_data(data):
+    required_attributes = ['name', 'stress_weekend_reduction', 'stress_overtime_increase', 'stress_error_increase',
+                           'done_tasks_per_meeting', 'train_skill_increase_rate']
+    for attribute in required_attributes:
+        if attribute not in data:
+            raise ValueError(f"Missing attribute '{attribute}' in scenario config data.")
+
+        value = data[attribute]
+
+        if attribute == 'stress_weekend_reduction' and value >= 0:
+            raise ValueError("Invalid value for attribute 'stress_weekend_reduction'. It should be negative.")
+
+        if attribute in ['stress_overtime_increase', 'stress_error_increase',
+                           'done_tasks_per_meeting', 'train_skill_increase_rate']:
+            if (value < 0 or value > 100):
+                raise ValueError(f"Invalid value for attribute '{attribute}'. It should be between 0 and 100.")
+
+
 def retrieve_skill_types_from_json():
-    with open("skilltypes.json", 'r') as json_file:
+    file_path = "skilltypes.json"
+    check_file_exists(file_path)
+
+    with open(file_path, 'r') as json_file:
         data = json.load(json_file)
 
     skill_types = []
     for skill_type_data in data:
+        validate_skill_type_data(skill_type_data)
         name = skill_type_data['name']
         cost_per_day = skill_type_data['cost_per_day']
         error_rate = skill_type_data['error_rate']
@@ -56,8 +120,14 @@ def retrieve_skill_types_from_json():
     return skill_types
 
 def retrieve_scenario_config_from_json():
-    with open("scenario_config.json", 'r') as json_file:
+    file_path = "scenario_config.json"
+    check_file_exists(file_path)
+
+    with open(file_path, 'r') as json_file:
         data = json.load(json_file)
+
+    validate_scenario_config_data(data)
+
 
     name = data['name']
     stress_weekend_reduction = data['stress_weekend_reduction']
@@ -100,8 +170,21 @@ def init_skill_types():
     for skill_type_data in skill_types_data:
         name = skill_type_data['name']
         cost_per_day = skill_type_data['cost_per_day']
+        error_rate = skill_type_data['error_rate']
+        throughput = skill_type_data['throughput']
+        management_quality = skill_type_data['management_quality']
+        development_quality = skill_type_data['development_quality']
+        signing_bonus = skill_type_data['signing_bonus']
 
-        skill_type = SkillType.objects.create(name=name, cost_per_day=cost_per_day)
+        skill_type = SkillType.objects.create(
+            name=name,
+            cost_per_day=cost_per_day,
+            error_rate=error_rate,
+            throughput=throughput,
+            management_quality=management_quality,
+            development_quality=development_quality,
+            signing_bonus=signing_bonus
+        )
         created_skill_types.append(skill_type)
 
     return created_skill_types
