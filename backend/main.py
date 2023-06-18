@@ -18,16 +18,22 @@ from dotenv import load_dotenv
 import json
 print("MAIN SCRIPT")
 
+
 def check_file_exists(file_path):
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"The file '{file_path}' does not exist.")
 
+
 def validate_env_file(file_path):
-    required_attributes = ["bucket", "USE_S3", "DATAPATH", "RUNNAME", "NRUNS", "SAVE_EVERY"]
+    required_attributes = ["bucket", "USE_S3",
+                           "DATAPATH", "RUNNAME", "NRUNS", "SAVE_EVERY"]
     load_dotenv(file_path)
-    missing_attributes = [attr for attr in required_attributes if os.getenv(attr) is None]
+    missing_attributes = [
+        attr for attr in required_attributes if os.getenv(attr) is None]
     if missing_attributes:
-        raise ValueError(f"Missing attributes in the .env file: {', '.join(missing_attributes)}")
+        raise ValueError(
+            f"Missing attributes in the .env file: {', '.join(missing_attributes)}")
+
 
 check_file_exists("testparams.env")
 validate_env_file("testparams.env")
@@ -35,7 +41,7 @@ validate_env_file("testparams.env")
 load_dotenv("testparams.env")
 
 bucket = os.getenv("bucket")
-USE_S3 = os.getenv("USE_S3")
+USE_S3 = os.getenv("USE_S3", 'False').lower() in ('true', '1', 't')
 DATAPATH = os.getenv("DATAPATH")
 RUNNAME = os.getenv("RUNNAME")
 NRUNS = int(os.getenv("NRUNS"))
@@ -49,25 +55,31 @@ def validate_skill_type_data(skill_type_data):
                            'development_quality', 'signing_bonus']
     for attribute in required_attributes:
         if attribute not in skill_type_data:
-            raise ValueError(f"Missing attribute '{attribute}' in skill type data.")
+            raise ValueError(
+                f"Missing attribute '{attribute}' in skill type data.")
 
         value = skill_type_data[attribute]
 
         if attribute == 'name' and not isinstance(value, str):
-            raise ValueError(f"Invalid value for attribute 'name'. It should be a string.")
+            raise ValueError(
+                f"Invalid value for attribute 'name'. It should be a string.")
 
         if attribute == 'cost_per_day' and value <= 0:
-            raise ValueError("Invalid value for attribute 'cost_per_day'. It should be greater than 0.")
+            raise ValueError(
+                "Invalid value for attribute 'cost_per_day'. It should be greater than 0.")
 
         if attribute == 'error_rate' and (value < 0 or value > 1):
-                raise ValueError(f"Invalid value for attribute 'error_rate'. It should be a value between 0 and 1.")
+            raise ValueError(
+                f"Invalid value for attribute 'error_rate'. It should be a value between 0 and 1.")
 
         if attribute in ['throughput', 'management_quality', 'development_quality']:
             if value < 0:
-                raise ValueError(f"Invalid value for attribute '{attribute}'. It should be greater than or equal to 0.")
+                raise ValueError(
+                    f"Invalid value for attribute '{attribute}'. It should be greater than or equal to 0.")
 
         if attribute == 'signing_bonus' and value < 0:
-            raise ValueError("Invalid value for attribute 'signing_bonus'. It should be greater than or equal to 0.")
+            raise ValueError(
+                "Invalid value for attribute 'signing_bonus'. It should be greater than or equal to 0.")
 
 
 def validate_scenario_config_data(data):
@@ -75,17 +87,20 @@ def validate_scenario_config_data(data):
                            'done_tasks_per_meeting', 'train_skill_increase_rate']
     for attribute in required_attributes:
         if attribute not in data:
-            raise ValueError(f"Missing attribute '{attribute}' in scenario config data.")
+            raise ValueError(
+                f"Missing attribute '{attribute}' in scenario config data.")
 
         value = data[attribute]
 
         if attribute == 'stress_weekend_reduction' and value >= 0:
-            raise ValueError("Invalid value for attribute 'stress_weekend_reduction'. It should be negative.")
+            raise ValueError(
+                "Invalid value for attribute 'stress_weekend_reduction'. It should be negative.")
 
         if attribute in ['stress_overtime_increase', 'stress_error_increase',
-                           'done_tasks_per_meeting', 'train_skill_increase_rate']:
+                         'done_tasks_per_meeting', 'train_skill_increase_rate']:
             if (value < 0 or value > 100):
-                raise ValueError(f"Invalid value for attribute '{attribute}'. It should be between 0 and 100.")
+                raise ValueError(
+                    f"Invalid value for attribute '{attribute}'. It should be between 0 and 100.")
 
 
 def retrieve_skill_types_from_json():
@@ -119,6 +134,7 @@ def retrieve_skill_types_from_json():
 
     return skill_types
 
+
 def retrieve_scenario_config_from_json():
     file_path = "scenario_config.json"
     check_file_exists(file_path)
@@ -127,7 +143,6 @@ def retrieve_scenario_config_from_json():
         data = json.load(json_file)
 
     validate_scenario_config_data(data)
-
 
     name = data['name']
     stress_weekend_reduction = data['stress_weekend_reduction']
@@ -368,6 +383,7 @@ def main():
         if x % SAVE_EVERY == 0:
             print(f"{x} of {NRUNS}")
             if USE_S3:
+                print("Saving in S3")
                 csv_buffer = StringIO()
                 rec.df().to_csv(csv_buffer)
                 s3_resource = boto3.resource("s3")
