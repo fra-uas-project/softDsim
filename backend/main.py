@@ -16,6 +16,8 @@ from random import randint
 import os
 from dotenv import load_dotenv
 import json
+import random
+
 print("MAIN SCRIPT")
 
 
@@ -150,6 +152,8 @@ def retrieve_scenario_config_from_json():
     stress_error_increase = data['stress_error_increase']
     done_tasks_per_meeting = data['done_tasks_per_meeting']
     train_skill_increase_rate = data['train_skill_increase_rate']
+    cost_member_team_event = data["cost_member_team_event"]
+    randomness = data["randomness"]
 
     scenario_config = ScenarioConfig(
         name=name,
@@ -157,8 +161,12 @@ def retrieve_scenario_config_from_json():
         stress_overtime_increase=stress_overtime_increase,
         stress_error_increase=stress_error_increase,
         done_tasks_per_meeting=done_tasks_per_meeting,
-        train_skill_increase_rate=train_skill_increase_rate
+        train_skill_increase_rate=train_skill_increase_rate,
     )
+
+    scenario_config.cost_member_team_event = cost_member_team_event
+    scenario_config.randomness = randomness
+
     return scenario_config
 
 
@@ -170,10 +178,8 @@ def init_scenario() -> UserScenario:
 
 
 def init_config():
-    try:
-        return ScenarioConfig.objects.get(name="c1")
-    except:
-        return ScenarioConfig.objects.create(name="c1")
+    ScenarioConfig.objects.all().delete()
+    return ScenarioConfig.objects.create(name="c1")
 
 
 def init_skill_types():
@@ -228,6 +234,8 @@ def set_config(config: ScenarioConfig):
     config.stress_error_increase = scenario_config.stress_error_increase
     config.done_tasks_per_meeting = scenario_config.done_tasks_per_meeting
     config.train_skill_increase_rate = scenario_config.train_skill_increase_rate
+    config.cost_member_team_event = scenario_config.cost_member_team_event
+    config.randomness = scenario_config.randomness
 
 
 def set_skill_types(skill_types: List[SkillType]):
@@ -266,12 +274,13 @@ def np_record(
             config.stress_error_increase,
             config.done_tasks_per_meeting,
             config.train_skill_increase_rate,
+            skill_types[0].name,
             skill_types[0].throughput,
             skill_types[0].error_rate,
-            skill_types[1].throughput,
-            skill_types[1].error_rate,
-            skill_types[2].throughput,
-            skill_types[2].error_rate,
+            skill_types[0].cost_per_day,
+            skill_types[0].management_quality,
+            skill_types[0].development_quality,
+            skill_types[0].signing_bonus,
             UP_n,
             workpack.days,
             workpack.bugfix,
@@ -317,12 +326,13 @@ class NpRecord:
                 "c_sei",
                 "c_dtm",
                 "c_tsi",
-                "s1_thr",
-                "s1_err",
-                "s2_thr",
-                "s2_err",
-                "s3_thr",
-                "s3_err",
+                "s_name",
+                "s_throughput",
+                "s_error_rate",
+                "s_cost_per_day",
+                "s_management_quality",
+                "s_development_quality",
+                "s_signing_bonus",
                 "UP",
                 "days",
                 "bugfix",
@@ -360,6 +370,34 @@ def set_scenario(scenario: UserScenario, state: ScenarioState):
     state.day = 0
 
 
+def random_boolean() -> bool:
+    return bool(random.getrandbits(1))
+
+
+def random_number(start: int, end: int) -> int:
+    if (start > end):
+        tmp = end
+        end = start
+        start = tmp
+
+    return random.randint(start, end)
+
+
+def generate_user_params() -> Workpack:
+    wp: Workpack = Workpack()
+
+    wp.bugfix = random_boolean()
+    wp.teamevent = random_boolean()
+    wp.integrationtest = random_boolean()
+    wp.unittest = random_boolean()
+    wp.meetings = random_number(0, 5)
+    wp.training = random_number(0, 5)
+    wp.salary = random_number(0, 2)
+    wp.overtime = random_number(-1, 2)
+
+    return wp
+
+
 def main():
     print("Started")
     rec = NpRecord()
@@ -371,7 +409,10 @@ def main():
     for x in range(1, NRUNS + 1):
         set_config(config)
         set_skill_types(skill_types)
-        for n, UP in enumerate(USERPARAMETERS):
+        # generate a userparameter randomly
+        user_params: List = [generate_user_params() for _ in range(8)]
+
+        for n, UP in enumerate(user_params):
 
             set_scenario(scenario, state)
             set_members(members)
@@ -388,14 +429,14 @@ def main():
                 rec.df().to_csv(csv_buffer)
                 s3_resource = boto3.resource("s3")
                 s3_resource.Object(
-                    bucket, f"ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv"
+                    bucket, f"{RUNNAME}_ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv"
                 ).put(Body=csv_buffer.getvalue())
             else:
                 if not os.path.exists(DATAPATH):
                     os.mkdir(DATAPATH)
 
                 fullname = os.path.join(
-                    DATAPATH, f"ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv")
+                    DATAPATH, f"{RUNNAME}_ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv")
 
                 rec.df().to_csv(fullname)
             rec.clear()
