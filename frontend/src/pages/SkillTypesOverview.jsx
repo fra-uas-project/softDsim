@@ -51,6 +51,8 @@ const SkilltypesOverview = () => {
     setIsModal2Open(false);
   };
 
+  window.value = 10;
+
   const [skillTypeForm, setSkillTypeForm] = useState({
     name: "",
     costPerDay: 0,

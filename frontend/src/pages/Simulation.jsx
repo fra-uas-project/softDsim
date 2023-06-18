@@ -85,6 +85,8 @@ const Simulation = () => {
     // save maximum number of task
     const [tasksMax, setTasksMax] = useState(0)
 
+    window.value = window.value + 10;
+
     // default values for actions
     const [actionDefaultValues, setActionDefaultValues] = useState(
         {

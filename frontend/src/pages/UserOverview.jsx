@@ -42,7 +42,7 @@ const UserOverview = () => {
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const cancelRef = useRef();
 
-
+    window.value = 10;
 
     const fetchUsers = async () => {
         const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user`, {
