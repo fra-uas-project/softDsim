@@ -16,18 +16,26 @@ from random import randint
 import os
 from dotenv import load_dotenv
 import json
+import random
+
 print("MAIN SCRIPT")
+
 
 def check_file_exists(file_path):
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"The file '{file_path}' does not exist.")
 
+
 def validate_env_file(file_path):
-    required_attributes = ["bucket", "USE_S3", "DATAPATH", "RUNNAME", "NRUNS", "SAVE_EVERY"]
+    required_attributes = ["bucket", "USE_S3",
+                           "DATAPATH", "RUNNAME", "NRUNS", "SAVE_EVERY"]
     load_dotenv(file_path)
-    missing_attributes = [attr for attr in required_attributes if os.getenv(attr) is None]
+    missing_attributes = [
+        attr for attr in required_attributes if os.getenv(attr) is None]
     if missing_attributes:
-        raise ValueError(f"Missing attributes in the .env file: {', '.join(missing_attributes)}")
+        raise ValueError(
+            f"Missing attributes in the .env file: {', '.join(missing_attributes)}")
+
 
 check_file_exists("testparams.env")
 validate_env_file("testparams.env")
@@ -35,7 +43,7 @@ validate_env_file("testparams.env")
 load_dotenv("testparams.env")
 
 bucket = os.getenv("bucket")
-USE_S3 = os.getenv("USE_S3")
+USE_S3 = os.getenv("USE_S3", 'False').lower() in ('true', '1', 't')
 DATAPATH = os.getenv("DATAPATH")
 RUNNAME = os.getenv("RUNNAME")
 NRUNS = int(os.getenv("NRUNS"))
@@ -49,25 +57,31 @@ def validate_skill_type_data(skill_type_data):
                            'development_quality', 'signing_bonus']
     for attribute in required_attributes:
         if attribute not in skill_type_data:
-            raise ValueError(f"Missing attribute '{attribute}' in skill type data.")
+            raise ValueError(
+                f"Missing attribute '{attribute}' in skill type data.")
 
         value = skill_type_data[attribute]
 
         if attribute == 'name' and not isinstance(value, str):
-            raise ValueError(f"Invalid value for attribute 'name'. It should be a string.")
+            raise ValueError(
+                f"Invalid value for attribute 'name'. It should be a string.")
 
         if attribute == 'cost_per_day' and value <= 0:
-            raise ValueError("Invalid value for attribute 'cost_per_day'. It should be greater than 0.")
+            raise ValueError(
+                "Invalid value for attribute 'cost_per_day'. It should be greater than 0.")
 
         if attribute == 'error_rate' and (value < 0 or value > 1):
-                raise ValueError(f"Invalid value for attribute 'error_rate'. It should be a value between 0 and 1.")
+            raise ValueError(
+                f"Invalid value for attribute 'error_rate'. It should be a value between 0 and 1.")
 
         if attribute in ['throughput', 'management_quality', 'development_quality']:
             if value < 0:
-                raise ValueError(f"Invalid value for attribute '{attribute}'. It should be greater than or equal to 0.")
+                raise ValueError(
+                    f"Invalid value for attribute '{attribute}'. It should be greater than or equal to 0.")
 
         if attribute == 'signing_bonus' and value < 0:
-            raise ValueError("Invalid value for attribute 'signing_bonus'. It should be greater than or equal to 0.")
+            raise ValueError(
+                "Invalid value for attribute 'signing_bonus'. It should be greater than or equal to 0.")
 
 
 def validate_scenario_config_data(data):
@@ -75,17 +89,20 @@ def validate_scenario_config_data(data):
                            'done_tasks_per_meeting', 'train_skill_increase_rate']
     for attribute in required_attributes:
         if attribute not in data:
-            raise ValueError(f"Missing attribute '{attribute}' in scenario config data.")
+            raise ValueError(
+                f"Missing attribute '{attribute}' in scenario config data.")
 
         value = data[attribute]
 
         if attribute == 'stress_weekend_reduction' and value >= 0:
-            raise ValueError("Invalid value for attribute 'stress_weekend_reduction'. It should be negative.")
+            raise ValueError(
+                "Invalid value for attribute 'stress_weekend_reduction'. It should be negative.")
 
         if attribute in ['stress_overtime_increase', 'stress_error_increase',
-                           'done_tasks_per_meeting', 'train_skill_increase_rate']:
+                         'done_tasks_per_meeting', 'train_skill_increase_rate']:
             if (value < 0 or value > 100):
-                raise ValueError(f"Invalid value for attribute '{attribute}'. It should be between 0 and 100.")
+                raise ValueError(
+                    f"Invalid value for attribute '{attribute}'. It should be between 0 and 100.")
 
 
 def retrieve_skill_types_from_json():
@@ -119,6 +136,7 @@ def retrieve_skill_types_from_json():
 
     return skill_types
 
+
 def retrieve_scenario_config_from_json():
     file_path = "scenario_config.json"
     check_file_exists(file_path)
@@ -128,13 +146,14 @@ def retrieve_scenario_config_from_json():
 
     validate_scenario_config_data(data)
 
-
     name = data['name']
     stress_weekend_reduction = data['stress_weekend_reduction']
     stress_overtime_increase = data['stress_overtime_increase']
     stress_error_increase = data['stress_error_increase']
     done_tasks_per_meeting = data['done_tasks_per_meeting']
     train_skill_increase_rate = data['train_skill_increase_rate']
+    cost_member_team_event = data["cost_member_team_event"]
+    randomness = data["randomness"]
 
     scenario_config = ScenarioConfig(
         name=name,
@@ -142,8 +161,12 @@ def retrieve_scenario_config_from_json():
         stress_overtime_increase=stress_overtime_increase,
         stress_error_increase=stress_error_increase,
         done_tasks_per_meeting=done_tasks_per_meeting,
-        train_skill_increase_rate=train_skill_increase_rate
+        train_skill_increase_rate=train_skill_increase_rate,
     )
+
+    scenario_config.cost_member_team_event = cost_member_team_event
+    scenario_config.randomness = randomness
+
     return scenario_config
 
 
@@ -155,10 +178,8 @@ def init_scenario() -> UserScenario:
 
 
 def init_config():
-    try:
-        return ScenarioConfig.objects.get(name="c1")
-    except:
-        return ScenarioConfig.objects.create(name="c1")
+    ScenarioConfig.objects.all().delete()
+    return ScenarioConfig.objects.create(name="c1")
 
 
 def init_skill_types():
@@ -213,6 +234,8 @@ def set_config(config: ScenarioConfig):
     config.stress_error_increase = scenario_config.stress_error_increase
     config.done_tasks_per_meeting = scenario_config.done_tasks_per_meeting
     config.train_skill_increase_rate = scenario_config.train_skill_increase_rate
+    config.cost_member_team_event = scenario_config.cost_member_team_event
+    config.randomness = scenario_config.randomness
 
 
 def set_skill_types(skill_types: List[SkillType]):
@@ -251,12 +274,13 @@ def np_record(
             config.stress_error_increase,
             config.done_tasks_per_meeting,
             config.train_skill_increase_rate,
+            skill_types[0].name,
             skill_types[0].throughput,
             skill_types[0].error_rate,
-            skill_types[1].throughput,
-            skill_types[1].error_rate,
-            skill_types[2].throughput,
-            skill_types[2].error_rate,
+            skill_types[0].cost_per_day,
+            skill_types[0].management_quality,
+            skill_types[0].development_quality,
+            skill_types[0].signing_bonus,
             UP_n,
             workpack.days,
             workpack.bugfix,
@@ -302,12 +326,13 @@ class NpRecord:
                 "c_sei",
                 "c_dtm",
                 "c_tsi",
-                "s1_thr",
-                "s1_err",
-                "s2_thr",
-                "s2_err",
-                "s3_thr",
-                "s3_err",
+                "s_name",
+                "s_throughput",
+                "s_error_rate",
+                "s_cost_per_day",
+                "s_management_quality",
+                "s_development_quality",
+                "s_signing_bonus",
                 "UP",
                 "days",
                 "bugfix",
@@ -345,6 +370,34 @@ def set_scenario(scenario: UserScenario, state: ScenarioState):
     state.day = 0
 
 
+def random_boolean() -> bool:
+    return bool(random.getrandbits(1))
+
+
+def random_number(start: int, end: int) -> int:
+    if (start > end):
+        tmp = end
+        end = start
+        start = tmp
+
+    return random.randint(start, end)
+
+
+def generate_user_params() -> Workpack:
+    wp: Workpack = Workpack()
+
+    wp.bugfix = random_boolean()
+    wp.teamevent = random_boolean()
+    wp.integrationtest = random_boolean()
+    wp.unittest = random_boolean()
+    wp.meetings = random_number(0, 5)
+    wp.training = random_number(0, 5)
+    wp.salary = random_number(0, 2)
+    wp.overtime = random_number(-1, 2)
+
+    return wp
+
+
 def main():
     print("Started")
     rec = NpRecord()
@@ -356,7 +409,10 @@ def main():
     for x in range(1, NRUNS + 1):
         set_config(config)
         set_skill_types(skill_types)
-        for n, UP in enumerate(USERPARAMETERS):
+        # generate a userparameter randomly
+        user_params: List = [generate_user_params() for _ in range(8)]
+
+        for n, UP in enumerate(user_params):
 
             set_scenario(scenario, state)
             set_members(members)
@@ -368,18 +424,19 @@ def main():
         if x % SAVE_EVERY == 0:
             print(f"{x} of {NRUNS}")
             if USE_S3:
+                print("Saving in S3")
                 csv_buffer = StringIO()
                 rec.df().to_csv(csv_buffer)
                 s3_resource = boto3.resource("s3")
                 s3_resource.Object(
-                    bucket, f"ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv"
+                    bucket, f"{RUNNAME}_ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv"
                 ).put(Body=csv_buffer.getvalue())
             else:
                 if not os.path.exists(DATAPATH):
                     os.mkdir(DATAPATH)
 
                 fullname = os.path.join(
-                    DATAPATH, f"ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv")
+                    DATAPATH, f"{RUNNAME}_ID{randint(10000000,99999999)}file{int(x / SAVE_EVERY)}.csv")
 
                 rec.df().to_csv(fullname)
             rec.clear()

@@ -38,3 +38,4 @@ frontend/npm-debug.log*
 docs/_*
 
 backend/simulation_framework/simulation_data
+**/*.env
