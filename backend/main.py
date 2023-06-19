@@ -28,7 +28,7 @@ def check_file_exists(file_path):
 
 def validate_env_file(file_path):
     required_attributes = ["bucket", "USE_S3",
-                           "DATAPATH", "RUNNAME", "NRUNS", "SAVE_EVERY"]
+                           "DATAPATH", "RUNNAME", "NRUNS", "SAVE_EVERY", "NUMBER_OF_SK_PER_TEAM"]
     load_dotenv(file_path)
     missing_attributes = [
         attr for attr in required_attributes if os.getenv(attr) is None]
@@ -48,6 +48,7 @@ DATAPATH = os.getenv("DATAPATH")
 RUNNAME = os.getenv("RUNNAME")
 NRUNS = int(os.getenv("NRUNS"))
 SAVE_EVERY = int(os.getenv("SAVE_EVERY"))
+NUMBER_OF_SK_PER_TEAM = int(os.getenv("NUMBER_OF_SK_PER_TEAM"))
 
 Team.objects.create()
 
@@ -214,7 +215,8 @@ def init_skill_types():
 def init_members(skill_types):
     members = []
     for sk in skill_types:
-        members.append(Member.objects.create(skill_type=sk, team_id=1))
+        for _ in range(NUMBER_OF_SK_PER_TEAM):
+            members.append(Member.objects.create(skill_type=sk, team_id=1))
     return members
 
 
@@ -274,6 +276,7 @@ def np_record(
             config.stress_error_increase,
             config.done_tasks_per_meeting,
             config.train_skill_increase_rate,
+            len(s.members),
             skill_types[0].name,
             skill_types[0].throughput,
             skill_types[0].error_rate,
@@ -326,6 +329,7 @@ class NpRecord:
                 "c_sei",
                 "c_dtm",
                 "c_tsi",
+                "s_number_of_sk",
                 "s_name",
                 "s_throughput",
                 "s_error_rate",
