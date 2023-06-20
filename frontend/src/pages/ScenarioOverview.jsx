@@ -215,7 +215,7 @@ const ScenarioOverview = () => {
                       <Th color="gray.400">Scenario Name</Th>
                       <Th color="gray.400">Tries</Th>
                       <Th color="gray.400">Best Score</Th>
-                      <Th color="gray.400">Actions</Th>
+                      {currentUser?.admin && <Th color="gray.400">Actions</Th>}
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -237,26 +237,28 @@ const ScenarioOverview = () => {
                           <Td fontWeight="500">{scenario.tries}</Td>
                           <Td fontWeight="500">{scenario.max_score}</Td>
                           <Td fontWeight="500">
-                            <IconButton
-                              variant="ghost"
-                              colorScheme="black"
-                              aria-label="Delete scenario"
-                              fontSize="20px"
-                              icon={<HiOutlineTrash />}
-                              onClick={() => {
-                                onDeleteOpen();
-                                setSelectedScenario(scenario);
-                              }}
-                            />
                             {currentUser?.admin && (
-                              <IconButton
-                                variant="ghost"
-                                colorScheme="black"
-                                aria-label="Download scenario"
-                                fontSize="20px"
-                                icon={<HiDownload />}
-                                onClick={() => downloadScenario(scenario)}
-                              />
+                              <>
+                                <IconButton
+                                  variant="ghost"
+                                  colorScheme="black"
+                                  aria-label="Delete scenario"
+                                  fontSize="20px"
+                                  icon={<HiOutlineTrash />}
+                                  onClick={() => {
+                                    onDeleteOpen();
+                                    setSelectedScenario(scenario);
+                                  }}
+                                />
+                                <IconButton
+                                  variant="ghost"
+                                  colorScheme="black"
+                                  aria-label="Download scenario"
+                                  fontSize="20px"
+                                  icon={<HiDownload />}
+                                  onClick={() => downloadScenario(scenario)}
+                                />
+                              </>
                             )}
                           </Td>
                         </Tr>
