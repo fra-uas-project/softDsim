@@ -1,6 +1,6 @@
 import Chart from "react-apexcharts";
 import React, { useEffect, useState } from "react";
-import { Box, Flex, Heading, useBreakpointValue, VStack, HStack } from "@chakra-ui/react";
+import { Box, Flex, Heading, useBreakpointValue, VStack, HStack, StatHelpText, StatLabel, StatNumber, Stat, StatArrow } from "@chakra-ui/react";
 import { useImmer } from "use-immer";
 
 const MentalstatusChart = ({ value, inverseColors, title }) => {
@@ -132,14 +132,40 @@ const MentalstatusChart = ({ value, inverseColors, title }) => {
   return (
     <HStack backgroundColor="white" borderRadius="2xl" p={5} spacing={15} mb={5} w="full">
       <VStack justifyContent="flex-start" alignItems="start" w="full">
-        <Heading size="lg" ml={5}>
-          {title}
-        </Heading>
+      <Heading size="lg">{title}</Heading>
+      <Flex justifyContent="space-between" w="full">
         <Box w="100%" h="300px">
           <Chart options={options} series={series} type="line" width="100%" height="100%" />
         </Box>
-      </VStack>
-    </HStack>
+        <VStack spacing={5} alignItems="baseline">
+          <Stat>
+            <StatLabel color="gray.400">Stress</StatLabel>
+            <StatNumber>{value.team.stress.toFixed(2) * 100}%</StatNumber>
+            <StatHelpText>
+              <StatArrow type="increase" />
+              {((series[0].data[series[0].data.length - 1] - series[0].data[series[0].data.length - 2]) || 0).toFixed(2)}% since last iteration
+            </StatHelpText>
+          </Stat>
+          <Stat>
+            <StatLabel color="gray.400">Motivation</StatLabel>
+            <StatNumber>{value.team.motivation.toFixed(2) * 100}%</StatNumber>
+            <StatHelpText>
+              <StatArrow type="increase" />
+              {((series[1].data[series[1].data.length - 1] - series[1].data[series[1].data.length - 2]) || 0).toFixed(2)}% since last iteration
+            </StatHelpText>
+          </Stat>
+          <Stat>
+            <StatLabel color="gray.400">Familiarity</StatLabel>
+            <StatNumber>{value.team.familiarity.toFixed(2) * 100}%</StatNumber>
+            <StatHelpText>
+              <StatArrow type="increase" />
+              {((series[2].data[series[2].data.length - 1] - series[2].data[series[2].data.length - 2]) || 0).toFixed(2)}% since last iteration
+            </StatHelpText>
+          </Stat>
+        </VStack>
+      </Flex>
+    </VStack>
+   </HStack>
   );
 };
 
