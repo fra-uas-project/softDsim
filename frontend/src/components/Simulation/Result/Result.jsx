@@ -41,7 +41,7 @@ const Result = (props) => {
             <Divider />
             {/* Total Score */}
             <ResultElement title="Total Score" secondaryText="" icon={MdQueryStats}>
-                <Text fontSize="3xl" color="gray">{props.resultParams.total_score}</Text>
+                <Text fontSize="3xl" color="gray">{props.resultParams.total_score}%</Text>
             </ResultElement>
         </Grid>
     )
