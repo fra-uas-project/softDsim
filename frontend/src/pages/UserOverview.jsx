@@ -39,24 +39,19 @@ import AddUser from "../components/AddUser";
 import { Link } from "react-router-dom";
 
 const UserOverview = () => {
+
+  const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose: onRoleClose } = useDisclosure()
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+  const cancelRef = useRef();
+
+  window.value = 10;
+  
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [roleToChange, setRoleToChange] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
 
   const toast = useToast();
-
-  const {
-    isOpen: isRoleOpen,
-    onOpen: onRoleOpen,
-    onClose: onRoleClose,
-  } = useDisclosure();
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
-  } = useDisclosure();
-  const cancelRef = useRef();
 
   const fetchUsers = async () => {
     const res = await fetch(

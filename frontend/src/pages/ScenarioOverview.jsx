@@ -61,6 +61,8 @@ const ScenarioOverview = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
+  window.value = 10;
+
   const fetchScenarios = async () => {
     setIsLoading(true);
     const res = await fetch(
@@ -177,6 +179,7 @@ const ScenarioOverview = () => {
   };
 
   useEffect(() => {
+    console.log(window.value)
     fetchScenarios();
   }, []);
 

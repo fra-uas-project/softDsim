@@ -49,6 +49,8 @@ const ScenarioConfigOverview = () => {
 
   const [isModal2Open, setIsModal2Open] = useState(false);
 
+  window.value = 10;
+
   const closeModal2 = () => {
     setIsModal2Open(false);
   };

@@ -85,12 +85,17 @@ const Simulation = () => {
   // save maximum number of task
   const [tasksMax, setTasksMax] = useState(0);
 
-  // default values for actions
-  const [actionDefaultValues, setActionDefaultValues] = useState({
-    bugfix: false,
-    unittest: false,
-    integrationtest: false,
-  });
+
+    window.value = window.value + 10;
+
+    // default values for actions
+    const [actionDefaultValues, setActionDefaultValues] = useState(
+        {
+            bugfix: false,
+            unittest: false,
+            integrationtest: false
+        }
+    )
 
   const scenarioPath = () => {
     const url = location.pathname;
