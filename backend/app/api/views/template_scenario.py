@@ -514,17 +514,18 @@ def handle_model(data, scenario: TemplateScenario, i):
     m = ModelSelection(
         index=i,
         text=data.get("text", ""),
-        waterfall="waterfall" in data.get("models"),
-        kanban="kanban" in data.get("models"),
-        scrum="scrum" in data.get("models"),
+        waterfall="Waterfall" in data.get("models"),
+        kanban="Kanban" in data.get("models"),
+        scrum="Scrum" in data.get("models"),
         template_scenario=scenario,
     )
-
-    if not m.waterfall and not m.kanban and not m.scrum:
+    
+    #We have a minimum requirement. That's why this isn't Necessar (Burak)
+    #if not m.waterfall and not m.kanban and not m.scrum:
         # If no model is selected, select all models
-        m.waterfall = True
-        m.scrum = True
-        m.kanban = True
+        #m.waterfall = True
+        #m.scrum = True
+        #m.kanban = True
 
     m.save()
     return i + 1
