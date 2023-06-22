@@ -28,6 +28,9 @@ from app.api.views.user import UserView
 # from app.api.views.sim_api import ParameterSimulation
 from app.api.views.user_scenario import UserScenarioViews
 from history.view import HistoryView, ResultView, ResultsView
+from app.api.views.course import CourseView, Course_UserView, Course_ScenarioView
+
+
 
 urlpatterns = [
     # User stuff
@@ -86,4 +89,21 @@ urlpatterns = [
     path("result/<int:id>", ResultView.as_view()),
     path("results", ResultsView.as_view()),
     # path("sim/param", ParameterSimulation.as_view()),
+
+    # Course
+    path('courses/', CourseView.as_view()),
+    path('courses/<int:id>/', CourseView.as_view()),
+
+
+    ## COURSE_USER
+    path('courses/users/', Course_UserView.as_view()),
+    path('courses/add_user/', Course_UserView.as_view()),
+    path('courses/remove_user/', Course_UserView.as_view()),
+
+
+    # COURSE_SCENARIO
+    path('courses/scenarios/', Course_ScenarioView.as_view()),
+    path('courses/add_scenario/', Course_ScenarioView.as_view()),
+    path('courses/remove_scenario/', Course_ScenarioView.as_view()),
+
 ]
