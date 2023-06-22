@@ -13,8 +13,13 @@ class CourseView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @allowed_roles(["student", "creator", "staff"])
-    def get(self, request):
+    def get(self, request, id=None):
         try:
+            if id:
+                course = get_object_or_404(Course, id=id)
+                serializer = CourseNameSerializer(course)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
             courses = Course.objects.all()
             serializer = CourseNameSerializer(courses, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)

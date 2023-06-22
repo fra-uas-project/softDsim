@@ -92,6 +92,7 @@ urlpatterns = [
 
     # Course
     path('courses/', CourseView.as_view()),
+    path('courses/<int:id>/', CourseView.as_view()),
     ## COURSE_USER
     path('courses/<int:course_id>/users', CourseUserView.as_view(), name='course-users'),
     # COURSE_SCENARIO
