@@ -36,6 +36,10 @@ def validate_env_file(file_path):
         raise ValueError(
             f"Missing attributes in the .env file: {', '.join(missing_attributes)}")
 
+    if os.getenv("NUMBER_OF_SK_PER_TEAM") < 1 or os.getenv("NUMBER_OF_SK_PER_TEAM") > 10:
+        raise ValueError(
+            f"Unvalid value of attribute 'NUMBER_OF_SK_PER_TEAM' in the .env file. It soulb be > 0 and <= 10")
+
 
 check_file_exists("testparams.env")
 validate_env_file("testparams.env")
