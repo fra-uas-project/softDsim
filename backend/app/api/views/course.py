@@ -8,7 +8,6 @@ from app.decorators.decorators import allowed_roles
 from app.models.course import Course
 from app.serializers.course import CourseNameSerializer
 
-
 class CourseView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -18,16 +17,26 @@ class CourseView(APIView):
             if id:
                 course = get_object_or_404(Course, id=id)
                 serializer = CourseNameSerializer(course)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                response_data = {
+                    "id": course.id,
+                    "name": serializer.data['name']
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
 
             courses = Course.objects.all()
             serializer = CourseNameSerializer(courses, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            response_data = {
+                "data": [{
+                    "id": course.id,
+                    "name": course.name
+                } for course in courses]
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response(
                 {"error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status=status.HTTP_404_NOT_FOUND,
             )
 
     @allowed_roles(["creator", "staff"])
@@ -49,11 +58,10 @@ class CourseView(APIView):
         )
 
     @allowed_roles(["creator", "staff"])
-    def delete(self, request):
-        course_id = request.data.get('course_id')
-        if course_id:
+    def delete(self, request, id):
+        if id:
             try:
-                course = Course.objects.get(id=course_id)
+                course = Course.objects.get(id=id)
                 course.delete()
                 return Response(
                     {"status": "Course deleted successfully."},
@@ -69,6 +77,32 @@ class CourseView(APIView):
                 {"error": "Invalid course ID."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    @allowed_roles(["creator", "staff"])
+    def put(self, request, id):
+        try:
+            course = Course.objects.get(id=id)
+        except Course.DoesNotExist:
+            return Response(
+                {"error": "Course not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        course_name = request.data.get('name')
+        if course_name:
+            course.name = course_name
+            course.save()
+            serializer = CourseNameSerializer(course)
+            response_data = {
+                "id": course.id,
+                "name": serializer.data['name']
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        return Response(
+            {"error": "Invalid course name."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 class CourseUserView(APIView):
     permission_classes = (IsAuthenticated,)
