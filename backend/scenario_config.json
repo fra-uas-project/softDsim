@@ -1,0 +1,10 @@
+{
+  "name": "config_low_stress",
+  "stress_weekend_reduction": -0.2,
+  "stress_overtime_increase": 0.04,
+  "stress_error_increase": 0.02,
+  "done_tasks_per_meeting": 50,
+  "train_skill_increase_rate": 0.1,
+  "cost_member_team_event": 500,
+  "randomness": "full"
+}
