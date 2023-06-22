@@ -62,9 +62,6 @@ import InspectorTab from "../components/ScenarionStudio/InspectorTab/InspectorTa
 const ScenarioStudio = () => {
     const toast = useToast();
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-
     const [tabIndex, setTabIndex] = useState(tabIndexEnum.COMPONENTS);
     const [editorList, updateEditorList] = useImmer([]);
     const [savedEditorList, setSavedEditorList] = useState(editorList);
@@ -100,10 +97,6 @@ const ScenarioStudio = () => {
     const editorListIsSaved = _.isEqual(editorList, savedEditorList);
 
     usePrompt( 'You have unsaved changes. Do you really want to leave the Scenario Studio?', editorListState === editorListStates.MODIFIED );
-
-      const handleOpenModal = () => {
-      setIsModalOpen(true);
-         };
 
     const undo = () => {
         setEditorListHistory(prevEditorListHistory => {
@@ -241,35 +234,6 @@ const ScenarioStudio = () => {
         })
         return res
     };
-
-    const updateScorecard = async (scenarioId, scorecardData) => {
-        console.log("SCENARIO ID", scenarioId)
-  try {
-    const response = await fetch(
-      `${process.env.REACT_APP_DJANGO_HOST}/api/studio/scorecard/${scenarioId}`,
-      {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'X-CSRFToken': getCookie('csrftoken'),
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ score_card: scorecardData }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to update scorecard');
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred while updating the scorecard');
-  }
-};
 
     const saveAndPublishScenarioTemplate = async (scenarioId) => {
         if (editorList.length === 0) {
@@ -975,25 +939,6 @@ const ScenarioStudio = () => {
                                 }}>
                             Duplicate
                         </Button>
-<Button
-  variant="outline"
-  colorScheme="blue"
-  onClick={() => {
-    const scenarioId = '10'; // Replace '10' with your actual scenario ID
-    const scorecardData = {
-      id: 10,
-      budget_limit: 80,
-      time_limit: 80,
-      quality_limit: 80,
-      budget_p: 0.8,
-      time_p: 0.8,
-      quality_k: 0.8,
-    };
-    updateScorecard(scenarioId, scorecardData);
-  }}
->
-  Parameter
-</Button>
                         <Button variant="solid"
                                 colorScheme="blue"
                                 onClick={() => {saveAndPublishScenarioTemplate(currentTemplateId)}}>
