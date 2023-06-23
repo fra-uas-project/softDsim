@@ -702,3 +702,4 @@ class TemplateScenarioUserListView(APIView):
         if tries:
             max_score = max(map(lambda x: x.total_score, results))
         return {**serializer.data, "tries": tries, "max_score": max_score}
+
