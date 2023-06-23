@@ -68,7 +68,7 @@ class CourseView(APIView):
                 course.delete()
                 return Response(
                     {"status": "Course deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT
+                    status=status.HTTP_200_OK
                 )
             except Course.DoesNotExist:
                 return Response(
@@ -262,7 +262,7 @@ class CourseScenarioView(APIView):
             "name": scenario.name
         } for scenario in scenarios]
 
-        return Response({"scenarios": reponse_data}, status=status.HTTP_200_OK)
+        return Response(reponse_data, status=status.HTTP_200_OK)
 
     @allowed_roles(["creator", "staff"])
     def post(self, request, course_id):
