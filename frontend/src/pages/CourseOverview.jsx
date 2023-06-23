@@ -44,10 +44,12 @@ import {
 } from "@chakra-ui/react";
 import { HiChevronRight } from "react-icons/hi";
 import { FaCog } from "react-icons/fa";
+import { IoIosMenu } from "react-icons/io";
 
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../utils/utils";
 import { AuthContext } from "../context/AuthProvider";
+import { BsPlusSquare, BsFillTrashFill } from "react-icons/bs";
 
 const CourseOverview = () => {
   const [courses, setCourses] = useState([]);
@@ -461,8 +463,8 @@ const CourseOverview = () => {
           <Table variant="simple" size="lg">
             <Thead>
               <Tr>
-                <Th color="gray.400">Course ID</Th>
-                <Th color="gray.400">Course Name</Th>
+                <Th color="gray.400">Id</Th>
+                <Th color="gray.400">Name</Th>
                 <Th color="gray.400"></Th>
               </Tr>
             </Thead>
@@ -471,38 +473,31 @@ const CourseOverview = () => {
                 <Tr key={index}>
                   <Td fontWeight="500">{course.id}</Td>
                   <Td fontWeight="500">{course.name}</Td>
-                  <td fontWeight="500">
+                  <Td fontWeight="500" >
                     {currentUser?.admin && (
-                      <Menu>
+                    <div style = {{padding: "0 0 0 70%"}}>
+                    <Menu >
                         <MenuButton
                           as={Button}
                           variant="ghost"
                           colorScheme="black"
-                          rightIcon={<FaCog style={{ fontSize: "18px" }} />} // Using the FaCog icon from react-icons/fa
+                          rightIcon={<IoIosMenu style={{ fontSize: "18px"}} />}
                         ></MenuButton>
                         <MenuList>
-                          <MenuItem
-                            onClick={() => {
-                              setIsDeleteOpen(true);
-                              setSelectedCourse(course);
-                            }}
-                          >
-                            Delete
+                          <MenuItem onClick={() => { setIsDeleteOpen(true); setSelectedCourse(course); }}>
+                          Delete
                           </MenuItem>
-                          <MenuItem
-                            onClick={() => handleOpenUserModal(course.id)}
-                          >
-                            Manage Users
+                          <MenuItem onClick={() => handleOpenUserModal(course.id)}>
+                          Manage Users
                           </MenuItem>
-                          <MenuItem
-                            onClick={() => handleOpenScenarioModal(course.id)}
-                          >
-                            Manage Scenarios
+                          <MenuItem onClick={() => handleOpenScenarioModal(course.id)}>
+                          Manage Scenarios
                           </MenuItem>
                         </MenuList>
                       </Menu>
+                    </div>
                     )}
-                  </td>
+                  </Td>
                 </Tr>
               ))}
             </Tbody>
@@ -539,7 +534,7 @@ const CourseOverview = () => {
                 }}
                 ml={3}
               >
-                Delete
+                <BsFillTrashFill/>
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -595,15 +590,11 @@ const CourseOverview = () => {
                       <Td>{user.id}</Td>
                       <Td>{user.username}</Td>
                       <Td>
-                        <Button
-                          colorScheme="red"
-                          size="sm"
-                          onClick={() =>
+                          <BsFillTrashFill onClick={() =>
                             handleDeleteUser(modalCourseId, user.username)
                           }
-                        >
-                          Delete
-                        </Button>
+                          onMouseOver={({target})=>target.style.opacity=0.5}
+                          onMouseOut={({target})=>target.style.opacity=1}/>
                       </Td>
                     </Tr>
                   ))}
@@ -614,11 +605,8 @@ const CourseOverview = () => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={handleCloseUserModal}>
-              Close
-            </Button>
-            <Button colorScheme="green" ml={3} onClick={handleOpenAddUserModal}>
-              Add
+            <Button colorScheme="green" ml={3} onClick={handleOpenAddUserModal} style ={{padding: "0% 11%", margin: "0 auto"}}>
+             <BsPlusSquare/>
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -713,7 +701,6 @@ const CourseOverview = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      ); };
     </Container>
   );
 };
