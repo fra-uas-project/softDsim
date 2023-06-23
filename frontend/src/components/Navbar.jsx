@@ -121,6 +121,9 @@ const Navbar = () => {
                   <MenuItem color="black" as={Link} to="/scenario-config" onClick={handleClick}>
                     Scenario Configurations
                   </MenuItem>
+                  <MenuItem color="black" as={Link} to="/courses" onClick={handleClick}>
+                    Courses
+                  </MenuItem>
                 </MenuGroup>
               </MenuList>
             </Menu>

@@ -16,6 +16,7 @@ import ScenarioStudio from "./pages/ScenarioStudio";
 import AddMultipleUsers from "./pages/AddMultipleUsers";
 import SkillTypesOverview from "./pages/SkillTypesOverview";
 import ScenarioConfigOverview from "./pages/ScenarioConfigOverview";
+import CourseOverview from "./pages/CourseOverview";
 
 const Routing = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext)
@@ -94,6 +95,7 @@ const Routing = () => {
                     <Route path="/scenario-studio" element={<ScenarioStudio />} />
                     <Route path="/skill-types" element={<SkillTypesOverview />} />
                     <Route path="/scenario-config" element={<ScenarioConfigOverview />} />
+                    <Route path="/courses" element={<CourseOverview />} />
 
 
                 </>
