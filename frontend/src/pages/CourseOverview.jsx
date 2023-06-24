@@ -15,10 +15,8 @@ import {
   Container,
   Flex,
   Heading,
-  IconButton,
   Spinner,
   Table,
-  TableContainer,
   Tbody,
   Td,
   Th,
@@ -42,14 +40,11 @@ import {
   Text,
   Input,
 } from "@chakra-ui/react";
-import { HiChevronRight } from "react-icons/hi";
-import { FaCog } from "react-icons/fa";
 import { IoIosMenu } from "react-icons/io";
-
-import { useNavigate } from "react-router-dom";
 import { getCookie } from "../utils/utils";
 import { AuthContext } from "../context/AuthProvider";
 import { BsPlusSquare, BsFillTrashFill } from "react-icons/bs";
+import {IoAdd} from "react-icons/io5";
 
 const CourseOverview = () => {
   const [courses, setCourses] = useState([]);
@@ -63,7 +58,6 @@ const CourseOverview = () => {
 
   const cancelRef = useRef();
   const toast = useToast();
-  const navigate = useNavigate();
 
   const {
     isOpen: isModalOpen,
@@ -77,15 +71,101 @@ const CourseOverview = () => {
   const [scenarios, setScenarios] = useState([]);
   const [modalCourseId, setModalCourseId] = useState(null);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [isAddScenarioModalOpen, setIsAddScenarioModalOpen] = useState(false);
   const [fetchedUsers, setFetchedUsers] = useState([]);
+  const [fetchedScenarios, setFetchedScenarios] = useState([]);
+  const [courseId, setCourseId] = useState(null);
+  const [isChangeNameModalOpen, setIsChangeNameModalOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+
+  const handleOpenChangeNameModal = (courseId, currentName) => {
+    setModalCourseId(courseId);
+    setCourseId(courseId); // Set the courseId in state
+    setNewName(currentName); // Reset the newName field
+    setIsChangeNameModalOpen(true); // Open the modal
+  };
+
+  const handleCloseChangeNameModal = () => {
+    setIsChangeNameModalOpen(false);
+  };
+
+  const handleNameChange = (event) => {
+    setNewName(event.target.value);
+  };
+
+  const handleSaveName = async (courseId) => {
+    try {
+      const existingCourse = courses.find((course) => course.id !== courseId && course.name === newName);
+      if (existingCourse) {
+        throw new Error("Course name already exists. Please choose a different name.");
+      }
+
+      const response = await fetch(
+          `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}`,
+          {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: newName }),
+          }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        handleCloseChangeNameModal();
+        toast({
+          title: "Course name has been updated",
+          status: "success",
+          duration: 5000,
+        });
+        const updatedCourses = courses.map((course) => {
+          if (course.id === courseId) {
+            return { ...course, name: newName };
+          }
+          return course;
+        });
+        setCourses(updatedCourses);
+      } else {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to update course name");
+      }
+    } catch (error) {
+      console.error("Error updating course name:", error);
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+      });
+    }
+  };
+
+
+
 
   const handleOpenAddUserModal = async () => {
     try {
       const data = await fetchAllUsers();
-      setFetchedUsers(data);
+      const filteredUsers = data.filter(user => !users.some(u => u.username === user.username));
+      setFetchedUsers(filteredUsers);
       setIsAddUserModalOpen(true);
+      handleCloseUserModal();
     } catch (error) {
       console.error("Error fetching users:", error);
+    }
+  };
+
+  const handleOpenAddScenarioModal = async () => {
+    try {
+      const data = await fetchAllScenarios();
+      const filteredScenarios = data.filter(scenario => !scenarios.some(u => u.name === scenario.name));
+      setFetchedScenarios(filteredScenarios);
+      setIsAddScenarioModalOpen(true);
+      handleCloseScenarioModal();
+    } catch (error) {
+      console.error("Error fetching Scenarios:", error);
     }
   };
 
@@ -93,21 +173,25 @@ const CourseOverview = () => {
     setIsAddUserModalOpen(false);
   };
 
+  const handleCloseAddScenarioModal = () => {
+    setIsAddScenarioModalOpen(false);
+  };
+
   const handleAddUser = async (courseId, id, username) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: id,
-            username: username,
-          }),
-        }
+          `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_id: id,
+              username: username,
+            }),
+          }
       );
 
       if (response.ok) {
@@ -117,6 +201,9 @@ const CourseOverview = () => {
           status: "success",
           duration: 5000,
         });
+
+        const updatedUsers = fetchedUsers.filter((user) => user.id !== id);
+        setFetchedUsers(updatedUsers);
       } else {
         const data = await response.json();
         throw new Error(data.error || "Failed to add user to the course");
@@ -131,6 +218,49 @@ const CourseOverview = () => {
       });
     }
   };
+
+  const handleAddScenario = async (courseId, id, name) => {
+    try {
+      const response = await fetch(
+          `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              scenario_id: id,
+              name: name,
+            }),
+          }
+      );
+
+      if (response.ok) {
+        await response.json();
+        toast({
+          title: "Scenario has been added to the course",
+          status: "success",
+          duration: 5000,
+        });
+
+        const updatedScenarios = fetchedScenarios.filter((scenario) => scenario.id !== id);
+        setFetchedScenarios(updatedScenarios);
+      } else {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to add scenario to the course");
+      }
+    } catch (error) {
+      console.error("Error adding scenario to the course:", error);
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+      });
+    }
+  };
+
 
   const handleDeleteUser = async (courseId, username) => {
     try {
@@ -195,7 +325,7 @@ const CourseOverview = () => {
         });
 
         const updatedScenarios = scenarios.filter(
-          (scenario) => scenario.scenario_id !== scenarioId
+          (scenario) => scenario.id !== scenarioId
         );
         setScenarios(updatedScenarios);
       } else {
@@ -226,6 +356,26 @@ const CourseOverview = () => {
       return data;
     } catch (error) {
       console.error("Error fetching users:", error);
+      return [];
+    }
+  };
+
+  const fetchAllScenarios = async () => {
+    try {
+      const response = await fetch(
+          `${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch Scenarios");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching Scenarios:", error);
       return [];
     }
   };
@@ -472,7 +622,9 @@ const CourseOverview = () => {
               {courses.map((course, index) => (
                 <Tr key={index}>
                   <Td fontWeight="500">{course.id}</Td>
-                  <Td fontWeight="500">{course.name}</Td>
+                  <Td fontWeight="500">
+                    <span style={{ cursor: 'pointer' }} onClick={() => handleOpenChangeNameModal(course.id, course.name)}>{course.name}</span>
+                  </Td>
                   <Td fontWeight="500" >
                     {currentUser?.admin && (
                     <div style = {{padding: "0 0 0 70%"}}>
@@ -632,15 +784,11 @@ const CourseOverview = () => {
                       <Td>{scenario.id}</Td>
                       <Td>{scenario.name}</Td>
                       <Td>
-                        <Button
-                          colorScheme="red"
-                          size="sm"
-                          onClick={() =>
+                        <BsFillTrashFill onClick={() =>
                             handleDeleteScenario(modalCourseId, scenario.id)
-                          }
-                        >
-                          Delete
-                        </Button>
+                        }
+                                         onMouseOver={({target})=>target.style.opacity=0.5}
+                                         onMouseOut={({target})=>target.style.opacity=1}/>
                       </Td>
                     </Tr>
                   ))}
@@ -651,8 +799,8 @@ const CourseOverview = () => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={handleCloseScenarioModal}>
-              Close
+            <Button colorScheme="green" ml={3} onClick={handleOpenAddScenarioModal} style ={{padding: "0% 11%", margin: "0 auto"}}>
+              <BsPlusSquare/>
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -669,6 +817,7 @@ const CourseOverview = () => {
                   <Tr>
                     <Th>ID</Th>
                     <Th>Name</Th>
+                    <Th></Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -678,12 +827,11 @@ const CourseOverview = () => {
                       <Td>{user.username}</Td>
                       <Td>
                         <Button
-                          colorScheme="green"
                           onClick={() =>
                             handleAddUser(modalCourseId, user.id, user.username)
                           }
                         >
-                          Add
+                          <IoAdd/>
                         </Button>
                       </Td>
                     </Tr>
@@ -695,12 +843,72 @@ const CourseOverview = () => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={handleCloseAddUserModal}>
-              Close
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isAddScenarioModalOpen} onClose={handleCloseAddScenarioModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add Scenario</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {fetchedScenarios.length > 0 ? (
+                <Table variant="simple">
+                  <Thead>
+                    <Tr>
+                      <Th>ID</Th>
+                      <Th>Name</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {fetchedScenarios.map((scenario) => (
+                        <Tr key={scenario.id}>
+                          <Td>{scenario.id}</Td>
+                          <Td>{scenario.name}</Td>
+                          <Td>
+                            <Button
+                                onClick={() =>
+                                    handleAddScenario(modalCourseId, scenario.id, scenario.name)
+                                }
+                            >
+                              <IoAdd/>
+                            </Button>
+                          </Td>
+                        </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+            ) : (
+                <Text>No Scenarios found.</Text>
+            )}
+          </ModalBody>
+          <ModalFooter>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isChangeNameModalOpen} onClose={handleCloseChangeNameModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Modify Name</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input value={newName} onChange={handleNameChange} placeholder="Enter new name" />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={() => handleSaveName(modalCourseId)} ml={2}>
+              Save
+            </Button>
+            <Button colorScheme="gray" ml={3} onClick={handleCloseChangeNameModal}>
+              Cancel
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+
+
     </Container>
   );
 };
