@@ -35,7 +35,7 @@ import SkilltypeContainer from "../components/Simulation/Actions/SkilltypeContai
 
 const Simulation = () => {
     const location = useLocation();
-
+    let modalCheck;
     // scenario template data
     const { state } = useLocation();
 
@@ -417,16 +417,21 @@ const Simulation = () => {
     }, [skillTypeReturn])
 
     useEffect(() => {
+        console.log("test")
         setStory(state.story)
         onOpen();
     }, [onOpen]);
 
     useEffect(() => {
+
         setSimValuesBefore(simValues)
-        // open story only if there is a story and if it is not the same story as before
-        if (simValues.text && simValues.text !== simValuesBefore.text) {
-            onStoryOpen();
-            setStory(story + "\n\n---\n\n" + simValues.text)
+        if (simValues.text !== simValuesBefore.text) {
+            console.log(window.modalCheck)
+            if (window.modalCheck< 2){
+                    window.modalCheck = window.modalCheck + 1;
+                    console.log(window.modalCheck)
+                    onStoryOpen();
+            }
         }
 
     }, [simValues])
