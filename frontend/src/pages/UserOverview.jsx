@@ -137,11 +137,6 @@ const UserOverview = () => {
 
   return (
     <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-      <Breadcrumb spacing="8px" separator={<HiChevronRight color="gray.500" />}>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="">Users</BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
       <Heading>Users</Heading>
       <Box h={5}></Box>
       <Box backgroundColor="white" borderRadius="2xl">

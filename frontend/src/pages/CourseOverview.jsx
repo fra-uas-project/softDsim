@@ -35,7 +35,7 @@ import {
   FormLabel,
   Menu,
   MenuButton,
-  MenuList,
+  MenuList,HStack,
   MenuItem,
   Text,
   Input,
@@ -77,6 +77,7 @@ const CourseOverview = () => {
   const [courseId, setCourseId] = useState(null);
   const [isChangeNameModalOpen, setIsChangeNameModalOpen] = useState(false);
   const [newName, setNewName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleOpenChangeNameModal = (courseId, currentName) => {
     setModalCourseId(courseId);
@@ -530,7 +531,7 @@ const CourseOverview = () => {
   const fetchCourses = async () => {
     setIsLoading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_DJANGO_HOST}/api/courses`,
+      `${process.env.REACT_APP_DJANGO_HOST}/api/courses?q=${searchQuery}`,
       {
         method: "GET",
         credentials: "include",
@@ -586,30 +587,44 @@ const CourseOverview = () => {
 
   useEffect(() => {
     fetchCourses();
-  }, []);
+  }, [searchQuery]);
 
   return (
     <Container maxW="container.xl">
-      <Flex justifyContent="space-between" alignItems="center" mt={6} mb={4}>
-        <Breadcrumb>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>
-            <BreadcrumbLink href="#">Courses</BreadcrumbLink>
-          </BreadcrumbItem>
-        </Breadcrumb>
-        <Button colorScheme="blue" onClick={handleOpenModal}>
-          Create new
-        </Button>
+      <Flex justifyContent="flex-end">
+        <Flex justifyContent="space-between" alignItems="center" mt={6} mb={4}>
+          <Button colorScheme="blue" onClick={handleOpenModal}>
+            Create new
+          </Button>
+        </Flex>
       </Flex>
+
+      <Heading size="lg" mb={4}>
+        Courses
+      </Heading>
       <Box p={4} bg="white" boxShadow="base" rounded="md">
-        <Heading size="lg" mb={4}>
-          Courses
-        </Heading>
-        {isLoading ? (
-          <Spinner />
-        ) : (
+
+        <HStack
+            justifyContent="space-between"
+            mr={3}
+            spacing={3}
+            alignItems="center"
+        >
+          <Flex align="left">
+            <Input
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "200px",
+                  border: "1px solid #333",
+                  color: "#555",
+                  paddingLeft: "0.5rem",
+                }}
+            />
+          </Flex>
+          </HStack>
+        { (
           <Table variant="simple" size="lg">
             <Thead>
               <Tr>
@@ -619,7 +634,11 @@ const CourseOverview = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {courses.map((course, index) => (
+              {courses.filter((course) =>
+                  course.name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase())
+              ).map((course, index) => (
                 <Tr key={index}>
                   <Td fontWeight="500">{course.id}</Td>
                   <Td fontWeight="500">

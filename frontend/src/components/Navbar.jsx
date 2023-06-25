@@ -8,6 +8,9 @@ import {
   Text,
   MenuButton,
   MenuGroup,
+  MenuItemOption,
+  MenuOptionGroup,
+  MenuDivider,
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
@@ -67,6 +70,8 @@ const Navbar = () => {
     setCurrentUser(null);
   }
 
+
+
   return (
     <Flex w="full" px={16} py={4} borderBottom="1px solid #E2E8F0">
       <Box as={Link} to={"/"} onClick={handleClick}>
@@ -91,14 +96,21 @@ const Navbar = () => {
           Scenario Studio
         </Button>
         )}
-        {currentUser?.admin && (
-          <Button variant="link" as={Link} to="/users" onClick={handleClick}>
-            User Management
-          </Button>
-        )}
         <Button variant="link" as={Link} to="/help" onClick={handleClick}>
           Help
         </Button>
+        {currentUser?.admin && (
+            <Menu>
+              <MenuButton as={Button}>
+                Admin Panel
+              </MenuButton>
+              <MenuList>
+                <MenuItem as={Link} to="/users" onClick={handleClick}>User Management</MenuItem>
+                <MenuItem as={Link} to="/scenariomanagement" onClick={handleClick}>Scenario Management</MenuItem>
+                <MenuItem as={Link} to="/courses" onClick={handleClick}>Course Management</MenuItem>
+              </MenuList>
+            </Menu>
+        )}
       </HStack>
 
       {currentUser?.staff && (
@@ -120,9 +132,6 @@ const Navbar = () => {
                   </MenuItem>
                   <MenuItem color="black" as={Link} to="/scenario-config" onClick={handleClick}>
                     Scenario Configurations
-                  </MenuItem>
-                  <MenuItem color="black" as={Link} to="/courses" onClick={handleClick}>
-                    Courses
                   </MenuItem>
                 </MenuGroup>
               </MenuList>
