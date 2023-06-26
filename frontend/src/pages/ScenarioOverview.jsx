@@ -1,10 +1,4 @@
 import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
   Box,
   Breadcrumb,
   BreadcrumbItem,
@@ -13,7 +7,6 @@ import {
   Container,
   Flex,
   Heading,
-  IconButton,
   Spinner,
   Table,
   TableContainer,
@@ -22,23 +15,10 @@ import {
   Th,
   Thead,
   Tr,
-  useDisclosure,
-  useToast,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  ModalCloseButton,
-  FormControl,
-  FormLabel,
-  Input,
 } from "@chakra-ui/react";
 import { HiChevronRight } from "react-icons/hi";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCookie } from "../utils/utils";
 import { AuthContext } from "../context/AuthProvider";
 import { useContext } from "react";
 
@@ -46,10 +26,6 @@ const ScenarioOverview = () => {
   const [scenarios, setScenarios] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { currentUser, setCurrentUser } = useContext(AuthContext);
-  const [selectedScenario, setSelectedScenario] = useState({});
-  const [isDateModalOpen, setIsDateModalOpen] = useState(false);
-  const [startDate, setStartDate] = useState("");
-  const toast = useToast();
   const navigate = useNavigate();
 
   window.value = 10;
