@@ -99,6 +99,6 @@ urlpatterns = [
     path('courses/<int:course_id>/scenarios', CourseScenarioView.as_view(), name='course-scenarios'),
 
     ##
-    path('courses/user-courses', UserCoursesView.as_view(), name='course-detail'),
+    path('courses/user-scenarios', UserCoursesView.as_view(), name='course-detail'),
 
 ]

@@ -32,7 +32,7 @@ const ScenarioOverview = () => {
 
   const fetchCourseScenarios = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/user-courses`,
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/user-scenarios`,
           {
             method: "GET",
             credentials: "include",
