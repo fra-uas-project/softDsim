@@ -6,9 +6,6 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Button,
   Container,
   Flex,
@@ -27,25 +24,19 @@ import {
   Divider,
   HStack,
 } from "@chakra-ui/react";
-import {
-  HiChevronRight,
-  HiOutlineCheck,
-  HiOutlineTrash,
-  HiOutlineX,
-} from "react-icons/hi";
+import { HiChevronRight, HiOutlineCheck, HiOutlineTrash, HiOutlineX } from "react-icons/hi";
 import { useEffect, useRef, useState } from "react";
 import { getCookie, role } from "../utils/utils";
 import AddUser from "../components/AddUser";
 import { Link } from "react-router-dom";
 
 const UserOverview = () => {
-
-  const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose: onRoleClose } = useDisclosure()
+  const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose: onRoleClose } = useDisclosure();
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const cancelRef = useRef();
 
   window.value = 10;
-  
+
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [roleToChange, setRoleToChange] = useState({});
@@ -54,13 +45,10 @@ const UserOverview = () => {
   const toast = useToast();
 
   const fetchUsers = async () => {
-    const res = await fetch(
-      `${process.env.REACT_APP_DJANGO_HOST}/api/user?q=${searchQuery}`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
+    const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user?q=${searchQuery}`, {
+      method: "GET",
+      credentials: "include",
+    });
     const fetchedUsers = await res.json();
     setUsers(fetchedUsers);
   };
@@ -69,16 +57,13 @@ const UserOverview = () => {
 
   const deleteUser = async (username) => {
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/user/${username}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            "X-CSRFToken": getCookie("csrftoken"),
-          },
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user/${username}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+      });
       await res.json();
       fetchUsers();
       toast({
@@ -98,21 +83,18 @@ const UserOverview = () => {
 
   const toggleRole = async (username) => {
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/user/${username}`,
-        {
-          method: "PATCH",
-          credentials: "include",
-          headers: {
-            "X-CSRFToken": getCookie("csrftoken"),
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            [roleToChange.role]: !roleToChange.value,
-            [role.CREATOR]: !roleToChange.value, // Update CREATOR role along with STAFF
-          }),
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user/${username}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          [roleToChange.role]: !roleToChange.value,
+          [role.CREATOR]: !roleToChange.value, // Update CREATOR role along with STAFF
+        }),
+      });
       await res.json();
       fetchUsers();
     } catch (e) {
@@ -125,11 +107,9 @@ const UserOverview = () => {
     }
   };
 
-
   useEffect(() => {
     fetchUsers();
   }, [searchQuery]);
-
 
   useEffect(() => {
     console.log(roleToChange);
@@ -137,21 +117,11 @@ const UserOverview = () => {
 
   return (
     <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-      <Breadcrumb spacing="8px" separator={<HiChevronRight color="gray.500" />}>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="">Users</BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
       <Heading>Users</Heading>
       <Box h={5}></Box>
       <Box backgroundColor="white" borderRadius="2xl">
         <Container maxW="6xl" pt={10} h="full" pb={10} minH="70vh" maxH="70vh">
-          <HStack
-            justifyContent="space-between"
-            mr={3}
-            spacing={3}
-            alignItems="center"
-          >
+          <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
             <Flex align="left">
               <Input
                 placeholder="Search"
@@ -187,11 +157,7 @@ const UserOverview = () => {
               </Thead>
               <Tbody>
                 {users
-                  .filter((user) =>
-                    user.username
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase())
-                  )
+                  .filter((user) => user.username.toLowerCase().includes(searchQuery.toLowerCase()))
                   .map((user, index) => {
                     return (
                       <Tr key={index}>
@@ -202,10 +168,7 @@ const UserOverview = () => {
                             onClick={() => {
                               navigateToUser(user.id);
                             }}
-                          >{`${
-                            user.username[0].toUpperCase() +
-                            user.username.slice(1)
-                          }`}</Button>
+                          >{`${user.username[0].toUpperCase() + user.username.slice(1)}`}</Button>
                         </Td>
                         <Td fontWeight="500">
                           <IconButton
@@ -213,9 +176,7 @@ const UserOverview = () => {
                             colorScheme="black"
                             aria-label="Toggle admin role"
                             fontSize="20px"
-                            icon={
-                              user.admin ? <HiOutlineCheck /> : <HiOutlineX />
-                            }
+                            icon={user.admin ? <HiOutlineCheck /> : <HiOutlineX />}
                             onClick={() => {
                               setSelectedUser(user.username);
                               onRoleOpen();
@@ -232,9 +193,7 @@ const UserOverview = () => {
                             colorScheme="black"
                             aria-label="Toggle admin role"
                             fontSize="20px"
-                            icon={
-                              user.staff ? <HiOutlineCheck /> : <HiOutlineX />
-                            }
+                            icon={user.staff ? <HiOutlineCheck /> : <HiOutlineX />}
                             onClick={() => {
                               setSelectedUser(user.username);
                               onRoleOpen();
@@ -251,9 +210,7 @@ const UserOverview = () => {
                             colorScheme="black"
                             aria-label="Toggle admin role"
                             fontSize="20px"
-                            icon={
-                              user.creator ? <HiOutlineCheck /> : <HiOutlineX />
-                            }
+                            icon={user.creator ? <HiOutlineCheck /> : <HiOutlineX />}
                             onClick={() => {
                               setSelectedUser(user.username);
                               onRoleOpen();
@@ -271,9 +228,7 @@ const UserOverview = () => {
                             colorScheme="black"
                             aria-label="Toggle admin role"
                             fontSize="20px"
-                            icon={
-                              user.student ? <HiOutlineCheck /> : <HiOutlineX />
-                            }
+                            icon={user.student ? <HiOutlineCheck /> : <HiOutlineX />}
                           />
                         </Td>
                         <Td fontWeight="500">
@@ -314,8 +269,7 @@ const UserOverview = () => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure that you want to delete {selectedUser}? You can't
-              undo this action afterwards.
+              Are you sure that you want to delete {selectedUser}? You can't undo this action afterwards.
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -352,8 +306,7 @@ const UserOverview = () => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure that you want to change role {roleToChange.role} of{" "}
-              {selectedUser}?
+              Are you sure that you want to change role {roleToChange.role} of {selectedUser}?
             </AlertDialogBody>
 
             <AlertDialogFooter>

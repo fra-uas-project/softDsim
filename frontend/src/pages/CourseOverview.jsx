@@ -7,15 +7,11 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Button,
   VStack,
   Container,
   Flex,
   Heading,
-  Spinner,
   Table,
   Tbody,
   Td,
@@ -36,6 +32,7 @@ import {
   Menu,
   MenuButton,
   MenuList,
+  HStack,
   MenuItem,
   Text,
   Input,
@@ -44,7 +41,7 @@ import { IoIosMenu } from "react-icons/io";
 import { getCookie } from "../utils/utils";
 import { AuthContext } from "../context/AuthProvider";
 import { BsPlusSquare, BsFillTrashFill } from "react-icons/bs";
-import {IoAdd} from "react-icons/io5";
+import { IoAdd } from "react-icons/io5";
 
 const CourseOverview = () => {
   const [courses, setCourses] = useState([]);
@@ -59,11 +56,7 @@ const CourseOverview = () => {
   const cancelRef = useRef();
   const toast = useToast();
 
-  const {
-    isOpen: isModalOpen,
-    onOpen: handleOpenModal,
-    onClose: handleCloseModal,
-  } = useDisclosure();
+  const { isOpen: isModalOpen, onOpen: handleOpenModal, onClose: handleCloseModal } = useDisclosure();
 
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isScenarioModalOpen, setIsScenarioModalOpen] = useState(false);
@@ -77,6 +70,7 @@ const CourseOverview = () => {
   const [courseId, setCourseId] = useState(null);
   const [isChangeNameModalOpen, setIsChangeNameModalOpen] = useState(false);
   const [newName, setNewName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleOpenChangeNameModal = (courseId, currentName) => {
     setModalCourseId(courseId);
@@ -100,17 +94,14 @@ const CourseOverview = () => {
         throw new Error("Course name already exists. Please choose a different name.");
       }
 
-      const response = await fetch(
-          `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}`,
-          {
-            method: "PUT",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ name: newName }),
-          }
-      );
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newName }),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -142,13 +133,10 @@ const CourseOverview = () => {
     }
   };
 
-
-
-
   const handleOpenAddUserModal = async () => {
     try {
       const data = await fetchAllUsers();
-      const filteredUsers = data.filter(user => !users.some(u => u.username === user.username));
+      const filteredUsers = data.filter((user) => !users.some((u) => u.username === user.username));
       setFetchedUsers(filteredUsers);
       setIsAddUserModalOpen(true);
       handleCloseUserModal();
@@ -160,7 +148,7 @@ const CourseOverview = () => {
   const handleOpenAddScenarioModal = async () => {
     try {
       const data = await fetchAllScenarios();
-      const filteredScenarios = data.filter(scenario => !scenarios.some(u => u.name === scenario.name));
+      const filteredScenarios = data.filter((scenario) => !scenarios.some((u) => u.name === scenario.name));
       setFetchedScenarios(filteredScenarios);
       setIsAddScenarioModalOpen(true);
       handleCloseScenarioModal();
@@ -179,20 +167,17 @@ const CourseOverview = () => {
 
   const handleAddUser = async (courseId, id, username) => {
     try {
-      const response = await fetch(
-          `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`,
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user_id: id,
-              username: username,
-            }),
-          }
-      );
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: id,
+          username: username,
+        }),
+      });
 
       if (response.ok) {
         await response.json();
@@ -221,20 +206,17 @@ const CourseOverview = () => {
 
   const handleAddScenario = async (courseId, id, name) => {
     try {
-      const response = await fetch(
-          `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`,
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              scenario_id: id,
-              name: name,
-            }),
-          }
-      );
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          scenario_id: id,
+          name: name,
+        }),
+      });
 
       if (response.ok) {
         await response.json();
@@ -261,20 +243,16 @@ const CourseOverview = () => {
     }
   };
 
-
   const handleDeleteUser = async (courseId, username) => {
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          body: JSON.stringify({ username }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`, {
+        method: "DELETE",
+        credentials: "include",
+        body: JSON.stringify({ username }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
         await response.json();
@@ -304,17 +282,14 @@ const CourseOverview = () => {
         throw new Error("Invalid scenario ID");
       }
 
-      const response = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          body: JSON.stringify({ scenario_id: scenarioId }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`, {
+        method: "DELETE",
+        credentials: "include",
+        body: JSON.stringify({ scenario_id: scenarioId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
         await response.json();
@@ -324,9 +299,7 @@ const CourseOverview = () => {
           duration: 5000,
         });
 
-        const updatedScenarios = scenarios.filter(
-          (scenario) => scenario.id !== scenarioId
-        );
+        const updatedScenarios = scenarios.filter((scenario) => scenario.id !== scenarioId);
         setScenarios(updatedScenarios);
       } else {
         throw new Error("Deletion failed");
@@ -342,13 +315,10 @@ const CourseOverview = () => {
 
   const fetchAllUsers = async () => {
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/user`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user`, {
+        method: "GET",
+        credentials: "include",
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
@@ -362,13 +332,10 @@ const CourseOverview = () => {
 
   const fetchAllScenarios = async () => {
     try {
-      const response = await fetch(
-          `${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-      );
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario`, {
+        method: "GET",
+        credentials: "include",
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch Scenarios");
       }
@@ -383,13 +350,10 @@ const CourseOverview = () => {
   const getUsersOfCourse = async (courseId) => {
     setModalCourseId(courseId);
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`, {
+        method: "GET",
+        credentials: "include",
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch users of course");
       }
@@ -404,13 +368,10 @@ const CourseOverview = () => {
   const getScenariosOfCourse = async (courseId) => {
     setModalCourseId(courseId);
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`, {
+        method: "GET",
+        credentials: "include",
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch scenarios of course");
       }
@@ -454,10 +415,7 @@ const CourseOverview = () => {
 
   const checkCourseNameExists = (name, id) => {
     return courses.some(
-      (course) =>
-        course.name &&
-        course.name.toLowerCase() === name.toLowerCase() &&
-        course.id !== id
+      (course) => course.name && course.name.toLowerCase() === name.toLowerCase() && course.id !== id,
     );
   };
 
@@ -476,25 +434,21 @@ const CourseOverview = () => {
       if (nameExists) {
         toast({
           title: "Failed to create course",
-          description:
-            "Course name already exists. Please provide a different name.",
+          description: "Course name already exists. Please provide a different name.",
           status: "warning",
           duration: 5000,
         });
         return;
       } else {
-        const createRes = await fetch(
-          `${process.env.REACT_APP_DJANGO_HOST}/api/courses`,
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": getCookie("csrftoken"),
-            },
-            body: JSON.stringify(newCourse),
-          }
-        );
+        const createRes = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify(newCourse),
+        });
 
         if (createRes.ok) {
           toast({
@@ -529,13 +483,10 @@ const CourseOverview = () => {
 
   const fetchCourses = async () => {
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_DJANGO_HOST}/api/courses`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
+    const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses?q=${searchQuery}`, {
+      method: "GET",
+      credentials: "include",
+    });
     const data = await res.json();
     setCourses(data.data);
     if ("error" in data) {
@@ -550,16 +501,13 @@ const CourseOverview = () => {
 
   const deleteCourse = async (course) => {
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${course.id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            "X-CSRFToken": getCookie("csrftoken"),
-          },
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${course.id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+      });
       await res.json();
       await fetchCourses();
       toast({
@@ -586,75 +534,91 @@ const CourseOverview = () => {
 
   useEffect(() => {
     fetchCourses();
-  }, []);
+  }, [searchQuery]);
 
   return (
-    <Container maxW="container.xl">
-      <Flex justifyContent="space-between" alignItems="center" mt={6} mb={4}>
-        <Breadcrumb>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>
-            <BreadcrumbLink href="#">Courses</BreadcrumbLink>
-          </BreadcrumbItem>
-        </Breadcrumb>
-        <Button colorScheme="blue" onClick={handleOpenModal}>
-          Create new
-        </Button>
-      </Flex>
-      <Box p={4} bg="white" boxShadow="base" rounded="md">
-        <Heading size="lg" mb={4}>
-          Courses
-        </Heading>
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <Table variant="simple" size="lg">
-            <Thead>
-              <Tr>
-                <Th color="gray.400">Id</Th>
-                <Th color="gray.400">Name</Th>
-                <Th color="gray.400"></Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {courses.map((course, index) => (
-                <Tr key={index}>
-                  <Td fontWeight="500">{course.id}</Td>
-                  <Td fontWeight="500">
-                    <span style={{ cursor: 'pointer' }} onClick={() => handleOpenChangeNameModal(course.id, course.name)}>{course.name}</span>
-                  </Td>
-                  <Td fontWeight="500" >
-                    {currentUser?.admin && (
-                    <div style = {{padding: "0 0 0 70%"}}>
-                    <Menu >
-                        <MenuButton
-                          as={Button}
-                          variant="ghost"
-                          colorScheme="black"
-                          rightIcon={<IoIosMenu style={{ fontSize: "18px"}} />}
-                        ></MenuButton>
-                        <MenuList>
-                          <MenuItem onClick={() => { setIsDeleteOpen(true); setSelectedCourse(course); }}>
-                          Delete
-                          </MenuItem>
-                          <MenuItem onClick={() => handleOpenUserModal(course.id)}>
-                          Manage Users
-                          </MenuItem>
-                          <MenuItem onClick={() => handleOpenScenarioModal(course.id)}>
-                          Manage Scenarios
-                          </MenuItem>
-                        </MenuList>
-                      </Menu>
-                    </div>
-                    )}
-                  </Td>
+    <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
+      <Heading>Courses</Heading>
+      <Box h={5}></Box>
+      <Box backgroundColor="white" borderRadius="2xl">
+        <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
+          <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
+            <Flex align="left">
+              <Input
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "200px",
+                  border: "1px solid #333",
+                  color: "#555",
+                  paddingLeft: "0.5rem",
+                }}
+              />
+            </Flex>
+            <Flex justifyContent="flex-end">
+              <Flex justifyContent="space-between" alignItems="center" mt={6} mb={4}>
+                <Button colorScheme="blue" onClick={handleOpenModal}>
+                  Create new
+                </Button>
+              </Flex>
+            </Flex>
+          </HStack>
+          {
+            <Table variant="simple" size="lg">
+              <Thead>
+                <Tr>
+                  <Th color="gray.400">Id</Th>
+                  <Th color="gray.400">Name</Th>
+                  <Th color="gray.400"></Th>
                 </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        )}
+              </Thead>
+              <Tbody>
+                {courses
+                  .filter((course) => course.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                  .map((course, index) => (
+                    <Tr key={index}>
+                      <Td fontWeight="500">{course.id}</Td>
+                      <Td fontWeight="500">
+                        <span
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleOpenChangeNameModal(course.id, course.name)}
+                        >
+                          {course.name}
+                        </span>
+                      </Td>
+                      <Td fontWeight="500">
+                        {currentUser?.admin && (
+                          <div style={{ padding: "0 0 0 70%" }}>
+                            <Menu>
+                              <MenuButton
+                                as={Button}
+                                variant="ghost"
+                                colorScheme="black"
+                                rightIcon={<IoIosMenu style={{ fontSize: "18px" }} />}
+                              ></MenuButton>
+                              <MenuList>
+                                <MenuItem
+                                  onClick={() => {
+                                    setIsDeleteOpen(true);
+                                    setSelectedCourse(course);
+                                  }}
+                                >
+                                  Delete
+                                </MenuItem>
+                                <MenuItem onClick={() => handleOpenUserModal(course.id)}>Manage Users</MenuItem>
+                                <MenuItem onClick={() => handleOpenScenarioModal(course.id)}>Manage Scenarios</MenuItem>
+                              </MenuList>
+                            </Menu>
+                          </div>
+                        )}
+                      </Td>
+                    </Tr>
+                  ))}
+              </Tbody>
+            </Table>
+          }
+        </Container>
       </Box>
       <AlertDialog
         isOpen={isDeleteOpen}
@@ -670,8 +634,7 @@ const CourseOverview = () => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure that you want to delete {selectedCourse.name}? You
-              can't undo this action afterwards.
+              Are you sure that you want to delete {selectedCourse.name}? You can't undo this action afterwards.
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -686,7 +649,7 @@ const CourseOverview = () => {
                 }}
                 ml={3}
               >
-                <BsFillTrashFill/>
+                <BsFillTrashFill />
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -702,13 +665,7 @@ const CourseOverview = () => {
               <VStack spacing={4}>
                 <FormControl>
                   <FormLabel>Name</FormLabel>
-                  <Input
-                    type="text"
-                    name="name"
-                    value={courseForm.name}
-                    maxLength={255}
-                    onChange={handleInputChange}
-                  />
+                  <Input type="text" name="name" value={courseForm.name} maxLength={255} onChange={handleInputChange} />
                 </FormControl>
               </VStack>
             </ModalBody>
@@ -742,11 +699,11 @@ const CourseOverview = () => {
                       <Td>{user.id}</Td>
                       <Td>{user.username}</Td>
                       <Td>
-                          <BsFillTrashFill onClick={() =>
-                            handleDeleteUser(modalCourseId, user.username)
-                          }
-                          onMouseOver={({target})=>target.style.opacity=0.5}
-                          onMouseOut={({target})=>target.style.opacity=1}/>
+                        <BsFillTrashFill
+                          onClick={() => handleDeleteUser(modalCourseId, user.username)}
+                          onMouseOver={({ target }) => (target.style.opacity = 0.5)}
+                          onMouseOut={({ target }) => (target.style.opacity = 1)}
+                        />
                       </Td>
                     </Tr>
                   ))}
@@ -757,8 +714,13 @@ const CourseOverview = () => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="green" ml={3} onClick={handleOpenAddUserModal} style ={{padding: "0% 11%", margin: "0 auto"}}>
-             <BsPlusSquare/>
+            <Button
+              colorScheme="green"
+              ml={3}
+              onClick={handleOpenAddUserModal}
+              style={{ padding: "0% 11%", margin: "0 auto" }}
+            >
+              <BsPlusSquare />
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -784,11 +746,11 @@ const CourseOverview = () => {
                       <Td>{scenario.id}</Td>
                       <Td>{scenario.name}</Td>
                       <Td>
-                        <BsFillTrashFill onClick={() =>
-                            handleDeleteScenario(modalCourseId, scenario.id)
-                        }
-                                         onMouseOver={({target})=>target.style.opacity=0.5}
-                                         onMouseOut={({target})=>target.style.opacity=1}/>
+                        <BsFillTrashFill
+                          onClick={() => handleDeleteScenario(modalCourseId, scenario.id)}
+                          onMouseOver={({ target }) => (target.style.opacity = 0.5)}
+                          onMouseOut={({ target }) => (target.style.opacity = 1)}
+                        />
                       </Td>
                     </Tr>
                   ))}
@@ -799,8 +761,13 @@ const CourseOverview = () => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="green" ml={3} onClick={handleOpenAddScenarioModal} style ={{padding: "0% 11%", margin: "0 auto"}}>
-              <BsPlusSquare/>
+            <Button
+              colorScheme="green"
+              ml={3}
+              onClick={handleOpenAddScenarioModal}
+              style={{ padding: "0% 11%", margin: "0 auto" }}
+            >
+              <BsPlusSquare />
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -826,12 +793,8 @@ const CourseOverview = () => {
                       <Td>{user.id}</Td>
                       <Td>{user.username}</Td>
                       <Td>
-                        <Button
-                          onClick={() =>
-                            handleAddUser(modalCourseId, user.id, user.username)
-                          }
-                        >
-                          <IoAdd/>
+                        <Button onClick={() => handleAddUser(modalCourseId, user.id, user.username)}>
+                          <IoAdd />
                         </Button>
                       </Td>
                     </Tr>
@@ -842,8 +805,7 @@ const CourseOverview = () => {
               <Text>No users found.</Text>
             )}
           </ModalBody>
-          <ModalFooter>
-          </ModalFooter>
+          <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>
 
@@ -854,37 +816,32 @@ const CourseOverview = () => {
           <ModalCloseButton />
           <ModalBody>
             {fetchedScenarios.length > 0 ? (
-                <Table variant="simple">
-                  <Thead>
-                    <Tr>
-                      <Th>ID</Th>
-                      <Th>Name</Th>
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th>ID</Th>
+                    <Th>Name</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {fetchedScenarios.map((scenario) => (
+                    <Tr key={scenario.id}>
+                      <Td>{scenario.id}</Td>
+                      <Td>{scenario.name}</Td>
+                      <Td>
+                        <Button onClick={() => handleAddScenario(modalCourseId, scenario.id, scenario.name)}>
+                          <IoAdd />
+                        </Button>
+                      </Td>
                     </Tr>
-                  </Thead>
-                  <Tbody>
-                    {fetchedScenarios.map((scenario) => (
-                        <Tr key={scenario.id}>
-                          <Td>{scenario.id}</Td>
-                          <Td>{scenario.name}</Td>
-                          <Td>
-                            <Button
-                                onClick={() =>
-                                    handleAddScenario(modalCourseId, scenario.id, scenario.name)
-                                }
-                            >
-                              <IoAdd/>
-                            </Button>
-                          </Td>
-                        </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
+                  ))}
+                </Tbody>
+              </Table>
             ) : (
-                <Text>No Scenarios found.</Text>
+              <Text>No Scenarios found.</Text>
             )}
           </ModalBody>
-          <ModalFooter>
-          </ModalFooter>
+          <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>
 
@@ -906,10 +863,7 @@ const CourseOverview = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-
-
-    </Container>
+    </Flex>
   );
 };
 

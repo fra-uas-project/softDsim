@@ -6,14 +6,10 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Button,
   Container,
   Flex,
   Heading,
-  IconButton,
   Spinner,
   Table,
   TableContainer,
@@ -32,30 +28,32 @@ import {
   ModalFooter,
   ModalCloseButton,
   FormControl,
+  HStack,
   FormLabel,
   Input,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
 import { HiChevronRight, HiOutlineTrash, HiDownload } from "react-icons/hi";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../utils/utils";
 import { AuthContext } from "../context/AuthProvider";
 import { useContext } from "react";
+import { IoIosMenu } from "react-icons/io";
 
-const ScenarioOverview = () => {
+const ScenarioManagement = () => {
   const [scenarios, setScenarios] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { currentUser, setCurrentUser } = useContext(AuthContext);
-
   const [selectedScenario, setSelectedScenario] = useState({});
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [startDate, setStartDate] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
-  } = useDisclosure();
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const cancelRef = useRef();
 
   const toast = useToast();
@@ -65,13 +63,10 @@ const ScenarioOverview = () => {
 
   const fetchScenarios = async () => {
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_DJANGO_HOST}/api/template-overview`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
+    const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-overview?q=${searchQuery}`, {
+      method: "GET",
+      credentials: "include",
+    });
     const scens = await res.json();
     setScenarios(scens);
     if ("error" in scens) {
@@ -82,16 +77,13 @@ const ScenarioOverview = () => {
 
   const deleteScenario = async (scenario) => {
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${scenario.id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            "X-CSRFToken": getCookie("csrftoken"),
-          },
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${scenario.id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+      });
       await res.json();
       await fetchScenarios();
       toast({
@@ -132,15 +124,10 @@ const ScenarioOverview = () => {
         queryParams.append("from", startDate);
       }
 
-      const res = await fetch(
-        `${
-          process.env.REACT_APP_DJANGO_HOST
-        }/api/results?${queryParams.toString()}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/results?${queryParams.toString()}`, {
+        method: "GET",
+        credentials: "include",
+      });
 
       const response = await res.json();
 
@@ -150,9 +137,7 @@ const ScenarioOverview = () => {
 
         const csvContent = [
           headers.join(";"),
-          ...values.map((obj) =>
-            headers.map((key) => JSON.stringify(obj[key] || "")).join(";")
-          ),
+          ...values.map((obj) => headers.map((key) => JSON.stringify(obj[key] || "")).join(";")),
         ].join("\n");
 
         const encodedCsvContent = encodeURIComponent(csvContent);
@@ -179,32 +164,32 @@ const ScenarioOverview = () => {
   };
 
   useEffect(() => {
-    console.log(window.value)
+    console.log(window.value);
     fetchScenarios();
   }, []);
 
   return (
     <>
       <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-        <Breadcrumb
-          spacing="8px"
-          separator={<HiChevronRight color="gray.500" />}
-        >
-          <BreadcrumbItem>
-            <BreadcrumbLink href="">Scenarios</BreadcrumbLink>
-          </BreadcrumbItem>
-        </Breadcrumb>
         <Heading>Scenarios</Heading>
         <Box h={5}></Box>
         <Box backgroundColor="white" borderRadius="2xl">
-          <Container
-            maxW="6xl"
-            pt={10}
-            minH="70vh"
-            maxH="70vh"
-            h="full"
-            pb={10}
-          >
+          <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
+            <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
+              <Flex align="left">
+                <Input
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    width: "200px",
+                    border: "1px solid #333",
+                    color: "#555",
+                    paddingLeft: "0.5rem",
+                  }}
+                />
+              </Flex>
+            </HStack>
             {isLoading ? (
               <Flex w="full" justifyContent="center" alignItems="center">
                 <Spinner size="xl" />
@@ -214,33 +199,57 @@ const ScenarioOverview = () => {
                 <Table variant="simple" size="lg">
                   <Thead>
                     <Tr>
-                      <Th color="gray.400">Scenario ID</Th>
-                      <Th color="gray.400">Scenario Name</Th>
-                      <Th color="gray.400">Tries</Th>
-                      <Th color="gray.400">Best Score</Th>
+                      <Th color="gray.400">ID</Th>
+                      <Th color="gray.400">Name</Th>
+                      <Th color="gray.400"></Th>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {scenarios.map((scenario, index) => {
-                      return (
-                        <Tr key={index}>
-                          <Td fontWeight="500">{scenario.id}</Td>
-                          <Td fontWeight="500">
-                            <Button
-                              variant="link"
-                              color="black"
-                              onClick={() => {
-                                navigate(`${scenario.id}`, { state: scenario });
-                              }}
-                            >
-                              {scenario.name}
-                            </Button>
-                          </Td>
-                          <Td fontWeight="500">{scenario.tries}</Td>
-                          <Td fontWeight="500">{scenario.max_score}</Td>
-                        </Tr>
-                      );
-                    })}
+                    {scenarios
+                      .filter((scenario) => scenario.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                      .map((scenario, index) => {
+                        return (
+                          <Tr key={index}>
+                            <Td fontWeight="500">{scenario.id}</Td>
+                            <Td fontWeight="500">
+                              <Button
+                                variant="link"
+                                color="black"
+                                onClick={() => {
+                                  navigate(`${scenario.id}`, { state: scenario });
+                                }}
+                              >
+                                {scenario.name}
+                              </Button>
+                            </Td>
+                            <Td>
+                              <div style={{ padding: "0 0 0 70%" }}>
+                                <Menu>
+                                  <MenuButton
+                                    as={Button}
+                                    variant="ghost"
+                                    colorScheme="black"
+                                    rightIcon={<IoIosMenu style={{ fontSize: "18px" }} />}
+                                  ></MenuButton>
+                                  <MenuList>
+                                    <MenuItem onClick={() => downloadScenario(scenario)}>Download Data</MenuItem>
+                                    <MenuItem
+                                      onClick={() => {
+                                        onDeleteOpen();
+                                        setSelectedScenario(scenario);
+                                      }}
+                                    >
+                                      Delete
+                                    </MenuItem>
+                                    <MenuItem>Courses</MenuItem>
+                                    <MenuItem>Remove from all Courses</MenuItem>
+                                  </MenuList>
+                                </Menu>
+                              </div>
+                            </Td>
+                          </Tr>
+                        );
+                      })}
                   </Tbody>
                 </Table>
               </TableContainer>
@@ -263,8 +272,7 @@ const ScenarioOverview = () => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure that you want to delete {selectedScenario.name}? You
-              can't undo this action afterwards.
+              Are you sure that you want to delete {selectedScenario.name}? You can't undo this action afterwards.
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -294,11 +302,7 @@ const ScenarioOverview = () => {
           <ModalBody>
             <FormControl>
               <FormLabel>Start Date</FormLabel>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </FormControl>
           </ModalBody>
           <ModalFooter>
@@ -314,5 +318,4 @@ const ScenarioOverview = () => {
     </>
   );
 };
-
-export default ScenarioOverview;
+export default ScenarioManagement;
