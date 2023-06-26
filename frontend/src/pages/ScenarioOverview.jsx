@@ -75,7 +75,7 @@ const ScenarioOverview = () => {
 
   const fetchScenarioIds = async () => {
     try {
-      const userCourses = await fetchUserCourses(); // Call fetchUserCourses first
+      const userCourses = await fetchUserCourses();
       const courseIds = userCourses.map(course => course.id);
 
       const scenarioIds = [];

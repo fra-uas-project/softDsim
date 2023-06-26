@@ -6,9 +6,11 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from app.decorators.decorators import allowed_roles
 from app.models.course import Course
-from app.serializers.course import CourseNameSerializer
+from app.serializers.course import CourseNameSerializer, CourseSerializer
 from custom_user.models import User
 from app.models.template_scenario import TemplateScenario
+
+from app.serializers.template_scenario import TemplateScenarioSerializer
 
 
 class CourseView(APIView):
@@ -355,29 +357,22 @@ class UserCoursesView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @allowed_roles(["student", "creator", "staff"])
-    def get(self, request, id=None):
-        try:
-            user = request.user
-            if id:
-                course = get_object_or_404(Course, id=id, users=user)
-                serializer = CourseNameSerializer(course)
-                response_data = {
-                    "id": course.id,
-                    "username": serializer.data['name']
-                }
-                return Response(response_data, status=status.HTTP_200_OK)
+    def get(self, request):
+        user = request.user
 
+        if not (user.admin or user.creator):
             courses = Course.objects.filter(users=user)
-            serializer = CourseNameSerializer(courses, many=True)
-            response_data = [{
-             "id": course.id,
-            "name": course.name
-                } for course in courses]
+            scenario_set = set()
+            for course in courses:
+                scenarios = course.scenarios.all()
+                scenario_set.update(scenarios)
+            scenario_list = list(scenario_set)
 
-            return Response(response_data, status=status.HTTP_200_OK)
+        template_scenarios = TemplateScenario.objects.filter(id__in=[scenario.id for scenario in scenario_list])
 
-        except Exception as e:
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        serialized_template_scenarios = TemplateScenarioSerializer(template_scenarios, many=True).data
+
+        return Response(
+            {serialized_template_scenarios},
+            status=status.HTTP_200_OK
+        )
