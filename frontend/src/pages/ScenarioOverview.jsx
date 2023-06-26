@@ -95,30 +95,48 @@ const ScenarioOverview = () => {
         scenarioIds.push(...scenarioIdsInCourse);
       }
 
-      console.log('Scenario IDs:', scenarioIds);
       return scenarioIds;
     } catch (error) {
-      console.log('Error fetching scenario IDs:', error);
       return [];
     }
   };
 
 
 
-  const fetchScenarios = async () => {
-    setIsLoading(true);
+const fetchScenarios = async () => {
+  setIsLoading(true);
 
+  if (currentUser?.admin || currentUser?.creator ) {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_DJANGO_HOST}/api/template-overview`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      const scens = await res.json();
+      setScenarios(scens);
+      if ("error" in scens) {
+        return;
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  } else {
     try {
       const scenarioIds = await fetchScenarioIds();
-
       const scenarios = [];
 
       for (const scenarioId of scenarioIds) {
-        const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-overview/${scenarioId}`,
-            {
-              method: "GET",
-              credentials: "include",
-            });
+        const response = await fetch(
+          `${process.env.REACT_APP_DJANGO_HOST}/api/template-overview/${scenarioId}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
         const scenario = await response.json();
         scenarios.push(scenario);
       }
@@ -126,12 +144,10 @@ const ScenarioOverview = () => {
       setScenarios(scenarios);
       setIsLoading(false);
     } catch (error) {
-      console.log('Error fetching scenarios:', error);
       setIsLoading(false);
     }
-  };
-
-
+  }
+};
 
   useEffect(() => {
     console.log(window.value)
