@@ -590,20 +590,20 @@ const CourseOverview = () => {
   }, [searchQuery]);
 
   return (
-    <Container maxW="container.xl">
-      <Flex justifyContent="flex-end">
-        <Flex justifyContent="space-between" alignItems="center" mt={6} mb={4}>
-          <Button colorScheme="blue" onClick={handleOpenModal}>
-            Create new
-          </Button>
-        </Flex>
-      </Flex>
-
-      <Heading size="lg" mb={4}>
+    <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
+      <Heading>
         Courses
       </Heading>
-      <Box p={4} bg="white" boxShadow="base" rounded="md">
-
+      <Box h={5}></Box>
+      <Box backgroundColor="white" borderRadius="2xl">
+      <Container
+                        maxW="6xl"
+                        pt={10}
+                        minH="70vh"
+                        maxH="70vh"
+                        h="full"
+                        pb={10}
+                    >
         <HStack
             justifyContent="space-between"
             mr={3}
@@ -623,6 +623,13 @@ const CourseOverview = () => {
                 }}
             />
           </Flex>
+                <Flex justifyContent="flex-end">
+        <Flex justifyContent="space-between" alignItems="center" mt={6} mb={4}>
+          <Button colorScheme="blue" onClick={handleOpenModal}>
+            Create new
+          </Button>
+        </Flex>
+      </Flex>
           </HStack>
         { (
           <Table variant="simple" size="lg">
@@ -674,6 +681,7 @@ const CourseOverview = () => {
             </Tbody>
           </Table>
         )}
+         </Container>
       </Box>
       <AlertDialog
         isOpen={isDeleteOpen}
@@ -925,10 +933,7 @@ const CourseOverview = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-
-
-    </Container>
+    </Flex>
   );
 };
 

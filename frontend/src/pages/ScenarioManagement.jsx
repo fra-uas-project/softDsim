@@ -220,7 +220,6 @@ const ScenarioManagement = () => {
                             />
                         </Flex>
                         </HStack>
-
                         {isLoading ? (
                             <Flex w="full" justifyContent="center" alignItems="center">
                                 <Spinner size="xl" />
