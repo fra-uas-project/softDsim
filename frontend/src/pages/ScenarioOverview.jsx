@@ -46,19 +46,15 @@ const ScenarioOverview = () => {
   const [scenarios, setScenarios] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { currentUser, setCurrentUser } = useContext(AuthContext);
-
   const [selectedScenario, setSelectedScenario] = useState({});
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [startDate, setStartDate] = useState("");
-
-  const [courses, setCourses] = useState([]);
-
   const toast = useToast();
   const navigate = useNavigate();
 
   window.value = 10;
 
-  const fetchUserCourses = async () => {
+  const fetchCourseScenarios = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/user-courses`,
           {
@@ -66,47 +62,17 @@ const ScenarioOverview = () => {
             credentials: "include",
           });
       const data = await response.json();
-      setCourses(data);
       return data;
     } catch (error) {
       return [];
     }
   };
 
-  const fetchScenarioIds = async () => {
-    try {
-      const userCourses = await fetchUserCourses();
-      const courseIds = userCourses.map(course => course.id);
-
-      const scenarioIds = [];
-
-      for (const courseId of courseIds) {
-        const scenarioResponse = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`,
-            {
-              method: "GET",
-              credentials: "include",
-            });
-        if (!scenarioResponse.ok) {
-          throw new Error(`Error fetching scenario IDs for course ${courseId}`);
-        }
-
-        const scenarioData = await scenarioResponse.json();
-        const scenarioIdsInCourse = scenarioData.map(scenario => scenario.id);
-        scenarioIds.push(...scenarioIdsInCourse);
-      }
-
-      return scenarioIds;
-    } catch (error) {
-      return [];
-    }
-  };
-
-
 
 const fetchScenarios = async () => {
   setIsLoading(true);
 
-  if (currentUser?.admin || currentUser?.creator ) {
+  if (currentUser?.admin || currentUser?.creator) {
     try {
       const res = await fetch(
         `${process.env.REACT_APP_DJANGO_HOST}/api/template-overview`,
@@ -115,9 +81,10 @@ const fetchScenarios = async () => {
           credentials: "include",
         }
       );
-      const scens = await res.json();
-      setScenarios(scens);
-      if ("error" in scens) {
+      const fetchedScenarios = await res.json();
+
+      setScenarios(fetchedScenarios);
+      if ("error" in fetchedScenarios) {
         return;
       }
       setIsLoading(false);
@@ -126,28 +93,43 @@ const fetchScenarios = async () => {
     }
   } else {
     try {
-      const scenarioIds = await fetchScenarioIds();
-      const scenarios = [];
+      const scenarios = await fetchCourseScenarios();
+      const scenarioIds = scenarios.map(scenario => scenario.id);
 
-      for (const scenarioId of scenarioIds) {
-        const response = await fetch(
-          `${process.env.REACT_APP_DJANGO_HOST}/api/template-overview/${scenarioId}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        const scenario = await response.json();
-        scenarios.push(scenario);
-      }
+      const fetchRequests = scenarioIds.map(scenarioId =>
+        fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-overview/${scenarioId}`, {
+          method: "GET",
+          credentials: "include",
+        })
+      );
 
-      setScenarios(scenarios);
+      const responses = await Promise.all(fetchRequests);
+      const fetchedScenarios = await Promise.all(responses.map(response => response.json()));
+
+      const uniqueFetchedScenarios = fetchedScenarios.reduce((accumulator, currentScenario) => {
+        const isDuplicate = accumulator.some(scenario => scenario.id === currentScenario.id);
+        if (!isDuplicate) {
+          accumulator.push(currentScenario);
+        }
+        return accumulator;
+      }, []);
+
+      const updatedScenarios = scenarios.map(scenario => {
+        const matchingScenario = uniqueFetchedScenarios.find(fetchedScenario => fetchedScenario.id === scenario.id);
+        if (matchingScenario) {
+          return { ...scenario, tries: matchingScenario.tries, max_score: matchingScenario.max_score };
+        }
+        return scenario;
+      });
+
+      setScenarios(updatedScenarios);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
     }
   }
 };
+
 
   useEffect(() => {
     console.log(window.value)

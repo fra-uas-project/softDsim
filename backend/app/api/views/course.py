@@ -373,6 +373,6 @@ class UserCoursesView(APIView):
         serialized_template_scenarios = TemplateScenarioSerializer(template_scenarios, many=True).data
 
         return Response(
-            {serialized_template_scenarios},
+            serialized_template_scenarios,
             status=status.HTTP_200_OK
         )
