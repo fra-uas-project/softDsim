@@ -209,7 +209,7 @@ class CourseUserView(APIView):
             status=status.HTTP_200_OK
         )
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["student", "creator", "staff"])
     def get(self, request, course_id: int):
         try:
             course_id = int(course_id)
@@ -242,7 +242,7 @@ class CourseUserView(APIView):
 class CourseScenarioView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["student", "creator", "staff"])
     def get(self, request, course_id):
         """
         Get all the scenarios in course by course id.
@@ -349,4 +349,35 @@ class CourseScenarioView(APIView):
             return Response(
                 {"error": f"Scenario {scenario_id} was not available for the course {course_id}."},
                 status=status.HTTP_400_BAD_REQUEST
+            )
+
+class UserCoursesView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @allowed_roles(["student", "creator", "staff"])
+    def get(self, request, id=None):
+        try:
+            user = request.user
+            if id:
+                course = get_object_or_404(Course, id=id, users=user)
+                serializer = CourseNameSerializer(course)
+                response_data = {
+                    "id": course.id,
+                    "username": serializer.data['name']
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
+
+            courses = Course.objects.filter(users=user)
+            serializer = CourseNameSerializer(courses, many=True)
+            response_data = [{
+             "id": course.id,
+            "name": course.name
+                } for course in courses]
+
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_404_NOT_FOUND,
             )

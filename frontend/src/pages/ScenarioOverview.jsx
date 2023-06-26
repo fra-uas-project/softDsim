@@ -35,7 +35,7 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/react";
-import { HiChevronRight, HiOutlineTrash, HiDownload } from "react-icons/hi";
+import { HiChevronRight } from "react-icons/hi";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../utils/utils";
@@ -51,132 +51,87 @@ const ScenarioOverview = () => {
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [startDate, setStartDate] = useState("");
 
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
-  } = useDisclosure();
-  const cancelRef = useRef();
+  const [courses, setCourses] = useState([]);
 
   const toast = useToast();
   const navigate = useNavigate();
 
   window.value = 10;
 
+  const fetchUserCourses = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/user-courses`,
+          {
+            method: "GET",
+            credentials: "include",
+          });
+      const data = await response.json();
+      setCourses(data);
+      return data;
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const fetchScenarioIds = async () => {
+    try {
+      const userCourses = await fetchUserCourses(); // Call fetchUserCourses first
+      const courseIds = userCourses.map(course => course.id);
+
+      const scenarioIds = [];
+
+      for (const courseId of courseIds) {
+        const scenarioResponse = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`,
+            {
+              method: "GET",
+              credentials: "include",
+            });
+        if (!scenarioResponse.ok) {
+          throw new Error(`Error fetching scenario IDs for course ${courseId}`);
+        }
+
+        const scenarioData = await scenarioResponse.json();
+        const scenarioIdsInCourse = scenarioData.map(scenario => scenario.id);
+        scenarioIds.push(...scenarioIdsInCourse);
+      }
+
+      console.log('Scenario IDs:', scenarioIds);
+      return scenarioIds;
+    } catch (error) {
+      console.log('Error fetching scenario IDs:', error);
+      return [];
+    }
+  };
+
+
+
   const fetchScenarios = async () => {
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_DJANGO_HOST}/api/template-overview`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
-    const scens = await res.json();
-    setScenarios(scens);
-    if ("error" in scens) {
-      return;
-    }
-    setIsLoading(false);
-  };
 
-  const deleteScenario = async (scenario) => {
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${scenario.id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            "X-CSRFToken": getCookie("csrftoken"),
-          },
-        }
-      );
-      await res.json();
-      await fetchScenarios();
-      toast({
-        title: `${scenario.name} has been deleted`,
-        status: "success",
-        duration: 5000,
-      });
-    } catch (e) {
-      toast({
-        title: `Could not delete ${scenario.name}`,
-        status: "error",
-        duration: 5000,
-      });
-      console.log(e);
+      const scenarioIds = await fetchScenarioIds();
+
+      const scenarios = [];
+
+      for (const scenarioId of scenarioIds) {
+        const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-overview/${scenarioId}`,
+            {
+              method: "GET",
+              credentials: "include",
+            });
+        const scenario = await response.json();
+        scenarios.push(scenario);
+      }
+
+      setScenarios(scenarios);
+      setIsLoading(false);
+    } catch (error) {
+      console.log('Error fetching scenarios:', error);
+      setIsLoading(false);
     }
   };
 
-  const openDateModal = () => {
-    setIsDateModalOpen(true);
-  };
 
-  const closeDateModal = () => {
-    setIsDateModalOpen(false);
-  };
-
-  const downloadScenario = async (scenario) => {
-    openDateModal();
-    setSelectedScenario(scenario);
-  };
-
-  const handleDownload = async () => {
-    closeDateModal();
-    try {
-      const queryParams = new URLSearchParams();
-      queryParams.append("template_scenario_id", selectedScenario.id);
-
-      if (startDate) {
-        queryParams.append("from", startDate);
-      }
-
-      const res = await fetch(
-        `${
-          process.env.REACT_APP_DJANGO_HOST
-        }/api/results?${queryParams.toString()}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-
-      const response = await res.json();
-
-      if (Object.keys(response.data).length > 0) {
-        const headers = Object.keys(response.data[0]).map((key) => key);
-        const values = Object.values(response.data);
-
-        const csvContent = [
-          headers.join(";"),
-          ...values.map((obj) =>
-            headers.map((key) => JSON.stringify(obj[key] || "")).join(";")
-          ),
-        ].join("\n");
-
-        const encodedCsvContent = encodeURIComponent(csvContent);
-        const downloadLink = `data:text/csv;charset=utf-8,${encodedCsvContent}`;
-
-        const link = document.createElement("a");
-        link.href = downloadLink;
-        link.download = `${selectedScenario.name.replace(/\s/g, "_")}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        toast({
-          title: "No data available for this Scenario",
-          status: "error",
-          duration: 5000,
-        });
-      }
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setStartDate("");
-    }
-  };
 
   useEffect(() => {
     console.log(window.value)
@@ -248,69 +203,6 @@ const ScenarioOverview = () => {
           </Container>
         </Box>
       </Flex>
-
-      <AlertDialog
-        isOpen={isDeleteOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onDeleteClose}
-        isCentered
-        motionPreset="slideInBottom"
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Delete scenario
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              Are you sure that you want to delete {selectedScenario.name}? You
-              can't undo this action afterwards.
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onDeleteClose}>
-                Cancel
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={() => {
-                  deleteScenario(selectedScenario);
-                  onDeleteClose();
-                }}
-                ml={3}
-              >
-                Delete
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
-
-      <Modal isOpen={isDateModalOpen} onClose={closeDateModal}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Select Date Range</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Start Date</FormLabel>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleDownload}>
-              Download
-            </Button>
-            <Button variant="ghost" onClick={closeDateModal}>
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </>
   );
 };
