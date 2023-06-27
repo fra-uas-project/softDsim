@@ -39,20 +39,21 @@ class StartUserScenarioView(APIView):
         config_id = request.data.get("config-id")
         user = request.user
 
-        if not (user.admin or user.creator):
-            courses = Course.objects.filter(users=user)
-            scenario_set = set()
-            for course in courses:
-                scenarios = course.scenarios.all()
-                scenario_set.update(scenarios)
-            scenario_list = list(scenario_set)
+        courses = Course.objects.filter(users=user)
+        scenario_set = set()
 
-            if template_id not in [scenario.id for scenario in scenario_list]:
-                msg = f"You don't have access to this Scenario."
-                logging.error(msg)
-                return Response(
-                    {"status": "error", "data": msg}, status=status.HTTP_403_FORBIDDEN
-                )
+        for course in courses:
+            scenarios = course.scenarios.all()
+            scenario_set.update(scenarios)
+
+        scenario_list = list(scenario_set)
+
+        if template_id not in [scenario.id for scenario in scenario_list]:
+            msg = f"You don't have access to this Scenario."
+            logging.error(msg)
+            return Response(
+                {"status": "error", "data": msg}, status=status.HTTP_403_FORBIDDEN
+            )
 
         try:
             template = TemplateScenario.objects.get(id=template_id)
@@ -63,6 +64,7 @@ class StartUserScenarioView(APIView):
             return Response(
                 {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
             )
+
         try:
             config = ScenarioConfig.objects.get(id=config_id)
         except ObjectDoesNotExist:
