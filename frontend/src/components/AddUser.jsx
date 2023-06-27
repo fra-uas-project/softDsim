@@ -25,19 +25,6 @@ const AddUser = () => {
     const [courses, setCourses] = useState([]);
     const [course, setCourse] = useState([]);
 
-    const handleCreateAndAssign = async () => {
-        try {
-            console.log("COURSEEE",course);
-            const userData = await register();
-            console.log("DATA", userData.user);
-            if (course.length !== 0 && userData !== null) {
-                await assignCourse(course, userData.user);
-            }
-        } catch (error) {
-            console.error("Error creating users and assigning to the course:", error);
-        }
-    };
-
     const handleCourseChange = (event) => {
         const selectedCourse = event.target.value;
         setCourse(selectedCourse);
@@ -54,34 +41,6 @@ const AddUser = () => {
             return;
         }
     };
-
-    const assignCourse = async (courseId, user) => {
-        try {
-            const response = await fetch(
-                `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`,
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        user_id: user.id,
-                        username: user.username,
-                    }),
-                }
-            );
-
-            if (response.ok) {
-            } else {
-                const data = await response.json();
-                throw new Error(data.error || "Failed to add user to the course");
-            }
-        } catch (error) {
-            console.error("Error adding user to the course:", error);
-        }
-    };
-
 
     // validate user ID input
     function useridInput(event) {
@@ -132,27 +91,23 @@ const AddUser = () => {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ "username": userID, "password": userPassword, "admin": false }),
-                });
-                const registerAttempt = await res;
+                })
+                const registerAttempt = await res
                 if (registerAttempt.status === 201) {
-                    setRegisterSuccess('none');
-                    const userData = await res.json();
-                    window.location.href = "/users";
-                    return userData; // Return the user data
+                    setRegisterSuccess('none')
+                    window.location.href = "/users"
                 } else if (registerAttempt.status === 400) {
-                    setRegisterSuccess('invalid');
+                    setRegisterSuccess('invalid')
                 } else {
-                    setRegisterSuccess('unknown');
+                    setRegisterSuccess('unknown')
                 }
             } catch (err) {
-                console.log('Error:', err);
+                console.log('Error:', err)
             }
         } else {
-            setRegisterSuccess('unknown');
+            setRegisterSuccess('unknown')
         }
-        return null;
     }
-
     // invert show password status
     function showPasswordClicked() {
         setShowPassword(!showPassword)
@@ -229,7 +184,7 @@ const AddUser = () => {
                         <ModalFooter align="center" justifyContent="center" >
                             <Button rightIcon={<HiOutlineLogin />} isLoading={registerSuccess === 'attempting' ? true : false}
                                 colorScheme={idInputValid && passwortInputValid && passwortRepeatInputValid ? 'blue' : 'blackAlpha'} size='lg'
-                                onClick={handleCreateAndAssign} isDisabled={!(idInputValid && passwortInputValid && passwortRepeatInputValid)}>
+                                onClick={register} isDisabled={!(idInputValid && passwortInputValid && passwortRepeatInputValid)}>
                                 Register
                             </Button>
                         </ModalFooter>
