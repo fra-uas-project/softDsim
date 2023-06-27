@@ -22,6 +22,8 @@ import { AuthContext } from "../context/AuthProvider";
 import { useCookies } from "react-cookie";
 import { getCookie } from "../utils/utils";
 import { HiOutlineCog } from "react-icons/hi";
+import { FaAngleDown } from "react-icons/fa";
+
 
 const Navbar = () => {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
@@ -101,13 +103,13 @@ const Navbar = () => {
         </Button>
         {currentUser?.admin && (
             <Menu>
-              <MenuButton as={Button}>
-                Admin Panel
+              <MenuButton colorScheme='blue' as={Button} rightIcon={<FaAngleDown/>}>
+                 Admin Panel
               </MenuButton>
               <MenuList>
-                <MenuItem as={Link} to="/users" onClick={handleClick}>User Management</MenuItem>
-                <MenuItem as={Link} to="/scenariomanagement" onClick={handleClick}>Scenario Management</MenuItem>
-                <MenuItem as={Link} to="/courses" onClick={handleClick}>Course Management</MenuItem>
+                <MenuItem as={Link} to="/users" onClick={handleClick}>Users</MenuItem>
+                <MenuItem as={Link} to="/scenariomanagement" onClick={handleClick}>Scenarios</MenuItem>
+                <MenuItem as={Link} to="/courses" onClick={handleClick}>Courses</MenuItem>
               </MenuList>
             </Menu>
         )}
