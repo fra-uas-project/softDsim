@@ -1,5 +1,5 @@
-import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Container, Flex, Grid, Heading, Input, Text, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper } from "@chakra-ui/react"
-import { useState } from "react"
+import { Box, Select, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Container, Flex, Grid, Heading, Input, Text, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper } from "@chakra-ui/react"
+import {useEffect, useState} from "react"
 import { HiChevronRight } from "react-icons/hi"
 
 
@@ -26,6 +26,54 @@ const AddMultipleUsers = () => {
     // error state
     const [errorState, setErrorState] = useState('none')
 
+    const [courses, setCourses] = useState([]);
+    const [course, setCourse] = useState([]);
+
+    const handleCreateAndAssign = async () => {
+        try {
+            const userData = await createUsers();
+            if (course.length !== 0) {
+                await assignCourse(course, userData);
+            }
+        } catch (error) {
+            console.error("Error creating users and assigning to the course:", error);
+        }
+    };
+
+    const assignCourse = async (courseId, userData) => {
+        try {
+            for (const user of userData.data) {
+                // Assign each user to the course
+                const response = await fetch(
+                    `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`,
+                    {
+                        method: "POST",
+                        credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            user_id: user.id,
+                            username: user.username,
+                        }),
+                    }
+                );
+
+                if (response.ok) {
+                    // Handle the success case if needed
+                } else {
+                    const data = await response.json();
+                    throw new Error(data.error || "Failed to add user to the course");
+                }
+            }
+        } catch (error) {
+            console.error("Error adding users to the course:", error);
+        }
+    };
+
+
+
+
     // save entered prefix
     function prefixInput(input) {
         setPreFix(input.target.value)
@@ -46,41 +94,65 @@ const AddMultipleUsers = () => {
         setStartingIndex(parseInt(input))
     }
 
+    const handleCourseChange = (event) => {
+        const selectedCourse = event.target.value;
+        setCourse(selectedCourse);
+    };
+
+    const fetchCourses = async () => {
+        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses`, {
+            method: "GET",
+            credentials: "include",
+        });
+        const data = await res.json();
+        setCourses(data.data);
+        if ("error" in data) {
+            return;
+        }
+    };
+
     // create users in backend
     async function createUsers() {
         try {
-            // create users api call
+            // create users API call
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user/create-many`, {
-                method: 'POST',
-                credentials: 'include',
-                body: JSON.stringify({ "prefix": prefix, "count": userCount, "pw-length": passwordLength, "start-index": startingIndex }),
+                method: "POST",
+                credentials: "include",
+                body: JSON.stringify({ prefix: prefix, count: userCount, "pw-length": passwordLength, "start-index": startingIndex }),
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-            })
+            });
 
             // get user data
-            const userData = await res.json()
+            const userData = await res.json();
 
             if (res.status === 201) {
                 // table head
-                var tempUsers = 'ID; Password;\r'
-                // generate userlist
+                var tempUsers = 'ID; Password;\r';
+                // generate user list
                 for (const user of userData.data) {
-                    tempUsers = tempUsers + `${user.username};${user.password};\r`
+                    tempUsers = tempUsers + `${user.username};${user.password};\r`;
                 }
-                setUserCsv(tempUsers)
-                setUsersGenerated(true)
-                setErrorState('success')
+                setUserCsv(tempUsers);
+                setUsersGenerated(true);
+                setErrorState("success");
+
+                // Return the userData object
+                return userData;
             } else {
-                setErrorState('error')
-                console.log('nope')
+                setErrorState("error");
+                console.log("nope");
             }
         } catch (error) {
-            console.log(error)
-            setErrorState('error')
+            console.log(error);
+            setErrorState("error");
         }
     }
+
+    useEffect(() => {
+        fetchCourses();
+    }, []);
 
     return (
         <>
@@ -137,6 +209,17 @@ const AddMultipleUsers = () => {
                                         </NumberInputStepper>
                                     </NumberInput>
                                 </Grid>
+                                <Grid>
+                                    {/* course dropdown */}
+                                    <Text fontWeight="bold">Course</Text>
+                                    <Select placeholder="Select a course" size='lg' onChange={handleCourseChange}>
+                                        {courses.map(course => (
+                                            <option key={course.id} value={course.id}>
+                                                {course.name}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                </Grid>
                             </Grid>
                             {/* error or success messages */}
                             <Flex align="center" justify="center" my={5}>
@@ -169,7 +252,7 @@ const AddMultipleUsers = () => {
                                     </>
                                     :
                                     <>
-                                        <Button onClick={() => { createUsers() }} colorScheme={prefix !== '' ? 'blue' : 'blackAlpha'} isDisabled={!(prefix !== '')}>
+                                        <Button onClick={handleCreateAndAssign} colorScheme={prefix !== '' ? 'blue' : 'blackAlpha'} isDisabled={!(prefix !== '')}>
                                             Create Users
                                         </Button>
                                     </>
