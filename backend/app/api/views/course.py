@@ -353,6 +353,7 @@ class CourseScenarioView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+
 class UserCoursesView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -360,17 +361,17 @@ class UserCoursesView(APIView):
     def get(self, request):
         user = request.user
 
-        if not (user.admin or user.creator):
-            courses = Course.objects.filter(users=user)
-            scenario_set = set()
-            for course in courses:
-                scenarios = course.scenarios.all()
-                scenario_set.update(scenarios)
-            scenario_list = list(scenario_set)
+        courses = Course.objects.filter(users=user)
+        scenario_set = set()
 
-        template_scenarios = TemplateScenario.objects.filter(id__in=[scenario.id for scenario in scenario_list])
+        for course in courses:
+            scenarios = course.scenarios.all()
+            scenario_set.update(scenarios)
 
-        serialized_template_scenarios = TemplateScenarioSerializer(template_scenarios, many=True).data
+        scenario_list: list[TemplateScenario] = list(scenario_set)
+
+        serialized_template_scenarios = TemplateScenarioSerializer(
+            scenario_list, many=True).data
 
         return Response(
             serialized_template_scenarios,
