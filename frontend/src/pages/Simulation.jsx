@@ -15,7 +15,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Skeleton,
   Spacer,
   Tooltip,
   useDisclosure,
@@ -32,6 +31,8 @@ import { getCookie } from "../utils/utils";
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 import SkilltypeContainer from "../components/Simulation/Actions/SkilltypeContainer";
+
+import { Spinner } from '@chakra-ui/react';
 
 const Simulation = () => {
   const location = useLocation();
@@ -85,17 +86,12 @@ const Simulation = () => {
   // save maximum number of task
   const [tasksMax, setTasksMax] = useState(0);
 
-
-    window.value = window.value + 10;
-
-    // default values for actions
-    const [actionDefaultValues, setActionDefaultValues] = useState(
-        {
-            bugfix: false,
-            unittest: false,
-            integrationtest: false
-        }
-    )
+  // default values for actions
+  const [actionDefaultValues, setActionDefaultValues] = useState({
+    bugfix: false,
+    unittest: false,
+    integrationtest: false,
+  });
 
   const scenarioPath = () => {
     const url = location.pathname;
@@ -495,7 +491,7 @@ const Simulation = () => {
           <Container maxW="container.2xl" h="full">
             <Flex h="full" flexDir={{ md: "column", lg: "row" }}>
               {scenarioIsLoading ? (
-                <Skeleton height="70vh" w="full" borderRadius="2xl" />
+               <Spinner />
               ) : (
                 <>
                   <Box w={{ md: "100%", lg: "62%" }} mb={{ md: 5, lg: 0 }}>
