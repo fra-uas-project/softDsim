@@ -6,9 +6,11 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from app.decorators.decorators import allowed_roles
 from app.models.course import Course
-from app.serializers.course import CourseNameSerializer
+from app.serializers.course import CourseNameSerializer, CourseSerializer
 from custom_user.models import User
 from app.models.template_scenario import TemplateScenario
+
+from app.serializers.template_scenario import TemplateScenarioSerializer
 
 
 class CourseView(APIView):
@@ -209,7 +211,7 @@ class CourseUserView(APIView):
             status=status.HTTP_200_OK
         )
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["student", "creator", "staff"])
     def get(self, request, course_id: int):
         try:
             course_id = int(course_id)
@@ -242,7 +244,7 @@ class CourseUserView(APIView):
 class CourseScenarioView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["student", "creator", "staff"])
     def get(self, request, course_id):
         """
         Get all the scenarios in course by course id.
@@ -350,3 +352,28 @@ class CourseScenarioView(APIView):
                 {"error": f"Scenario {scenario_id} was not available for the course {course_id}."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class UserCoursesView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @allowed_roles(["student", "creator", "staff"])
+    def get(self, request):
+        user = request.user
+
+        courses = Course.objects.filter(users=user)
+        scenario_set = set()
+
+        for course in courses:
+            scenarios = course.scenarios.all()
+            scenario_set.update(scenarios)
+
+        scenario_list: list[TemplateScenario] = list(scenario_set)
+
+        serialized_template_scenarios = TemplateScenarioSerializer(
+            scenario_list, many=True).data
+
+        return Response(
+            serialized_template_scenarios,
+            status=status.HTTP_200_OK
+        )

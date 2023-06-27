@@ -27,6 +27,8 @@ from app.serializers.user_scenario import UserScenarioSerializer
 from app.src.simulation import continue_simulation
 from app.src.util.scenario_util import create_correct_request_model
 
+from app.models.course import Course
+
 
 class StartUserScenarioView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -35,15 +37,34 @@ class StartUserScenarioView(APIView):
     def post(self, request):
         template_id = request.data.get("template-id")
         config_id = request.data.get("config-id")
+        user = request.user
+
+        courses = Course.objects.filter(users=user)
+        scenario_set = set()
+
+        for course in courses:
+            scenarios = course.scenarios.all()
+            scenario_set.update(scenarios)
+
+        scenario_list = list(scenario_set)
+
+        if template_id not in [scenario.id for scenario in scenario_list]:
+            msg = f"You don't have access to this Scenario."
+            logging.error(msg)
+            return Response(
+                {"status": "error", "data": msg}, status=status.HTTP_403_FORBIDDEN
+            )
 
         try:
             template = TemplateScenario.objects.get(id=template_id)
+
         except ObjectDoesNotExist:
             msg = f"'{template_id}' is not a valid template-scenario id. Must provide attribute 'template-id'."
             logging.error(msg)
             return Response(
                 {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
             )
+
         try:
             config = ScenarioConfig.objects.get(id=config_id)
         except ObjectDoesNotExist:

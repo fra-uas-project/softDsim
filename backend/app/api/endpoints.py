@@ -28,7 +28,7 @@ from app.api.views.user import UserView
 # from app.api.views.sim_api import ParameterSimulation
 from app.api.views.user_scenario import UserScenarioViews
 from history.view import HistoryView, ResultView, ResultsView
-from app.api.views.course import CourseView, CourseUserView, CourseScenarioView
+from app.api.views.course import CourseView, CourseUserView, CourseScenarioView, UserCoursesView
 
 
 
@@ -98,5 +98,7 @@ urlpatterns = [
     # COURSE_SCENARIO
     path('courses/<int:course_id>/scenarios', CourseScenarioView.as_view(), name='course-scenarios'),
 
+    ##
+    path('courses/user-scenarios', UserCoursesView.as_view(), name='course-detail'),
 
 ]
