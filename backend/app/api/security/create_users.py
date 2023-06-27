@@ -2,6 +2,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.hashers import make_password
+from django.shortcuts import get_object_or_404
+
 
 from app.decorators.decorators import allowed_roles
 
@@ -12,6 +14,7 @@ import string
 import logging
 import copy
 
+from app.models.course import Course
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
@@ -28,6 +31,7 @@ class UserCreationView(APIView):
         amount = data.get("count", 1)
         pw_len = data.get("pw-length", 8)
         start_index = data.get("start-index", 1)
+        course_id = data.get("course_id")
 
         if start_index < 0:
             start_index = 0
@@ -44,7 +48,7 @@ class UserCreationView(APIView):
             )
 
         users = [
-            {"username": f"{prefix}{i}", "password": generate_password()}
+            {"username": f"{prefix}{i}", "password": generate_password(), "course_id": course_id}
             for i in range(start_index, start_index + amount)
         ]
 
@@ -63,8 +67,11 @@ class UserCreationView(APIView):
                 )
 
         try:
+            course = get_object_or_404(Course, pk=course_id)
             for user in users_hashedPassword:
-                User.objects.create(**user)
+                user_obj = User.objects.create(**user)
+                course.users.add(user_obj)
+
         except Exception as e:
             logging.error(f"{e.__class__.__name__} occured when creating users.")
             return Response(
