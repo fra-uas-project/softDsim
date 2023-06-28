@@ -29,49 +29,6 @@ const AddMultipleUsers = () => {
     const [courses, setCourses] = useState([]);
     const [course, setCourse] = useState([]);
 
-    const handleCreateAndAssign = async () => {
-        try {
-            const userData = await createUsers();
-            if (course.length !== 0) {
-                await assignCourse(course, userData);
-            }
-        } catch (error) {
-            console.error("Error creating users and assigning to the course:", error);
-        }
-    };
-
-    const assignCourse = async (courseId, userData) => {
-        try {
-            for (const user of userData.data) {
-                // Assign each user to the course
-                const response = await fetch(
-                    `${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/users`,
-                    {
-                        method: "POST",
-                        credentials: "include",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            user_id: user.id,
-                            username: user.username,
-                        }),
-                    }
-                );
-
-                if (response.ok) {
-                    // Handle the success case if needed
-                } else {
-                    const data = await response.json();
-                    throw new Error(data.error || "Failed to add user to the course");
-                }
-            }
-        } catch (error) {
-            console.error("Error adding users to the course:", error);
-        }
-    };
-
-
 
 
     // save entered prefix
@@ -95,8 +52,8 @@ const AddMultipleUsers = () => {
     }
 
     const handleCourseChange = (event) => {
-        const selectedCourse = event.target.value;
-        setCourse(selectedCourse);
+        const course = event.target.value;
+        setCourse(course || null);
     };
 
     const fetchCourses = async () => {
@@ -114,39 +71,48 @@ const AddMultipleUsers = () => {
     // create users in backend
     async function createUsers() {
         try {
-            // create users API call
+            // create users api call
+
+            const requestBody = {
+                "prefix": prefix,
+                "count": userCount,
+                "pw-length": passwordLength,
+                "start-index": startingIndex,
+            };
+            if (course.length > 0) {
+                requestBody.course_id = course;
+            }
+
+            console.log(requestBody);
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user/create-many`, {
-                method: "POST",
-                credentials: "include",
-                body: JSON.stringify({ prefix: prefix, count: userCount, "pw-length": passwordLength, "start-index": startingIndex }),
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify(requestBody),
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json"
                 },
-            });
+            })
 
             // get user data
-            const userData = await res.json();
+            const userData = await res.json()
 
             if (res.status === 201) {
                 // table head
-                var tempUsers = 'ID; Password;\r';
-                // generate user list
+                var tempUsers = 'ID; Password;\r'
+                // generate userlist
                 for (const user of userData.data) {
-                    tempUsers = tempUsers + `${user.username};${user.password};\r`;
+                    tempUsers = tempUsers + `${user.username};${user.password};\r`
                 }
-                setUserCsv(tempUsers);
-                setUsersGenerated(true);
-                setErrorState("success");
-
-                // Return the userData object
-                return userData;
+                setUserCsv(tempUsers)
+                setUsersGenerated(true)
+                setErrorState('success')
             } else {
-                setErrorState("error");
-                console.log("nope");
+                setErrorState('error')
+                console.log('nope')
             }
         } catch (error) {
-            console.log(error);
-            setErrorState("error");
+            console.log(error)
+            setErrorState('error')
         }
     }
 
@@ -252,7 +218,7 @@ const AddMultipleUsers = () => {
                                     </>
                                     :
                                     <>
-                                        <Button onClick={handleCreateAndAssign} colorScheme={prefix !== '' ? 'blue' : 'blackAlpha'} isDisabled={!(prefix !== '')}>
+                                        <Button onClick={() => { createUsers() }} colorScheme={prefix !== '' ? 'blue' : 'blackAlpha'} isDisabled={!(prefix !== '')}>
                                             Create Users
                                         </Button>
                                     </>
