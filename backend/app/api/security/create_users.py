@@ -41,14 +41,16 @@ class UserCreationView(APIView):
 
         def generate_password():
             return "".join(
-                [
-                    random.choice(string.ascii_letters + string.digits)
-                    for _ in range(pw_len)
-                ]
+                [random.choice(string.ascii_letters + string.digits) for _ in range(pw_len)]
             )
 
         users = [
-            {"username": f"{prefix}{i}", "password": generate_password(), "course_id": course_id}
+            {
+                "id": i,
+                "username": f"{prefix}{i}",
+                "password": generate_password(),
+                "course_id": course_id,
+            }
             for i in range(start_index, start_index + amount)
         ]
 
@@ -67,18 +69,21 @@ class UserCreationView(APIView):
                 )
 
         try:
-            course = get_object_or_404(Course, pk=course_id)
             for user in users_hashedPassword:
-                user_obj = User.objects.create(**user)
-                course.users.add(user_obj)
-
+                user_obj = User.objects.create(username=user['username'], password=user['password'])
+                if course_id is not None:
+                    course = get_object_or_404(Course, pk=user['course_id'])
+                    course.users.add(user_obj)
         except Exception as e:
-            logging.error(f"{e.__class__.__name__} occured when creating users.")
+            logging.error(f"{e.__class__.__name__} occurred when creating users.")
             return Response(
                 {"error": f"{e.__class__.__name__}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
         return Response(
-            data={"status": "success", "data": users}, status=status.HTTP_201_CREATED
+            data={"status": "success", "data": users},
+            status=status.HTTP_201_CREATED,
         )
+
 
