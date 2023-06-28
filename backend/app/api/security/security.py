@@ -3,10 +3,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import login, logout, authenticate
+from django.shortcuts import get_object_or_404
 
 from app.decorators.decorators import allowed_roles
 from app.serializers.user import UserSerializer
 from custom_user.models import User
+
+from app.models.course import Course
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
@@ -33,6 +36,7 @@ class RegisterView(APIView):
 
         username = data["username"]
         password = data["password"]
+        course_id = data.get("course_id")
 
         # try:
         if User.objects.filter(username=username).exists():
@@ -57,6 +61,10 @@ class RegisterView(APIView):
 
         serializer = UserSerializer(user)
 
+        if course_id is not None:
+            course = get_object_or_404(Course, pk=course_id)
+            course.users.add(user)
+
         return Response(
             {
                 "success": "User created successfully",
@@ -70,6 +78,9 @@ class RegisterView(APIView):
         #         {"error": "Something went wrong (except clause)"},
         #         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         #     )
+
+
+
 
 
 class LoginView(APIView):
