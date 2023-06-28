@@ -32,39 +32,55 @@ class RegisterView(APIView):
         Creates new user in database (as long as user does not already exist (PK=username))
         Returns: Response with information about user creation, created user and HTTP-Status Code.
         """
-        data = self.request.data
+        username: str = request.data.get("username", None)
+        password = request.data.get("password", None)
+        course_id = request.data.get("course_id", None)
 
-        username = data["username"]
-        password = data["password"]
-        course_id = data.get("course_id")
-
-        # try:
-        if User.objects.filter(username=username).exists():
+        if username is None or username.strip() == "":
             return Response(
-                {"error": "Username already exists"},
+                {"error": f"Username is not provided."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        if password is None or password.strip() == "":
+            return Response(
+                {"error": f"Password is not provided."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        username = username.strip()
+        password = password.strip()
+
+        with_course: bool = course_id is not None
+
+        # Check username not taken:
+        if User.objects.filter(username=username).exists():
+            return Response(
+                {"error": f"Username {username} is not available."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        course: Course = None
+
+        # check course exists:
+        if with_course:
+            try:
+                course = get_object_or_404(Course, pk=course_id)
+            except:
+                return Response(
+                    {"error": f"Course {course_id} not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
         user = User.objects.create_user(username=username, password=password)
 
-        # todo philip: !!!take this out before release (this is just for people that are developing with the api)
-        is_superuser = data.get("superuser", False)
-        is_admin = data.get("admin", False)
-        if (is_superuser is True) or (is_admin is True):
-            user.creator = True
-            user.staff = True
-            user.admin = True
+        if with_course:
+            course.users.add(user)
+            course.save()
 
         user.save()
 
-        user = User.objects.get(id=user.id)
-
         serializer = UserSerializer(user)
-
-        if course_id is not None:
-            course = get_object_or_404(Course, pk=course_id)
-            course.users.add(user)
-
         return Response(
             {
                 "success": "User created successfully",
@@ -72,15 +88,6 @@ class RegisterView(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
-
-        # except:
-        #     return Response(
-        #         {"error": "Something went wrong (except clause)"},
-        #         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        #     )
-
-
-
 
 
 class LoginView(APIView):
