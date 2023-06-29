@@ -6,7 +6,7 @@ import {
   Button,
   Container,
   Flex,
-  Heading,
+  Heading, Input,
   Spinner,
   Table,
   TableContainer,
@@ -14,13 +14,14 @@ import {
   Td,
   Th,
   Thead,
-  Tr,
+  Tr, useDisclosure,
 } from "@chakra-ui/react";
 import { HiChevronRight } from "react-icons/hi";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthProvider";
 import { useContext } from "react";
+
 
 const ScenarioOverview = () => {
   const [scenarios, setScenarios] = useState([]);
@@ -29,6 +30,9 @@ const ScenarioOverview = () => {
   const navigate = useNavigate();
 
   window.value = 10;
+
+
+
 
   const fetchCourseScenarios = async () => {
     try {

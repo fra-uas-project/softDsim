@@ -35,13 +35,16 @@ import {
   HStack,
   MenuItem,
   Text,
-  Input,
+  Input, Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, DrawerFooter, Divider,
 } from "@chakra-ui/react";
 import { IoIosMenu } from "react-icons/io";
 import { getCookie } from "../utils/utils";
 import { AuthContext } from "../context/AuthProvider";
 import { BsPlusSquare, BsFillTrashFill } from "react-icons/bs";
 import { IoAdd } from "react-icons/io5";
+import { Link } from 'react-router-dom';
+import { FaAlignJustify } from "react-icons/fa";
+
 
 const CourseOverview = () => {
   const [courses, setCourses] = useState([]);
@@ -55,6 +58,9 @@ const CourseOverview = () => {
 
   const cancelRef = useRef();
   const toast = useToast();
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const btnRef = React.useRef()
 
   const { isOpen: isModalOpen, onOpen: handleOpenModal, onClose: handleCloseModal } = useDisclosure();
 
@@ -538,11 +544,84 @@ const CourseOverview = () => {
 
   return (
     <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-      <Heading>Courses</Heading>
+      <Flex alignItems="center">
+        <Button ref={btnRef} colorScheme="teal" onClick={onOpen} mr={4}>
+          <FaAlignJustify/>
+        </Button>
+        <Heading as="h2" size="lg">
+          Courses
+        </Heading>
+      </Flex>
       <Box h={5}></Box>
       <Box backgroundColor="white" borderRadius="2xl">
         <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
           <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
+            <Drawer
+                isOpen={isOpen}
+                placement="left"
+                onClose={onClose}
+                finalFocusRef={btnRef}
+            >
+              <DrawerOverlay />
+              <DrawerContent>
+                <DrawerHeader fontSize="xl" py={4}>Admin Panel</DrawerHeader>
+                <Divider />
+                <DrawerBody>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Link
+                        to="/users"
+                        style={{
+                          fontSize: '1.5rem',
+                          marginBottom: '1rem',
+                          color: 'black',
+                          textDecoration: 'none',
+                          transition: 'background-color 0.3s',
+                          padding: '0.5rem',
+                        }}
+                        activeStyle={{ color: 'blue' }}
+                        onMouseEnter={(e) => (e.target.style.backgroundColor = 'teal')}
+                        onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
+                    >
+                      Users
+                    </Link>
+                    <Link
+                        to="/scenariomanagement"
+                        style={{
+                          fontSize: '1.5rem',
+                          marginBottom: '1rem',
+                          color: 'black',
+                          textDecoration: 'none',
+                          transition: 'background-color 0.3s',
+                          padding: '0.5rem',
+                        }}
+                        activeStyle={{ color: 'blue' }}
+                        onMouseEnter={(e) => (e.target.style.backgroundColor = 'teal')}
+                        onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
+                    >
+                      Scenarios
+                    </Link>
+                    <Link
+                        to="/courses"
+                        style={{
+                          fontSize: '1.5rem',
+                          marginBottom: '1rem',
+                          color: 'black',
+                          textDecoration: 'none',
+                          transition: 'background-color 0.3s',
+                          padding: '0.5rem',
+                        }}
+                        activeStyle={{ color: 'blue' }}
+                        onMouseEnter={(e) => (e.target.style.backgroundColor = 'teal')}
+                        onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
+                    >
+                      Courses
+                    </Link>
+                  </div>
+                </DrawerBody>
+                <DrawerFooter>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
             <Flex align="left">
               <Input
                 placeholder="Search"

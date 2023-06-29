@@ -102,16 +102,9 @@ const Navbar = () => {
           Help
         </Button>
         {currentUser?.admin && (
-            <Menu>
-              <MenuButton colorScheme='blue' as={Button} rightIcon={<FaAngleDown/>}>
-                 Admin Panel
-              </MenuButton>
-              <MenuList>
-                <MenuItem as={Link} to="/users" onClick={handleClick}>Users</MenuItem>
-                <MenuItem as={Link} to="/scenariomanagement" onClick={handleClick}>Scenarios</MenuItem>
-                <MenuItem as={Link} to="/courses" onClick={handleClick}>Courses</MenuItem>
-              </MenuList>
-            </Menu>
+            <Button variant="link" as={Link} to="/scenariomanagement" onClick={handleClick}>
+              Admin Panel
+            </Button>
         )}
       </HStack>
 
