@@ -72,7 +72,7 @@ const ScenarioStudio = () => {
             future: []
         }
     )
-
+    window.value = window.value + 10;
     const [editorListHistoryState, setEditorListHistoryState] = useState(editorListHistoryStates.LOG_HIST);
 
     const [selectedObjectId, setSelectedObjectId] = useState(null);
@@ -770,6 +770,7 @@ const ScenarioStudio = () => {
     // }, [editorListState])
 
     useEffect(() => {
+    console.log(window.value)
         console.log("editorListIsSaved", editorListIsSaved)
     }, [editorListIsSaved])
 

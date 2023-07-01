@@ -15,6 +15,8 @@ import {HiChevronRight} from "react-icons/hi";
 
 const Help = () => {
 
+window.value = 10;
+
     return (
         <>
             <Flex px={10} pt={2} flexDir="column" flexGrow={1}>

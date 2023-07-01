@@ -8,6 +8,9 @@ import {
   Text,
   MenuButton,
   MenuGroup,
+  MenuItemOption,
+  MenuOptionGroup,
+  MenuDivider,
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
@@ -19,6 +22,8 @@ import { AuthContext } from "../context/AuthProvider";
 import { useCookies } from "react-cookie";
 import { getCookie } from "../utils/utils";
 import { HiOutlineCog } from "react-icons/hi";
+import { FaAngleDown } from "react-icons/fa";
+
 
 const Navbar = () => {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
@@ -27,6 +32,15 @@ const Navbar = () => {
   ]);
 
   const menuButton = useRef();
+
+  const handleClick = () => {
+    if (window.value >= 20) {
+      const confirmLeave = window.confirm('Are you sure you want to leave this page?');
+      if (!confirmLeave) {
+        return; // Abbruch, wenn der Benutzer "Abbrechen" geklickt hat
+      }
+    }
+   }
 
   // Workaround to center text in avatar
   useEffect(() => {
@@ -58,9 +72,11 @@ const Navbar = () => {
     setCurrentUser(null);
   }
 
+
+
   return (
     <Flex w="full" px={16} py={4} borderBottom="1px solid #E2E8F0">
-      <Box as={Link} to={"/"}>
+      <Box as={Link} to={"/"} onClick={handleClick}>
         <Image src={Logo} alt="logo" w={14} objectFit="contain" />
       </Box>
 
@@ -73,23 +89,30 @@ const Navbar = () => {
 
 
       <HStack w="100%" justifyContent="center" gap={14}>
-        <Button variant="link" as={Link} to="/scenarios">
+        <Button variant="link" as={Link} to="/scenarios" onClick={handleClick}>
           Scenarios
         </Button>
 
         {currentUser?.creator && (
-          <Button variant="link" as={Link} to="/scenario-studio">
-            Scenario Studio
-          </Button>
+        <Button variant="link" as={Link} to="/scenario-studio" onClick={handleClick}>
+          Scenario Studio
+        </Button>
         )}
-        {currentUser?.admin && (
-          <Button variant="link" as={Link} to="/users">
-            User Management
-          </Button>
-        )}
-        <Button variant="link" as={Link} to="/help">
+        <Button variant="link" as={Link} to="/help" onClick={handleClick}>
           Help
         </Button>
+        {currentUser?.admin && (
+            <Menu>
+              <MenuButton colorScheme='blue' as={Button} rightIcon={<FaAngleDown/>}>
+                 Admin Panel
+              </MenuButton>
+              <MenuList>
+                <MenuItem as={Link} to="/users" onClick={handleClick}>Users</MenuItem>
+                <MenuItem as={Link} to="/scenariomanagement" onClick={handleClick}>Scenarios</MenuItem>
+                <MenuItem as={Link} to="/courses" onClick={handleClick}>Courses</MenuItem>
+              </MenuList>
+            </Menu>
+        )}
       </HStack>
 
       {currentUser?.staff && (
@@ -106,10 +129,10 @@ const Navbar = () => {
               </MenuButton>
               <MenuList mt={2}>
                 <MenuGroup>
-                  <MenuItem color="black" as={Link} to="/skill-types">
+                  <MenuItem color="black" as={Link} to="/skill-types" onClick={handleClick}>
                     Skill Types
                   </MenuItem>
-                  <MenuItem color="black" as={Link} to="/scenario-config">
+                  <MenuItem color="black" as={Link} to="/scenario-config" onClick={handleClick}>
                     Scenario Configurations
                   </MenuItem>
                 </MenuGroup>
