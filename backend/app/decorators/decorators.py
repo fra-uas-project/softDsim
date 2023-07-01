@@ -68,7 +68,12 @@ def has_access_to_scenario(field_name: str = None, template_id_in_request_data: 
                 template_id = kwargs[field_name.strip()]
 
             if template_id is None:
-                return view_class(self, request, *args, **kwargs)
+                return Response(
+                    {
+                        "message": "Template Id is not provided."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             is_allowed: bool = Course.objects.filter(
                 users__id=user.id, scenarios__id=template_id
