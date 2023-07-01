@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.decorators.decorators import allowed_roles
+from app.decorators.decorators import allowed_roles, has_access_to_scenario
 from app.models.template_scenario import TemplateScenario
 from app.serializers.user_scenario import UserScenarioSerializer
 from django.core.exceptions import ObjectDoesNotExist
@@ -118,7 +118,8 @@ class UserScenarioViews(APIView):
             return Response(
                 {"status": "error", "data": errors}, status=status.HTTP_400_BAD_REQUEST,
             )
-        serializer = UserScenarioSerializer(item, data=request.data, partial=True)
+        serializer = UserScenarioSerializer(
+            item, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({"status": "success", "data": serializer.data})

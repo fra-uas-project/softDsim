@@ -31,7 +31,6 @@ from history.view import HistoryView, ResultView, ResultsView
 from app.api.views.course import CourseView, CourseUserView, CourseScenarioView, UserCoursesView
 
 
-
 urlpatterns = [
     # User stuff
     path("login", LoginView.as_view(), name="login"),
@@ -93,10 +92,12 @@ urlpatterns = [
     # Course
     path('courses', CourseView.as_view()),
     path('courses/<int:id>', CourseView.as_view()),
-    ## COURSE_USER
-    path('courses/<int:course_id>/users', CourseUserView.as_view(), name='course-users'),
+    # COURSE_USER
+    path('courses/<int:course_id>/users',
+         CourseUserView.as_view(), name='course-users'),
     # COURSE_SCENARIO
-    path('courses/<int:course_id>/scenarios', CourseScenarioView.as_view(), name='course-scenarios'),
+    path('courses/<int:course_id>/scenarios',
+         CourseScenarioView.as_view(), name='course-scenarios'),
 
     ##
     path('courses/user-scenarios', UserCoursesView.as_view(), name='course-detail'),

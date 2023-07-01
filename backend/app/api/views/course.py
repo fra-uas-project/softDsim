@@ -359,6 +359,10 @@ class UserCoursesView(APIView):
 
     @allowed_roles(["student", "creator", "staff"])
     def get(self, request):
+        """
+        Finds and retunrns a list fo all scnearios from all the courses in which current user is assigned.
+        """
+
         user = request.user
 
         courses = Course.objects.filter(users=user)
@@ -368,10 +372,8 @@ class UserCoursesView(APIView):
             scenarios = course.scenarios.all()
             scenario_set.update(scenarios)
 
-        scenario_list: list[TemplateScenario] = list(scenario_set)
-
         serialized_template_scenarios = TemplateScenarioSerializer(
-            scenario_list, many=True).data
+            scenario_set, many=True).data
 
         return Response(
             serialized_template_scenarios,
