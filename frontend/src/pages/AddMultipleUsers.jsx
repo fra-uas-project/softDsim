@@ -1,5 +1,5 @@
-import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Container, Flex, Grid, Heading, Input, Text, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper } from "@chakra-ui/react"
-import { useState } from "react"
+import { Box, Select, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Container, Flex, Grid, Heading, Input, Text, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper } from "@chakra-ui/react"
+import {useEffect, useState} from "react"
 import { HiChevronRight } from "react-icons/hi"
 
 
@@ -26,6 +26,11 @@ const AddMultipleUsers = () => {
     // error state
     const [errorState, setErrorState] = useState('none')
 
+    const [courses, setCourses] = useState([]);
+    const [course, setCourse] = useState([]);
+
+
+
     // save entered prefix
     function prefixInput(input) {
         setPreFix(input.target.value)
@@ -46,14 +51,43 @@ const AddMultipleUsers = () => {
         setStartingIndex(parseInt(input))
     }
 
+    const handleCourseChange = (event) => {
+        const course = event.target.value;
+        setCourse(course || null);
+    };
+
+    const fetchCourses = async () => {
+        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses`, {
+            method: "GET",
+            credentials: "include",
+        });
+        const data = await res.json();
+        setCourses(data.data);
+        if ("error" in data) {
+            return;
+        }
+    };
+
     // create users in backend
     async function createUsers() {
         try {
             // create users api call
+
+            const requestBody = {
+                "prefix": prefix,
+                "count": userCount,
+                "pw-length": passwordLength,
+                "start-index": startingIndex,
+            };
+            if (course.length > 0) {
+                requestBody.course_id = course;
+            }
+
+            console.log(requestBody);
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/user/create-many`, {
                 method: 'POST',
                 credentials: 'include',
-                body: JSON.stringify({ "prefix": prefix, "count": userCount, "pw-length": passwordLength, "start-index": startingIndex }),
+                body: JSON.stringify(requestBody),
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -81,6 +115,10 @@ const AddMultipleUsers = () => {
             setErrorState('error')
         }
     }
+
+    useEffect(() => {
+        fetchCourses();
+    }, []);
 
     return (
         <>
@@ -136,6 +174,17 @@ const AddMultipleUsers = () => {
                                             <NumberDecrementStepper />
                                         </NumberInputStepper>
                                     </NumberInput>
+                                </Grid>
+                                <Grid>
+                                    {/* course dropdown */}
+                                    <Text fontWeight="bold">Course</Text>
+                                    <Select placeholder="Select a course" size='lg' onChange={handleCourseChange}>
+                                        {courses.map(course => (
+                                            <option key={course.id} value={course.id}>
+                                                {course.name}
+                                            </option>
+                                        ))}
+                                    </Select>
                                 </Grid>
                             </Grid>
                             {/* error or success messages */}
