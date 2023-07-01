@@ -32,11 +32,11 @@ import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 import SkilltypeContainer from "../components/Simulation/Actions/SkilltypeContainer";
 
-import { Spinner } from '@chakra-ui/react';
+import { Spinner } from "@chakra-ui/react";
 
 const Simulation = () => {
   const location = useLocation();
-
+  let modalCheck;
   // scenario template data
   const { state } = useLocation();
 
@@ -491,7 +491,7 @@ const Simulation = () => {
           <Container maxW="container.2xl" h="full">
             <Flex h="full" flexDir={{ md: "column", lg: "row" }}>
               {scenarioIsLoading ? (
-               <Spinner />
+                <Spinner />
               ) : (
                 <>
                   <Box w={{ md: "100%", lg: "62%" }} mb={{ md: 5, lg: 0 }}>

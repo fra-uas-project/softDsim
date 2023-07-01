@@ -61,7 +61,6 @@ import InspectorTab from "../components/ScenarionStudio/InspectorTab/InspectorTa
 
 const ScenarioStudio = () => {
     const toast = useToast();
-
     const [tabIndex, setTabIndex] = useState(tabIndexEnum.COMPONENTS);
     const [editorList, updateEditorList] = useImmer([]);
     const [savedEditorList, setSavedEditorList] = useState(editorList);
