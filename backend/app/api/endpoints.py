@@ -29,7 +29,7 @@ from app.api.views.user import UserView
 from app.api.views.user_scenario import UserScenarioViews
 from history.view import HistoryView, ResultView, ResultsView
 from app.api.views.course import CourseView, CourseUserView, CourseScenarioView, UserCoursesView
-
+from app.api.views.score_card import ScoreCardView
 
 urlpatterns = [
     # User stuff
@@ -43,6 +43,9 @@ urlpatterns = [
     # template scenario
     path("template-scenario", TemplateScenarioView.as_view()),
     path("template-scenario/<int:scenario_id>", TemplateScenarioView.as_view()),
+    # Score Card
+    path("template-scenario/<int:scenario_id>/score-card",
+         ScoreCardView.as_view()),
     path("template-overview", TemplateScenarioUserListView.as_view()),
     path("template-overview/<int:scenario_id>",
          TemplateScenarioUserListView.as_view()),
