@@ -1,14 +1,10 @@
-import logging
 
-from django.core.exceptions import ObjectDoesNotExist
-from custom_user.models import User
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.cache.scenario import CachedScenario
-from app.decorators.decorators import allowed_roles, has_access_to_scenario
+from app.decorators.decorators import allowed_roles
 
 from app.models.template_scenario import TemplateScenario
 from app.models.score_card import ScoreCard
