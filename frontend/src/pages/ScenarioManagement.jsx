@@ -177,7 +177,7 @@ const ScenarioManagement = () => {
     <>
       <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
         <Flex alignItems="center">
-          <Button ref={btnRef} colorScheme="teal" onClick={onOpen} mr={4}>
+          <Button ref={btnRef} colorScheme="blue" onClick={onOpen} mr={4}>
             <FaAlignJustify/>
           </Button>
           <Heading as="h2" size="lg">
@@ -199,7 +199,12 @@ const ScenarioManagement = () => {
                   <DrawerHeader fontSize="xl" py={4}>Admin Panel</DrawerHeader>
                   <Divider />
                   <DrawerBody>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginLeft: '-2rem',
+                    paddingLeft: '0.5rem',
+                   }}>
                       <Link
                           to="/users"
                           style={{
@@ -209,10 +214,17 @@ const ScenarioManagement = () => {
                             textDecoration: 'none',
                             transition: 'background-color 0.3s',
                             padding: '0.5rem',
+                            width: '120%',
                           }}
                           activeStyle={{ color: 'blue' }}
-                          onMouseEnter={(e) => (e.target.style.backgroundColor = 'teal')}
-                          onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
+                            onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                            e.target.style.color = 'white';
+                            }}
+                            onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                            e.target.style.color = 'black';
+                            }}
                       >
                         Users
                       </Link>
@@ -225,10 +237,17 @@ const ScenarioManagement = () => {
                             textDecoration: 'none',
                             transition: 'background-color 0.3s',
                             padding: '0.5rem',
+                            width: '120%',
                           }}
                           activeStyle={{ color: 'blue' }}
-                          onMouseEnter={(e) => (e.target.style.backgroundColor = 'teal')}
-                          onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
+                            onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                            e.target.style.color = 'white';
+                            }}
+                            onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                            e.target.style.color = 'black';
+                            }}
                       >
                         Scenarios
                       </Link>
@@ -241,10 +260,17 @@ const ScenarioManagement = () => {
                             textDecoration: 'none',
                             transition: 'background-color 0.3s',
                             padding: '0.5rem',
+                            width: '120%',
                           }}
                           activeStyle={{ color: 'blue' }}
-                          onMouseEnter={(e) => (e.target.style.backgroundColor = 'teal')}
-                          onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
+                            onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                            e.target.style.color = 'white';
+                            }}
+                            onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                            e.target.style.color = 'black';
+                            }}
                       >
                         Courses
                       </Link>
