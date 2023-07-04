@@ -145,12 +145,12 @@ const UserOverview = () => {
                 <DrawerHeader fontSize="xl" py={4}>Admin Panel</DrawerHeader>
                 <Divider />
                 <DrawerBody>
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    marginLeft: '-2rem',
-                    paddingLeft: '0.5rem',
-                   }}>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        marginLeft: '0.01em',
+                        paddingLeft: '0.1rem',
+                    }}>
                     <Link
                         to="/users"
                         style={{
