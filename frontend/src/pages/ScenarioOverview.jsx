@@ -24,6 +24,7 @@ import { useContext } from "react";
 
 
 const ScenarioOverview = () => {
+  window.modalCheck = 0;
   const [scenarios, setScenarios] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { currentUser, setCurrentUser } = useContext(AuthContext);
