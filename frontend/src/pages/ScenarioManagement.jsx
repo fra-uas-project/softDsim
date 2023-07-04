@@ -34,7 +34,7 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem,
+  MenuItem, FormHelperText,
 } from "@chakra-ui/react";
 import { HiChevronRight, HiOutlineTrash, HiDownload } from "react-icons/hi";
 import React, { useEffect, useRef, useState } from "react";
@@ -52,6 +52,14 @@ const ScenarioManagement = () => {
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isScoreCardModalOpen, setIsScoreCardModalOpen] = useState(false);
+
+  const [scoreCardParams, setScoreCardParams] = useState({
+    budget_p: "",
+    time_p: "",
+    quality_k: "",
+  });
+
 
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const cancelRef = useRef();
@@ -60,6 +68,69 @@ const ScenarioManagement = () => {
   const navigate = useNavigate();
 
   window.value = 10;
+
+  const handleScoreCardParams = async (scenario) => {
+    setSelectedScenario(scenario);
+    await fetchScoreCard(scenario.id);
+    setIsScoreCardModalOpen(true);
+  };
+
+  const fetchScoreCard = async (selectedScenarioId) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${selectedScenarioId}/score-card`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await res.json();
+      setScoreCardParams(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const saveScoreCardParams = () => {
+    const requestBody = {
+      template_scenario_id: selectedScenario.id,
+      budget_p: scoreCardParams.budget_p,
+      time_p: scoreCardParams.time_p,
+      quality_k: scoreCardParams.quality_k,
+    };
+
+    fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${selectedScenario.id}/score-card`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+      body: JSON.stringify(requestBody),
+    })
+        .then((response) => {
+          if (response.ok) {
+            toast({
+              title: `Score card has been updated`,
+              status: "success",
+              duration: 5000,
+            });
+            setIsScoreCardModalOpen(false);
+          } else {
+            toast({
+              title: "Failed to update score card",
+              status: "error",
+              duration: 5000,
+            });
+          }
+        })
+        .catch((error) => {
+          toast({
+            title: "An error occurred",
+            status: "error",
+            duration: 5000,
+          });        });
+  };
+
+
+
 
   const fetchScenarios = async () => {
     setIsLoading(true);
@@ -97,7 +168,6 @@ const ScenarioManagement = () => {
         status: "error",
         duration: 5000,
       });
-      console.log(e);
     }
   };
 
@@ -157,7 +227,6 @@ const ScenarioManagement = () => {
         });
       }
     } catch (e) {
-      console.log(e);
     } finally {
       setStartDate("");
     }
@@ -243,6 +312,7 @@ const ScenarioManagement = () => {
                                     </MenuItem>
                                     <MenuItem>Courses</MenuItem>
                                     <MenuItem>Remove from all Courses</MenuItem>
+                                    <MenuItem onClick={() => handleScoreCardParams(scenario)}>Score card</MenuItem>
                                   </MenuList>
                                 </Menu>
                               </div>
@@ -311,6 +381,96 @@ const ScenarioManagement = () => {
             </Button>
             <Button variant="ghost" onClick={closeDateModal}>
               Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isScoreCardModalOpen} onClose={() => setIsScoreCardModalOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Score Card</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel style={{ marginBottom: "1px" }}>Budget</FormLabel>
+              <FormHelperText style={{ marginTop: "1px" }}>
+                Please enter a number between 0 and 1. ( x.xx )
+              </FormHelperText>              <Input
+                  type="text"
+                  value={scoreCardParams.budget_p}
+                  onChange={(e) => setScoreCardParams({ ...scoreCardParams, budget_p: e.target.value })}
+                  onKeyPress={(e) => {
+                    const charCode = e.which ? e.which : e.keyCode;
+                    const inputValue =
+                        e.target.value + String.fromCharCode(charCode);
+                    const isValid =
+                        /^\d*\.?\d*$/.test(inputValue) &&
+                        parseFloat(inputValue) >= 0 &&
+                        parseFloat(inputValue) <= 1;
+
+                    if (!isValid) {
+                      e.preventDefault();
+                    }
+                  }}
+                  pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
+                  title="Please enter a number between 0 and 1"
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel style={{ marginBottom: "1px" }}>Time</FormLabel>
+              <FormHelperText style={{ marginTop: "1px" }}>
+                Please enter a number between 0 and 1. ( x.xx )
+              </FormHelperText>              <Input
+                  type="text"
+                  value={scoreCardParams.time_p}
+                  onChange={(e) => setScoreCardParams({ ...scoreCardParams, time_p: e.target.value })}
+                  onKeyPress={(e) => {
+                    const charCode = e.which ? e.which : e.keyCode;
+                    const inputValue =
+                        e.target.value + String.fromCharCode(charCode);
+                    const isValid =
+                        /^\d*\.?\d*$/.test(inputValue) &&
+                        parseFloat(inputValue) >= 0 &&
+                        parseFloat(inputValue) <= 1;
+
+                    if (!isValid) {
+                      e.preventDefault();
+                    }
+                  }}
+                  pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
+                  title="Please enter a number between 0 and 1"
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel style={{ marginBottom: "1px" }}>Quality</FormLabel>
+              <FormHelperText style={{ marginTop: "1px" }}>
+                Please enter a number between 0 and 1. ( x.xx )
+              </FormHelperText>              <Input
+                  type="text"
+                  value={scoreCardParams.quality_k}
+                  onChange={(e) => setScoreCardParams({ ...scoreCardParams, quality_k: e.target.value })}
+                  onKeyPress={(e) => {
+                    const charCode = e.which ? e.which : e.keyCode;
+                    const inputValue =
+                        e.target.value + String.fromCharCode(charCode);
+                    const isValid =
+                        /^\d*\.?\d*$/.test(inputValue) &&
+                        parseFloat(inputValue) >= 0 &&
+                        parseFloat(inputValue) <= 1;
+
+                    if (!isValid) {
+                      e.preventDefault();
+                    }
+                  }}
+                  pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
+                  title="Please enter a number between 0 and 1"
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={saveScoreCardParams}>
+              Save
             </Button>
           </ModalFooter>
         </ModalContent>
