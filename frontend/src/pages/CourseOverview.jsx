@@ -570,8 +570,8 @@ const CourseOverview = () => {
                   <div style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    marginLeft: '0.01em',
-                    paddingLeft: '0.1rem',
+                    marginLeft: '-2rem',
+                    paddingLeft: '0.5rem',
                   }}>
                     <Link
                         to="/users"
