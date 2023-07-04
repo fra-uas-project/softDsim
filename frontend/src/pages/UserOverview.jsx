@@ -149,7 +149,7 @@ const UserOverview = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         marginLeft: '-2rem',
-                        paddingLeft: '0.51rem',
+                        paddingLeft: '0.5rem',
                     }}>
                         <Link
                             to="/users"
