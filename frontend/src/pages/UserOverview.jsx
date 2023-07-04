@@ -132,7 +132,7 @@ const UserOverview = () => {
       </Flex>
       <Box h={5}></Box>
       <Box backgroundColor="white" borderRadius="2xl">
-        <Container maxW="6xl" pt={10} h="full" pb={10} minH="70vh" maxH="70vh">
+          <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
           <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
             <Drawer
                 isOpen={isOpen}
@@ -246,8 +246,7 @@ const UserOverview = () => {
               <AddUser />
             </Flex>
           </HStack>
-
-          <TableContainer overflowY="auto" h="full">
+              <TableContainer overflowY="auto" h="400px">
             <Table variant="simple" size="lg">
               <Thead>
                 <Tr>
@@ -353,7 +352,6 @@ const UserOverview = () => {
                   })}
               </Tbody>
             </Table>
-            <Divider />
           </TableContainer>
         </Container>
       </Box>
