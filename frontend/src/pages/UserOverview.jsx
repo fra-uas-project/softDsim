@@ -160,7 +160,7 @@ const UserOverview = () => {
                                 textDecoration: 'none',
                                 transition: 'background-color 0.3s',
                                 padding: '0.5rem',
-                                width: '120%',
+                                width: '108%',
                                 backgroundColor: 'grey',
                             }}
                             onMouseEnter={(e) => {
@@ -183,7 +183,7 @@ const UserOverview = () => {
                           textDecoration: 'none',
                           transition: 'background-color 0.3s',
                           padding: '0.5rem',
-                          width: '120%',
+                            width: '108%',
                         }}
                         activeStyle={{ color: 'blue' }}
                             onMouseEnter={(e) => {
@@ -206,7 +206,7 @@ const UserOverview = () => {
                           textDecoration: 'none',
                           transition: 'background-color 0.3s',
                           padding: '0.5rem',
-                          width: '120%',
+                            width: '108%',
                         }}
                         activeStyle={{ color: 'blue' }}
                             onMouseEnter={(e) => {
