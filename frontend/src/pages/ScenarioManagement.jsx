@@ -307,13 +307,14 @@ const ScenarioManagement = () => {
                       <Link
                         to="/scenariomanagement"
                         style={{
-                          fontSize: "1.5rem",
-                          marginBottom: "1rem",
-                          color: "black",
-                          textDecoration: "none",
-                          transition: "background-color 0.3s",
-                          padding: "0.5rem",
-                          width: "120%",
+                          fontSize: '1.5rem',
+                          marginBottom: '1rem',
+                          color: 'white',
+                          textDecoration: 'none',
+                          transition: 'background-color 0.3s',
+                          padding: '0.5rem',
+                          width: '120%',
+                          backgroundColor: 'grey',
                         }}
                         activeStyle={{ color: "blue" }}
                         onMouseEnter={(e) => {
@@ -321,8 +322,8 @@ const ScenarioManagement = () => {
                           e.target.style.color = "white";
                         }}
                         onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = "transparent";
-                          e.target.style.color = "black";
+                          e.target.style.backgroundColor = "grey";
+                          e.target.style.color = "white";
                         }}
                       >
                         Scenarios

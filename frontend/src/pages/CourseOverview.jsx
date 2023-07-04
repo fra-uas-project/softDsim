@@ -624,11 +624,12 @@ const CourseOverview = () => {
                         style={{
                           fontSize: '1.5rem',
                           marginBottom: '1rem',
-                          color: 'black',
+                          color: 'white',
                           textDecoration: 'none',
                           transition: 'background-color 0.3s',
                           padding: '0.5rem',
                           width: '120%',
+                          backgroundColor: 'grey',
                         }}
                         activeStyle={{ color: 'blue' }}
                         onMouseEnter={(e) => {
@@ -636,8 +637,8 @@ const CourseOverview = () => {
                         e.target.style.color = 'white';
                         }}
                         onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
-                        e.target.style.color = 'black';
+                        e.target.style.backgroundColor = 'grey';
+                        e.target.style.color = 'white';
                         }}
                     >
                       Courses
