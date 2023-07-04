@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.decorators.decorators import allowed_roles
+from app.decorators.decorators import allowed_roles, has_access_to_scenario
 from app.exceptions import IndexException
 from app.models.action import Action
 from app.models.answer import Answer
@@ -34,9 +34,8 @@ class TemplateScenarioView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["student", "creator", "staff"])
+    @allowed_roles(["creator", "staff"])
     def get(self, request, scenario_id=None, format=None):
-
         try:
             if scenario_id:
                 template_scenario = TemplateScenario.objects.get(
@@ -519,13 +518,13 @@ def handle_model(data, scenario: TemplateScenario, i):
         scrum="Scrum" in data.get("models"),
         template_scenario=scenario,
     )
-    
-    #We have a minimum requirement. That's why this isn't Necessar (Burak)
-    #if not m.waterfall and not m.kanban and not m.scrum:
-        # If no model is selected, select all models
-        #m.waterfall = True
-        #m.scrum = True
-        #m.kanban = True
+
+    # We have a minimum requirement. That's why this isn't Necessar (Burak)
+    # if not m.waterfall and not m.kanban and not m.scrum:
+    # If no model is selected, select all models
+    # m.waterfall = True
+    # m.scrum = True
+    # m.kanban = True
 
     m.save()
     return i + 1
@@ -659,9 +658,9 @@ class TemplateScenarioUserListView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["student"])
+    @allowed_roles(["all"])
+    @has_access_to_scenario("scenario_id", False)
     def get(self, request, scenario_id=None, format=None):
-
         try:
             if scenario_id:
                 data = self.get_data_for_single_scenario(
@@ -670,6 +669,7 @@ class TemplateScenarioUserListView(APIView):
                 return Response(data, status=status.HTTP_200_OK)
 
             template_scenarios = TemplateScenario.objects.all()
+
             data = [
                 self.get_data_for_single_scenario(
                     scenario.id, request.user.username)
@@ -702,4 +702,3 @@ class TemplateScenarioUserListView(APIView):
         if tries:
             max_score = max(map(lambda x: x.total_score, results))
         return {**serializer.data, "tries": tries, "max_score": max_score}
-

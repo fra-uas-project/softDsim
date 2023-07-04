@@ -1,13 +1,14 @@
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
+from custom_user.models import User
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app.cache.scenario import CachedScenario
-from app.decorators.decorators import allowed_roles
+from app.decorators.decorators import allowed_roles, has_access_to_scenario
 from app.exceptions import (
     SimulationException,
     RequestTypeException,
@@ -34,26 +35,13 @@ class StartUserScenarioView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @allowed_roles(["student"])
+    @has_access_to_scenario("template-id", True)
     def post(self, request):
         template_id = request.data.get("template-id")
         config_id = request.data.get("config-id")
-        user = request.user
 
-        courses = Course.objects.filter(users=user)
-        scenario_set = set()
-
-        for course in courses:
-            scenarios = course.scenarios.all()
-            scenario_set.update(scenarios)
-
-        scenario_list = list(scenario_set)
-
-        if template_id not in [scenario.id for scenario in scenario_list]:
-            msg = f"You don't have access to this Scenario."
-            logging.error(msg)
-            return Response(
-                {"status": "error", "data": msg}, status=status.HTTP_403_FORBIDDEN
-            )
+        template: TemplateScenario = None
+        config: ScenarioConfig = None
 
         try:
             template = TemplateScenario.objects.get(id=template_id)
