@@ -12,7 +12,28 @@ import {
 } from "@chakra-ui/react"
 import React from "react";
 import scenario from "../images/Scenarios.png";
-import Logo from "../images/logo-simplify.png";
+import story from "../images/Story.png";
+import simulation from "../images/Simulation.png";
+import information from "../images/Information_About_Simulation.png";
+import remaining_tasks from "../images/Remaining_tasks.png";
+import tasks from "../images/Tasks.png";
+import budget from "../images/Budget.png";
+import employeee_status from "../images/Employee_status.png";
+import action from "../images/Action.png";
+import meetings from "../images/Meetings.png";
+import models from "../images/Models.png";
+import overtime from "../images/Overtime.png";
+import team_event from "../images/Team_event.png";
+import training from "../images/Training.png";
+import unit_testing from "../images/Unit_testing.png";
+import bugfixing from "../images/Bugfixing.png";
+import employees from "../images/Employees.png";
+import integration_testing from "../images/Integration_testing.png";
+import questions from "../images/Questions.png";
+
+
+
+
 
 const Help = () => {
 
@@ -65,6 +86,9 @@ const Help = () => {
                           </AccordionButton>
                         </h2>
                         <AccordionPanel pb={4}>
+                          <Box display="flex" justifyContent="center">
+                            <Image src={story} w={500} objectFit="contain" mx="auto" />
+                          </Box>
                           By selecting a scenario from the overview, the "Story" of the scenario opens. The Story describes the scenario and the project's content. It contains as much information as possible about a project, aiming to make the scenario execution easier and more intuitive for the user. The Story of a simulation provides a comprehensive overview of the project and allows participants to have important information at their disposal. For example, it may outline the project prerequisites and the project management methodology to be applied. The Story helps students to better understand the context of the scenario and facilitates the identification of challenges and decisions to be made during the simulation. The "Start Simulation" button initiates the simulation. During the simulation itself, the Story remains accessible, allowing participants to refer to relevant information whenever needed. The ability to open and reread the Story during the simulation promotes a deeper understanding of the scenario, supports the learning objectives of the project management module, and facilitates achieving a good outcome within the simulation.
                         </AccordionPanel>
                       </AccordionItem>
@@ -78,6 +102,7 @@ const Help = () => {
                           </AccordionButton>
                         </h2>
                         <AccordionPanel pb={4}>
+                          <Image src={simulation} w={1000} objectFit="contain" />
                           After starting, a new page opens for the previously selected simulation. It is divided into two main sections. On the left side, information about the current progress of the simulation is displayed. On the right side, user actions are performed. Each week, within the simulation, new inputs are required from the user on the right side of the screen. User inputs could include questions, model selection, simulation fragments, events, or results.             </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -90,12 +115,14 @@ const Help = () => {
                           </AccordionButton>
                         </h2>
                         <AccordionPanel pb={4}>
+                          <Image src={information} w={800} objectFit="contain" mx="auto" />
                           The image below shows information about the current state of the simulation. After each iteration, the simulation fragments are changed or adjusted based on user inputs, and the information is updated accordingly.
                           <p>  •	Under <strong>"Open Story"</strong> in the top left corner of the image, the story of the simulation opens, describing the project.</p>
                           <p>  •	<strong>"Days until deadline"</strong> shows the number of days remaining until the project deadline. Below that, it indicates the duration of the last iteration in days.</p>
                           <p> •	<strong>"Expenses"</strong> displays the amount spent on the project in dollars. Below that, it shows the expenses of the last iteration.</p>
                           <p>  •	<strong>"Remaining Tasks"</strong> shows the number of remaining tasks. Below that, it indicates the number of tasks completed in the last iteration. If the arrow color next to the number is red instead of green, it means that additional tasks have been added through integration testing.</p>
                           <p>There is also a graphical representation of tasks, the budget and the employee status. Through the graphical display, one can see the entire project progress from the beginning to the current state.  </p>
+                          <Image src={remaining_tasks} w={1000} objectFit="contain" mx="auto" />
                         </AccordionPanel>         </AccordionItem>
                       <AccordionItem>
                         <h2>
@@ -107,6 +134,7 @@ const Help = () => {
                           </AccordionButton>
                         </h2>
                         <AccordionPanel pb={4}>
+                          <Image src={tasks} w={1000} objectFit="contain" mx="auto" />
                           "Done" refers to completed tasks in the project. Throughout the simulation, various tasks need to be completed, such as integration testing, unit testing, and bug fixing. Information about these tasks is visible in the graph. The unit tests are not counted among the “Done” tasks. Therefore, the number of unit tests is subtracted from the “Done” tasks. However, integration tests may add additional tasks, which must be completed afterwards.             </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -119,6 +147,7 @@ const Help = () => {
                           </AccordionButton>
                         </h2>
                         <AccordionPanel pb={4}>
+                          <Image src={budget} w={1000} objectFit="contain" mx="auto" />
                           In this area the graph shows how the costs have evolved and how the costs would progress in the project if they were linear.             </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -135,6 +164,7 @@ const Help = () => {
                           <p>• <strong>Stress</strong>: If the tasks are too demanding and the employees are overwhelmed, the stress value increases. The deadline is also crucial because the closer it gets, the higher the stress level becomes. However, for an ideal and efficient workflow, the stress value should not be at 0 either. An ideal stress value would be around 20. Within the simulation, it is possible to lower the stress level through stress-reducing measures. An example of this would be team meetings. Hovering the mouse over the "Team Event" field also indicates that it reduces stress.</p>
                           <p>• <strong>Motivation</strong>: The motivation value is also crucial for efficiency, as without motivation, the employees' mood decreases. Motivation is high when employees feel well-treated. For example, a team event would increase the motivation of the employees.</p>
                           <p>• <strong>Familiarity</strong>: Familiarity describes the employees' familiarity with the tasks. Familiarity is important for employees to work efficiently together in the project and complete the tasks. Familiarity increases, for example, through the scheduling of meetings.</p>
+                          <Image src={employeee_status} w={1000} objectFit="contain" mx="auto" />
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -175,6 +205,7 @@ const Help = () => {
                     <TabPanel>
                       <p style={{ marginBottom: '10px' }}>
                         Under this section, the course of the project can change after each iteration. The settings of each fragment can be seen in the image below and can be adjusted after each iteration. After making the adjustments, clicking on "Next Week" will execute the simulation, and the new simulation results will be displayed. Furthermore, the simulation fragments allow for detailed control over various aspects of the project. By adjusting the fragment settings, different situations can be simulated, and potential impacts on the project flow and outcome can be analyzed.</p>
+                      <Image src={action} w={800} objectFit="contain" mx="auto" />
                       <AccordionItem>
                         <h2>
                           <AccordionButton>
@@ -187,7 +218,7 @@ const Help = () => {
                         <AccordionPanel pb={4}>
                           At the beginning of the project, it is important to select the appropriate project management method. For the simulation, this decision is crucial as the approach varies for each method. The chosen method can influence the project flow and outcome in the simulation. There are different approaches available: Scrum, Kanban, and the Waterfall approach. Scrum and Kanban are agile methods that emphasize adaptability and engagement. Scrum is based on flexibility and active participation. It is characterized by short iterations, regular meetings, and close collaboration within the team. This iterative approach allows for changing requirements throughout the project. The high transparency and communication in Scrum enable effective collaboration.
                           On the other hand, the Waterfall approach places a strong emphasis on detailed upfront planning. Therefore, the Waterfall approach is suitable when the requirements are well-defined from the beginning. Through its structured approach, the Waterfall method allows for precise planning, clear milestones, and accurate predictability of the project's progress. Scrum and Kanban are used when the requirements may change or need to be adapted during the project.
-
+                          <Image src={models} w={500} objectFit="contain" mx="auto" />
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -226,6 +257,8 @@ const Help = () => {
                           <p>
                             • <strong>Technical Specialist:</strong> A Technical Specialist is an expert in a specific technical area or technology. They provide technical expertise, assist in solving technical challenges, and advise the team on technical decisions.
                           </p>
+                          <Image src={employees} w={600} objectFit="contain" mx="auto" />
+
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -239,6 +272,8 @@ const Help = () => {
                         </h2>
                         <AccordionPanel pb={4}>
                           In bugfixing discovered software bugs are addressed and resolved. To find bugs, unit testing must have been performed beforehand. To ensure good quality of the final result, bugs should be identified and subsequently fixed. Bugfixing is therefore important to ensure the quality of the software and provide a bug-free application. Depending on the number of bugs that need to be fixed, it is possible that in an iteration, the "remaining tasks" may not be considered at all or given less priority.
+                          <Image src={bugfixing} w={1000} objectFit="contain" mx="auto" />
+
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -252,6 +287,7 @@ const Help = () => {
                         </h2>
                         <AccordionPanel pb={4}>
                           Unit testing is the process of testing individual units or modules to verify their functionality. These tests help to identify bugs or errors that can be addressed through bugfixing. Unit testing is also important for ensuring the quality of the software. Depending on the number of unit tests being conducted, it is possible that in an iteration, the "remaining tasks" may not be considered at all or given less priority.
+                          <Image src={unit_testing} w={1000} objectFit="contain" mx="auto" />
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -265,21 +301,7 @@ const Help = () => {
                         </h2>
                         <AccordionPanel pb={4}>
                           Integration testing should ideally be conducted towards the end of the project. After performing unit testing and bug fixing, integration testing is carried out to verify if the outcome of completed tasks functions correctly within the final product. Following integration testing, there may be additional tasks added to the "remaining tasks," which will increase the number of tasks. Integration testing is also crucial for ensuring high-quality end results. Depending on the number of integration tests being conducted, it is possible that in an iteration, the "remaining tasks" may not be considered at all or given less priority.
-                        </AccordionPanel>
-                      </AccordionItem>
-                      <AccordionItem>
-                        <h2>
-                          <AccordionButton>
-                            <Box flex='1' textAlign='left'>
-                              Model Selection - Project Management Method
-                            </Box>
-                            <AccordionIcon />
-                          </AccordionButton>
-                        </h2>
-                        <AccordionPanel pb={4}>
-                          At the beginning of the project, it is important to select the appropriate project management method. For the simulation, this decision is crucial as the approach varies for each method. The chosen method can influence the project flow and outcome in the simulation. There are different approaches available: Scrum, Kanban, and the Waterfall approach. Scrum and Kanban are agile methods that emphasize adaptability and engagement. Scrum is based on flexibility and active participation. It is characterized by short iterations, regular meetings, and close collaboration within the team. This iterative approach allows for changing requirements throughout the project. The high transparency and communication in Scrum enable effective collaboration.
-                          On the other hand, the Waterfall approach places a strong emphasis on detailed upfront planning. Therefore, the Waterfall approach is suitable when the requirements are well-defined from the beginning. Through its structured approach, the Waterfall method allows for precise planning, clear milestones, and accurate predictability of the project's progress. Scrum and Kanban are used when the requirements may change or need to be adapted during the project.
-
+                          <Image src={integration_testing} w={1000} objectFit="contain" mx="auto" />
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -293,6 +315,7 @@ const Help = () => {
                         </h2>
                         <AccordionPanel pb={4}>
                           Meetings are also an adjustable component in the simulation. The number of weekly meetings can be determined from week to week. Meetings provide an opportunity for team members to exchange information and ideas. They promote effective collaboration and enhance the familiarity of employees with the tasks and the project.                        </AccordionPanel>
+                        <Image src={meetings} w={1000} objectFit="contain" mx="auto" />
                       </AccordionItem>
                       <AccordionItem>
                         <h2>
@@ -305,6 +328,7 @@ const Help = () => {
                         </h2>
                         <AccordionPanel pb={4}>
                           Team events are adjustable activities in the simulation that aim to strengthen team cohesion and reduce stress. Team events can be utilized, for example, during stressful phases to lower the stress level. Their purpose is to create a positive and supportive team environment, fostering collaboration and reducing overall stress among team members.
+                          <Image src={team_event} w={1000} objectFit="contain" mx="auto" />
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -318,6 +342,7 @@ const Help = () => {
                         </h2>
                         <AccordionPanel pb={4}>
                           Training is an adjustable component in the simulation that provides the opportunity to enhance the skills and knowledge of employees. Through training, new skills can be learned, existing abilities can be further developed, and domain expertise can be expanded. By investing in training, employees can become more proficient in their tasks, increase their productivity, and reduce the error rate associated with task completion. Training plays a crucial role in improving the overall performance and capabilities of the team members within the simulation.
+                          <Image src={training} w={1000} objectFit="contain" mx="auto" />
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -331,6 +356,7 @@ const Help = () => {
                         </h2>
                         <AccordionPanel pb={4}>
                           The working hours of the employees can be adjusted here. The working hours have an impact on the number of tasks completed and on the level of stress. The more working hours are performed, the more tasks can be accomplished by the employees, but it also increases the level of stress.
+                          <Image src={overtime} w={1000} objectFit="contain" mx="auto" />
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
@@ -343,7 +369,9 @@ const Help = () => {
                           </AccordionButton>
                         </h2>
                         <AccordionPanel pb={4}>
-                          During the simulation, questions may arise to test the users' knowledge. These questions could relate to general project management topics or to the scenario itself. The progression of the simulation is not directly affected by the questions. It gives the user the opportunity to earn points by answering the questions correctly, which increases the overall score. The "Question Score" indicates the points achieved in the questions in the result.                        </AccordionPanel>
+                          During the simulation, questions may arise to test the users' knowledge. These questions could relate to general project management topics or to the scenario itself. The progression of the simulation is not directly affected by the questions. It gives the user the opportunity to earn points by answering the questions correctly, which increases the overall score. The "Question Score" indicates the points achieved in the questions in the result.
+                          <Image src={questions} w={700} objectFit="contain" mx="auto" />
+                        </AccordionPanel>
                       </AccordionItem>
                     </TabPanel>
 
