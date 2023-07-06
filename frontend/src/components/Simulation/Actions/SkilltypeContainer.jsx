@@ -4,6 +4,7 @@ import { Grid, IconButton, Tooltip } from "@chakra-ui/react";
 import { HiOutlineChevronDown, HiOutlineChevronLeft } from "react-icons/hi";
 import { useState, useEffect } from "react";
 import Skilltype from "./Skilltype";
+import {FaQuestionCircle} from "react-icons/fa";
 
 const SkilltypeContainer = ({
   skillTypeReturn,
@@ -13,6 +14,25 @@ const SkilltypeContainer = ({
   const [actionListExpanded, setActionListExpanded] = useState(false);
   const [skilltypes, setSkilltypes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTooltip, setActiveTooltip] = useState(null);
+
+  useEffect(() => {
+    const handleDocumentClick = (event) => {
+      if (activeTooltip && !event.target.closest('.tooltip-container')) {
+        setActiveTooltip(null);
+      }
+    };
+
+    document.addEventListener('click', handleDocumentClick);
+
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, [activeTooltip]);
+
+  const handleButtonClick = (tooltip) => {
+    setActiveTooltip(tooltip);
+  };
 
   useEffect(() => {
     fetchSkillTypes();
@@ -53,25 +73,30 @@ const SkilltypeContainer = ({
   return (
     <Grid borderRadius="xl">
       <ActionElement
-        title="Employees"
-        secondaryText="Hire employees"
-        icon={actionIcon.SKILLTYPE}
-        tooltip={
-          "Choose the necessary amount of the specific skilltype which is needed for the current project"
-        }
+          title={
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              Employees
+              <div className="tooltip-container" style={{ marginLeft: '8px' }}>
+                <Tooltip
+                    label="Choose the necessary amount of the specific skilltype which is needed for the current project"
+                    isOpen={activeTooltip === 'employees'}
+                >
+                  <button onClick={() => handleButtonClick('employees')}>
+                    <FaQuestionCircle size={12} />
+                  </button>
+                </Tooltip>
+              </div>
+            </div>
+          }
+          secondaryText="Hire employees"
+          icon={actionIcon.SKILLTYPE}
       >
         <IconButton
-          aria-label="Expand and collapse actions"
-          icon={
-            actionListExpanded ? (
-              <HiOutlineChevronDown />
-            ) : (
-              <HiOutlineChevronLeft />
-            )
-          }
-          variant="ghost"
-          size="md"
-          onClick={toggleActionList}
+            aria-label="Expand and collapse actions"
+            icon={actionListExpanded ? <HiOutlineChevronDown /> : <HiOutlineChevronLeft />}
+            variant="ghost"
+            size="md"
+            onClick={toggleActionList}
         />
       </ActionElement>
       {actionListExpanded && (
