@@ -49,8 +49,8 @@ import { FaAlignJustify } from "react-icons/fa";
 const CourseOverview = () => {
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { currentUser } = useContext(AuthContext);
   const [selectedCourse, setSelectedCourse] = useState({});
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [courseForm, setCourseForm] = useState({
     name: "",
@@ -573,29 +573,56 @@ const CourseOverview = () => {
                     marginLeft: '-2rem',
                     paddingLeft: '0.5rem',
                   }}>
-                    <Link
-                        to="/users"
-                        style={{
-                          fontSize: '1.5rem',
-                          marginBottom: '1rem',
-                          color: 'black',
-                          textDecoration: 'none',
-                          transition: 'background-color 0.3s',
-                          padding: '0.5rem',
-                          width: '108%',
-                        }}
-                        activeStyle={{ color: 'blue' }}
-                        onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = 'rgb(51, 120, 212)';
-                        e.target.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
-                        e.target.style.color = 'black';
-                        }}
-                    >
-                      Users
-                    </Link>
+                    {currentUser?.staff && (
+                        <>
+                          <Link
+                              to="/users"
+                              style={{
+                                fontSize: '1.5rem',
+                                marginBottom: '1rem',
+                                color: 'black',
+                                textDecoration: 'none',
+                                transition: 'background-color 0.3s',
+                                padding: '0.5rem',
+                                width: '108%',
+                              }}
+                              activeStyle={{ color: 'blue' }}
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                                e.target.style.color = 'white';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = 'transparent';
+                                e.target.style.color = 'black';
+                              }}
+                          >
+                            Users
+                          </Link>
+                          <Link
+                              to="/courses"
+                              style={{
+                                fontSize: '1.5rem',
+                                marginBottom: '1rem',
+                                color: 'white',
+                                textDecoration: 'none',
+                                transition: 'background-color 0.3s',
+                                padding: '0.5rem',
+                                width: '108%',
+                                backgroundColor: 'grey',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                                e.target.style.color = 'white';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = 'grey';
+                                e.target.style.color = 'white';
+                              }}
+                          >
+                            Courses
+                          </Link>
+                        </>
+                    )}
                     <Link
                         to="/scenariomanagement"
                         style={{
@@ -609,39 +636,15 @@ const CourseOverview = () => {
                         }}
                         activeStyle={{ color: 'blue' }}
                         onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = 'rgb(51, 120, 212)';
-                        e.target.style.color = 'white';
+                          e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                          e.target.style.color = 'white';
                         }}
                         onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
-                        e.target.style.color = 'black';
+                          e.target.style.backgroundColor = 'transparent';
+                          e.target.style.color = 'black';
                         }}
                     >
                       Scenarios
-                    </Link>
-                    <Link
-                        to="/courses"
-                        style={{
-                          fontSize: '1.5rem',
-                          marginBottom: '1rem',
-                          color: 'white',
-                          textDecoration: 'none',
-                          transition: 'background-color 0.3s',
-                          padding: '0.5rem',
-                          width: '108%',
-                          backgroundColor: 'grey',
-                        }}
-                        activeStyle={{ color: 'blue' }}
-                        onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = 'rgb(51, 120, 212)';
-                        e.target.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'grey';
-                        e.target.style.color = 'white';
-                        }}
-                    >
-                      Courses
                     </Link>
                   </div>
                 </DrawerBody>

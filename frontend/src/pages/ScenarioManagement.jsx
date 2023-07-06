@@ -64,6 +64,7 @@ const ScenarioManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isScoreCardModalOpen, setIsScoreCardModalOpen] = useState(false);
 
+
   const [scoreCardParams, setScoreCardParams] = useState({
     budget_p: "",
     time_p: "",
@@ -265,12 +266,15 @@ const ScenarioManagement = () => {
         <Box backgroundColor="white" borderRadius="2xl">
           <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
             <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
-              <Drawer isOpen={isOpen} placement="left" onClose={onClose} finalFocusRef={btnRef}>
+              <Drawer
+                  isOpen={isOpen}
+                  placement="left"
+                  onClose={onClose}
+                  finalFocusRef={btnRef}
+              >
                 <DrawerOverlay />
                 <DrawerContent>
-                  <DrawerHeader fontSize="xl" py={4}>
-                    Admin Panel
-                  </DrawerHeader>
+                  <DrawerHeader fontSize="xl" py={4}>Admin Panel</DrawerHeader>
                   <Divider />
                   <DrawerBody>
                     <div style={{
@@ -279,79 +283,83 @@ const ScenarioManagement = () => {
                       marginLeft: '-2rem',
                       paddingLeft: '0.5rem',
                     }}>
+                      {currentUser?.staff && (
+                          <>
+                            <Link
+                                to="/users"
+                                style={{
+                                  fontSize: '1.5rem',
+                                  marginBottom: '1rem',
+                                  color: 'black',
+                                  textDecoration: 'none',
+                                  transition: 'background-color 0.3s',
+                                  padding: '0.5rem',
+                                  width: '108%',
+                                }}
+                                activeStyle={{ color: 'blue' }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                                  e.target.style.color = 'white';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.backgroundColor = 'transparent';
+                                  e.target.style.color = 'black';
+                                }}
+                            >
+                              Users
+                            </Link>
+                            <Link
+                                to="/courses"
+                                style={{
+                                  fontSize: '1.5rem',
+                                  marginBottom: '1rem',
+                                  color: 'black',
+                                  textDecoration: 'none',
+                                  transition: 'background-color 0.3s',
+                                  padding: '0.5rem',
+                                  width: '108%',
+                                }}
+                                activeStyle={{ color: 'blue' }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                                  e.target.style.color = 'white';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.backgroundColor = 'transparent';
+                                  e.target.style.color = 'black';
+                                }}
+                            >
+                              Courses
+                            </Link>
+                          </>
+                      )}
                       <Link
-                        to="/users"
-                        style={{
-                          fontSize: "1.5rem",
-                          marginBottom: "1rem",
-                          color: "black",
-                          textDecoration: "none",
-                          transition: "background-color 0.3s",
-                          padding: "0.5rem",
-                          width: '108%',
-                        }}
-                        activeStyle={{ color: "blue" }}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = "rgb(51, 120, 212)";
-                          e.target.style.color = "white";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = "transparent";
-                          e.target.style.color = "black";
-                        }}
-                      >
-                        Users
-                      </Link>
-                      <Link
-                        to="/scenariomanagement"
-                        style={{
-                          fontSize: '1.5rem',
-                          marginBottom: '1rem',
-                          color: 'white',
-                          textDecoration: 'none',
-                          transition: 'background-color 0.3s',
-                          padding: '0.5rem',
-                          width: '108%',
-                          backgroundColor: 'grey',
-                        }}
-                        activeStyle={{ color: "blue" }}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = "rgb(51, 120, 212)";
-                          e.target.style.color = "white";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = "grey";
-                          e.target.style.color = "white";
-                        }}
+                          to="/scenariomanagement"
+                          style={{
+                            fontSize: '1.5rem',
+                            marginBottom: '1rem',
+                            color: 'white',
+                            textDecoration: 'none',
+                            transition: 'background-color 0.3s',
+                            padding: '0.5rem',
+                            width: '108%',
+                            backgroundColor: 'grey',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                            e.target.style.color = 'white';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'grey';
+                            e.target.style.color = 'white';
+                          }}
                       >
                         Scenarios
                       </Link>
-                      <Link
-                        to="/courses"
-                        style={{
-                          fontSize: "1.5rem",
-                          marginBottom: "1rem",
-                          color: "black",
-                          textDecoration: "none",
-                          transition: "background-color 0.3s",
-                          padding: "0.5rem",
-                          width: '108%',
-                        }}
-                        activeStyle={{ color: "blue" }}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = "rgb(51, 120, 212)";
-                          e.target.style.color = "white";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = "transparent";
-                          e.target.style.color = "black";
-                        }}
-                      >
-                        Courses
-                      </Link>
                     </div>
                   </DrawerBody>
-                  <DrawerFooter></DrawerFooter>
+                  <DrawerFooter>
+                  </DrawerFooter>
                 </DrawerContent>
               </Drawer>
               <Flex align="left">

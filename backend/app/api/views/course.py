@@ -44,7 +44,7 @@ class CourseView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["staff"])
     def post(self, request):
         course_name = request.data.get('name')
         if Course.objects.filter(name=course_name).exists():
@@ -62,7 +62,7 @@ class CourseView(APIView):
             serializer.errors, status=status.HTTP_400_BAD_REQUEST
         )
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["staff"])
     def delete(self, request, id):
         if id:
             try:
@@ -83,7 +83,7 @@ class CourseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["staff"])
     def put(self, request, id):
         try:
             course = Course.objects.get(id=id)
@@ -113,7 +113,7 @@ class CourseView(APIView):
 class CourseUserView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["staff"])
     def post(self, request, course_id):
         username = request.data.get('username')
         try:
@@ -154,7 +154,7 @@ class CourseUserView(APIView):
             status=status.HTTP_200_OK
         )
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["staff"])
     def delete(self, request, course_id: int):
         """
         Remove a user from course by username.
@@ -266,7 +266,7 @@ class CourseScenarioView(APIView):
 
         return Response(reponse_data, status=status.HTTP_200_OK)
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["staff"])
     def post(self, request, course_id):
         scenario_id = request.data.get('scenario_id')
 
@@ -311,7 +311,7 @@ class CourseScenarioView(APIView):
             status=status.HTTP_200_OK
         )
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["staff"])
     def delete(self, request, course_id):
         scenario_id = request.data.get('scenario_id')
 
