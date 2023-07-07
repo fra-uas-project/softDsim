@@ -101,14 +101,14 @@ const Navbar = () => {
         <Button variant="link" as={Link} to="/help" onClick={handleClick}>
           Help
         </Button>
-        {currentUser?.admin && (
+        {currentUser?.creator && (
             <Button variant="link" as={Link} to="/scenariomanagement" onClick={handleClick}>
               Admin Panel
             </Button>
         )}
       </HStack>
 
-      {currentUser?.staff && (
+      {currentUser?.creator && (
         <HStack direction="row" spacing={4} justifyContent="flex-end">
           <HStack
             borderRadius="full"

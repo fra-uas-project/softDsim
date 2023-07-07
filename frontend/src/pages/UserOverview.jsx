@@ -25,17 +25,19 @@ import {
   HStack,Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, DrawerFooter,
 } from "@chakra-ui/react";
 import { HiOutlineCheck, HiOutlineTrash, HiOutlineX } from "react-icons/hi";
-import React, { useEffect, useRef, useState } from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import { getCookie, role } from "../utils/utils";
 import AddUser from "../components/AddUser";
 import { Link } from "react-router-dom";
 import {FaAlignJustify} from "react-icons/fa";
+import {AuthContext} from "../context/AuthProvider";
 
 
 const UserOverview = () => {
   const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose: onRoleClose } = useDisclosure();
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const cancelRef = useRef();
+    const { currentUser, setCurrentUser } = useContext(AuthContext);
 
   window.value = 10;
 
@@ -134,98 +136,102 @@ const UserOverview = () => {
       <Box backgroundColor="white" borderRadius="2xl">
           <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
           <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
-            <Drawer
-                isOpen={isOpen}
-                placement="left"
-                onClose={onClose}
-                finalFocusRef={btnRef}
-            >
-              <DrawerOverlay />
-              <DrawerContent>
-                <DrawerHeader fontSize="xl" py={4}>Admin Panel</DrawerHeader>
-                <Divider />
-                <DrawerBody>
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        marginLeft: '-2rem',
-                        paddingLeft: '0.5rem',
-                    }}>
-                        <Link
-                            to="/users"
-                            style={{
-                                fontSize: '1.5rem',
-                                marginBottom: '1rem',
-                                color: 'white',
-                                textDecoration: 'none',
-                                transition: 'background-color 0.3s',
-                                padding: '0.5rem',
-                                width: '108%',
-                                backgroundColor: 'grey',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.target.style.backgroundColor = 'rgb(51, 120, 212)';
-                                e.target.style.color = 'white';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.backgroundColor = 'grey';
-                                e.target.style.color = 'white';
-                            }}
-                        >
-                            Users
-                        </Link>
-                    <Link
-                        to="/scenariomanagement"
-                        style={{
-                          fontSize: '1.5rem',
-                          marginBottom: '1rem',
-                          color: 'black',
-                          textDecoration: 'none',
-                          transition: 'background-color 0.3s',
-                          padding: '0.5rem',
-                            width: '108%',
-                        }}
-                        activeStyle={{ color: 'blue' }}
-                            onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = 'rgb(51, 120, 212)';
-                            e.target.style.color = 'white';
-                            }}
-                            onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = 'transparent';
-                            e.target.style.color = 'black';
-                            }}
-                    >
-                      Scenarios
-                    </Link>
-                    <Link
-                        to="/courses"
-                        style={{
-                          fontSize: '1.5rem',
-                          marginBottom: '1rem',
-                          color: 'black',
-                          textDecoration: 'none',
-                          transition: 'background-color 0.3s',
-                          padding: '0.5rem',
-                            width: '108%',
-                        }}
-                        activeStyle={{ color: 'blue' }}
-                            onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = 'rgb(51, 120, 212)';
-                            e.target.style.color = 'white';
-                            }}
-                            onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = 'transparent';
-                            e.target.style.color = 'black';
-                            }}
-                    >
-                      Courses
-                    </Link>
-                  </div>
-                </DrawerBody>
-                <DrawerFooter>
-                </DrawerFooter>
-              </DrawerContent>
-            </Drawer>
+              <Drawer
+                  isOpen={isOpen}
+                  placement="left"
+                  onClose={onClose}
+                  finalFocusRef={btnRef}
+              >
+                  <DrawerOverlay />
+                  <DrawerContent>
+                      <DrawerHeader fontSize="xl" py={4}>Admin Panel</DrawerHeader>
+                      <Divider />
+                      <DrawerBody>
+                          <div style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              marginLeft: '-2rem',
+                              paddingLeft: '0.5rem',
+                          }}>
+                              {currentUser?.staff && (
+                                  <>
+                                      <Link
+                                          to="/users"
+                                          style={{
+                                              fontSize: '1.5rem',
+                                              marginBottom: '1rem',
+                                              color: 'white',
+                                              textDecoration: 'none',
+                                              transition: 'background-color 0.3s',
+                                              padding: '0.5rem',
+                                              width: '108%',
+                                              backgroundColor: 'grey',
+                                          }}
+                                          onMouseEnter={(e) => {
+                                              e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                                              e.target.style.color = 'white';
+                                          }}
+                                          onMouseLeave={(e) => {
+                                              e.target.style.backgroundColor = 'grey';
+                                              e.target.style.color = 'white';
+                                          }}
+                                      >
+                                          Users
+                                      </Link>
+                                      <Link
+                                          to="/courses"
+                                          style={{
+                                              fontSize: '1.5rem',
+                                              marginBottom: '1rem',
+                                              color: 'black',
+                                              textDecoration: 'none',
+                                              transition: 'background-color 0.3s',
+                                              padding: '0.5rem',
+                                              width: '108%',
+                                          }}
+                                          activeStyle={{ color: 'blue' }}
+                                          onMouseEnter={(e) => {
+                                              e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                                              e.target.style.color = 'white';
+                                          }}
+                                          onMouseLeave={(e) => {
+                                              e.target.style.backgroundColor = 'transparent';
+                                              e.target.style.color = 'black';
+                                          }}
+                                      >
+                                          Courses
+                                      </Link>
+                                  </>
+                              )}
+                              <Link
+                                  to="/scenariomanagement"
+                                  style={{
+                                      fontSize: '1.5rem',
+                                      marginBottom: '1rem',
+                                      color: 'black',
+                                      textDecoration: 'none',
+                                      transition: 'background-color 0.3s',
+                                      padding: '0.5rem',
+                                      width: '108%',
+                                  }}
+                                  activeStyle={{ color: 'blue' }}
+                                  onMouseEnter={(e) => {
+                                      e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                                      e.target.style.color = 'white';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                      e.target.style.backgroundColor = 'transparent';
+                                      e.target.style.color = 'black';
+                                  }}
+                              >
+                                  Scenarios
+                              </Link>
+                          </div>
+                      </DrawerBody>
+                      <DrawerFooter>
+                      </DrawerFooter>
+                  </DrawerContent>
+              </Drawer>
             <Flex align="left">
               <Input
                 placeholder="Search"
