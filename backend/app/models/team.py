@@ -178,13 +178,13 @@ class Team(models.Model):
         # logging.warn(f"Task work took {time.perf_counter() - start} secs")
 
     # def work(workpack)
-    ## 1. meeting (done)
-    ## self.meeting(workpack) (zieht Zeit vom tag ab)
-    ## 2. training
-    ## self.training(workpack) (zieht Zeit vom tag ab)
+    # 1. meeting (done)
+    # self.meeting(workpack) (zieht Zeit vom tag ab)
+    # 2. training
+    # self.training(workpack) (zieht Zeit vom tag ab)
 
-    ## 3. ab hier geht um tasks
-    ## self.task_work()
+    # 3. ab hier geht um tasks
+    # self.task_work()
 
     def task_work(self, session: CachedScenario, hours: int, workpack: Workpack):
         tasks = session.tasks
@@ -222,16 +222,16 @@ class Team(models.Model):
                     )
                 n -= 1
 
-    ### 3. unit tests (poisson zahl z.B. *1.3, unit test könnte schneller gehen als task machen)
-    #### alle tasks aus db holen die unit tested werden müssen (TaskStatus.done() (sind alle tasks die done sind und jetzt unit tested werden können)
-    #### junior skill type würde leichte tasks nehmen, senior schwere (am anfang einfach zufällig)
-    #### TaskStatus.done() gibt liste mit done tasks zurück -> holen 12 zufällig raus -> setzen unit_tested auf True
-    #### (task hat status unit_tested wenn er unit tested wurde UND bug False; \\ hat status BUG wenn unit_tested true und bug true
-    ### 4. integration tests: kann tested werden wenn task den status unit_tested hat (testing, wird vielleicht nur von tester skill type gemacht (später irgendwann, jetzt einfach von developer))
-    ### wenn integration tested status -> höchster status den task haben kann (diesen status gibt es nur wenn BUG==False)
-    ### 5. bugfix
-    ### 6. tasks_machen (macht entwickler fehler oder nicht -> bug True/False)
-    ### brauchen fallback, wenn keine unit tests gibt dann sollen die stunden auf andere sachen verteilt werden
+    # 3. unit tests (poisson zahl z.B. *1.3, unit test könnte schneller gehen als task machen)
+    # alle tasks aus db holen die unit tested werden müssen (TaskStatus.done() (sind alle tasks die done sind und jetzt unit tested werden können)
+    # junior skill type würde leichte tasks nehmen, senior schwere (am anfang einfach zufällig)
+    # TaskStatus.done() gibt liste mit done tasks zurück -> holen 12 zufällig raus -> setzen unit_tested auf True
+    # (task hat status unit_tested wenn er unit tested wurde UND bug False; \\ hat status BUG wenn unit_tested true und bug true
+    # 4. integration tests: kann tested werden wenn task den status unit_tested hat (testing, wird vielleicht nur von tester skill type gemacht (später irgendwann, jetzt einfach von developer))
+    # wenn integration tested status -> höchster status den task haben kann (diesen status gibt es nur wenn BUG==False)
+    # 5. bugfix
+    # 6. tasks_machen (macht entwickler fehler oder nicht -> bug True/False)
+    # brauchen fallback, wenn keine unit tests gibt dann sollen die stunden auf andere sachen verteilt werden
 
     # def meeting(workpack)
     # for m in self.members:
@@ -248,25 +248,29 @@ class Team(models.Model):
 
 class SkillType(models.Model):
     name = models.CharField(max_length=32, unique=True)
-    cost_per_day = models.FloatField(validators=[MinValueValidator(0.0)], default=100)
+    cost_per_day = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=100)
     error_rate = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)], default=0.05
     )
-    throughput = models.FloatField(validators=[MinValueValidator(0.0)], default=1)
+    throughput = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=1)
     management_quality = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(100)], default=0
     )
     development_quality = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(100)], default=100
     )
-    signing_bonus = models.FloatField(validators=[MinValueValidator(0.0)], default=0)
+    signing_bonus = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0)
 
     def __str__(self):
         return self.name
 
 
 class Member(models.Model):
-    xp: float = models.FloatField(default=0.0, validators=[MinValueValidator(0.0)])
+    xp: float = models.FloatField(default=0.0, validators=[
+                                  MinValueValidator(0.0)])
     motivation = models.FloatField(
         default=0.75, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
@@ -277,7 +281,8 @@ class Member(models.Model):
     stress = models.FloatField(
         default=0.1, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="members")
+    team = models.ForeignKey(
+        Team, on_delete=models.CASCADE, related_name="members")
     skill_type = models.ForeignKey(
         SkillType,
         on_delete=models.CASCADE,
@@ -292,11 +297,14 @@ class Member(models.Model):
     @property
     def efficiency(self) -> float:
         """Returns the efficiency of the member"""
-        
+
         def st(s):
             return 1 - (abs(s - 0.2))  # 0.2 is the ideal stress level
 
-        return sum([self.familiarity, self.motivation, st(self.stress)]) / 3
+        sum: float = sum(
+            [self.familiarity, self.motivation, st(self.stress)]) / 3
+
+        return sum
 
     def calculate_familiarity(self, solved_tasks):
         if solved_tasks > 0:
@@ -329,7 +337,8 @@ class Member(models.Model):
         difficulty and the member's skill."""
 
         # Get difference between task difficulty and member's skill
-        diff = self.skill_type.development_quality - (task.difficulty / 3) * 100
+        diff = self.skill_type.development_quality - \
+            (task.difficulty / 3) * 100
 
         # If the task difficulty fits the skill type's development quality, motivation goes up
         # If not (too easy or too difficult) motivation goes down
