@@ -94,7 +94,8 @@ def simulate(req, session: CachedScenario) -> None:
                 raise SimulationException(msg)
             if m.change > 0:
                 for _ in range(m.change):
-                    new_member = Member(skill_type=s, team=session.scenario.team)
+                    new_member = Member(
+                        skill_type=s, team=session.scenario.team)
                     new_member.save()
             else:
                 list_of_members = Member.objects.filter(
@@ -125,13 +126,14 @@ def simulate(req, session: CachedScenario) -> None:
     # check if there are members to work
     if len(session.members) > 0:
         # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
-        ## scenario.team.work(workpack) (ein tag simuliert)
+        # scenario.team.work(workpack) (ein tag simuliert)
         for day in range(0, days):
             session.scenario.team.work(session, workpack, workpack_status, day)
             session.scenario.state.day += 1
             for member in session.members:
                 member.calculate_familiarity(len(session.tasks.solved()))
-        logging.warning(f"Team work took {time.perf_counter() - start} seconds")
+        logging.warning(
+            f"Team work took {time.perf_counter() - start} seconds")
     else:
         logging.info(
             "There are no members in the team, so there is nothing to simulate."
@@ -146,7 +148,8 @@ def simulate(req, session: CachedScenario) -> None:
 
     # team event
     if req.actions.teamevent:
-        cost = len(session.members) * session.scenario.config.cost_member_team_event
+        cost = len(session.members) * \
+            session.scenario.config.cost_member_team_event
         session.scenario.state.cost += cost
         session.scenario.state.day += 1
         for member in session.members:
@@ -154,6 +157,19 @@ def simulate(req, session: CachedScenario) -> None:
             member.stress = member.stress * 0.5
             # Motivation is increased by 20% ?
             member.motivation = min((member.motivation * 1.2, 1))
+
+    diverse: bool = False
+    m_ids = set()
+    for m in session.members:
+        m_ids.add(m.id)
+        if len(m_ids) > 3:
+            diverse = True
+            break
+
+    if diverse:
+        for member in session.members:
+            # Stress is reduced by 50% ?
+            member.efficiency = min(member.efficiency*1.1, 1)
 
 
 def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
@@ -197,7 +213,8 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
     event = event_triggered(session)
     if isinstance(event, Event):
         scenario_response = EventResponse(
-            event_text=event.text,  # todo philip: don't know which one frontend wants to use, can delete one of the two text fields later
+            # todo philip: don't know which one frontend wants to use, can delete one of the two text fields later
+            event_text=event.text,
             text=event.text,
             effects=get_effects_from_event(event),
             management=session.scenario.get_management_goal_dto(),
