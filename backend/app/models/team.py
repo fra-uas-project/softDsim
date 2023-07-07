@@ -297,14 +297,20 @@ class Member(models.Model):
     @property
     def efficiency(self) -> float:
         """Returns the efficiency of the member"""
+        m_ids = set()
 
         def st(s):
             return 1 - (abs(s - 0.2))  # 0.2 is the ideal stress level
 
-        sum: float = sum(
-            [self.familiarity, self.motivation, st(self.stress)]) / 3
+        sum_val = (self.familiarity + self.motivation + st(self.stress)) / 3
 
-        return sum
+        for m in self.team.members.all():
+            m_ids.add(m.id)
+
+        if len(m_ids) > 3:
+            return min(sum_val * 1.1, 1)
+        else:
+            return sum_val
 
     def calculate_familiarity(self, solved_tasks):
         if solved_tasks > 0:
@@ -316,9 +322,9 @@ class Member(models.Model):
         As a second variable it also returns the poisson value it created.
         """
         mu = (
-            hours
-            * ((self.efficiency + self.team.efficiency(session)) / 2)
-            * (self.skill_type.throughput + self.xp)
+                hours
+                * ((self.efficiency + self.team.efficiency(session)) / 2)
+                * (self.skill_type.throughput + self.xp)
         )
 
         # varying degrees of randomness (none=no randomness, semi=some randomness, full=full randomness)

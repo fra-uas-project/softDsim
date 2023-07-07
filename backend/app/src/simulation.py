@@ -70,7 +70,6 @@ def simulate(req, session: CachedScenario) -> None:
         raise RequestActionException()
 
     normal_work_hour_day: int = 8
-
     workpack = req.actions
     # logging.info(f"Workpack: {workpack}")
     days = workpack.days
@@ -80,6 +79,10 @@ def simulate(req, session: CachedScenario) -> None:
         raise TooManyMeetingsException(
             (workpack.meetings / days), (normal_work_hour_day + workpack.overtime)
         )
+
+
+
+
 
     start = time.perf_counter()
     if req.members and req.members != []:
@@ -123,6 +126,10 @@ def simulate(req, session: CachedScenario) -> None:
 
     workpack_status = WorkpackStatus(days, workpack)
 
+
+
+
+
     # check if there are members to work
     if len(session.members) > 0:
         # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
@@ -157,19 +164,6 @@ def simulate(req, session: CachedScenario) -> None:
             member.stress = member.stress * 0.5
             # Motivation is increased by 20% ?
             member.motivation = min((member.motivation * 1.2, 1))
-
-    diverse: bool = False
-    m_ids = set()
-    for m in session.members:
-        m_ids.add(m.id)
-        if len(m_ids) > 3:
-            diverse = True
-            break
-
-    if diverse:
-        for member in session.members:
-            # Stress is reduced by 50% ?
-            member.efficiency = min(member.efficiency*1.1, 1)
 
 
 def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
