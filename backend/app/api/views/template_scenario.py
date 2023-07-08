@@ -100,10 +100,10 @@ class TemplateScenarioView(APIView):
 
     @allowed_roles(["creator", "staff"])
     def delete(self, request, scenario_id=None):
-
         try:
             template_scenario = get_object_or_404(
                 TemplateScenario, id=scenario_id)
+
             serializer = TemplateScenarioSerializer(template_scenario)
             template_scenario.delete()
 
@@ -116,7 +116,7 @@ class TemplateScenarioView(APIView):
 
         except Exception as e:
             logging.error(
-                f"{e.__class__.__name__} occurred in DELETE template-scenario with id {id}"
+                f"{e.__class__.__name__} occurred in DELETE template-scenario with id {scenario_id}"
             )
             return Response(
                 {"status": "something went wrong internally"},
