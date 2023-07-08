@@ -22,7 +22,9 @@ def calc_scores(scenario: UserScenario, tasks: CachedTasks) -> dict:
 
     total_positive_points = 0
 
-    template_scenario = scenario.template_scenario
+    template_scenario = scenario.template
+    print("TEMPLATE",template_scenario);
+
     questions = template_scenario.questions.all();
     for question in questions:
         answers = Answer.objects.filter(question=question)
@@ -30,12 +32,16 @@ def calc_scores(scenario: UserScenario, tasks: CachedTasks) -> dict:
              if answer.points > 0:
                         total_positive_points += answer.points
     print("MAX",total_positive_points);
+
+
+
     return {
         "quality_score": quality_score,
         "time_score": time_score,
         "budget_score": budget_score,
         "question_score": scenario.question_points,
-        "total_score" : ((quality_score + time_score + budget_score + scenario.question_points) /(300 + max(total_positive_points, 0)))*100
+        #"total_score" : ((quality_score + time_score + budget_score + scenario.question_points) /(300 + max(total_positive_points, 0)))*100
+        "total_score" : ((quality_score + time_score + budget_score + scenario.question_points) /(300))*100
     ,
     }
 
