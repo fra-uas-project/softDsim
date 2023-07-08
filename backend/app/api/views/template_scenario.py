@@ -100,7 +100,6 @@ class TemplateScenarioView(APIView):
 
     @allowed_roles(["creator", "staff"])
     def delete(self, request, scenario_id=None):
-        print("IDDDDDDD",scenario_id);
         try:
             template_scenario = get_object_or_404(
                 TemplateScenario, id=scenario_id)
