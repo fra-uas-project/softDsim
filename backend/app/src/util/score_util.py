@@ -24,7 +24,6 @@ def calc_scores(scenario: UserScenario, tasks: CachedTasks) -> dict:
     total_positive_points = 0
 
     template_scenario = scenario.template
-    print("TEMPLATE", template_scenario);
 
     question_collections = template_scenario.question_collections.all()
     for question_collection in question_collections:
