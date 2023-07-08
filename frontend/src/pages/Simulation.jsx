@@ -16,6 +16,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Spacer,
+  useToast,
   Tooltip,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -31,6 +32,8 @@ import { getCookie } from "../utils/utils";
 import Dashboard from "../components/Simulation/Dashboard/Dashboard";
 import MarkdownDisplay from "../components/MarkdownDisplay";
 import SkilltypeContainer from "../components/Simulation/Actions/SkilltypeContainer";
+
+
 
 import { Spinner } from "@chakra-ui/react";
 
@@ -86,6 +89,9 @@ const Simulation = () => {
   // save maximum number of task
   const [tasksMax, setTasksMax] = useState(0);
 
+  const toast = useToast();
+
+
   // default values for actions
   const [actionDefaultValues, setActionDefaultValues] = useState({
     bugfix: false,
@@ -114,7 +120,11 @@ const Simulation = () => {
         question_collection: event,
       };
       setReturnValues(tempReturnValues);
-      setDataValidationStatus(true);
+
+      const allQuestionsAnswered = event.questions.every(question => {
+        return question.answers.some(answer => answer.answer);
+      });
+      setDataValidationStatus(allQuestionsAnswered);
     } else if (currentType === "SIMULATION") {
       var tempSimFragmentActions = simFragmentActions;
 
