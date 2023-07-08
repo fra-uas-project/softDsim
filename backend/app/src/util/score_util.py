@@ -3,6 +3,7 @@ from app.models.score_card import ScoreCard
 from app.models.task import CachedTasks
 from app.models.management_goal import ManagementGoal
 from app.models.user_scenario import UserScenario
+from app.models.answer import Answer
 
 
 def calc_scores(scenario: UserScenario, tasks: CachedTasks) -> dict:
@@ -23,27 +24,27 @@ def calc_scores(scenario: UserScenario, tasks: CachedTasks) -> dict:
     total_positive_points = 0
 
     template_scenario = scenario.template
-    print("TEMPLATE",template_scenario);
+    print("TEMPLATE", template_scenario);
 
-    questions = template_scenario.questions.all();
+    question_collections = template_scenario.question_collections.all()
+    for question_collection in question_collections:
+        questions = question_collection.questions.all()
+
     for question in questions:
         answers = Answer.objects.filter(question=question)
         for answer in answers:
-             if answer.points > 0:
-                        total_positive_points += answer.points
-    print("MAX",total_positive_points);
-
-
+            if answer.points > 0:
+                total_positive_points += answer.points
 
     return {
         "quality_score": quality_score,
         "time_score": time_score,
         "budget_score": budget_score,
         "question_score": scenario.question_points,
-        #"total_score" : ((quality_score + time_score + budget_score + scenario.question_points) /(300 + max(total_positive_points, 0)))*100
-        "total_score" : ((quality_score + time_score + budget_score + scenario.question_points) /(300))*100
-    ,
+        "total_score" : ((quality_score + time_score + budget_score + scenario.question_points) /(300 + max(total_positive_points, 0)))*100
+        ,
     }
+
 
 def calc_time_score(actual_time, scheduled_time, limit, p) -> int:
     if scheduled_time == 0:
@@ -67,4 +68,3 @@ def calc_quality_score(tasks, err, limit, k) -> int:
     if tasks == 0:
         return 0
     return int((1 - (err / tasks)) ** k * limit)
-
