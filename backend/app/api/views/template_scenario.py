@@ -535,7 +535,7 @@ def handle_event(data, scenario: TemplateScenario, i):
     event = Event()
 
     event.template_scenario = scenario
-    event.text = data['displayName']
+    event.text = data['text']
     event.trigger_type = data['trigger_type']
     event.trigger_comparator = data['trigger_comparator']
 
