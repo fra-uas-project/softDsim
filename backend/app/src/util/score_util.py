@@ -25,16 +25,15 @@ def calc_scores(scenario: UserScenario, tasks: CachedTasks) -> dict:
 
     template_scenario = scenario.template
 
-    question_collections = template_scenario.question_collections.all()
-    for question_collection in question_collections:
-        questions = question_collection.questions.all()
-
-    if questions.exists:
-        for question in questions:
-            answers = Answer.objects.filter(question=question)
-            for answer in answers:
-                if answer.points > 0:
-                    total_positive_points += answer.points
+    if hasattr(template_scenario, 'question_collections'):
+        question_collections = template_scenario.question_collections.all()
+        for question_collection in question_collections:
+            questions = question_collection.questions.all()
+            for question in questions:
+                answers = Answer.objects.filter(question=question)
+                for answer in answers:
+                    if answer.points > 0:
+                        total_positive_points += answer.points
 
     return {
         "quality_score": quality_score,
