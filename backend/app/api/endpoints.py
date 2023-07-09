@@ -16,7 +16,7 @@ from app.api.views.simulation import (
     StartUserScenarioView,
     NextStepView,
 )
-from app.api.views.team import SkillTypeView, TeamViews, MemberView
+from app.api.views.team import SkillTypeView, TeamViews, MemberView, SkillTypeInfoView
 # all request with /api/ land here (see softDsim/urls.py)
 from app.api.views.template_scenario import (
     TemplateScenarioUserListView,
@@ -77,6 +77,8 @@ urlpatterns = [
     path("member/<int:id>", MemberView.as_view()),
     path("skill-type", SkillTypeView.as_view()),
     path("skill-type/<int:id>", SkillTypeView.as_view()),
+    path("skill-type/<int:skilltype_id>/info", SkillTypeInfoView.as_view()),
+
     # scenario config
     path("scenario-config", ScenarioConfigView.as_view()),
     path("scenario-config/<str:id>", ScenarioConfigView.as_view()),
