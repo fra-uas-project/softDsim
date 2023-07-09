@@ -41,3 +41,5 @@ docs/_*
 */simulation_framework/simulation_data/*
 
 */*.env
+
+backend/app/migrations/*
