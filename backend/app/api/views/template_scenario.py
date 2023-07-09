@@ -725,3 +725,31 @@ class ScenarioCoursesView(APIView):
         } for course in courses]
 
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+
+    @allowed_roles(["staff"])
+    def delete(self, request, scenario_id):
+         """
+         Remove a scenario from all the associated courses.
+         """
+         try:
+            scenario_id = int(scenario_id)
+            if scenario_id < 1:
+                raise ValueError(f"Invalid scenario ID: {scenario_id}")
+         except ValueError as e:
+             return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+             )
+
+         scenario = get_object_or_404(TemplateScenario, id=scenario_id)
+         courses = Course.objects.filter(scenarios__id=scenario_id)
+
+         for course in courses:
+            course.scenarios.remove(scenario)
+
+         return Response(
+            {"status": f"Scenario {scenario_id} removed from all associated courses."},
+            status=status.HTTP_200_OK
+         )

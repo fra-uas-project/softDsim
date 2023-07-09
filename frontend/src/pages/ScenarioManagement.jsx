@@ -38,7 +38,6 @@ import {
   Drawer,
   DrawerOverlay,
   DrawerContent,
-  DrawerCloseButton,
   DrawerHeader,
   DrawerBody,
   DrawerFooter,
@@ -83,6 +82,32 @@ const ScenarioManagement = () => {
   const btnRef = React.useRef();
 
   window.value = 10;
+
+
+  const handleRemoveFromAllCourses = async (scenario) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${scenario.id}/courses`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        toast({
+          title: `Scenario removed from all courses`,
+          status: 'success',
+          duration: 5000,
+        });
+      } else {
+        throw new Error('Failed to remove scenario from all courses');
+      }
+    } catch (error) {
+      toast({
+        title: `Error: ${error.message}`,
+        status: 'error',
+        duration: 5000,
+      });
+    }
+  };
 
   const handleDeleteCourse = async (courseId, scenarioId) => {
     try {
@@ -488,7 +513,7 @@ const ScenarioManagement = () => {
                                               Delete
                                             </MenuItem>
                                             <MenuItem onClick={() => { handleCourses(scenario); setSelectedScenario(scenario); }}>Courses</MenuItem>
-                                            <MenuItem>Remove from all Courses</MenuItem>
+                                            <MenuItem onClick={() => handleRemoveFromAllCourses(scenario)}>Remove from all Courses</MenuItem>
                                             <MenuItem onClick={() => handleScoreCardParams(scenario)}>Score card</MenuItem>
                                           </MenuList>
                                         </Menu>
