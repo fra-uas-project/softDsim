@@ -22,7 +22,7 @@ from app.api.views.template_scenario import (
     TemplateScenarioUserListView,
     TemplateScenarioView,
     StudioTemplateScenarioView,
-    TemplateScenarioFromStudioView, StudioTemplateScenarioIsPublishedValidatorView
+    TemplateScenarioFromStudioView, StudioTemplateScenarioIsPublishedValidatorView, ScenarioCoursesView
 )
 from app.api.views.user import UserView
 # from app.api.views.sim_api import ParameterSimulation
@@ -106,5 +106,8 @@ urlpatterns = [
 
     ##
     path('courses/user-scenarios', UserCoursesView.as_view(), name='course-detail'),
+
+    path("template-scenario/<int:scenario_id>/courses", ScenarioCoursesView.as_view())
+
 
 ]

@@ -43,7 +43,7 @@ import {
   DrawerBody,
   DrawerFooter,
   Divider,
-  FormHelperText,
+  FormHelperText, Text,
 } from "@chakra-ui/react";
 import { FaAlignJustify } from "react-icons/fa";
 import React, { useEffect, useRef, useState } from "react";
@@ -53,6 +53,7 @@ import { AuthContext } from "../context/AuthProvider";
 import { useContext } from "react";
 import { IoIosMenu } from "react-icons/io";
 import { Link } from "react-router-dom";
+import {BsFillTrashFill} from "react-icons/bs";
 
 const ScenarioManagement = () => {
   const [scenarios, setScenarios] = useState([]);
@@ -64,7 +65,8 @@ const ScenarioManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isScoreCardModalOpen, setIsScoreCardModalOpen] = useState(false);
 
-
+  const [isCoursesModalOpen, setIsCoursesModalOpen] = useState(false);
+  const [courses, setCourses] = useState([]);
   const [scoreCardParams, setScoreCardParams] = useState({
     budget_p: "",
     time_p: "",
@@ -82,6 +84,64 @@ const ScenarioManagement = () => {
 
   window.value = 10;
 
+  const handleDeleteCourse = async (courseId, scenarioId) => {
+    try {
+      if (scenarioId === null || scenarioId === undefined) {
+        throw new Error("Invalid scenario ID");
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/${courseId}/scenarios`, {
+        method: "DELETE",
+        credentials: "include",
+        body: JSON.stringify({ scenario_id: scenarioId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        await response.json();
+        toast({
+          title: `Scenario has been removed from course`,
+          status: "success",
+          duration: 5000,
+        });
+
+        const updatedCourses = courses.filter((course) => course.id !== courseId);
+        setCourses(updatedCourses);
+      } else {
+        throw new Error("Deletion failed");
+      }
+    } catch (error) {
+      toast({
+        title: `Could not delete Scenario: ${error.message}`,
+        status: "error",
+        duration: 5000,
+      });
+    }
+  };
+
+  const fetchCourses = async (scenario) => {
+    try {
+      const res = await fetch(
+          `${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${scenario.id}/courses`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+      );
+      const data = await res.json();
+      setCourses(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCourses = (scenario) => {
+    setIsCoursesModalOpen(true);
+    fetchCourses(scenario);
+  };
+
   const handleScoreCardParams = async (scenario) => {
     setSelectedScenario(scenario);
     await fetchScoreCard(scenario.id);
@@ -91,11 +151,11 @@ const ScenarioManagement = () => {
   const fetchScoreCard = async (selectedScenarioId) => {
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${selectedScenarioId}/score-card`,
-        {
-          method: "GET",
-          credentials: "include",
-        },
+          `${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${selectedScenarioId}/score-card`,
+          {
+            method: "GET",
+            credentials: "include",
+          },
       );
       const data = await res.json();
       setScoreCardParams(data);
@@ -121,29 +181,29 @@ const ScenarioManagement = () => {
       },
       body: JSON.stringify(requestBody),
     })
-      .then((response) => {
-        if (response.ok) {
+        .then((response) => {
+          if (response.ok) {
+            toast({
+              title: `Score card has been updated`,
+              status: "success",
+              duration: 5000,
+            });
+            setIsScoreCardModalOpen(false);
+          } else {
+            toast({
+              title: "Failed to update score card",
+              status: "error",
+              duration: 5000,
+            });
+          }
+        })
+        .catch((error) => {
           toast({
-            title: `Score card has been updated`,
-            status: "success",
-            duration: 5000,
-          });
-          setIsScoreCardModalOpen(false);
-        } else {
-          toast({
-            title: "Failed to update score card",
+            title: "An error occurred",
             status: "error",
             duration: 5000,
           });
-        }
-      })
-      .catch((error) => {
-        toast({
-          title: "An error occurred",
-          status: "error",
-          duration: 5000,
         });
-      });
   };
 
   const fetchScenarios = async () => {
@@ -252,341 +312,386 @@ const ScenarioManagement = () => {
   }, []);
 
   return (
-    <>
-      <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-        <Flex alignItems="center">
-          <Button ref={btnRef} colorScheme="blue" onClick={onOpen} mr={4}>
-            <FaAlignJustify />
-          </Button>
-          <Heading as="h2" size="lg">
-            Scenarios
-          </Heading>
-        </Flex>
-        <Box h={5}></Box>
-        <Box backgroundColor="white" borderRadius="2xl">
-          <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
-            <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
-              <Drawer
-                  isOpen={isOpen}
-                  placement="left"
-                  onClose={onClose}
-                  finalFocusRef={btnRef}
-              >
-                <DrawerOverlay />
-                <DrawerContent>
-                  <DrawerHeader fontSize="xl" py={4}>Admin Panel</DrawerHeader>
-                  <Divider />
-                  <DrawerBody>
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      marginLeft: '-2rem',
-                      paddingLeft: '0.5rem',
-                    }}>
-                      {currentUser?.staff && (
-                          <>
-                            <Link
-                                to="/users"
-                                style={{
-                                  fontSize: '1.5rem',
-                                  marginBottom: '1rem',
-                                  color: 'black',
-                                  textDecoration: 'none',
-                                  transition: 'background-color 0.3s',
-                                  padding: '0.5rem',
-                                  width: '108%',
-                                }}
-                                activeStyle={{ color: 'blue' }}
-                                onMouseEnter={(e) => {
-                                  e.target.style.backgroundColor = 'rgb(51, 120, 212)';
-                                  e.target.style.color = 'white';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.target.style.backgroundColor = 'transparent';
-                                  e.target.style.color = 'black';
-                                }}
-                            >
-                              Users
-                            </Link>
-                            <Link
-                                to="/courses"
-                                style={{
-                                  fontSize: '1.5rem',
-                                  marginBottom: '1rem',
-                                  color: 'black',
-                                  textDecoration: 'none',
-                                  transition: 'background-color 0.3s',
-                                  padding: '0.5rem',
-                                  width: '108%',
-                                }}
-                                activeStyle={{ color: 'blue' }}
-                                onMouseEnter={(e) => {
-                                  e.target.style.backgroundColor = 'rgb(51, 120, 212)';
-                                  e.target.style.color = 'white';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.target.style.backgroundColor = 'transparent';
-                                  e.target.style.color = 'black';
-                                }}
-                            >
-                              Courses
-                            </Link>
-                          </>
-                      )}
-                      <Link
-                          to="/scenariomanagement"
-                          style={{
-                            fontSize: '1.5rem',
-                            marginBottom: '1rem',
-                            color: 'white',
-                            textDecoration: 'none',
-                            transition: 'background-color 0.3s',
-                            padding: '0.5rem',
-                            width: '108%',
-                            backgroundColor: 'grey',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = 'rgb(51, 120, 212)';
-                            e.target.style.color = 'white';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = 'grey';
-                            e.target.style.color = 'white';
-                          }}
-                      >
-                        Scenarios
-                      </Link>
-                    </div>
-                  </DrawerBody>
-                  <DrawerFooter>
-                  </DrawerFooter>
-                </DrawerContent>
-              </Drawer>
-              <Flex align="left">
-                <Input
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{
-                    width: "200px",
-                    border: "1px solid #333",
-                    color: "#555",
-                    paddingLeft: "0.5rem",
-                  }}
-                />
-              </Flex>
-            </HStack>
-            {isLoading ? (
-              <Flex w="full" justifyContent="center" alignItems="center">
-                <Spinner size="xl" />
-              </Flex>
-            ) : (
-              <TableContainer overflowY="auto" h="full">
-                <Table variant="simple" size="lg">
-                  <Thead>
-                    <Tr>
-                      <Th color="gray.400">ID</Th>
-                      <Th color="gray.400">Name</Th>
-                      <Th color="gray.400"></Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {scenarios
-                      .filter((scenario) => scenario.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                      .map((scenario, index) => {
-                        return (
-                          <Tr key={index}>
-                            <Td fontWeight="500">{scenario.id}</Td>
-                            <Td fontWeight="500">
-                              <Button
-                                variant="link"
-                                color="black"
-                                onClick={() => {
-                                  navigate(`${scenario.id}`, { state: scenario });
-                                }}
+      <>
+        <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
+          <Flex alignItems="center">
+            <Button ref={btnRef} colorScheme="blue" onClick={onOpen} mr={4}>
+              <FaAlignJustify />
+            </Button>
+            <Heading as="h2" size="lg">
+              Scenarios
+            </Heading>
+          </Flex>
+          <Box h={5}></Box>
+          <Box backgroundColor="white" borderRadius="2xl">
+            <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
+              <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
+                <Drawer
+                    isOpen={isOpen}
+                    placement="left"
+                    onClose={onClose}
+                    finalFocusRef={btnRef}
+                >
+                  <DrawerOverlay />
+                  <DrawerContent>
+                    <DrawerHeader fontSize="xl" py={4}>Admin Panel</DrawerHeader>
+                    <Divider />
+                    <DrawerBody>
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        marginLeft: '-2rem',
+                        paddingLeft: '0.5rem',
+                      }}>
+                        {currentUser?.staff && (
+                            <>
+                              <Link
+                                  to="/users"
+                                  style={{
+                                    fontSize: '1.5rem',
+                                    marginBottom: '1rem',
+                                    color: 'black',
+                                    textDecoration: 'none',
+                                    transition: 'background-color 0.3s',
+                                    padding: '0.5rem',
+                                    width: '108%',
+                                  }}
+                                  activeStyle={{ color: 'blue' }}
+                                  onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                                    e.target.style.color = 'white';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = 'transparent';
+                                    e.target.style.color = 'black';
+                                  }}
                               >
-                                {scenario.name}
-                              </Button>
-                            </Td>
-                            <Td>
-                              <div style={{ padding: "0 0 0 70%" }}>
-                                <Menu>
-                                  <MenuButton
-                                    as={Button}
-                                    variant="ghost"
-                                    colorScheme="black"
-                                    rightIcon={<IoIosMenu style={{ fontSize: "18px" }} />}
-                                  ></MenuButton>
-                                  <MenuList>
-                                    <MenuItem onClick={() => downloadScenario(scenario)}>Download Data</MenuItem>
-                                    <MenuItem
-                                      onClick={() => {
-                                        onDeleteOpen();
-                                        setSelectedScenario(scenario);
-                                      }}
-                                    >
-                                      Delete
-                                    </MenuItem>
-                                    <MenuItem>Courses</MenuItem>
-                                    <MenuItem>Remove from all Courses</MenuItem>
-                                    <MenuItem onClick={() => handleScoreCardParams(scenario)}>Score card</MenuItem>
-                                  </MenuList>
-                                </Menu>
-                              </div>
-                            </Td>
-                          </Tr>
-                        );
-                      })}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            )}
-          </Container>
-        </Box>
-      </Flex>
+                                Users
+                              </Link>
+                              <Link
+                                  to="/courses"
+                                  style={{
+                                    fontSize: '1.5rem',
+                                    marginBottom: '1rem',
+                                    color: 'black',
+                                    textDecoration: 'none',
+                                    transition: 'background-color 0.3s',
+                                    padding: '0.5rem',
+                                    width: '108%',
+                                  }}
+                                  activeStyle={{ color: 'blue' }}
+                                  onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                                    e.target.style.color = 'white';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = 'transparent';
+                                    e.target.style.color = 'black';
+                                  }}
+                              >
+                                Courses
+                              </Link>
+                            </>
+                        )}
+                        <Link
+                            to="/scenariomanagement"
+                            style={{
+                              fontSize: '1.5rem',
+                              marginBottom: '1rem',
+                              color: 'white',
+                              textDecoration: 'none',
+                              transition: 'background-color 0.3s',
+                              padding: '0.5rem',
+                              width: '108%',
+                              backgroundColor: 'grey',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = 'rgb(51, 120, 212)';
+                              e.target.style.color = 'white';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'grey';
+                              e.target.style.color = 'white';
+                            }}
+                        >
+                          Scenarios
+                        </Link>
+                      </div>
+                    </DrawerBody>
+                    <DrawerFooter>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
+                <Flex align="left">
+                  <Input
+                      placeholder="Search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      style={{
+                        width: "200px",
+                        border: "1px solid #333",
+                        color: "#555",
+                        paddingLeft: "0.5rem",
+                      }}
+                  />
+                </Flex>
+              </HStack>
+              {isLoading ? (
+                  <Flex w="full" justifyContent="center" alignItems="center">
+                    <Spinner size="xl" />
+                  </Flex>
+              ) : (
+                  <TableContainer overflowY="auto" h="full">
+                    <Table variant="simple" size="lg">
+                      <Thead>
+                        <Tr>
+                          <Th color="gray.400">ID</Th>
+                          <Th color="gray.400">Name</Th>
+                          <Th color="gray.400"></Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {scenarios
+                            .filter((scenario) => scenario.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                            .map((scenario, index) => {
+                              return (
+                                  <Tr key={index}>
+                                    <Td fontWeight="500">{scenario.id}</Td>
+                                    <Td fontWeight="500">
+                                      <Button
+                                          variant="link"
+                                          color="black"
+                                          onClick={() => {
+                                            navigate(`${scenario.id}`, { state: scenario });
+                                          }}
+                                      >
+                                        {scenario.name}
+                                      </Button>
+                                    </Td>
+                                    <Td>
+                                      <div style={{ padding: "0 0 0 70%" }}>
+                                        <Menu>
+                                          <MenuButton
+                                              as={Button}
+                                              variant="ghost"
+                                              colorScheme="black"
+                                              rightIcon={<IoIosMenu style={{ fontSize: "18px" }} />}
+                                          ></MenuButton>
+                                          <MenuList>
+                                            <MenuItem onClick={() => downloadScenario(scenario)}>Download Data</MenuItem>
+                                            <MenuItem
+                                                onClick={() => {
+                                                  onDeleteOpen();
+                                                  setSelectedScenario(scenario);
+                                                }}
+                                            >
+                                              Delete
+                                            </MenuItem>
+                                            <MenuItem onClick={() => { handleCourses(scenario); setSelectedScenario(scenario); }}>Courses</MenuItem>
+                                            <MenuItem>Remove from all Courses</MenuItem>
+                                            <MenuItem onClick={() => handleScoreCardParams(scenario)}>Score card</MenuItem>
+                                          </MenuList>
+                                        </Menu>
+                                      </div>
+                                    </Td>
+                                  </Tr>
+                              );
+                            })}
+                      </Tbody>
+                    </Table>
+                  </TableContainer>
+              )}
+            </Container>
+          </Box>
+        </Flex>
 
-      <AlertDialog
-        isOpen={isDeleteOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onDeleteClose}
-        isCentered
-        motionPreset="slideInBottom"
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Delete scenario
-            </AlertDialogHeader>
+        <AlertDialog
+            isOpen={isDeleteOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={onDeleteClose}
+            isCentered
+            motionPreset="slideInBottom"
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Delete scenario
+              </AlertDialogHeader>
 
-            <AlertDialogBody>
-              Are you sure that you want to delete {selectedScenario.name}? You can't undo this action afterwards.
-            </AlertDialogBody>
+              <AlertDialogBody>
+                Are you sure that you want to delete {selectedScenario.name}? You can't undo this action afterwards.
+              </AlertDialogBody>
 
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onDeleteClose}>
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={onDeleteClose}>
+                  Cancel
+                </Button>
+                <Button
+                    colorScheme="red"
+                    onClick={() => {
+                      deleteScenario(selectedScenario);
+                      onDeleteClose();
+                    }}
+                    ml={3}
+                >
+                  Delete
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+
+        <Modal isOpen={isDateModalOpen} onClose={closeDateModal}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Select Date Range</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel>Start Date</FormLabel>
+                <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={handleDownload}>
+                Download
+              </Button>
+              <Button variant="ghost" onClick={closeDateModal}>
                 Cancel
               </Button>
-              <Button
-                colorScheme="red"
-                onClick={() => {
-                  deleteScenario(selectedScenario);
-                  onDeleteClose();
-                }}
-                ml={3}
-              >
-                Delete
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        <Modal isOpen={isScoreCardModalOpen} onClose={() => setIsScoreCardModalOpen(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Score Card</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel style={{ marginBottom: "1px" }}>Budget</FormLabel>
+                <FormHelperText style={{ marginTop: "1px" }}>
+                  Please enter a number between 0 and 1. ( x.xx )
+                </FormHelperText>{" "}
+                <Input
+                    type="text"
+                    value={scoreCardParams.budget_p}
+                    onChange={(e) => setScoreCardParams({ ...scoreCardParams, budget_p: e.target.value })}
+                    onKeyPress={(e) => {
+                      const charCode = e.which ? e.which : e.keyCode;
+                      const inputValue = e.target.value + String.fromCharCode(charCode);
+                      const isValid =
+                          /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
+
+                      if (!isValid) {
+                        e.preventDefault();
+                      }
+                    }}
+                    pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
+                    title="Please enter a number between 0 and 1"
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel style={{ marginBottom: "1px" }}>Time</FormLabel>
+                <FormHelperText style={{ marginTop: "1px" }}>
+                  Please enter a number between 0 and 1. ( x.xx )
+                </FormHelperText>{" "}
+                <Input
+                    type="text"
+                    value={scoreCardParams.time_p}
+                    onChange={(e) => setScoreCardParams({ ...scoreCardParams, time_p: e.target.value })}
+                    onKeyPress={(e) => {
+                      const charCode = e.which ? e.which : e.keyCode;
+                      const inputValue = e.target.value + String.fromCharCode(charCode);
+                      const isValid =
+                          /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
+
+                      if (!isValid) {
+                        e.preventDefault();
+                      }
+                    }}
+                    pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
+                    title="Please enter a number between 0 and 1"
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel style={{ marginBottom: "1px" }}>Quality</FormLabel>
+                <FormHelperText style={{ marginTop: "1px" }}>
+                  Please enter a number between 0 and 1. ( x.xx )
+                </FormHelperText>{" "}
+                <Input
+                    type="text"
+                    value={scoreCardParams.quality_k}
+                    onChange={(e) => setScoreCardParams({ ...scoreCardParams, quality_k: e.target.value })}
+                    onKeyPress={(e) => {
+                      const charCode = e.which ? e.which : e.keyCode;
+                      const inputValue = e.target.value + String.fromCharCode(charCode);
+                      const isValid =
+                          /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
+
+                      if (!isValid) {
+                        e.preventDefault();
+                      }
+                    }}
+                    pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
+                    title="Please enter a number between 0 and 1"
+                />
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={saveScoreCardParams}>
+                Save
               </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
-      <Modal isOpen={isDateModalOpen} onClose={closeDateModal}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Select Date Range</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Start Date</FormLabel>
-              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleDownload}>
-              Download
-            </Button>
-            <Button variant="ghost" onClick={closeDateModal}>
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        <Modal isOpen={isCoursesModalOpen} onClose={() => setIsCoursesModalOpen(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Courses</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {courses.length > 0 ? (
+                  <Table variant="simple">
+                    <Thead>
+                      <Tr>
+                        <Th>ID</Th>
+                        <Th>Name</Th>
+                        <Th></Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {courses.map((course) => (
+                          <Tr key={course.id}>
+                            <Td>{course.id}</Td>
+                            <Td>{course.name}</Td>
+                            <Td>
+                              <BsFillTrashFill
+                                  onClick={() => handleDeleteCourse(course.id, selectedScenario.id)}
+                                  onMouseOver={({ target }) => (target.style.opacity = 0.5)}
+                                  onMouseOut={({ target }) => (target.style.opacity = 1)}
+                              />
+                            </Td>
+                          </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+              ) : (
+                  <Text>No courses found.</Text>
+              )}
+            </ModalBody>
 
-      <Modal isOpen={isScoreCardModalOpen} onClose={() => setIsScoreCardModalOpen(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Score Card</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel style={{ marginBottom: "1px" }}>Budget</FormLabel>
-              <FormHelperText style={{ marginTop: "1px" }}>
-                Please enter a number between 0 and 1. ( x.xx )
-              </FormHelperText>{" "}
-              <Input
-                type="text"
-                value={scoreCardParams.budget_p}
-                onChange={(e) => setScoreCardParams({ ...scoreCardParams, budget_p: e.target.value })}
-                onKeyPress={(e) => {
-                  const charCode = e.which ? e.which : e.keyCode;
-                  const inputValue = e.target.value + String.fromCharCode(charCode);
-                  const isValid =
-                    /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
 
-                  if (!isValid) {
-                    e.preventDefault();
-                  }
-                }}
-                pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
-                title="Please enter a number between 0 and 1"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel style={{ marginBottom: "1px" }}>Time</FormLabel>
-              <FormHelperText style={{ marginTop: "1px" }}>
-                Please enter a number between 0 and 1. ( x.xx )
-              </FormHelperText>{" "}
-              <Input
-                type="text"
-                value={scoreCardParams.time_p}
-                onChange={(e) => setScoreCardParams({ ...scoreCardParams, time_p: e.target.value })}
-                onKeyPress={(e) => {
-                  const charCode = e.which ? e.which : e.keyCode;
-                  const inputValue = e.target.value + String.fromCharCode(charCode);
-                  const isValid =
-                    /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
-
-                  if (!isValid) {
-                    e.preventDefault();
-                  }
-                }}
-                pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
-                title="Please enter a number between 0 and 1"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel style={{ marginBottom: "1px" }}>Quality</FormLabel>
-              <FormHelperText style={{ marginTop: "1px" }}>
-                Please enter a number between 0 and 1. ( x.xx )
-              </FormHelperText>{" "}
-              <Input
-                type="text"
-                value={scoreCardParams.quality_k}
-                onChange={(e) => setScoreCardParams({ ...scoreCardParams, quality_k: e.target.value })}
-                onKeyPress={(e) => {
-                  const charCode = e.which ? e.which : e.keyCode;
-                  const inputValue = e.target.value + String.fromCharCode(charCode);
-                  const isValid =
-                    /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
-
-                  if (!isValid) {
-                    e.preventDefault();
-                  }
-                }}
-                pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
-                title="Please enter a number between 0 and 1"
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={saveScoreCardParams}>
-              Save
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={() => setIsCoursesModalOpen(false)}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </>
   );
 };
 export default ScenarioManagement;
