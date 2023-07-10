@@ -7,10 +7,10 @@ import Skilltype from "./Skilltype";
 import {FaQuestionCircle} from "react-icons/fa";
 
 const SkilltypeContainer = ({
-  skillTypeReturn,
-  simValues,
-  updateSkillTypeObject,
-}) => {
+                              skillTypeReturn,
+                              simValues,
+                              updateSkillTypeObject,
+                            }) => {
   const [actionListExpanded, setActionListExpanded] = useState(false);
   const [skilltypes, setSkilltypes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -87,111 +87,99 @@ const SkilltypeContainer = ({
   }
 
   return (
-    <Grid borderRadius="xl">
-      <ActionElement
-          title={
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              Employees
-              <div className="tooltip-container" style={{ marginLeft: '8px' }}>
-                <Tooltip
-                    label="Choose the necessary amount of the specific skilltype which is needed for the current project"
-                    isOpen={activeTooltip === 'employees'}
-                >
-                  <button onClick={() => handleButtonClick('employees')}>
-                    <FaQuestionCircle size={12} />
-                  </button>
-                </Tooltip>
-              </div>
-            </div>
-          }
-          secondaryText="Hire employees"
-          icon={actionIcon.SKILLTYPE}
-      >
-        <IconButton
-            aria-label="Expand and collapse actions"
-            icon={actionListExpanded ? <HiOutlineChevronDown /> : <HiOutlineChevronLeft />}
-            variant="ghost"
-            size="md"
-            onClick={toggleActionList}
-        />
-      </ActionElement>
-      {actionListExpanded && (
-        <Grid templateColumns="repeat(2, 1fr)" gap={2}>
-          {isLoading ? (
-            <div>Loading skill types...</div>
-          ) : (
-            skillTypeReturn.map((skilltype, index) => {
-              const skillTypeObj = skilltypes.find(
-                (st) => st.name === skilltype.skill_type
-              );
-
-              if (!skillTypeObj) {
-                return null;
-              }
-              const { extra_info: extraInfo } = skillTypeObj;
-
-              if (extraInfo) {
-                console.log(extraInfo.description);
-              }
-
-              return (
+      <Grid borderRadius="xl">
+        <ActionElement
+            title={
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                Employees
+                <div className="tooltip-container" style={{ marginLeft: '8px' }}>
                   <Tooltip
-                      key={index}
-                      label={
-                        <div>
-                          <strong>Cost per day:</strong> ${skillTypeObj.cost_per_day}
-                          <br />
-                          <strong>Error rate:</strong> {skillTypeObj.error_rate}
-                          <br />
-                          <strong>Throughput:</strong> {skillTypeObj.throughput}
-                          <br />
-                          <strong>Management quality:</strong> {skillTypeObj.management_quality}
-                          <br />
-                          <strong>Development quality:</strong> {skillTypeObj.development_quality}
-                          <br />
-
-                          {extraInfo && (
-                              <>
-                                <strong>Description:</strong> {extraInfo.description}
-                                <br />
-                                <strong>Weekly Tasks:</strong> {extraInfo && `[${extraInfo.min_weekly_tasks} ~ ${extraInfo.max_weekly_tasks}]`}
-                                <br />
-                                <strong>Avg Weekly Tasks:</strong> {extraInfo.avg_weekly_tasks}
-                                <br />
-                                <strong>Standard Deviation Weekly Tasks:</strong>{" "}
-                                {extraInfo.standard_deviation_weekly_tasks}
-                                <br />
-                                <strong>Cost per Task:</strong> ${extraInfo.cost_per_task}
-                                <br />
-                              </>
-                          )}
-
-                          {!extraInfo && (
-                              <>
-                                <strong>No Extra Info Available</strong>
-                                <br />
-                              </>
-                          )}
-                        </div>
-                      }
+                      label="Choose the necessary amount of the specific skilltype which is needed for the current project"
+                      isOpen={activeTooltip === 'employees'}
                   >
-                    <div>
-                      <Skilltype
-                          onUpdateChange={(event) => {
-                            updateSkillTypeObject(event.name, event.value);
-                          }}
-                          skillTypeName={skilltype.skill_type}
-                          currentCount={getSkillTypeCount(skilltype.skill_type)}
-                          countChange={skilltype.change}
-                      />
-                    </div>
+                    <button onClick={() => handleButtonClick('employees')}>
+                      <FaQuestionCircle size={12} />
+                    </button>
                   </Tooltip>
-              );
-            })
-          )}
-        </Grid>
-      )}
-    </Grid>
+                </div>
+              </div>
+            }
+            secondaryText="Hire employees"
+            icon={actionIcon.SKILLTYPE}
+        >
+          <IconButton
+              aria-label="Expand and collapse actions"
+              icon={actionListExpanded ? <HiOutlineChevronDown /> : <HiOutlineChevronLeft />}
+              variant="ghost"
+              size="md"
+              onClick={toggleActionList}
+          />
+        </ActionElement>
+        {actionListExpanded && (
+            <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+              {isLoading ? (
+                  <div>Loading skill types...</div>
+              ) : (
+                  skillTypeReturn.map((skilltype, index) => {
+                    const skillTypeObj = skilltypes.find(
+                        (st) => st.name === skilltype.skill_type
+                    );
+
+                    if (!skillTypeObj) {
+                      return null;
+                    }
+                    const { extra_info: extraInfo } = skillTypeObj;
+
+                    if (extraInfo) {
+                      console.log(extraInfo.description);
+                    }
+
+                    return (
+                        <Tooltip
+                            key={index}
+                            label={
+                              <div>
+                                <strong>Cost per day:</strong> ${skillTypeObj.cost_per_day}
+                                <br />
+                                <strong>Error rate:</strong> {skillTypeObj.error_rate}
+                                <br />
+                                <strong>Management quality:</strong> {skillTypeObj.management_quality}
+                                <br />
+                                <strong>Development quality:</strong> {skillTypeObj.development_quality}
+                                <br />
+
+                                {extraInfo && extraInfo.min_throughput !== 0 && extraInfo.max_throughput !== 0 && (
+                                    <>
+                                      <strong>Throughput per Week:</strong> {extraInfo && `[${extraInfo.min_weekly_tasks} ~ ${extraInfo.max_weekly_tasks}]`}
+                                      <br />
+                                    </>
+                                )}
+                                {!extraInfo && (
+                                    <>
+                                      <strong>No Extra Info Available</strong>
+                                      <br />
+                                    </>
+                                )}
+                              </div>
+                            }
+                        >
+                          <div>
+                            <Skilltype
+                                onUpdateChange={(event) => {
+                                  updateSkillTypeObject(event.name, event.value);
+                                }}
+                                skillTypeName={skilltype.skill_type}
+                                currentCount={getSkillTypeCount(skilltype.skill_type)}
+                                countChange={skilltype.change}
+                            />
+                          </div>
+                        </Tooltip>
+                    );
+                  })
+              )}
+            </Grid>
+        )}
+      </Grid>
   );
 };
 
