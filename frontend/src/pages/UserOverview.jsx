@@ -252,7 +252,7 @@ const UserOverview = () => {
               <AddUser />
             </Flex>
           </HStack>
-              <TableContainer overflowY="auto" h="400px">
+              <TableContainer overflowY="auto" h="calc(100% - 40px)">
             <Table variant="simple" size="lg">
               <Thead>
                 <Tr>
