@@ -24,10 +24,14 @@ from app.serializers.template_scenario import (
     ReducedTemplateScenarioSerializer,
     TemplateScenarioSerializer,
 )
+from app.serializers.course import (
+    CourseNameSerializer,
+)
 from config import get_config
 from history.models.result import Result
 from app.models.event import Event
 from app.models.event import EventEffect
+from app.models.course import Course
 
 
 class TemplateScenarioView(APIView):
@@ -702,3 +706,22 @@ class TemplateScenarioUserListView(APIView):
         if tries:
             max_score = max(map(lambda x: x.total_score, results))
         return {**serializer.data, "tries": tries, "max_score": max_score}
+
+
+class ScenarioCoursesView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    @allowed_roles(["staff"])
+    def get(self, request, scenario_id):
+        """
+        Get all the courses where a scenario is associated.
+        """
+        courses = Course.objects.filter(scenarios__id=scenario_id)
+        serializer = CourseNameSerializer(courses, many=True)
+        response_data = [{
+            "id": course.id,
+            "name": course.name
+        } for course in courses]
+
+        return Response(response_data, status=status.HTTP_200_OK)
