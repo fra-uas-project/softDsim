@@ -41,20 +41,36 @@ const SkilltypeContainer = ({
   const fetchSkillTypes = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/skill-type`, {
+        method: "GET",
+        credentials: "include",
+      });
       const skilltypesData = await res.json();
-      setSkilltypes(skilltypesData.data);
+
+      const skillTypeInfoRequests = skilltypesData.data.map(async (skillType) => {
+        if (skillType.extra_info) {
+          const extraInfoRes = await fetch(
+              `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skillType.id}/info`,
+              {
+                method: "GET",
+                credentials: "include",
+              }
+          );
+          const extraInfoData = await extraInfoRes.json();
+          skillType.extra_info = extraInfoData.data;
+        }
+        return skillType;
+      });
+
+      const skillTypeInfoData = await Promise.all(skillTypeInfoRequests);
+
+      setSkilltypes(skillTypeInfoData);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
     }
   };
+
 
   const toggleActionList = () => {
     setActionListExpanded(!actionListExpanded);
@@ -112,37 +128,64 @@ const SkilltypeContainer = ({
               if (!skillTypeObj) {
                 return null;
               }
+              const { extra_info: extraInfo } = skillTypeObj;
+
+              if (extraInfo) {
+                console.log(extraInfo.description);
+              }
 
               return (
-                <Tooltip
-                  key={index}
-                  label={
+                  <Tooltip
+                      key={index}
+                      label={
+                        <div>
+                          <strong>Cost per day:</strong> ${skillTypeObj.cost_per_day}
+                          <br />
+                          <strong>Error rate:</strong> {skillTypeObj.error_rate}
+                          <br />
+                          <strong>Throughput:</strong> {skillTypeObj.throughput}
+                          <br />
+                          <strong>Management quality:</strong> {skillTypeObj.management_quality}
+                          <br />
+                          <strong>Development quality:</strong> {skillTypeObj.development_quality}
+                          <br />
+
+                          {extraInfo && (
+                              <>
+                                <strong>Description:</strong> {extraInfo.description}
+                                <br />
+                                <strong>Weekly Tasks:</strong> {extraInfo && `[${extraInfo.min_weekly_tasks} ~ ${extraInfo.max_weekly_tasks}]`}
+                                <br />
+                                <strong>Avg Weekly Tasks:</strong> {extraInfo.avg_weekly_tasks}
+                                <br />
+                                <strong>Standard Deviation Weekly Tasks:</strong>{" "}
+                                {extraInfo.standard_deviation_weekly_tasks}
+                                <br />
+                                <strong>Cost per Task:</strong> ${extraInfo.cost_per_task}
+                                <br />
+                              </>
+                          )}
+
+                          {!extraInfo && (
+                              <>
+                                <strong>No Extra Info Available</strong>
+                                <br />
+                              </>
+                          )}
+                        </div>
+                      }
+                  >
                     <div>
-                      <strong>Cost per day:</strong> ${skillTypeObj.cost_per_day}
-                      <br />
-                      <strong>Error rate:</strong> {skillTypeObj.error_rate}
-                      <br />
-                      <strong>Throughput:</strong> {skillTypeObj.throughput}
-                      <br />
-                      <strong>Management quality:</strong>{" "}
-                      {skillTypeObj.management_quality}
-                      <br />
-                      <strong>Development quality:</strong>{" "}
-                      {skillTypeObj.development_quality}
+                      <Skilltype
+                          onUpdateChange={(event) => {
+                            updateSkillTypeObject(event.name, event.value);
+                          }}
+                          skillTypeName={skilltype.skill_type}
+                          currentCount={getSkillTypeCount(skilltype.skill_type)}
+                          countChange={skilltype.change}
+                      />
                     </div>
-                  }
-                >
-                  <div>
-                    <Skilltype
-                      onUpdateChange={(event) => {
-                        updateSkillTypeObject(event.name, event.value);
-                      }}
-                      skillTypeName={skilltype.skill_type}
-                      currentCount={getSkillTypeCount(skilltype.skill_type)}
-                      countChange={skilltype.change}
-                    />
-                  </div>
-                </Tooltip>
+                  </Tooltip>
               );
             })
           )}

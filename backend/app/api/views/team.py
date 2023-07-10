@@ -159,8 +159,6 @@ class SkillTypeView(APIView):
 
     @allowed_roles(["creator", "staff"])
     def post(self, request):
-        print(request.data)
-
         serializer = SkillTypeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
