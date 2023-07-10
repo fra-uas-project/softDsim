@@ -35,7 +35,15 @@ import {
   HStack,
   MenuItem,
   Text,
-  Input, Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, DrawerFooter, Divider,
+  Input,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
+  Divider,
+  TableContainer,
 } from "@chakra-ui/react";
 import { IoIosMenu } from "react-icons/io";
 import { getCookie } from "../utils/utils";
@@ -556,12 +564,7 @@ const CourseOverview = () => {
       <Box backgroundColor="white" borderRadius="2xl">
         <Container maxW="6xl" pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
           <HStack justifyContent="space-between" mr={3} spacing={3} alignItems="center">
-            <Drawer
-                isOpen={isOpen}
-                placement="left"
-                onClose={onClose}
-                finalFocusRef={btnRef}
-            >
+            <Drawer isOpen={isOpen} placement="left" onClose={onClose} finalFocusRef={btnRef}>
               <DrawerOverlay />
               <DrawerContent>
                 <DrawerHeader fontSize="xl" py={4}>Admin Panel</DrawerHeader>
@@ -648,21 +651,20 @@ const CourseOverview = () => {
                     </Link>
                   </div>
                 </DrawerBody>
-                <DrawerFooter>
-                </DrawerFooter>
+                <DrawerFooter />
               </DrawerContent>
             </Drawer>
             <Flex align="left">
               <Input
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: "200px",
-                  border: "1px solid #333",
-                  color: "#555",
-                  paddingLeft: "0.5rem",
-                }}
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    width: "200px",
+                    border: "1px solid #333",
+                    color: "#555",
+                    paddingLeft: "0.5rem",
+                  }}
               />
             </Flex>
             <Flex justifyContent="flex-end">
@@ -673,7 +675,7 @@ const CourseOverview = () => {
               </Flex>
             </Flex>
           </HStack>
-          {
+          <TableContainer overflowY="auto" h="calc(100% - 40px)">
             <Table variant="simple" size="lg">
               <Thead>
                 <Tr>
@@ -684,49 +686,49 @@ const CourseOverview = () => {
               </Thead>
               <Tbody>
                 {courses
-                  .filter((course) => course.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                  .map((course, index) => (
-                    <Tr key={index}>
-                      <Td fontWeight="500">{course.id}</Td>
-                      <Td fontWeight="500">
-                        <span
-                          style={{ cursor: "pointer" }}
-                          onClick={() => handleOpenChangeNameModal(course.id, course.name)}
-                        >
-                          {course.name}
-                        </span>
-                      </Td>
-                      <Td fontWeight="500">
-                        {currentUser?.admin && (
-                          <div style={{ padding: "0 0 0 70%" }}>
-                            <Menu>
-                              <MenuButton
-                                as={Button}
-                                variant="ghost"
-                                colorScheme="black"
-                                rightIcon={<IoIosMenu style={{ fontSize: "18px" }} />}
-                              ></MenuButton>
-                              <MenuList>
-                                <MenuItem
-                                  onClick={() => {
-                                    setIsDeleteOpen(true);
-                                    setSelectedCourse(course);
-                                  }}
-                                >
-                                  Delete
-                                </MenuItem>
-                                <MenuItem onClick={() => handleOpenUserModal(course.id)}>Manage Users</MenuItem>
-                                <MenuItem onClick={() => handleOpenScenarioModal(course.id)}>Manage Scenarios</MenuItem>
-                              </MenuList>
-                            </Menu>
-                          </div>
-                        )}
-                      </Td>
-                    </Tr>
-                  ))}
+                    .filter((course) => course.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                    .map((course, index) => (
+                        <Tr key={index}>
+                          <Td fontWeight="500">{course.id}</Td>
+                          <Td fontWeight="500">
+                <span
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleOpenChangeNameModal(course.id, course.name)}
+                >
+                  {course.name}
+                </span>
+                          </Td>
+                          <Td fontWeight="500">
+                            {currentUser?.admin && (
+                                <div style={{ padding: "0 0 0 70%" }}>
+                                  <Menu>
+                                    <MenuButton
+                                        as={Button}
+                                        variant="ghost"
+                                        colorScheme="black"
+                                        rightIcon={<IoIosMenu style={{ fontSize: "18px" }} />}
+                                    ></MenuButton>
+                                    <MenuList>
+                                      <MenuItem
+                                          onClick={() => {
+                                            setIsDeleteOpen(true);
+                                            setSelectedCourse(course);
+                                          }}
+                                      >
+                                        Delete
+                                      </MenuItem>
+                                      <MenuItem onClick={() => handleOpenUserModal(course.id)}>Manage Users</MenuItem>
+                                      <MenuItem onClick={() => handleOpenScenarioModal(course.id)}>Manage Scenarios</MenuItem>
+                                    </MenuList>
+                                  </Menu>
+                                </div>
+                            )}
+                          </Td>
+                        </Tr>
+                    ))}
               </Tbody>
             </Table>
-          }
+          </TableContainer>
         </Container>
       </Box>
       <AlertDialog

@@ -22,7 +22,7 @@ import {
   useToast,
   Input,
   Divider,
-  HStack,Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, DrawerFooter,
+  HStack,Drawer, DrawerOverlay, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter,
 } from "@chakra-ui/react";
 import { HiOutlineCheck, HiOutlineTrash, HiOutlineX } from "react-icons/hi";
 import React, {useContext, useEffect, useRef, useState} from "react";
@@ -252,7 +252,7 @@ const UserOverview = () => {
               <AddUser />
             </Flex>
           </HStack>
-              <TableContainer overflowY="auto" h="400px">
+              <TableContainer overflowY="auto" h="calc(100% - 40px)">
             <Table variant="simple" size="lg">
               <Thead>
                 <Tr>
