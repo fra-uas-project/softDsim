@@ -310,6 +310,8 @@ class Member(models.Model):
     )
     team = models.ForeignKey(
         Team, on_delete=models.CASCADE, related_name="members")
+    team = models.ForeignKey(
+        Team, on_delete=models.CASCADE, related_name="members")
     skill_type = models.ForeignKey(
         SkillType,
         on_delete=models.CASCADE,
@@ -324,11 +326,20 @@ class Member(models.Model):
     @property
     def efficiency(self) -> float:
         """Returns the efficiency of the member"""
+        m_ids = set()
 
         def st(s):
             return 1 - (abs(s - 0.2))  # 0.2 is the ideal stress level
 
-        return sum([self.familiarity, self.motivation, st(self.stress)]) / 3
+        sum_val = (self.familiarity + self.motivation + st(self.stress)) / 3
+
+        for m in self.team.members.all():
+            m_ids.add(m.id)
+
+        if len(m_ids) > 3:
+            return min(sum_val * 1.1, 1)
+        else:
+            return sum_val
 
     def calculate_familiarity(self, solved_tasks):
         if solved_tasks > 0:

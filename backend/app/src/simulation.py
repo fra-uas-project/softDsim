@@ -70,7 +70,6 @@ def simulate(req, session: CachedScenario) -> None:
         raise RequestActionException()
 
     normal_work_hour_day: int = 8
-
     workpack = req.actions
     # logging.info(f"Workpack: {workpack}")
     days = workpack.days
@@ -80,6 +79,10 @@ def simulate(req, session: CachedScenario) -> None:
         raise TooManyMeetingsException(
             (workpack.meetings / days), (normal_work_hour_day + workpack.overtime)
         )
+
+
+
+
 
     start = time.perf_counter()
     if req.members and req.members != []:
@@ -94,7 +97,8 @@ def simulate(req, session: CachedScenario) -> None:
                 raise SimulationException(msg)
             if m.change > 0:
                 for _ in range(m.change):
-                    new_member = Member(skill_type=s, team=session.scenario.team)
+                    new_member = Member(
+                        skill_type=s, team=session.scenario.team)
                     new_member.save()
             else:
                 list_of_members = Member.objects.filter(
@@ -122,16 +126,21 @@ def simulate(req, session: CachedScenario) -> None:
 
     workpack_status = WorkpackStatus(days, workpack)
 
+
+
+
+
     # check if there are members to work
     if len(session.members) > 0:
         # for schleife für tage (kleinste simulation ist stunde, jeder tag ist 8 stunden) (falls team event muss ein tag abgezogen werden)
-        ## scenario.team.work(workpack) (ein tag simuliert)
+        # scenario.team.work(workpack) (ein tag simuliert)
         for day in range(0, days):
             session.scenario.team.work(session, workpack, workpack_status, day)
             session.scenario.state.day += 1
             for member in session.members:
                 member.calculate_familiarity(len(session.tasks.solved()))
-        logging.warning(f"Team work took {time.perf_counter() - start} seconds")
+        logging.warning(
+            f"Team work took {time.perf_counter() - start} seconds")
     else:
         logging.info(
             "There are no members in the team, so there is nothing to simulate."
@@ -146,7 +155,8 @@ def simulate(req, session: CachedScenario) -> None:
 
     # team event
     if req.actions.teamevent:
-        cost = len(session.members) * session.scenario.config.cost_member_team_event
+        cost = len(session.members) * \
+            session.scenario.config.cost_member_team_event
         session.scenario.state.cost += cost
         session.scenario.state.day += 1
         for member in session.members:
@@ -197,7 +207,8 @@ def continue_simulation(session: CachedScenario, req) -> ScenarioResponse:
     event = event_triggered(session)
     if isinstance(event, Event):
         scenario_response = EventResponse(
-            event_text=event.text,  # todo philip: don't know which one frontend wants to use, can delete one of the two text fields later
+            # todo philip: don't know which one frontend wants to use, can delete one of the two text fields later
+            event_text=event.text,
             text=event.text,
             effects=get_effects_from_event(event),
             management=session.scenario.get_management_goal_dto(),
