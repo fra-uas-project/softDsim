@@ -22,7 +22,7 @@ import {
   useToast,
   Input,
   Divider,
-  HStack,Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, DrawerFooter,
+  HStack,Drawer, DrawerOverlay, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter,
 } from "@chakra-ui/react";
 import { HiOutlineCheck, HiOutlineTrash, HiOutlineX } from "react-icons/hi";
 import React, {useContext, useEffect, useRef, useState} from "react";
