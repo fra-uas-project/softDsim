@@ -1,5 +1,6 @@
 from app.models.team import SkillType, Team, Member
 from rest_framework import serializers
+from app.models.team import SkillTypeInfo
 
 
 class SkillTypeSerializer(serializers.ModelSerializer):
@@ -31,3 +32,9 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ("id", "name", "members")
+
+
+class SkillTypeInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SkillTypeInfo
+        fields = "__all__"

@@ -24,10 +24,14 @@ from app.serializers.template_scenario import (
     ReducedTemplateScenarioSerializer,
     TemplateScenarioSerializer,
 )
+from app.serializers.course import (
+    CourseNameSerializer,
+)
 from config import get_config
 from history.models.result import Result
 from app.models.event import Event
 from app.models.event import EventEffect
+from app.models.course import Course
 
 
 class TemplateScenarioView(APIView):
@@ -100,10 +104,10 @@ class TemplateScenarioView(APIView):
 
     @allowed_roles(["creator", "staff"])
     def delete(self, request, scenario_id=None):
-
         try:
             template_scenario = get_object_or_404(
                 TemplateScenario, id=scenario_id)
+
             serializer = TemplateScenarioSerializer(template_scenario)
             template_scenario.delete()
 
@@ -116,7 +120,7 @@ class TemplateScenarioView(APIView):
 
         except Exception as e:
             logging.error(
-                f"{e.__class__.__name__} occurred in DELETE template-scenario with id {id}"
+                f"{e.__class__.__name__} occurred in DELETE template-scenario with id {scenario_id}"
             )
             return Response(
                 {"status": "something went wrong internally"},
@@ -535,7 +539,7 @@ def handle_event(data, scenario: TemplateScenario, i):
     event = Event()
 
     event.template_scenario = scenario
-    event.text = data['displayName']
+    event.text = data['text']
     event.trigger_type = data['trigger_type']
     event.trigger_comparator = data['trigger_comparator']
 
@@ -702,3 +706,22 @@ class TemplateScenarioUserListView(APIView):
         if tries:
             max_score = max(map(lambda x: x.total_score, results))
         return {**serializer.data, "tries": tries, "max_score": max_score}
+
+
+class ScenarioCoursesView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    @allowed_roles(["staff"])
+    def get(self, request, scenario_id):
+        """
+        Get all the courses where a scenario is associated.
+        """
+        courses = Course.objects.filter(scenarios__id=scenario_id)
+        serializer = CourseNameSerializer(courses, many=True)
+        response_data = [{
+            "id": course.id,
+            "name": course.name
+        } for course in courses]
+
+        return Response(response_data, status=status.HTTP_200_OK)

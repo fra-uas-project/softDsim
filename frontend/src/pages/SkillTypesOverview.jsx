@@ -44,8 +44,17 @@ const SkilltypesOverview = () => {
   const [selectedSkilltype, setSelectedSkilltype] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-
+  const [isEditExtraInfoOpen, setIsEditExtraInfoOpen] = useState(false);
   const [isModal2Open, setIsModal2Open] = useState(false);
+
+  const [editedExtraInfo, setEditedExtraInfo] = useState({
+    description: "",
+    min_weekly_tasks: 0,
+    max_weekly_tasks: 0,
+    avg_weekly_tasks: 0,
+    standard_deviation_weekly_tasks: 0,
+    cost_per_task: 0,
+  });
 
   const closeModal2 = () => {
     setIsModal2Open(false);
@@ -53,6 +62,118 @@ const SkilltypesOverview = () => {
 
   window.value = 10;
 
+  const handleOpenEditExtraInfo = async (skillType) => {
+    setSelectedSkilltype(skillType);
+
+    try {
+      const response = await fetch(
+          `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skillType.id}/info`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+      );
+
+      if (response.ok) {
+        const { data } = await response.json();
+        setEditedExtraInfo(data || {
+          description: "",
+          min_weekly_tasks: 0,
+          max_weekly_tasks: 0,
+          avg_weekly_tasks: 0,
+          standard_deviation_weekly_tasks: 0,
+          cost_per_task: 0,
+        });
+        setIsEditExtraInfoOpen(true);
+      } else {
+        throw new Error("Failed to fetch extra info");
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to fetch extra info",
+        status: "error",
+        duration: 5000,
+      });
+    }
+  };
+
+  const handleDeleteExtraInfo = async () => {
+    try {
+      const response = await fetch(
+          `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${selectedSkilltype.id}/info`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+      );
+
+      if (response.ok) {
+        toast({
+          title: "Extra info deleted",
+          status: "success",
+          duration: 5000,
+        });
+        setIsEditExtraInfoOpen(false);
+      } else {
+        throw new Error("Failed to delete extra info");
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to delete extra info",
+        status: "error",
+        duration: 5000,
+      });
+    }
+  };
+
+
+
+  const handleCloseEditExtraInfo = () => {
+    setIsEditExtraInfoOpen(false);
+  };
+
+  const handleSaveEditExtraInfo = async (skilltype) => {
+    console.log("IDDDDDDDD", skilltype.id);
+    try {
+      const updatedSkillType = {
+        ...editedExtraInfo,
+      };
+
+      const response = await fetch(
+          `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type/${skilltype.id}/info`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "X-CSRFToken": getCookie("csrftoken"),
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedSkillType),
+          }
+      );
+
+      if (response.ok) {
+        toast({
+          title: `Extra Info has been saved.`,
+          status: "success",
+          duration: 5000,
+        });
+        setIsEditExtraInfoOpen(false);
+      } else {
+        toast({
+          title: `Could not save the extra Info`,
+          status: "error",
+          duration: 5000,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: `Could not save the extra Info`,
+        status: "error",
+        duration: 5000,
+      });
+    }
+  };
   const [skillTypeForm, setSkillTypeForm] = useState({
     name: "",
     costPerDay: 0,
@@ -157,7 +278,6 @@ const SkilltypesOverview = () => {
     };
 
     try {
-      // Check if the skill type name already exists
       const nameExists = checkSkillTypeNameExists(name);
 
       if (nameExists) {
@@ -170,7 +290,6 @@ const SkilltypesOverview = () => {
         });
         return;
       } else {
-        // Create the skill type if the name is unique
         const createRes = await fetch(
           `${process.env.REACT_APP_DJANGO_HOST}/api/skill-type`,
           {
@@ -191,7 +310,6 @@ const SkilltypesOverview = () => {
             duration: 5000,
           });
 
-          // Clear the form inputs
           setSkillTypeForm({
             name: "",
             costPerDay: 0,
@@ -202,10 +320,8 @@ const SkilltypesOverview = () => {
             signingBonus: 0,
           });
 
-          // Fetch updated skill types
           fetchSkillTypes();
 
-          // Close the modal
           setIsModalOpen(false);
         } else {
           toast({
@@ -223,7 +339,6 @@ const SkilltypesOverview = () => {
       });
     }
   };
-
   useEffect(() => {
     fetchSkillTypes();
   }, []);
@@ -263,14 +378,11 @@ const SkilltypesOverview = () => {
     setSkillTypeForm(skillType);
     setIsModal2Open(true);
   };
-
   const handleUpdateSkillType = async (e) => {
     e.preventDefault();
-
     try {
       const { id, name } = skillTypeForm;
 
-      // Check if the name already exists
       const nameExists = checkSkillTypeNameExists(name, id);
 
       if (nameExists) {
@@ -292,7 +404,6 @@ const SkilltypesOverview = () => {
             body: JSON.stringify(skillTypeForm),
           }
         );
-
         if (res.ok) {
           const updatedSkillType = await res.json();
           // Update the skill type if the name doesn't exist
@@ -319,14 +430,12 @@ const SkilltypesOverview = () => {
       });
     }
   };
-
   const handleInputChange = (e) => {
     setSkillTypeForm((prevForm) => ({
       ...prevForm,
       [e.target.name]: e.target.value,
     }));
   };
-
   return (
     <Container maxW="container.xl">
       <Flex justifyContent="space-between" alignItems="center" mt={6} mb={4}>
@@ -384,6 +493,13 @@ const SkilltypesOverview = () => {
                             Edit
                           </Button>
                           <Button
+                              size="sm"
+                              colorScheme="blue"
+                              onClick={() => handleOpenEditExtraInfo(skillType)}
+                          >
+                            Extra Info
+                          </Button>
+                          <Button
                             size="sm"
                             colorScheme="red"
                             onClick={() => handleOpenDeleteDialog(skillType)}
@@ -401,8 +517,6 @@ const SkilltypesOverview = () => {
           </Table>
         )}
       </Box>
-
-      {/* Delete Confirmation Dialog */}
       <AlertDialog
         isOpen={isDeleteOpen}
         leastDestructiveRef={cancelRef}
@@ -429,8 +543,6 @@ const SkilltypesOverview = () => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-
-      {/* Create Skill Type Modal */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <ModalOverlay />
         <ModalContent>
@@ -607,12 +719,10 @@ const SkilltypesOverview = () => {
               <Button colorScheme="blue" mr={3} type="submit">
                 Create
               </Button>
-              <Button onClick={handleCloseModal}>Cancel</Button>
             </ModalFooter>
           </form>
         </ModalContent>
       </Modal>
-
       <Modal isOpen={isModal2Open} onClose={closeModal2}>
         <ModalOverlay />
         <ModalContent>
@@ -791,13 +901,138 @@ const SkilltypesOverview = () => {
               <Button colorScheme="blue" mr={3} type="submit">
                 Update
               </Button>
-              <Button onClick={closeModal2}>Cancel</Button>
             </ModalFooter>
           </form>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isEditExtraInfoOpen} onClose={handleCloseEditExtraInfo}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Extra Info</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel style={{ marginBottom: "1px" }}>
+                Description</FormLabel>
+              <FormHelperText style={{ marginTop: "1px" }}>
+                Max 255 characters.
+              </FormHelperText>
+              <Input
+                  type="text"
+                  name="description"
+                  value={editedExtraInfo.description}
+                  onChange={(e) =>
+                      setEditedExtraInfo({
+                        ...editedExtraInfo,
+                        description: e.target.value,
+                      })
+                  }
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel style={{ marginBottom: "1px" }}>
+                Min Weekly Tasks</FormLabel>
+              <FormHelperText style={{ marginTop: "1px" }}>
+                Please enter a positive number.
+              </FormHelperText>
+              <Input
+                  type="number"
+                  name="min_weekly_tasks"
+                  value={editedExtraInfo.min_weekly_tasks}
+                  onChange={(e) =>
+                      setEditedExtraInfo({
+                        ...editedExtraInfo,
+                        min_weekly_tasks: parseFloat(e.target.value),
+                      })
+                  }
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel style={{ marginBottom: "1px" }}>
+                Max Weekly Tasks</FormLabel>
+              <FormHelperText style={{ marginTop: "1px" }}>
+                Please enter a positive number.
+              </FormHelperText>
+              <Input
+                  type="number"
+                  name="max_weekly_tasks"
+                  value={editedExtraInfo.max_weekly_tasks}
+                  onChange={(e) =>
+                      setEditedExtraInfo({
+                        ...editedExtraInfo,
+                        max_weekly_tasks: parseFloat(e.target.value),
+                      })
+                  }
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel style={{ marginBottom: "1px" }}>
+                Avg Weekly Tasks</FormLabel>
+              <FormHelperText style={{ marginTop: "1px" }}>
+                Please enter a positive number.
+              </FormHelperText>
+              <Input
+                  type="number"
+                  name="avg_weekly_tasks"
+                  value={editedExtraInfo.avg_weekly_tasks}
+                  onChange={(e) =>
+                      setEditedExtraInfo({
+                        ...editedExtraInfo,
+                        avg_weekly_tasks: parseFloat(e.target.value),
+                      })
+                  }
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel style={{ marginBottom: "1px" }}>
+                Standard Deviation Weekly Tasks</FormLabel>
+              <FormHelperText style={{ marginTop: "1px" }}>
+                Please enter a positive number.
+              </FormHelperText>
+              <Input
+                  type="number"
+                  name="standard_deviation_weekly_tasks"
+                  value={editedExtraInfo.standard_deviation_weekly_tasks}
+                  onChange={(e) =>
+                      setEditedExtraInfo({
+                        ...editedExtraInfo,
+                        standard_deviation_weekly_tasks: parseFloat(e.target.value),
+                      })
+                  }
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel style={{ marginBottom: "1px" }}>
+                Cost per Task</FormLabel>
+              <FormHelperText style={{ marginTop: "1px" }}>
+                Please enter a positive number.
+              </FormHelperText>
+              <Input
+                  type="number"
+                  name="cost_per_task"
+                  value={editedExtraInfo.cost_per_task}
+                  onChange={(e) =>
+                      setEditedExtraInfo({
+                        ...editedExtraInfo,
+                        cost_per_task: parseFloat(e.target.value),
+                      })
+                  }
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+          <ButtonGroup>
+          <Button colorScheme="red" onClick={handleDeleteExtraInfo}>
+              <HiOutlineTrash />
+            </Button>
+            <Button colorScheme="blue" mr={3} onClick={() => handleSaveEditExtraInfo(selectedSkilltype)}>
+              Save
+            </Button>
+          </ButtonGroup>
+        </ModalFooter>
         </ModalContent>
       </Modal>
     </Container>
   );
 };
-
 export default SkilltypesOverview;

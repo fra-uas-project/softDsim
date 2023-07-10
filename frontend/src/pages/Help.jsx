@@ -5,10 +5,8 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink, Container,
-  Flex, Tabs, TabList, TabPanels, Tab, TabPanel, Heading, Textarea, Image,
+  Container,
+  Flex, Tabs, TabList, TabPanels, Tab, TabPanel, Heading, Image,
 } from "@chakra-ui/react"
 import React from "react";
 import scenario from "../images/Scenarios.png";
@@ -314,8 +312,9 @@ const Help = () => {
                           </AccordionButton>
                         </h2>
                         <AccordionPanel pb={4}>
-                          Meetings are also an adjustable component in the simulation. The number of weekly meetings can be determined from week to week. Meetings provide an opportunity for team members to exchange information and ideas. They promote effective collaboration and enhance the familiarity of employees with the tasks and the project.                        </AccordionPanel>
-                        <Image src={meetings} w={1000} objectFit="contain" mx="auto" />
+                          Meetings are also an adjustable component in the simulation. The number of weekly meetings can be determined from week to week. Meetings provide an opportunity for team members to exchange information and ideas. They promote effective collaboration and enhance the familiarity of employees with the tasks and the project.
+                          <Image src={meetings} w={1000} objectFit="contain" mx="auto" />
+                        </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
                         <h2>

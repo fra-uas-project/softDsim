@@ -6,7 +6,7 @@ import time
 
 from deprecated.classic import deprecated
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, MaxLengthValidator
 
 
 from app.dto.request import Workpack
@@ -14,6 +14,7 @@ from app.dto.response import TeamStatsDTO
 from app.models.task import CachedTasks, Task
 from app.models.user_scenario import UserScenario
 from app.src.util.util import probability
+
 
 import numpy as np
 
@@ -246,6 +247,24 @@ class Team(models.Model):
     # def teamevent()
 
 
+class SkillTypeInfo(models.Model):
+    description = models.CharField(max_length=255, validators=[
+        MaxLengthValidator(255, "Text is longer than 255 characters.")])
+    min_weekly_tasks = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0)
+    max_weekly_tasks = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0)
+    avg_weekly_tasks = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0)
+    standard_deviation_weekly_tasks = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0)
+    cost_per_task = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0)
+
+    def __str__(self):
+        return self.name
+
+
 class SkillType(models.Model):
     name = models.CharField(max_length=32, unique=True)
     cost_per_day = models.FloatField(
@@ -264,6 +283,14 @@ class SkillType(models.Model):
     signing_bonus = models.FloatField(
         validators=[MinValueValidator(0.0)], default=0)
 
+    extra_info = models.OneToOneField(
+        SkillTypeInfo,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        default=None
+    )
+
     def __str__(self):
         return self.name
 
@@ -281,6 +308,8 @@ class Member(models.Model):
     stress = models.FloatField(
         default=0.1, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
+    team = models.ForeignKey(
+        Team, on_delete=models.CASCADE, related_name="members")
     team = models.ForeignKey(
         Team, on_delete=models.CASCADE, related_name="members")
     skill_type = models.ForeignKey(
@@ -322,9 +351,9 @@ class Member(models.Model):
         As a second variable it also returns the poisson value it created.
         """
         mu = (
-                hours
-                * ((self.efficiency + self.team.efficiency(session)) / 2)
-                * (self.skill_type.throughput + self.xp)
+            hours
+            * ((self.efficiency + self.team.efficiency(session)) / 2)
+            * (self.skill_type.throughput + self.xp)
         )
 
         # varying degrees of randomness (none=no randomness, semi=some randomness, full=full randomness)
