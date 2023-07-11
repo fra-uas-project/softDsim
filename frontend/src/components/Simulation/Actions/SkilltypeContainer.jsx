@@ -141,13 +141,6 @@ const SkilltypeContainer = ({
                               <div>
                                 <strong>Cost per day:</strong> ${skillTypeObj.cost_per_day}
                                 <br />
-                                <strong>Error rate:</strong> {skillTypeObj.error_rate}
-                                <br />
-                                <strong>Management quality:</strong> {skillTypeObj.management_quality}
-                                <br />
-                                <strong>Development quality:</strong> {skillTypeObj.development_quality}
-                                <br />
-
                                 {extraInfo && extraInfo.min_throughput !== 0 && extraInfo.max_throughput !== 0 && (
                                     <>
                                       <strong>Throughput per Week:</strong> {extraInfo && `[${extraInfo.min_weekly_tasks} ~ ${extraInfo.max_weekly_tasks}]`}
