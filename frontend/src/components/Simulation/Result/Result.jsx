@@ -20,7 +20,7 @@ const Result = (props) => {
             </ResultElement>
             {/* Budget Score */}
             <ResultElement title="Budget Score" secondaryText="" icon={MdAccountBalanceWallet}>
-                <Text fontSize="3xl" color="gray">{props.resultParams.budget_score}</Text>
+                <Text fontSize="3xl" color="gray">{props.resultParams.budget_score}/100</Text>
             </ResultElement>
             {/* Quality Score */}
             <ResultElement title="Quality Score" secondaryText="" icon={MdBuild}>
@@ -28,7 +28,7 @@ const Result = (props) => {
             </ResultElement>
             {/* Time Score */}
             <ResultElement title="Time Score" secondaryText="" icon={MdAccessTime}>
-                <Text fontSize="3xl" color="gray">{props.resultParams.time_score}</Text>
+                <Text fontSize="3xl" color="gray">{props.resultParams.time_score}/100</Text>
             </ResultElement>
             {/* Total Days */}
             <ResultElement title="Total Days" secondaryText="" icon={MdCalendarToday}>
