@@ -483,15 +483,7 @@ const ScenarioManagement = () => {
                                   <Tr key={index}>
                                     <Td fontWeight="500">{scenario.id}</Td>
                                     <Td fontWeight="500">
-                                      <Button
-                                          variant="link"
-                                          color="black"
-                                          onClick={() => {
-                                            navigate(`${scenario.id}`, { state: scenario });
-                                          }}
-                                      >
                                         {scenario.name}
-                                      </Button>
                                     </Td>
                                     <Td>
                                       <div style={{ padding: "0 0 0 70%" }}>
