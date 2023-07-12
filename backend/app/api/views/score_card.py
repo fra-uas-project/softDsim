@@ -85,15 +85,15 @@ class ScoreCardView(APIView):
             time_p: float = float(request.data.get('time_p'))
             quality_k: float = float(request.data.get('quality_k'))
 
-            if budget_p > 1 or budget_p < 0:
+            if budget_p > 2 or budget_p < 0:
                 raise ValueError(
                     f"budget_p value {budget_p} is not valid. budget_p should be >= 0 and <= 1")
 
-            if time_p > 1 or time_p < 0:
+            if time_p > 2 or time_p < 0:
                 raise ValueError(
                     f"time_p value {time_p} is not valid. time_p should be >= 0 and <= 1")
 
-            if quality_k > 1 or quality_k < 0:
+            if quality_k > 8 or quality_k < 0:
                 raise ValueError(
                     f"quality_k value {quality_k} is not valid. quality_k should be >= 0 and <= 1")
 
