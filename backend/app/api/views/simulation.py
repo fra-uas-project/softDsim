@@ -27,8 +27,7 @@ from app.serializers.team import MemberSerializer
 from app.serializers.user_scenario import UserScenarioSerializer
 from app.src.simulation import continue_simulation
 from app.src.util.scenario_util import create_correct_request_model
-
-from app.models.course import Course
+from datetime import datetime, timezone
 
 
 class StartUserScenarioView(APIView):
@@ -67,6 +66,7 @@ class StartUserScenarioView(APIView):
             user_scenario = UserScenario(
                 user=request.user, template=template, config=config,
             )
+            user_scenario.start_datetime = datetime.now(timezone.utc)
             user_scenario.save()
 
             # Create ScenarioState

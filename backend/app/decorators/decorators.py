@@ -9,7 +9,6 @@ def allowed_roles(allowed_roles=[]):
     def decorator(view_class):
         # Update the parameter list to include 'self'
         def wrapper_func(self, request, *args, **kwargs):
-            print("allowed_roles")
             if "all" in allowed_roles:
                 # Pass 'self' as the first argument
                 return view_class(self, request, *args, **kwargs)
@@ -44,7 +43,6 @@ def has_access_to_scenario(field_name: str = None, template_id_in_request_data: 
     """
     def decorator(view_class):
         def wrapper_func(self, request, *args, **kwargs):
-            print("has_access_to_scenario")
             user: User = request.user
 
             if user is None:

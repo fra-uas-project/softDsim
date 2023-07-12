@@ -18,8 +18,9 @@ from app.src.util.task_util import (
     get_tasks_status_detailed,
 )
 from app.src.util.user_scenario_util import get_scenario_state_dto
-from history.models.history import History
 from history.models.result import Result
+
+from datetime import datetime, timezone
 
 
 def get_result_response(session: CachedScenario) -> ResultResponse:
@@ -60,13 +61,13 @@ def get_result_response(session: CachedScenario) -> ResultResponse:
         return Response(dict(status="error", data=msg), status=500)
 
 
-def handle_scenario_ending(scenario):
+def handle_scenario_ending(scenario: UserScenario):
     result = write_result_entry(scenario)
     delete_sceanrio_objects(scenario)
     return result
 
 
-def write_result_entry(scenario):
+def write_result_entry(scenario: UserScenario):
     final_tasks = CachedTasks(scenario_id=scenario.id)
     result: Result = Result.objects.create(
         user_scenario=scenario,
@@ -88,20 +89,29 @@ def write_result_entry(scenario):
     return result
 
 
-def delete_sceanrio_objects(scenario):
+def delete_sceanrio_objects(scenario: UserScenario):
     # Delete all objects that wont be used any longer
     n_tasks, _ = Task.objects.filter(user_scenario=scenario).delete()
     logging.info(f"Deleted {n_tasks} tasks for scenario {scenario.id}")
 
 
-def calculate_time_played(scenario):
-    history = History.objects.filter(user_scenario_id=scenario.id).order_by("id")
-    try:
-        start_time = history.first().timestamp
-        end_time = history.last().timestamp
-    except:
+def calculate_time_played(scenario: UserScenario) -> int:
+    """
+    Returns time in seconds.
+    """
+
+    if not scenario.ended or scenario.start_datetime is None:
         return 0
-    return math.floor((end_time - start_time).total_seconds())
+
+    now: datetime = datetime.now(timezone.utc)
+
+    try:
+        diff: int = (now-scenario.start_datetime).total_seconds()
+        return diff
+    except Exception as e:
+        logging.warning(f"Error while calculating time played: {e}")
+
+    return 0
 
 
 class ResultDTO:
