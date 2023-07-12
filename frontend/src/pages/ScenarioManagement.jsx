@@ -594,73 +594,95 @@ const ScenarioManagement = () => {
             <ModalHeader>Score Card</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
+
               <FormControl>
                 <FormLabel style={{ marginBottom: "1px" }}>Budget</FormLabel>
                 <FormHelperText style={{ marginTop: "1px" }}>
-                  Please enter a number between 0 and 1. ( x.xx )
+                  Please enter a number between 0 and 2. (x.xx)
                 </FormHelperText>{" "}
                 <Input
                     type="text"
                     value={scoreCardParams.budget_p}
-                    onChange={(e) => setScoreCardParams({ ...scoreCardParams, budget_p: e.target.value })}
+                    onChange={(e) =>
+                        setScoreCardParams({
+                          ...scoreCardParams,
+                          budget_p: e.target.value,
+                        })
+                    }
                     onKeyPress={(e) => {
                       const charCode = e.which ? e.which : e.keyCode;
                       const inputValue = e.target.value + String.fromCharCode(charCode);
                       const isValid =
-                          /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
+                          /^\d*\.?\d*$/.test(inputValue) &&
+                          parseFloat(inputValue) >= 0 &&
+                          parseFloat(inputValue) <= 2;
 
                       if (!isValid) {
                         e.preventDefault();
                       }
                     }}
-                    pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
-                    title="Please enter a number between 0 and 1"
+                    pattern="^(0(\.\d+)?|1(\.\d+)?|2(\.0*)?)$"
+                    title="Please enter a number between 0 and 2"
                 />
               </FormControl>
               <FormControl>
                 <FormLabel style={{ marginBottom: "1px" }}>Time</FormLabel>
                 <FormHelperText style={{ marginTop: "1px" }}>
-                  Please enter a number between 0 and 1. ( x.xx )
+                  Please enter a number between 0 and 2. (x.xx)
                 </FormHelperText>{" "}
                 <Input
                     type="text"
                     value={scoreCardParams.time_p}
-                    onChange={(e) => setScoreCardParams({ ...scoreCardParams, time_p: e.target.value })}
+                    onChange={(e) =>
+                        setScoreCardParams({
+                          ...scoreCardParams,
+                          time_p: e.target.value,
+                        })
+                    }
                     onKeyPress={(e) => {
                       const charCode = e.which ? e.which : e.keyCode;
                       const inputValue = e.target.value + String.fromCharCode(charCode);
                       const isValid =
-                          /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
+                          /^\d*\.?\d*$/.test(inputValue) &&
+                          parseFloat(inputValue) >= 0 &&
+                          parseFloat(inputValue) <= 2;
 
                       if (!isValid) {
                         e.preventDefault();
                       }
                     }}
-                    pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
-                    title="Please enter a number between 0 and 1"
+                    pattern="^(?:0(\.\d+)?|1(\.0*)?|2(\.0*)?)$"
+                    title="Please enter a number between 0 and 2"
                 />
               </FormControl>
               <FormControl>
                 <FormLabel style={{ marginBottom: "1px" }}>Quality</FormLabel>
                 <FormHelperText style={{ marginTop: "1px" }}>
-                  Please enter a number between 0 and 1. ( x.xx )
+                  Please enter a number between 0 and 8. (x.xx)
                 </FormHelperText>{" "}
                 <Input
                     type="text"
                     value={scoreCardParams.quality_k}
-                    onChange={(e) => setScoreCardParams({ ...scoreCardParams, quality_k: e.target.value })}
+                    onChange={(e) =>
+                        setScoreCardParams({
+                          ...scoreCardParams,
+                          quality_k: e.target.value,
+                        })
+                    }
                     onKeyPress={(e) => {
                       const charCode = e.which ? e.which : e.keyCode;
                       const inputValue = e.target.value + String.fromCharCode(charCode);
                       const isValid =
-                          /^\d*\.?\d*$/.test(inputValue) && parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1;
+                          /^\d*\.?\d*$/.test(inputValue) &&
+                          parseFloat(inputValue) >= 0 &&
+                          parseFloat(inputValue) <= 8;
 
                       if (!isValid) {
                         e.preventDefault();
                       }
                     }}
-                    pattern="^(?:0(\.\d+)?|1(\.0*)?)$"
-                    title="Please enter a number between 0 and 1"
+                    pattern="^(?:0(\.\d+)?|1(\.0*)?|2(\.0*)?|3(\.0*)?|4(\.0*)?|5(\.0*)?|6(\.0*)?|7(\.0*)?|8(\.0*)?)$"
+                    title="Please enter a number between 0 and 8"
                 />
               </FormControl>
             </ModalBody>
