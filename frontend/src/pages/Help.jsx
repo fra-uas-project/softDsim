@@ -9,7 +9,7 @@ import {
   Flex, Tabs, TabList, TabPanels, Tab, TabPanel, Heading, Image,
 } from "@chakra-ui/react"
 import React from "react";
-import scenario from "../images/Scenarios.png";
+import scenario from "../images/Scenarios.jpg";
 import story from "../images/Story.png";
 import simulation from "../images/Simulation.png";
 import information from "../images/Information_About_Simulation.png";
@@ -17,7 +17,7 @@ import remaining_tasks from "../images/Remaining_tasks.png";
 import tasks from "../images/Tasks.png";
 import budget from "../images/Budget.png";
 import employeee_status from "../images/Employee_status.png";
-import action from "../images/Action.png";
+import action from "../images/Action.jpg";
 import meetings from "../images/Meetings.png";
 import models from "../images/Models.png";
 import overtime from "../images/Overtime.png";
@@ -26,8 +26,14 @@ import training from "../images/Training.png";
 import unit_testing from "../images/Unit_testing.png";
 import bugfixing from "../images/Bugfixing.png";
 import employees from "../images/Employees.png";
-import integration_testing from "../images/Integration_testing.png";
+import integration_testing from "../images/integration_testing.jpg";
+import error_rate from "../images/error_rate.jpg";
+import final_score from "../images/final_Score.jpg";
+import quality_score from "../images/quality_Score.jpg";
+import stress_motivation_familiarity from "../images/stress_motivation_familiarity.jpg";
+import stress_motivation_familiarity_userinput_only from "../images/stress_motivation_familiarity_userinput_only.jpg";
 import questions from "../images/Questions.png";
+
 
 
 
@@ -73,7 +79,9 @@ const Help = () => {
                       <p style={{ marginBottom: '10px' }}>
                         After logging in, under the "Scenarios" section, there is an overview of the available scenarios created and published by the instructors for students to play through. A simulation can be selected and started from here. Additionally, the overview shows how many times the user has attempted a simulation ("TRIES") and the highest score achieved ("BEST SCORE") for a simulation by the user.
                       </p>
-                      <Image src={scenario} w={1000} objectFit="contain" />
+                      <Box display="flex" justifyContent="center">
+                      <Image src={scenario} w={700} objectFit="contain" />
+                      </Box>
                       <AccordionItem>
                         <h2>
                           <AccordionButton>
@@ -199,11 +207,37 @@ const Help = () => {
 
                         </AccordionPanel>
                       </AccordionItem>
+                      <AccordionItem>
+                        <h2>
+                          <AccordionButton>
+                            <Box flex='1' textAlign='left'>
+                              Graphical Representation
+                            </Box>
+                            <AccordionIcon />
+                          </AccordionButton>
+                        </h2>
+                        <AccordionPanel pb={4}>
+                          This section shows graphically how the parameters depend on each other and what effects they have.
+                          <p>• Effects on Stress/Motivation/Familiarity (Userinput only)</p>
+                          <Image src={stress_motivation_familiarity_userinput_only} w={800} objectFit="contain" mx="auto" />
+                          <p>• Effects on Stress/Motivation/Familiarity</p>
+                          <Image src={stress_motivation_familiarity} w={800} objectFit="contain" mx="auto" />
+                          <p>• Impacts on Employee Error Rate (Regarding Tasks)</p>
+                          <Image src={error_rate} w={800} objectFit="contain" mx="auto" />
+                          <p>• Final Score</p>
+                          <Image src={final_score} w={800} objectFit="contain" mx="auto" />
+                          <p>• Quality Score</p>
+                          <Image src={quality_score} w={800} objectFit="contain" mx="auto" />
+
+
+
+                        </AccordionPanel>
+                      </AccordionItem>
                     </TabPanel>
                     <TabPanel>
                       <p style={{ marginBottom: '10px' }}>
                         Under this section, the course of the project can change after each iteration. The settings of each fragment can be seen in the image below and can be adjusted after each iteration. After making the adjustments, clicking on "Next Week" will execute the simulation, and the new simulation results will be displayed. Furthermore, the simulation fragments allow for detailed control over various aspects of the project. By adjusting the fragment settings, different situations can be simulated, and potential impacts on the project flow and outcome can be analyzed.</p>
-                      <Image src={action} w={800} objectFit="contain" mx="auto" />
+                      <Image src={action} w={450} objectFit="contain" mx="auto" />
                       <AccordionItem>
                         <h2>
                           <AccordionButton>
@@ -299,7 +333,7 @@ const Help = () => {
                         </h2>
                         <AccordionPanel pb={4}>
                           Integration testing should ideally be conducted towards the end of the project. After performing unit testing and bug fixing, integration testing is carried out to verify if the outcome of completed tasks functions correctly within the final product. Following integration testing, there may be additional tasks added to the "remaining tasks," which will increase the number of tasks. Integration testing is also crucial for ensuring high-quality end results. Depending on the number of integration tests being conducted, it is possible that in an iteration, the "remaining tasks" may not be considered at all or given less priority.
-                          <Image src={integration_testing} w={1000} objectFit="contain" mx="auto" />
+                          <Image src={integration_testing} w={700} objectFit="contain" mx="auto" />
                         </AccordionPanel>
                       </AccordionItem>
                       <AccordionItem>
