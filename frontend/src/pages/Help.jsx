@@ -9,7 +9,7 @@ import {
   Flex, Tabs, TabList, TabPanels, Tab, TabPanel, Heading, Image,
 } from "@chakra-ui/react"
 import React from "react";
-import scenario from "../images/Scenarios.jpg";
+import scenario from "../images/Scenarios.png";
 import story from "../images/Story.png";
 import simulation from "../images/Simulation.png";
 import information from "../images/Information_About_Simulation.png";
@@ -17,7 +17,7 @@ import remaining_tasks from "../images/Remaining_tasks.png";
 import tasks from "../images/Tasks.png";
 import budget from "../images/Budget.png";
 import employeee_status from "../images/Employee_status.png";
-import action from "../images/Action.jpg";
+import action from "../images/Action.png";
 import meetings from "../images/Meetings.png";
 import models from "../images/Models.png";
 import overtime from "../images/Overtime.png";
@@ -27,14 +27,12 @@ import unit_testing from "../images/Unit_testing.png";
 import bugfixing from "../images/Bugfixing.png";
 import employees from "../images/Employees.png";
 import integration_testing from "../images/integration_testing.jpg";
-import error_rate from "../images/error_rate.jpg";
-import final_score from "../images/final_Score.jpg";
-import quality_score from "../images/quality_Score.jpg";
-import stress_motivation_familiarity from "../images/stress_motivation_familiarity.jpg";
-import stress_motivation_familiarity_userinput_only from "../images/stress_motivation_familiarity_userinput_only.jpg";
+import error_rate from "../images/error_rate.png";
+import final_score from "../images/final_Score.png";
+import quality_score from "../images/quality_Score.png";
+import stress_motivation_familiarity from "../images/stress_motivation_familiarity.png";
+import stress_motivation_familiarity_userinput_only from "../images/stress_motivation_familiarity_userinput_only.png";
 import questions from "../images/Questions.png";
-
-
 
 
 
@@ -80,7 +78,7 @@ const Help = () => {
                         After logging in, under the "Scenarios" section, there is an overview of the available scenarios created and published by the instructors for students to play through. A simulation can be selected and started from here. Additionally, the overview shows how many times the user has attempted a simulation ("TRIES") and the highest score achieved ("BEST SCORE") for a simulation by the user.
                       </p>
                       <Box display="flex" justifyContent="center">
-                      <Image src={scenario} w={700} objectFit="contain" />
+                      <Image src={scenario} w={900} objectFit="contain" />
                       </Box>
                       <AccordionItem>
                         <h2>
