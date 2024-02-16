@@ -1,4 +1,5 @@
 import logging
+from pprint import pprint
 
 from bson import ObjectId
 from django.shortcuts import get_object_or_404
@@ -7,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.decorators.decorators import allowed_roles
+from app.decorators.decorators import allowed_roles, has_access_to_scenario
 from app.exceptions import IndexException
 from app.models.action import Action
 from app.models.answer import Answer
@@ -23,29 +24,38 @@ from app.serializers.template_scenario import (
     ReducedTemplateScenarioSerializer,
     TemplateScenarioSerializer,
 )
+from app.serializers.course import (
+    CourseNameSerializer,
+)
 from config import get_config
 from history.models.result import Result
+from app.models.event import Event
+from app.models.event import EventEffect
+from app.models.course import Course
 
 
 class TemplateScenarioView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["student", "creator", "staff"])
+    @allowed_roles(["creator", "staff"])
     def get(self, request, scenario_id=None, format=None):
-
         try:
             if scenario_id:
-                template_scenario = TemplateScenario.objects.get(id=scenario_id)
-                serializer = TemplateScenarioSerializer(template_scenario, many=False)
+                template_scenario = TemplateScenario.objects.get(
+                    id=scenario_id)
+                serializer = TemplateScenarioSerializer(
+                    template_scenario, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
             template_scenarios = TemplateScenario.objects.all()
-            serializer = TemplateScenarioSerializer(template_scenarios, many=True)
+            serializer = TemplateScenarioSerializer(
+                template_scenarios, many=True)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            logging.error(f"{e.__class__.__name__} occurred in GET template-scenario")
+            logging.error(
+                f"{e.__class__.__name__} occurred in GET template-scenario")
             logging.error(f"{str(e)} occurred in GET template-scenario")
             return Response(
                 {
@@ -59,7 +69,8 @@ class TemplateScenarioView(APIView):
     def post(self, request):
 
         try:
-            serializer = TemplateScenarioSerializer(data=request.data, many=False)
+            serializer = TemplateScenarioSerializer(
+                data=request.data, many=False)
             if serializer.is_valid():
 
                 # create method of TemplateScenarioSerializer checks if indexes of components are correct
@@ -83,7 +94,8 @@ class TemplateScenarioView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except Exception as e:
-            logging.error(f"{e.__class__.__name__} occurred in POST template-scenario")
+            logging.error(
+                f"{e.__class__.__name__} occurred in POST template-scenario")
             logging.error(f"{str(e)} occurred in POST template-scenario")
             return Response(
                 {"status": "something went wrong internally", "data": str(e)},
@@ -92,9 +104,10 @@ class TemplateScenarioView(APIView):
 
     @allowed_roles(["creator", "staff"])
     def delete(self, request, scenario_id=None):
-
         try:
-            template_scenario = get_object_or_404(TemplateScenario, id=scenario_id)
+            template_scenario = get_object_or_404(
+                TemplateScenario, id=scenario_id)
+
             serializer = TemplateScenarioSerializer(template_scenario)
             template_scenario.delete()
 
@@ -107,7 +120,7 @@ class TemplateScenarioView(APIView):
 
         except Exception as e:
             logging.error(
-                f"{e.__class__.__name__} occurred in DELETE template-scenario with id {id}"
+                f"{e.__class__.__name__} occurred in DELETE template-scenario with id {scenario_id}"
             )
             return Response(
                 {"status": "something went wrong internally"},
@@ -152,10 +165,12 @@ class StudioTemplateScenarioView(APIView):
 
             if scenario_id:
                 try:
-                    scenario_template = collection.find_one({"_id": ObjectId(scenario_id)})
+                    scenario_template = collection.find_one(
+                        {"_id": ObjectId(scenario_id)})
 
                     return Response(
-                        dict(status="success", data=serialize_template_scenario(scenario_template)),
+                        dict(status="success", data=serialize_template_scenario(
+                            scenario_template)),
                         status=status.HTTP_200_OK
                     )
                 except:
@@ -195,7 +210,8 @@ class StudioTemplateScenarioView(APIView):
                 scenario_template_dto = dict(
                     scenario=scenario_template)
 
-                response = collection.replace_one({"_id": ObjectId(scenario_id)}, scenario_template_dto)
+                response = collection.replace_one(
+                    {"_id": ObjectId(scenario_id)}, scenario_template_dto)
 
                 if response.acknowledged and response.modified_count == 1:
                     return Response(
@@ -211,7 +227,8 @@ class StudioTemplateScenarioView(APIView):
                     )
             else:
                 return Response(
-                    dict(status="error", data="Please specify a <scenario_id> as path parameter"),
+                    dict(
+                        status="error", data="Please specify a <scenario_id> as path parameter"),
                     status=status.HTTP_405_METHOD_NOT_ALLOWED
                 )
 
@@ -228,19 +245,25 @@ class StudioTemplateScenarioView(APIView):
             collection = config.get_mongo_db_scenario_template_collection()
 
             if "clone" in request.query_params:
-                template_scenario = collection.find_one({"_id": ObjectId(request.query_params.get("clone"))})
+                template_scenario = collection.find_one(
+                    {"_id": ObjectId(request.query_params.get("clone"))})
 
-                scenario = next(component for component in template_scenario["scenario"] if component["type"] == "BASE")
+                scenario = next(
+                    component for component in template_scenario["scenario"] if component["type"] == "BASE")
                 scenario["template_name"] = f"{scenario['template_name']} (1)"
 
-                template_scenario_dto = dict(scenario=template_scenario["scenario"])
-                template_scenario_result = collection.insert_one(template_scenario_dto)
+                template_scenario_dto = dict(
+                    scenario=template_scenario["scenario"])
+                template_scenario_result = collection.insert_one(
+                    template_scenario_dto)
                 duplicate_template_scenario_id = template_scenario_result.inserted_id
 
-                duplicate_template_scenario = collection.find_one({"_id": duplicate_template_scenario_id})
+                duplicate_template_scenario = collection.find_one(
+                    {"_id": duplicate_template_scenario_id})
 
                 return Response(
-                    dict(status="success", data=serialize_template_scenario(duplicate_template_scenario)),
+                    dict(status="success", data=serialize_template_scenario(
+                        duplicate_template_scenario)),
                     status=status.HTTP_200_OK
                 )
 
@@ -251,15 +274,18 @@ class StudioTemplateScenarioView(APIView):
 
                 object_id = collection.insert(scenario_template_dto)
 
-                template_name = [fragment["template_name"] for fragment in scenario_template if fragment["type"] == "BASE"][0]
+                template_name = [fragment["template_name"]
+                                 for fragment in scenario_template if fragment["type"] == "BASE"][0]
 
                 return Response(
-                    dict(status="success", data={"name": template_name, "id": str(object_id)}),
+                    dict(status="success", data={
+                         "name": template_name, "id": str(object_id)}),
                     status=status.HTTP_200_OK
                 )
 
         except Exception as e:
-            logging.error(f"{e.__class__.__name__} occurred in POST studio/template-scenario")
+            logging.error(
+                f"{e.__class__.__name__} occurred in POST studio/template-scenario")
             logging.error(f"{str(e)} occurred in POST template-scenario")
             return Response(
                 {"status": "something went wrong internally", "data": str(e)},
@@ -273,7 +299,8 @@ class StudioTemplateScenarioView(APIView):
                 config = get_config()
                 collection = config.get_mongo_db_scenario_template_collection()
 
-                response = collection.delete_one({"_id": ObjectId(scenario_id)})
+                response = collection.delete_one(
+                    {"_id": ObjectId(scenario_id)})
 
                 if response.deleted_count == 0:
                     return Response(
@@ -288,14 +315,16 @@ class StudioTemplateScenarioView(APIView):
                 )
             else:
                 return Response(
-                    dict(status="error", data="Please specify a <scenario_id> as path parameter"),
+                    dict(
+                        status="error", data="Please specify a <scenario_id> as path parameter"),
                     status=status.HTTP_400_BAD_REQUEST
                 )
         except:
             return Response(
-                dict(status="error", data="An error occurred while fetching all scenarios"),
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+                dict(status="error",
+                     data="An error occurred while fetching all scenarios"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class TemplateScenarioFromStudioView(APIView):
@@ -314,7 +343,8 @@ class TemplateScenarioFromStudioView(APIView):
 
             config = get_config()
             collection = config.get_mongo_db_scenario_template_collection()
-            template_scenario = collection.find_one({"_id": ObjectId(studio_template_id)}, {"scenario": 1, "_id": 0})["scenario"]
+            template_scenario = collection.find_one({"_id": ObjectId(studio_template_id)}, {
+                                                    "scenario": 1, "_id": 0})["scenario"]
 
             template_scenario[0]["studio_template_id"] = studio_template_id
 
@@ -345,7 +375,8 @@ class TemplateScenarioFromStudioView(APIView):
 
             scenario.save()
             set_last_fragement(scenario)
-            logging.info("Template scenario created with id: " + str(scenario.id))
+            logging.info("Template scenario created with id: " +
+                         str(scenario.id))
 
             # Create Scorecard
             scorecard = ScoreCard(template_scenario=scenario)
@@ -360,7 +391,8 @@ class TemplateScenarioFromStudioView(APIView):
             try:
                 scenario.delete()
             except Exception:
-                logging.warning("Could not delete scenario after failed creation")
+                logging.warning(
+                    "Could not delete scenario after failed creation")
             msg = f"{e.__class__.__name__} occured while creating template scenario from studio"
             logging.error(msg)
             return Response(
@@ -375,7 +407,8 @@ class StudioTemplateScenarioIsPublishedValidatorView(APIView):
         try:
 
             if "scenario_id" in request.query_params:
-                template_scenarios = TemplateScenario.objects.filter(studio_template_id=request.query_params["scenario_id"])
+                template_scenarios = TemplateScenario.objects.filter(
+                    studio_template_id=request.query_params["scenario_id"])
                 if template_scenarios:
                     return Response(
                         dict(status="success", data=True),
@@ -388,7 +421,8 @@ class StudioTemplateScenarioIsPublishedValidatorView(APIView):
                     )
             else:
                 return Response(
-                    dict(status="error", data="Please provide the query parameter <scenario_id>"),
+                    dict(
+                        status="error", data="Please provide the query parameter <scenario_id>"),
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except:
@@ -422,7 +456,8 @@ def handle_base(data, scenario: TemplateScenario, i):
 
 
 def handle_question(data, scenario: TemplateScenario, i):
-    qc = QuestionCollection(index=i, template_scenario=scenario, text=data["text"])
+    qc = QuestionCollection(
+        index=i, template_scenario=scenario, text=data["text"])
     qc.save()
     qi = 0
     for question_data in data.get("questions", []):
@@ -482,17 +517,18 @@ def handle_model(data, scenario: TemplateScenario, i):
     m = ModelSelection(
         index=i,
         text=data.get("text", ""),
-        waterfall="waterfall" in data.get("models"),
-        kanban="kanban" in data.get("models"),
-        scrum="scrum" in data.get("models"),
+        waterfall="Waterfall" in data.get("models"),
+        kanban="Kanban" in data.get("models"),
+        scrum="Scrum" in data.get("models"),
         template_scenario=scenario,
     )
 
-    if not m.waterfall and not m.kanban and not m.scrum:
-        # If no model is selected, select all models
-        m.waterfall = True
-        m.scrum = True
-        m.kanban = True
+    # We have a minimum requirement. That's why this isn't Necessar (Burak)
+    # if not m.waterfall and not m.kanban and not m.scrum:
+    # If no model is selected, select all models
+    # m.waterfall = True
+    # m.scrum = True
+    # m.kanban = True
 
     m.save()
     return i + 1
@@ -500,7 +536,114 @@ def handle_model(data, scenario: TemplateScenario, i):
 
 def handle_event(data, scenario: TemplateScenario, i):
     # Events are not yet implemented
-    return i
+    event = Event()
+
+    event.template_scenario = scenario
+    event.text = data['text']
+    event.trigger_type = data['trigger_type']
+    event.trigger_comparator = data['trigger_comparator']
+
+    try:
+        event.trigger_value = float(data['trigger_value'])
+    except:
+        event.trigger_value = 0
+
+    event.save()
+
+    valued_effect_types = [
+        'budget',
+        'duration',
+        'stress',
+        'motivation',
+        'familiarity'
+    ]
+
+    for effect_type in valued_effect_types:
+        get_valued_effect(effect_type, data[effect_type], event)
+
+    get_tasks_effects(data, event)
+
+    event.save()
+
+    return i + 1
+
+
+def get_valued_effect(effect_type: str, value: str, event: Event) -> EventEffect:
+    effect: EventEffect = EventEffect()
+    effect.event = event
+
+    effect.type = effect_type
+
+    effect.easy_tasks = 0
+    effect.medium_tasks = 0
+    effect.hard_tasks = 0
+
+    try:
+        effect.value = float(value)
+    except:
+        effect.value = 0
+
+    effect.save()
+    return effect
+
+
+def get_tasks_effects(data, event: Event) -> EventEffect:
+    effect: EventEffect = EventEffect()
+    effect.event = event
+    effect.type = 'tasks'
+    effect.value = 0
+
+    try:
+        effect.easy_tasks = int(data['easy_tasks'])
+    except:
+        effect.easy_tasks = 0
+
+    try:
+        effect.medium_tasks = int(data['medium_tasks'])
+    except:
+        effect.medium_tasks = 0
+
+    try:
+        effect.hard_tasks = int(data['hard_tasks'])
+    except:
+        effect.hard_tasks = 0
+
+    effect.save()
+    return effect
+
+
+def get_effect(data, event, effect_type) -> EventEffect:
+    event_effect: EventEffect = EventEffect()
+    event_effect.event = event
+    event_effect.type = effect_type
+
+    try:
+        event_effect.value = float(data[effect_type])
+    except:
+        event_effect.value = 0
+
+    try:
+        event_effect.easy_tasks = int(data['easy_tasks'])
+    except:
+        event_effect.easy_tasks = 0
+
+    try:
+        event_effect.medium_tasks = int(data['medium_tasks'])
+    except:
+        event_effect.medium_tasks = 0
+
+    try:
+        event_effect.hard_tasks = int(data['hard_tasks'])
+    except:
+        event_effect.hard_tasks = 0
+
+    try:
+        return event_effect.save()
+    except Exception as e:
+        logging.error(str(e))
+
+    event_effect.save()
+    return event_effect
 
 
 def set_last_fragement(scenario: TemplateScenario):
@@ -519,9 +662,9 @@ class TemplateScenarioUserListView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["student"])
+    @allowed_roles(["all"])
+    @has_access_to_scenario("scenario_id", False)
     def get(self, request, scenario_id=None, format=None):
-
         try:
             if scenario_id:
                 data = self.get_data_for_single_scenario(
@@ -530,14 +673,17 @@ class TemplateScenarioUserListView(APIView):
                 return Response(data, status=status.HTTP_200_OK)
 
             template_scenarios = TemplateScenario.objects.all()
+
             data = [
-                self.get_data_for_single_scenario(scenario.id, request.user.username)
+                self.get_data_for_single_scenario(
+                    scenario.id, request.user.username)
                 for scenario in template_scenarios
             ]
             return Response(data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            logging.error(f"{e.__class__.__name__} occurred in GET template-scenario")
+            logging.error(
+                f"{e.__class__.__name__} occurred in GET template-scenario")
             logging.error(f"{str(e)} occurred in GET template-scenario")
             return Response(
                 {
@@ -549,7 +695,8 @@ class TemplateScenarioUserListView(APIView):
 
     def get_data_for_single_scenario(self, scenario_id: int, username: str):
         template_scenario = TemplateScenario.objects.get(id=scenario_id)
-        serializer = ReducedTemplateScenarioSerializer(template_scenario, many=False)
+        serializer = ReducedTemplateScenarioSerializer(
+            template_scenario, many=False)
         results = Result.objects.filter(
             user_scenario__user__username=username,
             user_scenario__template__id=template_scenario.id,
@@ -559,3 +706,50 @@ class TemplateScenarioUserListView(APIView):
         if tries:
             max_score = max(map(lambda x: x.total_score, results))
         return {**serializer.data, "tries": tries, "max_score": max_score}
+
+
+class ScenarioCoursesView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    @allowed_roles(["staff"])
+    def get(self, request, scenario_id):
+        """
+        Get all the courses where a scenario is associated.
+        """
+        courses = Course.objects.filter(scenarios__id=scenario_id)
+        serializer = CourseNameSerializer(courses, many=True)
+        response_data = [{
+            "id": course.id,
+            "name": course.name
+        } for course in courses]
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+
+    @allowed_roles(["staff"])
+    def delete(self, request, scenario_id):
+         """
+         Remove a scenario from all the associated courses.
+         """
+         try:
+            scenario_id = int(scenario_id)
+            if scenario_id < 1:
+                raise ValueError(f"Invalid scenario ID: {scenario_id}")
+         except ValueError as e:
+             return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+             )
+
+         scenario = get_object_or_404(TemplateScenario, id=scenario_id)
+         courses = Course.objects.filter(scenarios__id=scenario_id)
+
+         for course in courses:
+            course.scenarios.remove(scenario)
+
+         return Response(
+            {"status": f"Scenario {scenario_id} removed from all associated courses."},
+            status=status.HTTP_200_OK
+         )

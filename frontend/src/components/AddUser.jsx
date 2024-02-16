@@ -7,10 +7,10 @@ import {
     ModalBody,
     ModalCloseButton,
     Button, useDisclosure, Box, Stack, Input, InputGroup, InputRightElement, Flex, Heading,
-    Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody
+    Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody, Select, Text,
 } from '@chakra-ui/react';
 import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin, HiOutlineInformationCircle } from "react-icons/hi";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 
 const AddUser = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -22,6 +22,25 @@ const AddUser = () => {
     const [userID, setUserID] = useState('')
     const [userPassword, setUserPassword] = useState('')
     const [registerSuccess, setRegisterSuccess] = useState('none')
+    const [courses, setCourses] = useState([]);
+    const [course, setCourse] = useState([]);
+
+    const handleCourseChange = (event) => {
+        const selectedCourse = event.target.value;
+        setCourse(selectedCourse);
+    };
+
+    const fetchCourses = async () => {
+        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses`, {
+            method: "GET",
+            credentials: "include",
+        });
+        const data = await res.json();
+        setCourses(data.data);
+        if ("error" in data) {
+            return;
+        }
+    };
 
     // validate user ID input
     function useridInput(event) {
@@ -62,33 +81,46 @@ const AddUser = () => {
 
     // Login API call
     async function register() {
-        setRegisterSuccess('attempting')
+        setRegisterSuccess('attempting');
         if (idInputValid && passwortInputValid && passwortRepeatInputValid) {
             try {
+                const requestBody = {
+                    "username": userID,
+                    "password": userPassword,
+                    "admin": false
+                };
+                console.log(course);
+                if (course.length > 0) {
+                    requestBody.course_id = course;
+                }
+                console.log(requestBody)
+
                 const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/register`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ "username": userID, "password": userPassword, "admin": false }),
-                })
-                const registerAttempt = await res
+                    body: JSON.stringify(requestBody),
+                });
+
+                const registerAttempt = await res;
                 if (registerAttempt.status === 201) {
-                    setRegisterSuccess('none')
-                    window.location.href = "/users"
+                    setRegisterSuccess('none');
+                    window.location.href = "/users";
                 } else if (registerAttempt.status === 400) {
-                    setRegisterSuccess('invalid')
+                    setRegisterSuccess('invalid');
                 } else {
-                    setRegisterSuccess('unknown')
+                    setRegisterSuccess('unknown');
                 }
             } catch (err) {
-                console.log('Error:', err)
+                console.log('Error:', err);
             }
         } else {
-            setRegisterSuccess('unknown')
+            setRegisterSuccess('unknown');
         }
     }
+
     // invert show password status
     function showPasswordClicked() {
         setShowPassword(!showPassword)
@@ -98,6 +130,12 @@ const AddUser = () => {
     function showPasswordRepeatClicked() {
         setShowRepeatPassword(!showRepeatPassword)
     }
+
+    useEffect(() => {
+        fetchCourses();
+    }, []);
+
+
     return (
         <>
             <Box align="center" justify="center" p='3'>
@@ -146,6 +184,14 @@ const AddUser = () => {
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
+                                <Text fontWeight="bold">Course</Text>
+                                <Select placeholder="Select a course" size='lg' onChange={handleCourseChange}>
+                                    {courses.map(course => (
+                                        <option key={course.id} value={course.id}>
+                                            {course.name}
+                                        </option>
+                                    ))}
+                                </Select>
                             </Stack>
                         </ModalBody>
                         <ModalFooter align="center" justifyContent="center" >

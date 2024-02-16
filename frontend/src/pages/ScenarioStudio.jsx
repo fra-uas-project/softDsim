@@ -61,7 +61,6 @@ import InspectorTab from "../components/ScenarionStudio/InspectorTab/InspectorTa
 
 const ScenarioStudio = () => {
     const toast = useToast();
-
     const [tabIndex, setTabIndex] = useState(tabIndexEnum.COMPONENTS);
     const [editorList, updateEditorList] = useImmer([]);
     const [savedEditorList, setSavedEditorList] = useState(editorList);
@@ -73,7 +72,7 @@ const ScenarioStudio = () => {
             future: []
         }
     )
-
+    window.value = window.value + 10;
     const [editorListHistoryState, setEditorListHistoryState] = useState(editorListHistoryStates.LOG_HIST);
 
     const [selectedObjectId, setSelectedObjectId] = useState(null);
@@ -602,33 +601,44 @@ const ScenarioStudio = () => {
 
     const fetchScenarioTemplates = async () => {
         try {
-            setIsLoading(true)
+            setIsLoading(true);
             const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/studio/template-scenario`, {
                 method: 'GET',
                 credentials: 'include',
-            })
+            });
             const fetchedScenarioTemplates = await res.json();
 
-            let templateScenarios = []
+            let templateScenarios = [];
 
             for (const templateScenario of fetchedScenarioTemplates.data) {
+                let name = null;
+                const scenarios = templateScenario?.scenario;
+                if (Array.isArray(scenarios)) {
+                    const baseScenario = scenarios.find(scenario => scenario.type === "BASE");
+                    if (baseScenario) {
+                        name = baseScenario.template_name;
+                    }
+                }
+
                 const templateDto = {
                     scenarioId: templateScenario.id,
-                    name: templateScenario?.scenario?.find(scenario => scenario.type === "BASE")?.template_name
-                }
-                templateScenarios.push(templateDto)
+                    name: name,
+                };
+                templateScenarios.push(templateDto);
             }
-            setTemplateScenarios(templateScenarios)
-            setIsLoading(false)
+
+            setTemplateScenarios(templateScenarios);
+            setIsLoading(false);
         } catch (e) {
-        toast({
-            title: `Could not fetch scenario templates. Please try again.`,
-            status: 'error',
-            duration: 5000,
-        });
-        console.log(e);
+            toast({
+                title: `Could not fetch scenario templates. Please try again.`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
         }
     };
+
 
     const resetScenarioStudio = () => {
         setEditorListHistoryState(editorListHistoryStates.RESET)
@@ -771,6 +781,7 @@ const ScenarioStudio = () => {
     // }, [editorListState])
 
     useEffect(() => {
+    console.log(window.value)
         console.log("editorListIsSaved", editorListIsSaved)
     }, [editorListIsSaved])
 
@@ -930,6 +941,13 @@ const ScenarioStudio = () => {
                                     saveScenarioTemplate(currentTemplateId)
                                 }}>
                             Save
+                        </Button>
+                        <Button variant="outline"
+                                colorScheme="blue"
+                                onClick={() => {
+                                    duplicateScenario(currentTemplateId)
+                                }}>
+                            Duplicate
                         </Button>
                         <Button variant="solid"
                                 colorScheme="blue"

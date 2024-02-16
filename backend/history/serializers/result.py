@@ -9,7 +9,11 @@ class ResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = Result
         fields = [
+            "id",
+            "template_scenario_id",
+            "template_scenario_name",
             "user_scenario",
+            "username",
             "total_score",
             "timestamp",
             "total_steps",
@@ -28,5 +32,8 @@ class ResultSerializer(serializers.ModelSerializer):
             "time_score",
             "budget_score",
             "question_score",
+            "avg_poisson_value",
             "model",
+            "time_played",
+            "randomness"
         ]

@@ -14,6 +14,10 @@ import { getCookie } from "./utils/utils";
 import NotFoundPage from "./components/NotFoundPage";
 import ScenarioStudio from "./pages/ScenarioStudio";
 import AddMultipleUsers from "./pages/AddMultipleUsers";
+import SkillTypesOverview from "./pages/SkillTypesOverview";
+import ScenarioConfigOverview from "./pages/ScenarioConfigOverview";
+import CourseOverview from "./pages/CourseOverview";
+import ScenarioManagement from "./pages/ScenarioManagement";
 
 const Routing = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext)
@@ -68,6 +72,7 @@ const Routing = () => {
                     <Route path="/help" element={<Help />} />
                     <Route path="/login" element={<Navigate to="/" replace />} />
                     <Route path="*" element={<NotFoundPage />} />
+
                 </>
                 :
                 <>
@@ -89,6 +94,12 @@ const Routing = () => {
                 <>
                     {/* adding routes which are accessible for every logged-in user with role creator */}
                     <Route path="/scenario-studio" element={<ScenarioStudio />} />
+                    <Route path="/skill-types" element={<SkillTypesOverview />} />
+                    <Route path="/scenario-config" element={<ScenarioConfigOverview />} />
+                    <Route path="/scenariomanagement" element={<ScenarioManagement />} />
+
+
+
                 </>
             }
             {
@@ -97,12 +108,8 @@ const Routing = () => {
                     {/* adding routes which are accessible for every logged-in user with role staff */}
                     <Route path="/users" element={<UserOverview />} />
                     <Route path="/addusers" element={<AddMultipleUsers />} />
-                </>
-            }
-            {
-                currentUser?.admin &&
-                <>
-                    {/* adding routes which are accessible for every logged-in user with role admin */}
+                    <Route path="/courses" element={<CourseOverview />} />
+
                 </>
             }
         </Routes>

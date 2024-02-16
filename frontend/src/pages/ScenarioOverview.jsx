@@ -1,180 +1,189 @@
 import {
-    AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay,
-    Box,
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink, Button,
-    Container, Flex,
-    Heading, IconButton, Spinner,
-    Table,
-    TableContainer,
-    Tbody,
-    Td,
-    Th,
-    Thead,
-    Tr, useDisclosure, useToast,
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Button,
+  Container,
+  Flex,
+  Heading, Input,
+  Spinner,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr, useDisclosure,
 } from "@chakra-ui/react";
-import {HiChevronRight, HiOutlineTrash} from "react-icons/hi";
-import {useEffect, useRef, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {getCookie} from "../utils/utils";
+import { HiChevronRight } from "react-icons/hi";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthProvider";
+import { useContext } from "react";
+
 
 const ScenarioOverview = () => {
-    const [scenarios, setScenarios] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+  window.modalCheck = 0;
+  const [scenarios, setScenarios] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-    const [selectedScenario, setSelectedScenario] = useState({});
+  window.value = 10;
 
-    const { isOpen: isDeleteOpen , onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
-    const cancelRef = useRef();
 
-    const toast = useToast()
-    const navigate = useNavigate();
 
-    const fetchScenarios = async () => {
-        setIsLoading(true)
-        const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-overview`, {
-            method: 'GET',
-            credentials: 'include',
+
+  const fetchCourseScenarios = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/courses/user-scenarios`,
+          {
+            method: "GET",
+            credentials: "include",
+          });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return [];
+    }
+  };
+
+
+const fetchScenarios = async () => {
+  setIsLoading(true);
+
+  if (currentUser?.admin || currentUser?.creator) {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_DJANGO_HOST}/api/template-overview`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      const fetchedScenarios = await res.json();
+
+      setScenarios(fetchedScenarios);
+      if ("error" in fetchedScenarios) {
+        return;
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  } else {
+    try {
+      const scenarios = await fetchCourseScenarios();
+      const scenarioIds = scenarios.map(scenario => scenario.id);
+
+      const fetchRequests = scenarioIds.map(scenarioId =>
+        fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-overview/${scenarioId}`, {
+          method: "GET",
+          credentials: "include",
         })
-        const scens = await res.json();
-        setScenarios(scens)
-        if ('error' in scens) {
-            return
+      );
+
+      const responses = await Promise.all(fetchRequests);
+      const fetchedScenarios = await Promise.all(responses.map(response => response.json()));
+
+      const uniqueFetchedScenarios = fetchedScenarios.reduce((accumulator, currentScenario) => {
+        const isDuplicate = accumulator.some(scenario => scenario.id === currentScenario.id);
+        if (!isDuplicate) {
+          accumulator.push(currentScenario);
         }
-        setIsLoading(false)
-    };
+        return accumulator;
+      }, []);
 
-    const deleteScenario = async (scenario) => {
-        try {
-            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/template-scenario/${scenario.id}`, {
-                method: 'DELETE',
-                credentials: 'include',
-                headers: {
-                    "X-CSRFToken": getCookie("csrftoken")
-                }
-            })
-            await res.json();
-            await fetchScenarios();
-            toast({
-                title: `${scenario.name} has been deleted`,
-                status: 'success',
-                duration: 5000,
-            });
-        } catch (e) {
-            toast({
-                title: `Could not delete ${scenario.name}`,
-                status: 'error',
-                duration: 5000,
-            });
-            console.log(e);
+      const updatedScenarios = scenarios.map(scenario => {
+        const matchingScenario = uniqueFetchedScenarios.find(fetchedScenario => fetchedScenario.id === scenario.id);
+        if (matchingScenario) {
+          return { ...scenario, tries: matchingScenario.tries, max_score: matchingScenario.max_score };
         }
-    };
+        return scenario;
+      });
 
-    useEffect(() => {
-        fetchScenarios();
-    }, []);
+      setScenarios(updatedScenarios);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  }
+};
 
-    return (
-        <>
-            <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-                <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href=''>Scenarios</BreadcrumbLink>
-                    </BreadcrumbItem>
-                </Breadcrumb>
-                <Heading>Scenarios</Heading>
-                <Box h={5}></Box>
-                <Box backgroundColor="white" borderRadius="2xl" >
-                    <Container maxW='6xl' pt={10} minH="70vh" maxH="70vh" h="full" pb={10}>
-                        {
-                            isLoading ?
-                                <Flex w="full" justifyContent="center" alignItems="center">
-                                    <Spinner size='xl'/>
-                                </Flex>
-                                :
-                                <TableContainer overflowY="auto" h="full">
-                                    <Table variant='simple' size="lg">
-                                        <Thead>
-                                            <Tr>
-                                                <Th color="gray.400">Scenario ID</Th>
-                                                <Th color="gray.400">Scenario Name</Th>
-                                                <Th color="gray.400">Tries</Th>
-                                                <Th color="gray.400">Best Score</Th>
-                                                <Th color="gray.400">Actions</Th>
 
-                                            </Tr>
-                                        </Thead>
-                                        <Tbody>
-                                            {scenarios.map((scenario, index) => {
-                                                return <Tr key={index}>
-                                                    <Td fontWeight="500">{scenario.id}</Td>
-                                                    <Td fontWeight="500">
-                                                        <Button variant="link" color="black" onClick={() => {
-                                                            navigate(`${scenario.id}`, {state: scenario})
-                                                        }}
-                                                        >{scenario.name}</Button>
-                                                    </Td>
-                                                    <Td fontWeight="500">{scenario.tries}</Td>
-                                                    <Td fontWeight="500">{scenario.max_score}</Td>
-                                                    <Td fontWeight="500">
-                                                        <IconButton
-                                                            variant='ghost'
-                                                            colorScheme='black'
-                                                            aria-label='Delete scenario'
-                                                            fontSize='20px'
-                                                            icon={<HiOutlineTrash/>}
-                                                            onClick={() => {
-                                                                onDeleteOpen()
-                                                                setSelectedScenario(scenario)
-                                                            }
-                                                            }
-                                                        />
-                                                    </Td>
-                                                </Tr>
-                                            })}
-                                        </Tbody>
-                                    </Table>
-                                </TableContainer>
-                        }
-                    </Container>
-                </Box>
-            </Flex>
+  useEffect(() => {
+    console.log(window.value)
+    fetchScenarios();
+  }, []);
 
-            {/*Delete scenario alert pop up*/}
-            <AlertDialog
-                isOpen={isDeleteOpen}
-                leastDestructiveRef={cancelRef}
-                onClose={onDeleteClose}
-                isCentered
-                motionPreset='slideInBottom'
-            >
-                <AlertDialogOverlay>
-                    <AlertDialogContent>
-                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                            Delete scenario
-                        </AlertDialogHeader>
-
-                        <AlertDialogBody>
-                            Are you sure that you want to delete {selectedScenario.name}? You can't undo this action afterwards.
-                        </AlertDialogBody>
-
-                        <AlertDialogFooter>
-                            <Button ref={cancelRef} onClick={onDeleteClose}>
-                                Cancel
+  return (
+    <>
+      <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
+        <Breadcrumb
+          spacing="8px"
+          separator={<HiChevronRight color="gray.500" />}
+        >
+          <BreadcrumbItem>
+            <BreadcrumbLink href="">Scenarios</BreadcrumbLink>
+          </BreadcrumbItem>
+        </Breadcrumb>
+        <Heading>Scenarios</Heading>
+        <Box h={5}></Box>
+        <Box backgroundColor="white" borderRadius="2xl">
+          <Container
+            maxW="6xl"
+            pt={10}
+            minH="70vh"
+            maxH="70vh"
+            h="full"
+            pb={10}
+          >
+            {isLoading ? (
+              <Flex w="full" justifyContent="center" alignItems="center">
+                <Spinner size="xl" />
+              </Flex>
+            ) : (
+              <TableContainer overflowY="auto" h="full">
+                <Table variant="simple" size="lg">
+                  <Thead>
+                    <Tr>
+                      <Th color="gray.400">Scenario ID</Th>
+                      <Th color="gray.400">Scenario Name</Th>
+                      <Th color="gray.400">Tries</Th>
+                      <Th color="gray.400">Best Score</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {scenarios.map((scenario, index) => {
+                      return (
+                        <Tr key={index}>
+                          <Td fontWeight="500">{scenario.id}</Td>
+                          <Td fontWeight="500">
+                            <Button
+                              variant="link"
+                              color="black"
+                              onClick={() => {
+                                navigate(`${scenario.id}`, { state: scenario });
+                              }}
+                            >
+                              {scenario.name}
                             </Button>
-                            <Button colorScheme='red' onClick={() => {
-                                deleteScenario(selectedScenario)
-                                onDeleteClose()
-                            }} ml={3}>
-                                Delete
-                            </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
-        </>
-    )
+                          </Td>
+                          <Td fontWeight="500">{scenario.tries}</Td>
+                          <Td fontWeight="500">{scenario.max_score}</Td>
+                        </Tr>
+                      );
+                    })}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            )}
+          </Container>
+        </Box>
+      </Flex>
+    </>
+  );
 };
 
 export default ScenarioOverview;

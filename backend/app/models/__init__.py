@@ -8,3 +8,4 @@
 # # from .action_model import Action
 # from .management_goal_model import ManagementGoal
 # from .template_scenario_model import TemplateScenario
+from app.models.course import Course

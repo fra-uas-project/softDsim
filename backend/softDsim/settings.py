@@ -15,6 +15,7 @@ import os
 import environ
 from config import get_config
 import logging.config
+from django.apps import AppConfig
 
 
 configuration = get_config()
@@ -38,7 +39,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*", "10.23.22.141"]
 
 
 # Application definition
@@ -116,9 +117,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator", },
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator", },
 ]
 
 
@@ -171,8 +172,8 @@ LOGGING = {
             "datefmt": "%d.%m %H:%M:%S",
         },
     },
-    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "stdlog"},},
-    "root": {"handlers": ["console"], "level": configuration.logging_level,},
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "stdlog"}, },
+    "root": {"handlers": ["console"], "level": configuration.logging_level, },
 }
 
 REST_FRAMEWORK = {
@@ -202,4 +203,3 @@ if configuration.server:
     SESSION_COOKIE_SAMESITE = 'None'
 
 # Needed for post requests
-

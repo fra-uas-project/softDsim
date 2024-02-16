@@ -10,14 +10,17 @@ from custom_user.models import User
 
 
 class UserScenario(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True)
     config = models.ForeignKey(
         ScenarioConfig, on_delete=models.SET_NULL, null=True, blank=True
     )
     model = models.CharField(max_length=16, null=True, blank=True)
-    template = models.ForeignKey(TemplateScenario, on_delete=models.SET_NULL, null=True)
+    template = models.ForeignKey(
+        TemplateScenario, on_delete=models.SET_NULL, null=True)
     question_points = models.IntegerField(default=0, blank=True, null=True)
     ended = models.BooleanField(default=False)
+    start_datetime = models.DateTimeField(default=None, blank=True, null=True)
     # team = app.models.team.Team
     # state = State
 
@@ -27,7 +30,8 @@ class UserScenario(models.Model):
             return ManagementGoalDTO(
                 budget=mgoal.budget,
                 duration=mgoal.duration,
-                tasks=sum((mgoal.easy_tasks, mgoal.medium_tasks, mgoal.hard_tasks)),
+                tasks=sum(
+                    (mgoal.easy_tasks, mgoal.medium_tasks, mgoal.hard_tasks)),
             )
         except Exception as e:
             logging.error(e)

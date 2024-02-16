@@ -20,6 +20,11 @@ const Login = () => {
 
     // handle login click
     async function handleLogin() {
+
+        if (!privacyPolicyAccepted) {
+            return;
+        }
+
         setLogInSuccess('attempting')
         const csrftoken = getCookie('csrftoken')
         if (csrftoken === undefined) {
@@ -145,12 +150,17 @@ const Login = () => {
                     </Flex>
                     {/* Privacy Policy checkbox */}
                     <Flex align="center" justify="center" my={5}>
-                        <Checkbox onChange={(event) => handlePrivacyClicked(event)}>
-                            <Flex gap={2}>
-                                <Text>I accept the </Text>
-                                <Text color="blue"><Link to={{ pathname: "/gdpr" }}>Privacy Policy</Link></Text>
-                            </Flex>
-                        </Checkbox>
+                        <Checkbox
+  onChange={(event) => handlePrivacyClicked(event)}
+  isChecked={privacyPolicyAccepted} // Add isChecked prop
+>
+  <Flex gap={2}>
+    <Text>I accept the </Text>
+    <Text color="blue">
+      <Link to={{ pathname: "/gdpr" }}>Privacy Policy</Link>
+    </Text>
+  </Flex>
+</Checkbox>
                     </Flex>
                     {/* login button */}
                     <Button rightIcon={<HiOutlineLogin />} isLoading={logInSuccess === 'attempting' ? true : false}

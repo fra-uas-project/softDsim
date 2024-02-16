@@ -1,13 +1,14 @@
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
+from custom_user.models import User
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app.cache.scenario import CachedScenario
-from app.decorators.decorators import allowed_roles
+from app.decorators.decorators import allowed_roles, has_access_to_scenario
 from app.exceptions import (
     SimulationException,
     RequestTypeException,
@@ -26,24 +27,31 @@ from app.serializers.team import MemberSerializer
 from app.serializers.user_scenario import UserScenarioSerializer
 from app.src.simulation import continue_simulation
 from app.src.util.scenario_util import create_correct_request_model
+from datetime import datetime, timezone
 
 
 class StartUserScenarioView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @allowed_roles(["student"])
+    @has_access_to_scenario("template-id", True)
     def post(self, request):
         template_id = request.data.get("template-id")
         config_id = request.data.get("config-id")
 
+        template: TemplateScenario = None
+        config: ScenarioConfig = None
+
         try:
             template = TemplateScenario.objects.get(id=template_id)
+
         except ObjectDoesNotExist:
             msg = f"'{template_id}' is not a valid template-scenario id. Must provide attribute 'template-id'."
             logging.error(msg)
             return Response(
                 {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
             )
+
         try:
             config = ScenarioConfig.objects.get(id=config_id)
         except ObjectDoesNotExist:
@@ -58,6 +66,7 @@ class StartUserScenarioView(APIView):
             user_scenario = UserScenario(
                 user=request.user, template=template, config=config,
             )
+            user_scenario.start_datetime = datetime.now(timezone.utc)
             user_scenario.save()
 
             # Create ScenarioState

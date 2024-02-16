@@ -17,6 +17,7 @@ class ScenarioConfigView(APIView):
     def post(self, request):
         serializer = ScenarioConfigSerializer(data=request.data)
         if serializer.is_valid():
+            serializer.validated_data['id'] = 1
             serializer.save()
             return Response(
                 {"status": "success", "data": serializer.data},
